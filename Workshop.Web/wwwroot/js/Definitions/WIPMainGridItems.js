@@ -456,7 +456,7 @@ $(function () {
         allowColumnReordering: true,
         allowColumnResizing: true,
         columnAutoWidth: false,
-        columnMinWidth: 60,
+        columnMinWidth: 50,
         wordWrapEnabled: false,
         hoverStateEnabled: true,
         paging: {
