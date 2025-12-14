@@ -1020,19 +1020,19 @@ function saveData() {
         dataType: 'json',
         data: model
     }).done(function (result) {
-        console.log("Edit_Post result:", result);
+        //console.log("Edit_Post result:", result);
 
-        if (result && result.success && result.wipId) {
-            Swal.fire("Success", "WIP " + WIPId + " Saved Successfully!").then(() => {
-                window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-            });
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Save Failed",
-                text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
-            });
-        }
+        //if (result && result.success && result.wipId) {
+        //    Swal.fire("Success", "WIP " + WIPId + " Saved Successfully!").then(() => {
+        //        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+        //    });
+        //} else {
+        //    Swal.fire({
+        //        icon: "error",
+        //        title: "Save Failed",
+        //        text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
+        //    });
+        //}
 
     });
 
