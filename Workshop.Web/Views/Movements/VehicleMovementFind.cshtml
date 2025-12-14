@@ -1,0 +1,826 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@using Workshop.Web.Interfaces.Services
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@inject IFileService FileService
+@model Workshop.Core.DTOs.Vehicle.VehicleMovement;
+
+@{
+    ViewBag.Title = Common["Button_Details"];
+
+    // Hero image (first uploaded document; fallback to placeholder)
+    var heroImgSrc = (Model?.VehicleMovementDocuments != null && Model.VehicleMovementDocuments.Any())
+        ? Url.Action("GetImage", "Base", new { Name = Model.VehicleMovementDocuments.First().FileName, D = 3, BasePath = Model.VehicleMovementDocuments.First().FilePath })
+        : Url.Content("~/images/vehicle-placeholder.png");
+}
+
+<style>
+    /* ====== Scoped to .the-movements ====== */
+    .the-movements * {
+        box-sizing: border-box;
+    }
+
+    .the-movements .panel {
+        border: 0;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 6px 18px rgba(20,20,40,.08);
+    }
+
+    .the-movements .panel-hdr {
+        border-bottom: 1px solid rgba(0,0,0,.06);
+        padding: 1rem 1.25rem;
+    }
+
+        .the-movements .panel-hdr h2 {
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+    .the-movements .panel-content {
+        padding: 1.25rem;
+    }
+
+    .the-movements fieldset {
+        border: 2px dashed var(--theme-primary-50);
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .the-movements legend {
+        color: var(--theme-primary);
+        font-weight: 800;
+        padding: 0 .5rem;
+        letter-spacing: .2px;
+    }
+
+    .the-movements .select2-dropdown,
+    .the-movements .select2-dropdown--above {
+        z-index: 999999999999 !important;
+    }
+
+    .the-movements .btn-w-m {
+        min-width: 150px;
+    }
+
+    .the-movements table.table {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .the-movements table.table thead th {
+            background: linear-gradient(180deg, #f7f7fb 0%, #eef0ff 100%);
+            border-bottom: 0;
+            color: #344054;
+            font-weight: 700;
+            font-size: .95rem;
+        }
+
+        .the-movements table.table tbody td {
+            vertical-align: middle;
+        }
+
+    /* ==== Vehicle hero – premium header (bigger car image + button-style status) ==== */
+    .the-movements .vehicle-hero__card {
+        background: radial-gradient(120% 120% at 0% 0%, #f7f7fd 0%, #ffffff 52%) no-repeat #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(23,23,40,.07);
+        padding: 22px 24px;
+    }
+
+    .the-movements .vehicle-hero__grid {
+        display: grid;
+        grid-template-columns: 260px 1fr 240px; /* bigger left column for the image */
+        gap: 24px;
+        align-items: stretch;
+    }
+
+    @@media (max-width: 1200px) {
+        .the-movements .vehicle-hero__grid {
+            grid-template-columns: 220px 1fr 220px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .the-movements .vehicle-hero__grid {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "icon"
+                "facts"
+                "status";
+        }
+
+        .the-movements .vehicle-hero__icon {
+            grid-area: icon;
+        }
+
+        .the-movements .vehicle-hero__facts {
+            grid-area: facts;
+        }
+
+        .the-movements .vehicle-hero__status {
+            grid-area: status;
+        }
+    }
+
+    .the-movements .vehicle-hero__icon {
+        background: #ffffff;
+        border: 1px solid #eef0f6;
+        border-radius: 18px;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 2px rgba(16,24,40,.06);
+    }
+
+    .the-movements .vehicle-hero__photo {
+        width: 100%;
+        height: 180px; /* taller visual */
+        object-fit: cover;
+        border-radius: 14px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .the-movements .vehicle-hero__facts {
+        padding: 6px 4px 8px 4px;
+    }
+
+    .the-movements .vehicle-hero__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 18px;
+        margin-bottom: 10px;
+    }
+
+    @@media (max-width: 576px) {
+        .the-movements .vehicle-hero__row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .the-movements .vehicle-hero__label {
+        font-size: .78rem;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        color: #667085;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .the-movements .vehicle-hero__value {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #5b3ec8;
+    }
+
+    .the-movements .vehicle-hero__fact {
+        background: #fff;
+        border: 1px solid #eef0f6;
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 2px rgba(16,24,40,.04);
+    }
+
+    .the-movements .vehicle-hero__meta {
+        display: grid;
+        gap: 8px 14px;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        margin: 10px 0 6px;
+    }
+
+    @@media (max-width: 576px) {
+        .the-movements .vehicle-hero__meta {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .the-movements .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fcfcff;
+        border: 1px dashed #e5e7f3;
+        padding: 9px 12px;
+        border-radius: 12px;
+    }
+
+        .the-movements .meta-item i {
+            font-size: 1rem;
+            color: #7c8aa6;
+        }
+
+        .the-movements .meta-item span {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .the-movements .meta-item b {
+            margin-left: auto;
+            color: #111827;
+            font-weight: 800;
+            font-size: .95rem;
+        }
+
+    .the-movements .vehicle-hero__notes {
+        margin-top: 12px;
+    }
+
+    .the-movements .vehicle-hero__notes-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #4b5563;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .the-movements .vehicle-hero__notes p {
+        margin: 0;
+        color: #334155;
+        background: #fff;
+        border: 1px solid #eef0f6;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+    /* Top-right status = button-style tile */
+    .the-movements .vehicle-hero__status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .the-movements .status-button {
+        width: 100%;
+        border: 0;
+        background: #fff;
+        cursor: pointer;
+        border-radius: 18px;
+        padding: 16px 14px;
+        box-shadow: 0 8px 22px rgba(17,24,39,.07);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .the-movements .status-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(17,24,39,.10);
+        }
+
+    .the-movements .status-button__icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f4ff;
+        margin-bottom: 10px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+        .the-movements .status-button__icon img {
+            width: 40px;
+            height: 40px;
+            opacity: .95;
+        }
+
+    .the-movements .status-button__label {
+        font-weight: 900;
+        color: #0f172a;
+        letter-spacing: .2px;
+        margin-bottom: 10px;
+    }
+
+    .the-movements .status-button__chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid #e6e9f2;
+        font-weight: 700;
+        color: #111827;
+        font-size: .85rem;
+    }
+
+        .the-movements .status-button__chip .chip__dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(180deg,#34d399,#059669);
+            box-shadow: 0 0 0 3px rgba(52,211,153,.15);
+        }
+
+    /* Scratches canvas (unchanged) */
+    .the-movements .lc-picker, .the-movements .lc-options {
+        display: none
+    }
+
+    .the-movements .mark-scratces-section #panel,
+    .the-movements .mark-scratces-section #panel-edit,
+    .the-movements #panel-canvas {
+        position: relative;
+        width: 100%;
+        max-width: 1000px;
+        height: 500px;
+        margin: 0 auto;
+        border: 1px solid #ced4da;
+        border-radius: 12px;
+        background: #f8fafc;
+        background-image: url('../images/tajeer-car-assets/tajeer-car.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding: 45px;
+        background-origin: content-box;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    .the-movements .mark-scratces-section .shape {
+        position: absolute;
+        z-index: 9;
+    }
+
+    .the-movements #deep-scratch,
+    .the-movements #small-scratch,
+    .the-movements #very-deep-scratch,
+    .the-movements #bend-in-body {
+        width: 34px;
+        height: 34px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: grab;
+    }
+
+    .the-movements #deep-scratch {
+        background-image: url('../../images/tajeer-car-assets/DeepScratch.png');
+    }
+
+    .the-movements #small-scratch {
+        background-image: url('../../images/tajeer-car-assets/MinorScratch.png');
+    }
+
+    .the-movements #very-deep-scratch {
+        background-image: url('../../images/tajeer-car-assets/VeryDeepScratch.png');
+    }
+
+    .the-movements #bend-in-body {
+        background-image: url('../../images/tajeer-car-assets/CurvatureStructure.png');
+    }
+</style>
+
+<input type="hidden" id="GettingVehicleId" value="@Model.VehicleID" />
+<input type="hidden" id="strikes" value="" />
+
+@{
+    var count = 0;
+}
+
+<div class="the-movements">
+    <div class="row">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-weight-bold">
+                        @(Model.MovementIN == true ? Common["Label_MovementIn"] : Common["Label_MovementOut"])
+                    </h2>
+                    <div class="panel-toolbar"></div>
+                </div>
+
+                <div class="panel-container show">
+                    <div class="panel-content">
+
+                        @Html.HiddenFor(a => a.Id)
+                        @Html.HiddenFor(a => a.VehicleID)
+                        @Html.HiddenFor(model => model.ImagesFilePath)
+                        @Html.HiddenFor(model => model.IsExternal)
+
+                        <input type="hidden" id="VehicleOdoMeter" name="VehicleOdoMeter" />
+
+                        <!-- ===== Vehicle Header / Hero (bigger car image + button-style status) ===== -->
+                        <div class="vehicle-hero">
+                            <div class="vehicle-hero__card">
+                                <div class="vehicle-hero__grid">
+                                    <!-- Big vehicle image -->
+                                    <div class="vehicle-hero__icon">
+                                        <img class="vehicle-hero__photo" src="@heroImgSrc" alt="vehicle" />
+                                    </div>
+
+                                    <!-- Facts -->
+                                    <div class="vehicle-hero__facts">
+                                        <div class="vehicle-hero__row">
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_VehicleClass"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehicleClass"></label></div>
+                                            </div>
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_Manufacturer"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehicleManufacturer"></label></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="vehicle-hero__row">
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_PlateNumber"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehiclePlateNo"></label></div>
+                                            </div>
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_Model"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehicleModel"></label></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="vehicle-hero__meta">
+                                            <div class="meta-item"><i class="fal fa-calendar"></i><span>@Common["Label_MovementDate"]</span><b>@Model.GregorianMovementDate.Value.ToString("yyyy-MM-dd")</b></div>
+                                            @if (Model.LastMaintenanceDate != null)
+                                            {
+                                                <div class="meta-item"><i class="fal fa-calendar-check"></i><span>@Common["Label_LastMaintenance"]</span><b>@((Convert.ToDateTime(Model.LastMaintenanceDate)).ToString("yyyy-MM-dd"))</b></div>
+                                            }
+                                            @if (Model.MovementIN == true)
+                                            {
+                                                <div class="meta-item"><i class="fal fa-clock"></i><span>@Common["Label_ReceivedTime"]</span><b>@Model.ReceivedTime</b></div>
+                                                <div class="meta-item"><i class="fal fa-tachometer"></i><span>@Common["Label_ReceivedMeter"]</span><b>@Model.ReceivedMeter Km</b></div>
+                                            }
+                                            else
+                                            {
+                                                <div class="meta-item"><i class="fal fa-clock"></i><span>@Common["Label_ExitTime"]</span><b>@Model.ExitTime</b></div>
+                                                <div class="meta-item"><i class="fal fa-tachometer"></i><span>@Common["Label_ExitMeter"]</span><b>@Model.ExitMeter Km</b></div>
+                                            }
+                                            <div class="meta-item"><i class="fal fa-user-alt"></i><span>@Common["Label_Driver"]</span><b>@Model.ResivedDriverId</b></div>
+                                        </div>
+
+                                        <div class="vehicle-hero__notes">
+                                            <div class="vehicle-hero__notes-label"><i class="fal fa-sticky-note"></i>@Common["Label_Notes"]</div>
+                                            <p>@Model.Note</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status as button-style tile -->
+                                    <div class="vehicle-hero__status">
+                                        <button type="button" class="status-button" title="@((bool)Model.IsRegularMaintenance ? Common["Label_RegularMaintenance"] : Common["Label_Insurance"])">
+                                            <div class="status-button__icon">
+                                                @if ((bool)Model.IsRegularMaintenance)
+                                                {
+                                                    <img src="~/images/maintenance1.png" alt="">
+                                                }
+                                                else
+                                                {
+                                                    <img src="~/images/insurance1.png" alt="">
+                                                }
+                                            </div>
+                                            <div class="status-button__label">
+                                                @if ((bool)Model.IsRegularMaintenance)
+                                                {
+                                                    @Common["Label_RegularMaintenance"]
+                                                }
+                                                else
+                                                {
+
+                                                    @Common["Label_Insurance"]
+                                                }
+                                            </div>
+                                            <div class="status-button__chip">
+                                                <span class="chip__dot"></span>
+                                                <span class="chip__text">@((bool)Model.IsRegularMaintenance ? Common["Label_Active"] : Common["Label_Insured"])</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ===== End Vehicle Header / Hero ===== -->
+                        <!-- Removed bottom vehicle image/gallery. Keep a small right column for fuel meter only. -->
+                        <div class="row mt-3">
+                            <div class="col-lg-9"></div>
+                            <div class="col-lg-3">
+                                <div class="form-group mt-3 mt-lg-0">
+                                    <div id="fuelMeterDiv"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- maintenance & invoice -->
+                        <div class="row mt-3">
+                            <div class="@(Model.MovementInvoice.Count > 0 ? "col-lg-6" : "col-lg-12") col-md-12">
+                                <fieldset>
+                                    <legend>@Common["Label_MaintenanceTypes"]</legend>
+                                    <div id="MaintenanacePart">
+                                        <div id="MaintenanceCard">
+                                            <table class="table table-bordered table-hover w-100 text-center" id="tblMainteneance">
+                                                <thead>
+                                                    <tr>
+                                                        <th>@Common["Button_Details"]</th>
+                                                        <th>@Common["Label_WorkOrder"] / @Common["Label_AccidentNo"]</th>
+                                                        <th>@Common["Label_Description"]</th>
+                                                        <th>@Common["Label_MaintenanceTypes"]</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tblData">
+                                                    @foreach (var item in Model.ColMaintenanceCard)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @{
+                                                                    var woId = item.WorkOrderId ?? Model.WorkOrders.FirstOrDefault()?.Id;
+                                                                }
+                                                                <a href="@Url.Action("Index", "WorkOrder", new { openId = woId })">
+                                                                    @woId
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <select id="WorkOrderId_@count" class="form-control select2" disabled>
+                                                                    @if (item.WorkOrderId == null && Model.WorkOrders.Any())
+                                                                    {
+                                                                        foreach (var workOrder in Model.WorkOrders)
+                                                                        {
+                                                                            <option value="@workOrder.Id" selected>@workOrder.WorkOrderTitle</option>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="">@Common["Label_Select"]</option>
+                                                                        foreach (var workOrder in Model.WorkOrders)
+                                                                        {
+                                                                            if (workOrder.Id == item.WorkOrderId)
+                                                                            {
+                                                                                <option value="@workOrder.Id" selected>@workOrder.WorkOrderTitle</option>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <option value="@workOrder.Id">@workOrder.WorkOrderTitle</option>
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </td>
+
+                                                            <td><textarea class="form-control" rows="3" disabled>@Model.WorkOrders.FirstOrDefault().Description</textarea></td>
+
+
+                                                            <td>
+                                                                <div class="custom-control custom-switch custom-control-inline my-1">
+                                                                    @if (item.status.HasValue && item.status.Value)
+                                                                    {
+                                                                        <input type="checkbox" checked disabled class="custom-control-input" id="@count" name="MainteneanceStatus_@count" value="@item.status" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled class="custom-control-input" id="@count" name="MainteneanceStatus_@count" value="@item.status" />
+                                                                    }
+                                                                    <label class="custom-control-label align-middle" for="@count">@Common["Label_IsFix"]</label>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            @if (Model.MovementInvoice.Count > 0)
+                            {
+                                <div class="col-lg-6 col-md-12">
+                                    <fieldset class="text-start">
+                                        <legend>@Common["Label_InvoiceDetails"]</legend>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>@Common["Label_YourUploadedFile"]</label>
+                                                <input type="file" class="movementDocument" id="dd" multiple>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>@Common["Label_InvoiceNo"]</label>
+                                                    <input id="InvoiceNo" value="@Model.MovementInvoice[0].InvoiceNo" class="form-control" disabled>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@Common["Label_PartsCost"]</label>
+                                                    <input id="PartsCost" value="@Model.MovementInvoice[0].PartsCost" class="form-control" disabled>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@Common["Label_LaborCost"]</label>
+                                                    <input id="LaborCost" value="@Model.MovementInvoice[0].LaborCost" class="form-control" disabled>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@Common["Label_Vat"]</label>
+                                                    <input id="Vat" value="@Model.MovementInvoice[0].Vat" class="form-control" disabled>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@Common["Label_TotalInvoice"]</label>
+                                                    <input id="TotalInvoice" value="@Model.MovementInvoice[0].TotalInvoice" class="form-control" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- scratches -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <fieldset class="text-start">
+                                    <div class="row mark-scratces-section">
+                                        <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 border-left mx-auto">
+                                            <div class="text-center">
+                                                <button type="button" class="btn btn-outline-primary btn-sm btn-w-m" id="DeepScratch-btn" disabled><img src="~/images/tajeer-car-assets/DeepScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_DeepScratch"]</button>
+                                                <button type="button" class="btn btn-outline-warning btn-sm btn-w-m" id="SmallScratch-btn" disabled><img src="~/images/tajeer-car-assets/MinorScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_SmallScratch"]</button>
+                                                <button type="button" class="btn btn-outline-danger btn-sm btn-w-m" id="VeryDeepScratch-btn" disabled><img src="~/images/tajeer-car-assets/VeryDeepScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_VeryDeepScratch"]</button>
+                                                <button type="button" class="btn btn-outline-brown btn-sm btn-w-m" id="BendInBody-btn" disabled><img src="~/images/tajeer-car-assets/CurvatureStructure.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_BendInBody"]</button>
+                                            </div>
+
+                                            <div class="scratches-container">
+                                                <div id="panel" class="mt-3"></div>
+                                            </div>
+
+                                            <div class="text-center mt-3">
+                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button"><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
+                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button"><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
+                                            </div>
+                                            <div id="coordinates" class="d-none"></div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        @if (Model.MaintenanceStatus != 3 || Model.MaintenanceStatus == null)
+                        {
+                            <div class="text-center mt-2">
+                                @if (Model.LastMovementDetails.MovementIN.HasValue)
+                                {
+                                    if (true && Model.IsExternal == false)
+                                    {
+                                        @* <button class="btn btn-primary btn-w-m" data-toggle="modal" data-target="#Compare" data-added="0">
+                                            <i class="fa fa-balance-scale-right"></i>&nbsp; @Common["Label_Compare"]
+                                        </button>
+                                        <button class="btn btn-primary btn-w-m" data-toggle="modal" data-target="#Transfer" data-added="0">
+                                            <i class="fa fa-globe-europe"></i>&nbsp; @Common["Label_TransferVehicle"]
+                                        </button> *@
+                                    }
+                                    if (true && Model.LastMovementDetails.HasWorkorder == 0)
+                                    {
+                                        <a href="@Url.Action("CreateJobCard", "WIP", new { movementId = Model.MovementId })" class="btn btn-success btn-w-m"><i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateJobCard"]</a>
+                                    }
+                                    if (true)
+                                    {
+                                        <a class="btn btn-warning add-record btn-w-m" href="@Url.Action("MovementOut", "MovementOut", new { MovementId = Model.MovementId })">
+                                            <i class="fal fa-exchange-alt"></i> @Common["Label_MovementOut"]
+                                        </a>
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compare Modal -->
+    <div id="Compare" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-transparent modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="text-white">@Common["Label_WorkshopServicesComparison"]</h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @{
+                        await Html.RenderPartialAsync("WorkshopServicesComparison", new Workshop.Core.DTOs.WorkshopMovement.WorckshopPriceTable());
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.LastMovementDetails.MovementIN.HasValue)
+    {
+        <div id="Transfer" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-transparent modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="text-white">@Common["Label_TransferVehicle"]</h4>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @{
+                            // await Html.RenderPartialAsync("TransferMovement", Model);
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="MoveOut" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-transparent modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="text-white">@Common["Label_MoveOut"]</h4>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body"></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    $(document).ready(function () {
+        if ($("#GettingVehicleId").val() > 0) {
+            GetVehicleData();
+        }
+        $(".lc-picker-contents div:nth-child(8)").trigger("click");
+    });
+
+    function GetVehicleData() {
+        var type = '@Model.IsExternal' == 'True' ? 2 : 1;
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetDetails", "VehicleDefinition")" + '?id=' + $("#GettingVehicleId").val() + "&Type=" + type,
+            dataType: "JSON",
+            success: function (Data) {
+                $("#VehicleManufacturer").text(Data.RefManufacturers.ManufacturerPrimaryName);
+                $("#VehicleClass").text(Data.RefVehicleClasses.VehicleClassPrimaryName);
+                $("#VehiclePlateNo").text(Data.PlateNumber);
+                $("#VehicleModel").text(Data.RefVehicleModels.VehicleModelPrimaryName);
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetStrike", "Movements")" + '?MovementId=' + @Model.MovementId,
+            dataType: "JSON",
+            success: function (Data) {
+                if (Data != "") {
+                    let jsonObject = JSON.parse(Data);
+                    for (var i = 0; i < jsonObject.length; i++) {
+                        var shapetype = jsonObject[i].type;
+                        var xcoord = jsonObject[i].x + 35;
+                        var ycoord = jsonObject[i].y + 23;
+                        var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
+                        $shape.css({ 'left': xcoord - 2, 'top': ycoord - 2 });
+                        $("#panel").append($shape);
+                    }
+                }
+            }
+        });
+    }
+
+    var cuspond;
+    var validCusPhoto = true;
+
+    $(document).ready(function () {
+        var inputElement = document.querySelector('.movementDocument');
+        var file = {};
+        var files = [];
+        file.files = files;
+
+        @foreach (var item in Model.MovementInvoice)
+        {
+                        <text>
+                            var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
+                            var fi = { "source": source, options: { type: 'local' } };
+                            file.files.push(fi);
+                        </text>
+        }
+
+        cuspond = FilePond.create(inputElement, {
+            imageCropAspectRatio: '1:1',
+            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/PNG', 'application/pdf'],
+            maxFileSize: fileSizeAllowed + fileSizeUnit,
+            fileMetadataObject: {
+                'markup': [[ 'rect', { left:0, right:0, bottom:0, height:'60px', backgroundColor:'rgba(0,0,0,.5)' } ]]
+            },
+            allowMultiple: true,
+            files: files,
+            server: {
+                load: (uniqueFileId, load) => { fetch(uniqueFileId).then(res => res.blob()).then(load); }
+            },
+            onactivatefile: function (file) {
+                var win = window.open(file.serverId);
+                win.focus();
+            }
+        });
+    });
+</script>

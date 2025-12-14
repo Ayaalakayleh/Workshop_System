@@ -1,0 +1,355 @@
+﻿@model Workshop.Core.DTOs.WIPDTO;
+@using Workshop.Domain.Enum;
+@using Newtonsoft.Json
+@using Workshop.Core.DTOs
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@{
+	var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+	// var lang = "en";
+	var WIPstatus = Model.Status;
+	ViewData["WIPstatus"] = WIPstatus;
+	ViewData["WIPId"] = Model.Id;
+}
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            @* @Html.HiddenFor(m => m.Id) *@
+            @Html.HiddenFor(m => m.VehicleId, new { Id="_vehicleId" }) 
+            @Html.HiddenFor(m => m.MovementId, new { Id = "_movementId" })
+			@Html.HiddenFor(m => m.PartsIssueId, new { Id = "_PartsIssueId" })
+			<input type="hidden" id="_DiscountPercentageLabor"  />
+            <input type="hidden" id="_DiscountPercentagePart"  />
+
+			<!-- header -->
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					<!-- tabs -->
+					<div class="row">
+						<ul class="nav nav-tabs mb-3 col-10" id="wipTabs" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabAccount" type="button" role="tab">
+									@Common["Label_Account"]
+								</button>
+							</li>
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabOptions" type="button" id="tabOptionsBTN">@Common["Label_Options"]</button></li>
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabOrder" type="button">@Common["Label_Order"]</button></li>
+							@* <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabCodes"  type="button">@Common["Label_Codes"]</button></li> *@
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabNotes" type="button">@Common["Label_Notes"]</button></li>
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabVehicle" type="button" id="tabVehicleBTN">@Common["Label_Vehicle"]</button></li>
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabService" type="button">@Common["Label_Service"]</button></li>
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabOperators" type="button">@Common["Label_Operators"]</button></li>
+							<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabHistory" type="button" id="tabHistoryBTN">@Common["Label_ServiceHistory"]</button></li>
+							<li class="nav-item" role="presentation" id="tabPartialAccountBTN">
+								<button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPartialAccount" type="button" role="tab" >
+									Partial Account
+								</button>
+							</li>
+							<li class="nav-item" role="presentation" id="tabInvoiceBTN">
+								<button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabWIPInvoice" type="button" role="tab" >
+									Invoice
+								</button>
+							</li>
+						</ul>
+
+						@if (ViewBag.IsWaitingInvoiced == true || ViewBag.IsWaitingInvoiced == "true")
+						{
+							<div class="col-1">
+								<button type="button" class="btn btn-secondary btn-sm" id="closeBTN">
+									<i class=""></i> Close
+								</button>
+							</div>
+						}
+					</div>
+					
+					<!-- tab-content -->
+					<div class="tab-content">
+						@await Html.PartialAsync("_Account", Model.AccountDetails)
+						@await Html.PartialAsync("_Options", Model.Options)
+						@await Html.PartialAsync("_Order")
+						@* @await Html.PartialAsync("_Codes") *@
+						@await Html.PartialAsync("_Notes")
+						@await Html.PartialAsync("_Vehicle", Model.VehicleTab)
+						@await Html.PartialAsync("_Service")
+						@await Html.PartialAsync("_Operators")
+						<div class="tab-pane fade" id="tabHistory" role="tabpanel">
+							@await Html.PartialAsync("_History", Model.History)
+						</div>
+						@await Html.PartialAsync("_AccountPartial", Model.AccountDetails)
+						<div class="tab-pane fade" id="tabWIPInvoice" role="tabpanel">
+							@await Html.PartialAsync("_Invoice", Model.InvoiceDetailsList)
+						</div>
+					</div>
+					<!-- /tab-content -->
+					<div class="row g-3">
+						<div class="col-lg-4 col-md-6 col-sm-12">
+							<label class="form-label">@Common["Label_WIPstatus"]</label>
+							<div class="d-flex flex-column">
+								@Html.DropDownListFor(m => m.Status, new SelectList(ViewBag.Status, "Value", "Text"), new { @class = "form-control", id = "statusId" })
+								@Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-6 col-sm-12">
+							<label>@Common["Label_Date"]</label>
+							<div class="d-flex flex-column">
+								@Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate" })
+								@Html.ValidationMessageFor(m => m.WipDate, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-6 col-sm-12">
+							<label>WIP No.</label>
+							<div class="d-flex flex-column">
+								@* @Html.LabelFor(model => model.Id) *@
+								@Html.TextBoxFor(m => m.Id, new { @class = "form-control", @readonly = "true" })
+
+							</div>
+						</div>
+					</div>
+
+					<div class="row mt-4">
+
+						<div class="col-xl-12 col-lg-7 col-md-12">
+							@await Html.PartialAsync("_LabourLines", Model.SCheduleList, new ViewDataDictionary(ViewData))
+							@await Html.PartialAsync("_PartsLines", new ViewDataDictionary(ViewData))
+						</div>
+
+                        <!-- totals -->
+                        <div class="col-xl-12 col-lg-5 col-md-12">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">@Common["Title_Totals"]</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>@Common["Label_Labour"]</span><strong id="totLabour" data-value="0"></strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>@Common["Label_Parts"]</span><strong id="totParts" data-value="0"></strong>
+                                    </div>
+                                    <hr class="my-2" />
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>@Common["Label_Subtotal"]</span><strong id="totSubtotal" data-value="0"></strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>@Common["Label_Vat"] (<span id="VatPercentage"></span>)</span><strong id="totVAT" data-value="0"></strong>
+                                    </div>
+                                    <hr class="my-2" />
+                                    <div class="d-flex justify-content-between">
+                                        <span class="h5 mb-0 fw-bold">@Common["Label_Total"]</span>
+                                        <strong class="h5 mb-0 fw-bold" id="totTotal"></strong>
+                                    </div>
+                                     <hr class="my-2" />
+                                      <div class="d-flex justify-content-between mb-2 text-secondary">
+										<span>@Common["DiscountLabor"]</span><strong id="TotalDiscountsLabour"></strong>
+                                    </div>
+                                   <div class="d-flex justify-content-between mb-2 text-secondary">
+										<span>@Common["DiscountParts"]</span><strong id="TotalDiscountsPart"></strong>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+					<!-- bottom actions -->
+					<div class="text-center">
+						@if (Model.Status != (int)WIPStatusEnum.Invoiced) //&& Model.Status != (int)WIPStatusEnum.G)
+						{
+							<button type="button" class="btn btn-primary" id="btnSave2"><i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]</button>
+						}
+						<a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]</a>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<input type="hidden" id="Services" name="Services" />
+		<input type="hidden" id="Items" name="Items" />
+	</div>
+</div>
+
+
+<!-- Transfer Modal -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="transferModalLabel">@Common["TransferVehicle"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div id="TransferMovement"></div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script>
+
+  var lang =  '@lang';
+  var ServicesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Services ?? new List<CreateWIPServiceDTO>()));
+  var AccountTypes = @Html.Raw(JsonConvert.SerializeObject(ViewBag.AccountTypes));
+  var ItemsData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Items ?? new List<CreateItemDTO>()));
+  var UnitsData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Units));
+  var WarehouseData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Warehouses));
+  var generalRequest = @Html.Raw(JsonConvert.SerializeObject(ViewBag.GeneralRequest));
+  var OurWarehouses = @Html.Raw(Json.Serialize(ViewBag.OurWarehouses));
+  var movementId = '@Model.MovementId';
+	var AllowActions = @Html.Raw(Json.Serialize(ViewBag.AllowActions));
+	window.URLs = {
+		indexUrl: '@Url.Action("Index", "WIP")',
+		vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',
+		branchesUrl: '@Url.Action("Branches", "ERPAPI")',
+		createIssueVoucher: '@Url.Action("CreateIssueVoucher", "WIP")',
+		editPostUrl: '@Url.Action("Edit_Post", "WIP")',
+		editGetUrl: '@Url.Action("Edit", "WIP")',
+		closeWipUrl: '@Url.Action("CloseWIP", "WIP")',
+		getVehicleDetailsByIdUrl: '@Url.Action("GetVehicleDetailsById", "WIP")',
+		getWIPOptionsByIdUrl: '@Url.Action("GetWIPOptionsById", "WIP")',
+		transferMoveInUrl: '@Url.Action("TransferMoveIn", "WIP")',
+		addUrl: '@Url.Action("Add", "WIP")',
+		createIssueVoucher: '@Url.Action("CreateIssueVoucher", "WIP")',
+		  addCreditNote: '@Url.Action("CreditNote", "WIP")',
+
+	}
+
+	window.resources = @Html.Raw(Json.Serialize(new
+		{
+			// validation + swal
+			required_field = Common["Label_RequiredField"].Value,
+			confirm_title = Common["Title_Confirm"].Value,
+			are_you_sure = Common["Label_AreYouSure"].Value,
+			delete = Common["Button_Delete"].Value,
+			cancel = Common["Button_Cancel"].Value,
+			done_title = Common["Title_Done"].Value,
+			yes = Message["SwalDeleteConfirm"].Value,
+			no = Message["SwalDeleteCancel"].Value,
+
+			// schedule modal helpers
+			job = Common["Label_Job"].Value,
+			allowed = Common["Label_Allowed"].Value,
+			fill_required = Common["Label_FillRequired"].Value,
+
+			// service history details tab
+			history_details_tab = Common["Label_ServiceHistoryDetails"].Value,
+			title_parts = Common["Title_Parts"].Value,
+			title_labour = Common["Title_Labour"].Value,
+			title_service_details = Common["Title_ServiceDetails"].Value,
+
+			label_product = Common["Label_Product"].Value,
+			label_description = Common["Label_Description"].Value,
+			label_w = Common["Label_W"].Value,
+			label_quantity = Common["Label_Quantity"].Value,
+			label_price = Common["Label_Price"].Value,
+			label_discount_pct = Common["Label_DiscountPct"].Value,
+			label_contrib_pct = Common["Label_ContribPct"].Value,
+			label_cost = Common["Label_Cost"].Value,
+			label_rts_code = Common["Label_RTSCode"].Value,
+			label_time = Common["Label_Time"].Value,
+			label_rate = Common["Label_Rate"].Value,
+			label_ext_value = Common["Label_ExtValue"].Value,
+			label_technician = Common["Label_Technician"].Value,
+
+			label_point_of_sale_account = Common["Label_PointOfSaleAccount"].Value,
+			label_aftersales_branch = Common["Label_AftersalesBranch"].Value,
+			label_aftersales_executive = Common["Label_AftersalesExecutive"].Value,
+			label_display_odometer_as = Common["Label_DisplayOdometerAs"].Value,
+			label_kilometres = Common["Label_Kilometres"].Value,
+			label_last_service_date = Common["Label_LastServiceDate"].Value,
+			label_next_service_due = Common["Label_NextServiceDue"].Value,
+			label_date_of_last_work = Common["Label_DateOfLastWork"].Value,
+			label_last_known_odometer = Common["Label_LastKnownOdometer"].Value,
+			label_timing_belt = Common["Label_TimingBelt"].Value,
+			label_service_interval = Common["Label_ServiceInterval"].Value,
+			label_months = Common["Label_Months"].Value,
+			label_or = Common["Label_Or"].Value,
+			label_ms_company = Common["Label_MSCompany"].Value,
+
+			service_flags = new[] {
+		Common["Label_ServiceFlag1"].Value,
+		Common["Label_ServiceFlag2"].Value,
+		Common["Label_ServiceFlag3"].Value,
+		Common["Label_ServiceFlag4"].Value,
+		Common["Label_ServiceFlag5"].Value,
+		Common["Label_ServiceFlag6"].Value,
+		Common["Label_ServiceFlag7"].Value,
+		Common["Label_ServiceFlag8"].Value,
+		Common["Label_ServiceFlag9"].Value,
+		Common["Label_ServiceFlag10"].Value
+	  }
+		}));
+
+	  window.RazorVars = {
+		  // ============================
+		  // DevExpress Labels - Items
+		  // ============================
+		  DXCode: '@Html.Raw(Common["Label_Code"])',
+		  DXName: '@Html.Raw(Common["Label_Name"])',
+		  DXLocator: '@Html.Raw(Common["Label_Locator"])',
+		  DXUnit: '@Html.Raw(Common["Label_Unit"])',
+		  DXRate: '@Html.Raw(Common["Label_Rate"])',
+		  DXRequestQuantity: '@Html.Raw(Common["Label_RequestQuantity"])',
+		  DXQuantity: '@Html.Raw(Common["Label_Quantity"])',
+		  DXUsedQuantity: '@Html.Raw(Common["Label_UsedQuantity"])',
+		  DXPrice: '@Html.Raw(Common["Label_Price"])',
+		  DXDiscount: '@Html.Raw(Common["Label_DiscountPct"])',
+		  Discount: '@Html.Raw(Common["Discount"])',
+		  DXStatus: '@Html.Raw(Common["Label_Status"])',
+		  DXTotal: '@Html.Raw(Common["Total"])',
+		  DXTax: '@Html.Raw(Common["Label_Tax"])',
+		  DXAccountType: '@Html.Raw(Common["Label_AccountType"])',
+		  DXPartApproved: '@Html.Raw(Common["Label_PartApproved"])',
+		  DXPartRejected: '@Html.Raw(Common["Label_PartReject"])',
+	   	  DXPartReceived: '@Html.Raw(Common["Label_PartReceived"])',
+			  DXPartTransferReq: '@Html.Raw(Common["Label_PartTransferReq"])',
+
+		  // ============================
+		  // DevExpress Labels - Services
+		  // ============================
+		  DXLongDescription: '@Html.Raw(Common["Label_Description"])',
+		  DXStandardHours: '@Html.Raw(Common["StandardHours"])',
+		  DXTimeTaken: '@Html.Raw(Common["Label_TimeTaken"])',
+
+		  // ============================
+		  // URLs - Items
+		  // ============================
+		  getAvailableLocatorsUrl: '@Url.Action("GetAvailableLocators", "WIP")',
+		  getVatValueByIdUrl: '@Url.Action("GetVatValueById", "WIP")',
+		  getReturnPartsUrl: '@Url.Action("GetReturnParts", "WIP")',
+		  updatePartStatusUrl: '@Url.Action("UpdatePartStatus", "WIP")',
+		  createInventoryTransactionUrl: '@Url.Action("CreateInventoryTransaction", "WIP")',
+		  createInventoryTransactionTransferRequestUrl: '@Url.Action("CreateInventoryTransaction_TransferRequest", "WIP")',
+		  getAllItemsUrl: '@Url.Action("GetAllItems", "WIP")',
+		  generalRequestUrl: '@Url.Action("GeneralRequest", "WIP")',
+		  undoIssueVoucherUrl: '@Url.Action("UndoIssueVoucher", "WIP")',
+		  updatePartStatusWithSingleItem: '@Url.Action("UpdatePartStatusForSingleItem", "WIP")',
+			getVehicleByManufacturerIdURL: '@Url.Action("GetVehicleByManufacturerId", "WIP")',
+
+		  // ============================
+		  // URLs - Services
+		  // ============================
+		  getLabourRateUrl: '@Url.Action("GetLabourRate", "WIP")',
+		  scheduleGetByIdUrl: '@Url.Action("ScheduleGetById", "WIP")',
+		  wipScheduleUrl: '@Url.Action("WIPSChedule", "WIP")',
+		  deleteServiceUrl: '@Url.Action("DeleteService", "WIP")',
+		  updateServiceStatusUrl: '@Url.Action("UpdateServiceStatus", "WIP")',
+		  getRTSDDLUrl: '@Url.Action("GetRTSDDL", "WIP")',
+		  getMenuDDLUrl: '@Url.Action("GetMenuDDL", "WIP")',
+			// ============================
+			// URLs - History
+			// ============================
+		 getServiceHistoryUrl: '@Url.Action("GetWIPServiceHistory", "WIP")',
+		 getWIPDetailsUrl: '@Url.Action("GetWIPDetails", "WIP")'
+	  };
+		const internalMatches = @Html.Raw(Json.Serialize(ViewBag.InternalMatches));
+	  const externalMatches = @Html.Raw(Json.Serialize(ViewBag.ExternalMatches));
+	  window.appUrls = {
+		  getSalesType: '@Url.Action("GetSalesType", "WIP")',
+		  getCustomerById: '@Url.Action("GetCustomerById", "WIP")',
+		  getVatValueById: '@Url.Action("GetVatValueById", "WIP")'
+	  };
+</script>
+<script src="~/js/definitions/wip.js"></script>

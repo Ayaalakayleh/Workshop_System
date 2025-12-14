@@ -1,0 +1,135 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@model Workshop.Core.DTOs.WIPSChedule
+
+@{
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true"
+     data-lang="@System.Threading.Thread.CurrentThread.CurrentCulture.Name">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleModalLabel">@Common["Title_ScheduleLabour"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"].Value"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="scheduleForm" class="row g-3">
+
+                    <div class="col-md-4 col-sm-12">
+                        <label class="form-label">@Common["Label_Date"]</label>
+                        <input type="text" class="form-control flat-picker" id="schDate" autocomplete="off" />
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label>@Common["Label_VehicleName"]</label>
+                            @Html.DropDownListFor(model => model.Id,
+                            (SelectList)ViewBag.Vehicles,
+                                                        Common["Select"].Value,
+                                                        new { @class = "form-control", id = "vehicleDropdown" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label>Customer <span class="text-danger">*</span></label>
+                            <input type="text" id="CustomerName" name="CustomerName" class="form-control" placeholder="Customer" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <label>@Common["Label_Chassis"]</label>
+                        @Html.DropDownList(
+                                                "ChassisNo",
+                                                (SelectList)ViewBag.Chassis,
+                                                Common["Select"].Value,
+                                                new { @class = "form-control", id = "chassisDropdown" }
+                                                )
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <label class="form-label">@Common["Label_Start"]</label>
+                        <input type="time" class="form-control" id="schStart" value="08:00" />
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <label class="form-label">@Common["Label_DurationHour"]</label>
+                        <input type="number" class="form-control" id="schDuration" min="1"  value="30" />
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <label class="form-label">@Common["Label_Ends"]</label>
+                        <input type="time" class="form-control" id="schEnd" />
+                    </div>
+                    <div class="col-md-8 col-sm-12">
+                        <div class="form-group">
+                            <label>@Common["Label_Description"]</label>
+                            <textarea class="form-control" id="descriptionInput" rows="3" maxlength="510"
+                                      placeholder="@Common["Label_Description"]"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-primary" id="btnSaveSchedule">
+                    <i class="fad fa-save"></i>&nbsp;@Common["Button_Save"]
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        insertReservationUrl: '@Url.Action("InsertReservation", "Reservations")',
+        getVehicleByChassis: '@Url.Action("VehicleDefinitionsGetByChassisNo", "Reservations")',
+
+        reservationInserted: '@Html.Raw(Common["Booked_Reservation"])',
+        reservationAlreadyExist: '@Html.Raw(Common["ActiveReservationExists"])',
+        reservationBookedSuccessfully: '@Html.Raw(Common["Booked_Reservation"])',
+        warning: '@Html.Raw(Common["Label_Warning"])',
+        doneSuccessfully: '@Html.Raw(Common["Label_DoneSuccessfully"])'
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        // Fields in exact order
+        const order = [
+            "#schDate",
+            "#schTech",
+            "#schStart",
+            "#schDuration",
+            "#schEnd"
+        ];
+
+        // Disable all except first
+        for (let i = 1; i < order.length; i++) {
+            $(order[i]).prop("disabled", true);
+        }
+
+        // Enable next field only when current field has a value
+        order.forEach((selector, i) => {
+            $(selector).on("change input", function () {
+                const hasValue = $(this).val()?.trim().length > 0;
+                if (hasValue && order[i + 1]) {
+                    $(order[i + 1]).prop("disabled", false);
+                }
+            });
+        });
+
+    });
+</script>
+
+
+
+
+<script src="~/js/definitions/schedule-modal.js"></script>

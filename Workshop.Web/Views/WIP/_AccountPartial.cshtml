@@ -1,0 +1,62 @@
+﻿@model Workshop.Core.DTOs.AccountDTO;
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+
+<div class="tab-pane fade" id="tabPartialAccount" role="tabpanel">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label>Partial Account Type</label>
+                    @Html.DropDownListFor(m => m.PartialAccountType, new SelectList(ViewBag.AccountTypes, "Value", "Text"), "Select", new { @class = "form-control", id = "PartialAccountType", disabled = "disabled" })
+                    @Html.ValidationMessageFor(m => m.PartialAccountType, "", new { @class = "text-danger" })
+
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label>Partial Sales Type</label>
+                    @Html.DropDownListFor(m => m.PartialSalesType, new SelectList(ViewBag.PartialSalesType ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "PartialSalesType" })
+                    @Html.ValidationMessageFor(m => m.PartialSalesType, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label class="form-label">Partial @Common["Label_Customer"]</label>
+                    @Html.DropDownListFor(m => m.PartialCustomerId, new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "PartialCustomerId" })
+                    @Html.ValidationMessageFor(m => m.PartialCustomerId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label class="form-label">Partial @Common["Label_Currency"]</label>
+                    @Html.TextBoxFor(m => m.PartialCurrencyId, new { @class = "form-control", id = "PartialCurrencyId", disabled = "disabled" })
+                    @Html.ValidationMessageFor(m => m.PartialCurrencyId, "", new { @class = "text-danger" })
+
+                </div>
+
+         
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label class="form-label">Partial @Common["Label_Terms"]</label>
+                    @Html.DropDownListFor(m => m.PartialTermsId, new SelectList(ViewBag.Terms ?? new List<SelectListItem>(), "Value", "Text"), new { @class = "form-control", id = "PartialTermsId", disabled = "disabled" })
+                    @Html.ValidationMessageFor(m => m.PartialTermsId, "", new { @class = "text-danger" })
+                </div>
+         
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label class="form-label">Partial Tax</label>
+                    @Html.DropDownListFor(model => model.PartialVat, new SelectList(ViewBag.VatClassificationList ?? new List<SelectListItem>(), "Value", "Text"), Common["Select"], new { @class = "form-control", id = "PartialVat", disabled = "disabled" })
+                    @Html.ValidationMessageFor(m => m.PartialVat, "", new { @class = "text-danger" })
+                </div> 
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // const internalMatches = @Html.Raw(Json.Serialize(ViewBag.InternalMatches));
+    // const externalMatches = @Html.Raw(Json.Serialize(ViewBag.ExternalMatches));
+    // window.appUrls = {
+    //     getSalesType: '@Url.Action("GetSalesType", "WIP")',
+    //     getCustomerById: '@Url.Action("GetCustomerById", "WIP")',
+    //     getVatValueById: '@Url.Action("GetVatValueById", "WIP")'
+    // };
+</script>
+<script src="~/js/definitions/accounttab.js"></script>

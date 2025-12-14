@@ -1,0 +1,326 @@
+﻿@using Microsoft.Extensions.Localization
+@using Newtonsoft.Json
+@using Workshop.Resources
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.ExternalWorkshopExp.MExternalWorkshopExpDTO
+
+@{
+	ViewBag.Title = Common["External_Workshop_Exp"];
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@using (Html.BeginForm("Edit", "Collection", FormMethod.Post, new { enctype = "multipart/form-data", @id = "form" }))
+{
+	@Html.HiddenFor(model => model.External_Workshop_ExpjsonList)
+	;
+	<div class="row">
+		<div class="col-12">
+			<div id="panel-1" class="panel">
+				<div class="panel-hdr">
+					<h2>@Common["External_Workshop_Exp"]</h2>
+				</div>
+				<div class="panel-container show">
+					<div class="panel-content">
+						<div class="row">
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label" for="validationCustom05">@Common["ExternalWorkshop "]<span class="text-danger">*</span></label>
+									@Html.DropDownListFor(model => model.ExternalWorkshopId, (IEnumerable<SelectListItem>)ViewBag.ExternalWorkshopList, Common["ExternalWorkshop"], new { @class = "form-control select2 ", @readonly = "true" })
+									@Html.ValidationMessageFor(m => m.ExternalWorkshopId, "", new { @class = "text-danger" })
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label">@Common["ExcelDate"]</label>
+									<div class="form-group">
+
+										@Html.TextBoxFor(model => model.Excel_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", id = "Excel_Date", type = "date", @placeholder = Common["ExcelDate"], @readonly = "true" })
+									</div>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<table id="price-list-table" class="table table-bordered table-hover w-100 text-center table-responsive-lg">
+							<thead>
+								<tr>
+									<th>
+										@Common["InvoiceNo"]
+									</th>
+									<th>
+										@Common["Location"]
+									</th>
+									<th>
+										@Common["Date"]
+									</th>
+									<th>
+										@Common["PlateNumber"]
+									</th>
+									<th>
+										@Common["BusinessLine"]
+									</th>
+									<th>
+										@Common["Milage"]
+									</th>
+									<th>
+										@Common["Maker"]
+									</th>
+									<th>
+										@Common["Model"]
+									</th>
+									<th>
+										@Common["Year"]
+									</th>
+									<th>
+										@Common["Service_Type"]
+									</th>
+									<th>
+										@Common["Quantity"]
+									</th>
+									<th>
+										@Common["Price"]
+									</th>
+									<th>
+										@Common["SubTotal_BeforVat"]
+									</th>
+									<th>
+										@Common["Vat"]
+									</th>
+									<th>
+										@Common["Total"]
+									</th>
+									<th>
+										@Common["Description"]
+									</th>
+									<th>
+										@Common["Action"]
+									</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+						<div class="text-center mt-3">
+							<a href="@Url.Action("Index", "Collection")" class="btn btn-secondary btn-w-m"><i class="fa @(@*Workshop.Controllers.LanguageController.IsRighToLeft()*@ true ? "fa-arrow-right" : "fa-arrow-left")"></i>&nbsp;@Common["BackToList"]</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<script>
+		var jsonData = @Html.Raw(JsonConvert.SerializeObject(Model.DExternalWorkshopExp));
+
+	$(document).ready(function () {
+
+			apppendTable();
+		});
+
+	$('#form').validate({
+		rules: {
+			ExternalWorkshopId: 'required',
+			Excel_Date: 'required',
+		},
+		messages: {
+			ExternalWorkshopId: '@Common["RequiredField"]',
+			Excel_Date: '@Common["RequiredField"]',
+		},
+	});
+	$("#Save").click(function (e) {
+
+		if ($("#form").valid()) {
+			const table = document.getElementById('price-list-table');
+			const rows = table.querySelectorAll('tr');
+			if (rows.length > 1) {
+				$('#sup').prop('disabled', true);
+				e.preventDefault();
+				e.stopPropagation();
+				GetTableData();
+
+				$('#form').submit();
+			} else {
+				swal("@Common["PleaseEnterData"]", "", "error");
+				return false;
+			}
+		}
+		else {
+			swal("@Common["PleaseEnterData"]", "", "error");
+			return false;
+		}
+
+	});
+	function apppendTable() {
+		var table = $('#price-list-table tbody');
+
+		$.each(jsonData, function (index, item) {
+			var row = $('<tr>');
+			row.append('<td contenteditable="false" hidden>' +index+ '</td>');
+			row.append('<td id="ck_'+index+ '"class="check-or-uncheck" contenteditable="false"><div class="the-loader"></div></td>');
+			row.append('<td contenteditable="true">' + item.Invoice_No + '</td>');
+			row.append('<td contenteditable="true">' + item.City + '</td>');
+			row.append('<td contenteditable="true">' + (item.Invoice_Date ? item.Invoice_Date : '') + '</td>');
+			row.append('<td contenteditable="true">' + item.License_Plate_No + '</td>');
+			row.append('<td contenteditable="true">' + item.Business_Line + '</td>');
+			row.append('<td contenteditable="true">' + item.MILAGE + '</td>');
+			row.append('<td contenteditable="true">' + item.Maker + '</td>');
+			row.append('<td contenteditable="true">' + item.Model + '</td>');
+			row.append('<td contenteditable="true">' + item.Year + '</td>');
+			row.append('<td contenteditable="true">' + item.Service_Type + '</td>');
+			row.append('<td contenteditable="true">' + item.Quantity + '</td>');
+			row.append('<td contenteditable="true">' + (item.Price ? item.Price.toFixed(2) : '') + '</td>');
+			row.append('<td contenteditable="true">' + (item.SubTotal_BeforVat ? item.SubTotal_BeforVat.toFixed(2) : '') + '</td>');
+			row.append('<td contenteditable="true">' + (item.Vat ? item.Vat.toFixed(2) : '') + '</td>');
+			row.append('<td contenteditable="true">' + (item.Total ? item.Total.toFixed(2) : '' )+ '</td>');
+			row.append('<td contenteditable="true">' + item.Description + '</td>');
+			row.append('<td class="errorReason" id="cr_' + index + '" contenteditable="true"></td>');
+			row.append('<td><button type="button" class="btn btn-danger btn-w-m btn-sm delete"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button></td>');
+			table.append(row);
+		});
+		$(document).ready(function () {
+
+			$(".edit-button").click(function () {
+				var row = $(this).closest("tr");
+
+
+				row.find(".edit-button").hide();
+				row.find(".save-button, .cancel-button").show();
+
+				row.find("td:not(:last-child)").each(function (index) {
+
+					var cell = $(this);
+					var value = cell.text();
+					cell.html('<input type="text" class="form-control" value="' + value + '">');
+					if (index == 3) {
+						cell.html('<input type="text" class="form-control hijri-date-input" value="' + value + '">');
+						cell.css('position', 'relative');
+					}
+				});
+
+			});
+
+			$(".save-button").click(function () {
+				var row = $(this).closest("tr");
+
+
+				row.find(".save-button, .cancel-button").hide();
+				row.find(".edit-button").show();
+
+
+				var rowData = {};
+
+
+				rowData['ID'] = row.find("td:not(:last-child)").eq(0).find("input").val();
+				rowData['Invoice_No'] = row.find("td:not(:last-child)").eq(1).find("input").val();
+				rowData['City'] = row.find("td:not(:last-child)").eq(2).find("input").val();
+				var date = row.find("td:not(:last-child)").eq(3).find("input").val();
+				var dateString = date.replaceAll('-', '/');
+				var parts = dateString.split('/');
+				var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+				var stringdate = formattedDate.toJSON();
+				rowData['Invoice_Date'] = stringdate;
+				rowData['License_Plate_No'] = row.find("td:not(:last-child)").eq(4).find("input").val();
+				rowData['Business_Line'] = row.find("td:not(:last-child)").eq(5).find("input").val();
+				rowData['MILAGE'] = parseInt(row.find("td:not(:last-child)").eq(6).find("input").val());
+				rowData['Maker'] = row.find("td:not(:last-child)").eq(7).find("input").val();
+				rowData['Model'] = row.find("td:not(:last-child)").eq(8).find("input").val();
+				rowData['Year'] = row.find("td:not(:last-child)").eq(9).find("input").val();
+				rowData['Service_Type'] = row.find("td:not(:last-child)").eq(10).find("input").val();
+				rowData['Quantity'] = parseInt(row.find("td:not(:last-child)").eq(11).find("input").val());
+				rowData['Price'] = parseFloat(row.find("td:not(:last-child)").eq(12).find("input").val());
+				rowData['SubTotal_BeforVat'] = parseFloat(row.find("td:not(:last-child)").eq(13).find("input").val());
+				rowData['Vat'] = parseFloat(row.find("td:not(:last-child)").eq(14).find("input").val());
+				rowData['Total'] = parseFloat(row.find("td:not(:last-child)").eq(15).find("input").val());
+				rowData['Description'] = row.find("td:not(:last-child)").eq(16).find("input").val();
+				rowData['WorkOrderId'] = row.find("td:not(:last-child)").eq(17).find("input").val();
+
+				var rowDataJSON = JSON.stringify(rowData);
+				$.ajax({
+					type: 'POST',
+					url: '@Url.Action("Edit", "Collection")',
+					contentType: 'application/json',
+					dataType: 'json',
+					data: rowDataJSON,
+					success: function (data) {
+						if (data.IsSuccess) {
+
+							swal("@Common["DoneSuccessfully"]", "", "success");
+						} else {
+							swal("@Common["Error"]", data.Message, "error");
+						}
+					}
+				});
+				row.find("td:not(:last-child)").each(function (index) {
+					var header = $("#data-table th").eq(index).text();
+					var value = $(this).find("input").val();
+					rowData[header] = value;
+
+					// Replace the input field with the updated value
+					$(this).html(value);
+				});
+			 });
+
+
+			$(".cancel-button").click(function () {
+				var row = $(this).closest("tr");
+
+
+				row.find(".save-button, .cancel-button").hide();
+				row.find(".edit-button").show();
+
+
+				row.find("td:not(:last-child)").each(function () {
+					var cell = $(this);
+					cell.html(cell.find("input").val());
+				});
+			});
+
+		});
+
+	}
+	function GetTableData(index) {
+
+		const table = document.getElementById('price-list-table');
+		const rows = table.querySelectorAll('tr');
+		const jsonData = [];
+		rows.forEach((row, index) => {
+			if (index === 0) return;
+			const cells = row.querySelectorAll('td');
+			const rowData = {};
+			rowData['Invoice_No'] = cells[0].textContent;
+			rowData['City'] = cells[1].textContent;
+			var date = cells[2].textContent;
+			var dateString = date.replaceAll('-', '/');
+			var parts = dateString.split('/');
+			var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+			var stringdate = formattedDate.toJSON();
+			rowData['Invoice_Date'] = stringdate;
+			rowData['License_Plate_No'] = cells[3].textContent;
+			rowData['Business_Line'] = cells[4].textContent;
+			rowData['MILAGE'] = parseInt(cells[5].textContent);
+			rowData['Maker'] = cells[6].textContent;
+			rowData['Model'] = cells[7].textContent;
+			rowData['Year'] = cells[8].textContent;
+			rowData['Service_Type'] = cells[9].textContent;
+			rowData['Quantity'] = parseInt(cells[10].textContent);
+			rowData['Price'] = parseFloat(cells[11].textContent);
+			rowData['SubTotal_BeforVat'] = parseFloat(cells[12].textContent);
+			rowData['Vat'] = parseFloat(cells[13].textContent);
+			rowData['Total'] = parseFloat(cells[14].textContent);
+			rowData['Description'] = cells[15].textContent;
+
+			jsonData.push(rowData);
+		});
+		$('#External_Workshop_ExpjsonList').val(JSON.stringify(jsonData));
+		//return ;
+
+		//console.log(jsonString);
+	}
+
+</script>
+
+
+<script src="~/js/site.js"></script>
+

@@ -1,0 +1,196 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Core.DTOs.Vehicle
+@using Workshop.Resources;
+
+@model Workshop.Core.DTOs.WorkshopDTOs.WorkShopDefinitionDTO
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+	ViewBag.Title = Common["EditWorkshop"];
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var lang = "en";
+
+}
+
+<ol class="breadcrumb bg-transparent mb-3">
+	<li class="breadcrumb-item">
+		<a href="@Url.Action("Index", "WorkshopDefinitions")">@Common["Label_WorkshopDefinition"]</a>
+	</li>
+	<li class="breadcrumb-item active">
+		<strong>@Common["Edit"]</strong>
+
+	</li>
+</ol>
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr px-2">
+				<h2 class="font-weight-bold">@Common["Label_WorkshopDefinition"]</h2>
+				<div class="panel-toolbar">
+					<div class="form-group">
+						<div class="form-check form-switch">
+							@Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+							<label class="form-check-label" for="IsActive">@Common["IsActive"]</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					@using (
+										Html.BeginForm(
+										"Edit",
+										"WorkshopDefinitions",
+										FormMethod.Post,
+										new { enctype = "multipart/form-data", @id = "workshopform", OnSuccess = "CreateSuccess(data)" }
+										)
+										)
+					{
+						@Html.HiddenFor(a => a.Id)
+						@Html.AntiForgeryToken()
+						<div class="row">
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									@Html.Label(Common["Label_NameEN"])<span class="text-danger required-star">*</span>
+									@Html.TextBoxFor(model => model.PrimaryName, new { @class = "form-control copyInput" })
+									@Html.ValidationMessageFor(m => m.PrimaryName, "", new { @class = "text-danger" })
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									@Html.Label(Common["Label_NameAR"])
+									@Html.TextBoxFor(model => model.SecondaryName, new { @class = "form-control pasteInput" })
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-md-6 col-sm-12 ">
+								<div class="form-group">
+									@Html.Label(Common["Label_Email"])<span class="text-danger required-star">*</span>
+									@Html.TextBoxFor(model => model.Email, new { @class = "form-control valid", @type = "email" })
+									@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_PhoneNumber"]<span class="text-danger required-star">*</span></label>
+									@Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control phone-number" } })
+									<span class="field-validation-valid text-danger" data-valmsg-for="CustomerPhoneNumber" data-valmsg-replace="true"> &nbsp;</span>
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									@Html.Label(Common["Label_PrimaryAddress"])<span class="text-danger required-star">*</span>
+									@Html.TextBoxFor(model => model.PrimaryAddress, new { @class = "form-control valid" })
+									@Html.ValidationMessageFor(m => m.PrimaryAddress, "", new { @class = "text-danger" })
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									@Html.Label(Common["Label_SecondaryAddress"])
+									@Html.TextBoxFor(model => model.SecondaryAddress, new { @class = "form-control valid" })
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									@Html.Label(Common["Label_GoogleURL"])<span class="text-danger required-star">*</span>
+									@Html.TextBoxFor(model => model.GoogleURL, new { @class = "form-control valid" })
+									@Html.ValidationMessageFor(m => m.GoogleURL, "", new { @class = "text-danger" })
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_CityId"]<span class="text-danger required-star">*</span></label>
+									@Html.DropDownListFor(model => model.CityId, new SelectList(ViewBag.ColCity, "Id", "Name"), Common["Select"], new { @class = "form-control select2", @tabindex = 4 })
+									<span class="field-validation-valid text-danger" data-valmsg-for="CityId" data-valmsg-replace="true"> &nbsp;</span>
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_InsuranceCompany"]<span class="text-danger required-star">*</span></label>
+									<select id="InsuranceCompanyIds" name="InsuranceCompanyIds" class="form-control select2" multiple>
+										@foreach (CustomerInformationSummery item in ViewBag.ColInsuranceCompany)
+										{
+											int r = Model.InsuranceCompanyIds != null ? Array.Find<int>(Model.InsuranceCompanyIds, (arr => arr == item.Id)) : 0;
+											if (r != 0)
+											{
+												<option value="@item.Id" selected>@item.CustomerName</option>
+
+											}
+											else
+											{
+												<option value="@item.Id">@item.CustomerName</option>
+
+											}
+										}
+
+									</select>
+									<span class="field-validation-valid text-danger" data-valmsg-for="CityId" data-valmsg-replace="true"> &nbsp;</span>
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_ParentId"]</label>
+									@Html.DropDownListFor(model => model.ParentId, (IEnumerable<SelectListItem>)ViewBag.ParentWorkshops, Common["Select"], new { @class = "form-control select2", @tabindex = 4 })
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_Vat"]<span class="text-danger required-star">*</span></label>
+									@Html.DropDownListFor(model => model.VatClassificationId, (IEnumerable<SelectListItem>)ViewBag.VatClassificationList, Common["Select"], new { @class = "form-control select2 " })
+									<span class="field-validation-valid text-danger" data-valmsg-for="VatClassificationId" data-valmsg-replace="true"> &nbsp;</span>
+									@* <label id="VatClassificationId-error" class="error" for="VatClassificationId"><span class="text-danger required-star">*</span></label> *@
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12" hidden>
+								<div class="form-group">
+									<label>@Common["WorkshopAccountNo "]<span class="text-danger required-star">*</span></label>
+									@Html.DropDownListFor(model => model.AccountId, (IEnumerable<SelectListItem>)ViewBag.AccountList, Common["Select"], new { @class = "form-control select2 " })
+									<span class="field-validation-valid text-danger" data-valmsg-for="AccountId" data-valmsg-replace="true"> &nbsp;</span>
+									@* <label id="AccountId-error" class="error" for="AccountId"><span class="text-danger required-star">*</span></label> *@
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_Supplier"]<span class="text-danger required-star">*</span></label>
+									@Html.DropDownListFor(model => model.SupplierId, new SelectList(ViewBag.SupplierList, "Id", "CustomerName"), Common["Select"], new { @class = "form-control select2 " })
+									<span class="field-validation-valid text-danger" data-valmsg-for="SupplierId" data-valmsg-replace="true"> &nbsp;</span>
+									@* <label id="AccountId-error" class="error" for="SupplierId"><span class="text-danger required-star">*</span></label> *@
+								</div>
+							</div>
+
+						</div>
+
+						<div class="text-center text-white my-3">
+							<button type="submit" id="btnCreate" class="btn btn-primary btn-w-m"><i class="fa fa-save"></i>&nbsp;@Common["Button_Save"]</button>
+							@* ToDo *@
+							<a href="@Url.Action("Index")" class="btn btn-secondary btn-w-m"><i class="fa @(true ? "fa-arrow-right" : "fa-arrow-left")"></i>&nbsp;@Common["Button_BackToList"]</a>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var RazorVars = {
+		indexUrl: '@Url.Action("Index", "WorkshopDefinitions")',
+
+		msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+		btnOk: '@Html.Raw(Common["Ok"])',
+		swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+		swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+		swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+		swalErrorHappened: '@Message["ErrorHappend"]',
+		swalDeleted: '@Message["Deleted"]',
+		swalCancelled: '@Message["Cancelled"]'
+	};
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/definitions/WorkshopDefinitions.js"></script>

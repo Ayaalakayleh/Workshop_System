@@ -1,0 +1,255 @@
+﻿@model Workshop.Core.DTOs.MenuDTO
+@using Workshop.Core.DTOs
+@using Workshop.Resources
+@using Newtonsoft.Json
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = "Menu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Lang = "en";
+}
+
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("Edit", "Menu", FormMethod.Post, new { id = "menuForm" }))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="menuId" value="@Model.Id" />
+
+            <div class="panel">
+                <div class="panel-hdr px-2">
+                    <h2 class="font-weight-bold">@Common["Title_MenuDefinition"]</h2>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row">
+
+                            <!-- Group Code -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_GroupCode"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.GroupCode, new { @class = "form-control make-integer" })
+                                    @Html.ValidationMessageFor(m => m.GroupCode, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div>
+
+                            <!-- Group Name -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_GroupName"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.GroupName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.GroupName, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_DescriptionEn"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.PrimaryDescription, new { @class = "form-control copyInput" })
+                                    @Html.ValidationMessageFor(m => m.PrimaryDescription, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_DescriptionAr"]</label>
+                                    @Html.TextBoxFor(m => m.SecondaryDescription, new { @class = "form-control pasteInput" })
+                                    @Html.ValidationMessageFor(m => m.SecondaryDescription, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div>
+
+                            <!-- Pricing Method -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_PricingMethod"]</label>
+                                    @Html.DropDownListFor(m => m.PricingMethod, new SelectList(new[] { "Sum", "Fixed" }), Common["Select"], new { @class = "form-control", id = "PricingMethod" })
+                                    @Html.ValidationMessageFor(m => m.PricingMethod, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div>
+
+                            <!-- Fixed Price -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_Price"]</label>
+                                    @Html.TextBoxFor(m => m.Price, new { @class = "form-control", type = "number", id = "priceField" })
+
+                                </div>
+                            </div>
+
+                            <!-- Total Time -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_TotalTime"]</label>
+                                    @Html.TextBoxFor(m => m.TotalTime, new { @class = "form-control" })
+                                </div>
+                            </div>
+
+
+                            <!-- Effective Date -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_EffectiveDate"]</label>
+                                    @Html.TextBoxFor(m => m.EffectiveDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text" })
+                                    @Html.ValidationMessageFor(m => m.EffectiveDate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-check form-switch mt-5">
+                                    @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input", id = "IsActive" })
+                                    <label class="form-check-label" for="IsActive">@Common["Label_IsActive"]</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+
+                        <div class="row my-3">
+                            <!-- RTS -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_RTS"]</label>
+                                    @Html.DropDownListFor(m => m.RTSId, new SelectList(ViewBag.RTSCodes, "Value", "Text"), Common["Select"], new { @class = "form-control", id = "rtsDropdown" })
+                                </div>
+                            </div>
+
+                            <!-- Parts -->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_Parts"]</label>
+                                    <input type="text" id="PartInput" class="form-control" readonly />
+                                    @Html.HiddenFor(m => m.PartId)
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="position-relative">
+                                    <div id="gridContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center my-3">
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]</button>
+                            <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="ServicesToSave" name="ServicesToSave" />
+        }
+
+    </div>
+
+    <!-- modal -->
+    <div class="modal fade" id="partModal" tabindex="-1" role="dialog" aria-labelledby="partModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Common["Title_SelectPart"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label>@Common["Label_Group"]</label>
+                            @Html.DropDownListFor(m => m.GroupId, new SelectList(ViewBag.Groups ?? new List<SelectListItem>(), "Value", "Text"), Common["Select"], new { @class = "form-control" })
+                        </div>
+                        <div class="col-lg-4">
+                            <label>@Common["Label_Category"]</label>
+                            @Html.DropDownListFor(m => m.CategoryId, new SelectList(ViewBag.Categories ?? new List<SelectListItem>(), "Value", "Text"), Common["Select"], new { @class = "form-control" })
+                        </div>
+                        <div class="col-lg-4">
+                            <label>@Common["Label_SubCategory"]</label>
+                            @Html.DropDownListFor(m => m.SubCategoryId, new SelectList(ViewBag.SubCategories ?? new List<SelectListItem>(), "Value", "Text"), Common["Select"], new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" id="partSearch">
+                            <i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                        </button>
+                    </div>
+                    <div class="row mt-2">
+                        <table class="table table-bordered table-hover" id="partsTable">
+                            <thead>
+                                <tr>
+                                    <th>@Common["PartId"]</th>
+                                    <th>@Common["PartName"]</th>
+                                    <th>@Common["Select"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Parts != null)
+                                {
+                                    foreach (var part in ViewBag.Parts)
+                                    {
+                                        <tr>
+                                            <td>@part.Value</td>
+                                            <td>@part.Text</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-success selectPart"
+                                                        data-id="@part.Value" data-name="@part.Text">
+                                                    <i class="fas fa-check"></i>&nbsp;@Common["Select"]
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <script>
+        var Lang = '@Lang';
+        var data = @Html.Raw(JsonConvert.SerializeObject(ViewBag.MenuItems ?? new List<MenuGroupDTO>()));
+
+            window.RazorVars = {
+                editUrl: '@Url.Action("Edit", "Menu")',
+                deleteUrl: '@Url.Action("Delete", "Menu")',
+                indexUrl: '@Url.Action("Index", "Menu")',
+                getItemFilteration: '@Url.Action("GetItemFilteration", "Menu")',
+                getRTSCodeById: '@Url.Action("GetRTSCodeById", "Menu")',
+                getItemById: '@Url.Action("GetItemById", "Menu")',
+                
+                ID: '@Html.Raw(Common["Label_Id"])',
+                IsPart: '@Html.Raw(Common["Label_IsPart"])',
+                Code: '@Html.Raw(Common["Label_Code"])',
+                Description: '@Html.Raw(Common["Label_Description"])',
+                Quantity: '@Html.Raw(Common["Label_Quantity"])',
+                StandardHours: '@Html.Raw(Common["StandardHours"])',
+                Price: '@Html.Raw(Common["Label_Price"])',
+                Discount: '@Html.Raw(Common["Label_DiscountPct"])',
+                Total: '@Html.Raw(Common["Label_Total"])',
+                TableData: '@Html.Raw(Common["TableData"])',
+            required_field: '@Html.Raw(Message["RequiredField"])',
+            }
+    </script>
+    <script src="~/js/site.js"></script>
+    <script src="~/js/definitions/menu.js"></script>
+
+
+

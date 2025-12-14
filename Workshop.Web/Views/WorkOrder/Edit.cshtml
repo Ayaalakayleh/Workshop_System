@@ -1,0 +1,156 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Workshop.Core.DTOs
+@using Workshop.Core.DTOs.AccountingDTOs
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model WorkOrderModel
+@inject IConfiguration Configuration
+@{
+    var isEdit = Model.WorkOrderForm.Id > 0;
+    ViewBag.Title = isEdit ? Common["Edit"] : Common["Create"];
+    string BASEURL = Configuration["ApiSettings:BaseApiUrl"] ?? "";
+    var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+
+<div class="modal fade" id="workOrderModal" tabindex="-1" aria-labelledby="workOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workOrderModalLabel">@Common["WorkOrder"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Edit", "WorkOrder", FormMethod.Post, new { id = "WorkOrderForm", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.WorkOrderForm.Id)
+                    @Html.HiddenFor(m => m.WorkOrderForm.WorkOrderStatus)
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 my-1">
+                                @Html.LabelFor(m => m.WorkOrderForm.WorkOrderType, Common["Label_WorkOrderType"].Value, new { @class = "form-label" })
+                                @Html.DropDownListFor(m => m.WorkOrderForm.WorkOrderType, ViewBag.WorkOrderType as List<SelectListItem>, Common["Select"].Value, new { @class = "form-control", required = "required" })
+                            </div>
+                            <div class="col-md-6 my-1">
+                                @Html.LabelFor(m => m.WorkOrderForm.VehicleType, Common["Label_VehicleType"].Value, new { @class = "form-label" })
+                                @Html.DropDownListFor(m => m.WorkOrderForm.VehicleType, ViewBag.VehicleType as List<SelectListItem>, Common["Select"].Value, new { @class = "form-control", required = "required", onchange = "getManufacturerList(this.value)" })
+                            </div>
+
+                            <div class="col-md-6 my-1">
+                                @Html.LabelFor(m => m.WorkOrderForm.VehicleId, Common["Label_Vehicle"].Value, new { @class = "form-label" })
+                                @Html.DropDownListFor(m => m.WorkOrderForm.VehicleId, ViewBag.Vehicles as List<SelectListItem>, Common["Select"].Value,
+                                new { @class = "form-control", required = "required", id = "VehicleId", onchange = "Get_Agreement_Movement(this.value)" })
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.VehicleId, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 my-1">
+                            @Html.LabelFor(m => m.WorkOrderForm.Wfstatus, Common["Label_SubStatus"].Value, new { @class = "form-label" })
+                            @Html.DropDownListFor(m => m.WorkOrderForm.Wfstatus, ViewBag.SubStatus as List<SelectListItem>, Common["Select"].Value,
+                                                        new { @class = "form-control", required = "required", id = "SubStatus" })
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.Wfstatus, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 my-1">
+                            @Html.LabelFor(m => m.WorkOrderForm.AccidentDate, Common["Label_DamageDate"].Value, new { @class = "form-label" })
+                            @Html.EditorFor(m => m.WorkOrderForm.AccidentDate, new { htmlAttributes = new { @class = "form-control flat-picker", required = "required" } })
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.AccidentDate, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 my-1">
+                            @Html.LabelFor(m => m.WorkOrderForm.AccidentTime, Common["Label_DamageTime"].Value, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.WorkOrderForm.AccidentTime,
+                                                        new
+                                                        {
+                                                            @class = "form-control",
+                                                            type = "time",
+                                                            required = "required",
+                                                            value = Model.WorkOrderForm.AccidentTime.HasValue ? Model.WorkOrderForm.AccidentTime.Value.ToString(@"hh\:mm") : ""
+                                                        })
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.AccidentTime, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 my-1">
+                            @Html.LabelFor(m => m.WorkOrderForm.Description, Common["Label_Description"].Value, new { @class = "form-label" })
+                            @Html.TextAreaFor(m => m.WorkOrderForm.Description, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.Description, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 my-1">
+                            @Html.LabelFor(m => m.WorkOrderForm.Note, Common["Label_Note"].Value, new { @class = "form-label", @maxlength = "3" })
+                            @Html.TextAreaFor(m => m.WorkOrderForm.Note, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.Note, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 my-1">
+                            @Html.LabelFor(m => m.WorkOrderForm.Description, Common["Label_ReleatedTo"].Value, new { @class = "form-label" })
+
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.WorkOrderForm.RelatedId, 1, new { @class = "form-check-input", id = "Agreement1", onclick = "formChoice(1)" })
+                                <label class="form-check-label" for="Agreement1">@Common["Label_None"].Value</label>
+                            </div>
+
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.WorkOrderForm.RelatedId, 2, new { @class = "form-check-input", id = "Agreement2", onclick = "formChoice(2)" })
+                                <label class="form-check-label" for="Agreement2">@Common["Label_Agreement"].Value</label>
+                            </div>
+
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.WorkOrderForm.RelatedId, 3, new { @class = "form-check-input", id = "Agreement3", onclick = "formChoice(3)" })
+                                <label class="form-check-label" for="Agreement3">@Common["Label_Movement"].Value</label>
+                            </div>
+
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.Description, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-6 col-sm-12 my-1" id="showAgreement" style="display:none">
+                            <div class="form-group">
+                                <div class="col-md-6 mb-3">
+                                    @Html.LabelFor(m => m.WorkOrderForm.FkAgreementId, Common["Label_AgreementId"].Value, new { @class = "form-label" })
+                                    @Html.DropDownListFor(m => m.WorkOrderForm.FkAgreementId, new List<SelectListItem>(), Common["Select"].Value,
+                                                                        new { @class = "form-control", required = "required", id = "FK_AgreementId" })
+                                    @Html.ValidationMessageFor(m => m.WorkOrderForm.FkAgreementId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12 my-1" id="showVehicleMovemen" style="display:none">
+                            <div class="form-group">
+                                <div class="col-md-6 mb-3">
+                                    @Html.LabelFor(m => m.WorkOrderForm.FkVehicleMovementId, Common["Label_VehicleMovement"].Value, new { @class = "form-label" })
+                                    @Html.DropDownListFor(m => m.WorkOrderForm.FkVehicleMovementId, ViewBag.FkVehicleMovementId as List<SelectListItem>, Common["Select"].Value,
+                                                                        new { @class = "form-control", required = "required", id = "FkVehicleMovementId" })
+                                    @Html.ValidationMessageFor(m => m.WorkOrderForm.FkVehicleMovementId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <input type="file" name="formFile" id="ImagesFile" class="filepond" accept="image/*" />
+                            @Html.ValidationMessageFor(m => m.WorkOrderForm.ImagesFilePath, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="submit" class="btn btn-primary"><i class="fad fa-save"></i>&nbsp;@Common["Button_Save"]</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fad fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+                </div>
+                                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        loadWorkOrderDataUrl: '@Url.Action("loadWorkOrderData", "WorkOrder")',
+        vehicleListUrl: '@Url.Action("VehicleList", "WorkOrder")',
+        getAgreementUrl: '@Url.Action("M_Agreement_GetAgreementId", "WorkOrder")',
+        getMovementUrl: '@Url.Action("M_Agreement_GetMovementId", "WorkOrder")'
+    });
+</script>
+<script src="~/js/Definitions/WorkOrder.js"></script>

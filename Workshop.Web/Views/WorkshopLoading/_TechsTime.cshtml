@@ -1,0 +1,13 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+
+<div class="flex-grow-1">
+    <div class="wl-grid mb-3">
+        <div class="wl-head">
+            <div class="fw-bold">@Common["Label_TechsTime"]</div>
+            <div class="wl-hours" id="hoursHeader"></div>
+        </div>
+        <div id="gridBody"></div>
+    </div>
+</div>

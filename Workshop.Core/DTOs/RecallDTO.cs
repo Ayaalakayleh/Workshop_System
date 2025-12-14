@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Workshop.Core.DTOs
+{
+	public abstract class RecallBaseDTO
+	{
+		public string? Code { get; set; }
+		public string? Title { get; set; }
+		public string? Description { get; set; }
+		public DateTime? StartDate { get; set; }
+		public DateTime? EndDate { get; set; }
+		public bool IsActive { get; set; } 
+		public List<VehicleRecallDTO>? Vehicles { get; set; }
+	}
+
+	public class RecallDTO : RecallBaseDTO
+	{
+		public int Id { get; set; }
+		public DateTime? CreatedAt { get; set; }
+		public int? CreatedBy { get; set; }
+		public DateTime? UpdatedAt { get; set; }
+		public int? UpdatedBy { get; set; }
+	}
+	public class CreateRecallDTO : RecallBaseDTO
+	{
+		public int? CreatedBy { get; set; }
+	}
+
+	public class UpdateRecallDTO : RecallBaseDTO
+	{
+		public int Id { get; set; }
+		public int? UpdatedBy { get; set; }
+	}
+	public class DeleteRecallDTO
+	{
+		public int Id { get; set; }
+		public int? UpdatedBy { get; set; }
+		public bool IsActive { get; set; }
+	}
+
+
+	public class FilterRecallDTO
+	{
+		public string? Tittle { get; set; }
+		public string? Code { get; set; }
+		public int? PageNumber { get; set; }
+	}
+
+    public class VehicleRecallDTO
+    {
+		public int? Id  { get; set; }
+        public int? RecallID { get; set; }
+        public int? MakeID { get; set; }
+        public int? ModelID { get; set; }
+        public string? Chassis { get; set; }
+    }
+}

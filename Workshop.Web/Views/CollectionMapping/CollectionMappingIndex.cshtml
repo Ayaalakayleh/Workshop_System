@@ -1,0 +1,112 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+
+@model Workshop.Core.DTOs.ExternalWorkshopExp.MExcelMappingDTO
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = Common["External_Workshop_Exp"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr px-2">
+                <h2 class="font-weight-bold">@Common["ExternalWorkshopTemplate"]</h2>
+                @* @if (BaseHttpContext.UserHasPermission(Permissions.CollectionMappingCreateOrEdit)) *@
+                @if (true)
+                {
+                    <a href="@Url.Action("CollectionMapping", "CollectionMapping")" class="btn btn-outline-primary add-record"><i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]</a>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content text-start">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["ExternalWorkshop"]</label>
+                                @Html.DropDownList("WorkshopId", (IEnumerable<SelectListItem>)ViewBag.WorkshopList, @Common["ExternalWorkshop"], new { @class = "form-control"  })                                
+                            </div>
+                        </div>  
+
+                    </div>
+                    <div class="text-center mt-3">
+                        <button id="searchButton" type="button" class="btn btn-primary btn-w-m"><i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                        <input type="hidden" id="hidsearchMaintenanceDefinitions" value="0" />
+                        <button type="button" class="btn btn-secondary" onclick="resetFilter()">
+                            <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<div id="CollectionMappingList"></div>
+    <div id="contentPager" hidden></div>
+
+<script>
+
+    $("#searchButton").click(function () {
+        getData(1);
+    });
+
+    var FromDate;
+    var ToDate;
+
+    $(document).ready(function () {
+        $(".select2").select2();
+
+        $("#FromDate").on('dp.change', function (arg) {
+            let date = arg.date;
+            FromDate = date.format("DD-MM-YYYY");
+        });
+
+        $("#ToDate").on('dp.change', function (arg) {
+            let date = arg.date;
+            ToDate = date.format("DD-MM-YYYY");
+        });
+
+        getData(1);
+    });
+
+    function getData(page) {
+
+        var workshopId = $('#WorkshopId').val();
+         model = {
+             'WorkshopId': workshopId, 'Page': page
+        };
+       
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("CollectionMappingList", "CollectionMapping")',
+            contentType: 'application/json',
+            dataType: 'html',
+            data: JSON.stringify(model)
+        }).done(function (result) {
+           
+            $("#CollectionMappingList").html(result);
+           
+            if ($("#total_pages").val() != undefined) {
+                $("#contentPager").attr("hidden", false);
+                $('#contentPager').pagination({
+                    
+                    items: $("#total_pages").val(),
+                    itemOnPage: 25,
+                    currentPage: page,
+                    cssStyle: 'light-theme',
+                    onInit: function () {
+                    },
+                    onPageClick: function (page, evt) {
+                        getData(page);
+                    }
+                });
+            }
+            else {
+                $("#contentPager").attr("hidden", true);
+            }
+        });
+    }
+</script>

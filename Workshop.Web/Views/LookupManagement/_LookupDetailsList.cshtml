@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.LookupDetailsDTO>
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+    @if (Model != null)
+    {
+        @foreach (var data in Model)
+        {
+            <tr id="@data.Id">
+                <td>@data.Code</td>
+                <td>@data.PrimaryName<span></span></td>
+                <td>@data.SecondaryName<span></span></td>
+                <td>
+                <button type="button" class="btn btn-info btn-w-m btn-sm my-1 editLKP" onclick="Editlookup(@data.Id)"><i class="fa fa-pencil"></i>&nbsp;@Common["Button_Edit"]</button>
+                <button type="button" class="btn btn-danger btn-w-m btn-sm my-1" onclick="DeleteLookup(@data.Id)"><i class="fa fa-trash"></i>&nbsp;@Common["Button_Delete"]</button>
+                </td>
+            </tr>
+        }
+
+        <input type="hidden" id="hidNoResultFound" value="0" />
+    }
+    else
+    {
+        <input type="hidden" id="hidNoResultFound" value="1" />
+    }

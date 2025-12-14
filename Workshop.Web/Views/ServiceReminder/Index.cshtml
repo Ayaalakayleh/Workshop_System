@@ -1,0 +1,407 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@using Workshop.Web.Services.Helpers.DateHelper
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model ServiceReminderPageVM
+
+@{
+    var lang = Workshop.Web.Controllers.ServiceReminderController.GetCurrentLanguage();
+}
+<div class="row">
+    <div class="col-12">
+        <div id="panel-61" class="panel">
+            <div class="panel-hdr px-2">
+                <h2 class="font-weight-bold">@Common["ServiceReminderStatus"]</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content bg-subtlelight-fade">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6">
+                            <div class="row mt-3 w-100" id="agDiv">
+                                <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <a>
+                                        <div class="py-5 rounded bg-light numbers-rounded overflow-hidden position-relative mb-g shadow">
+                                            <div class="d-flex justify-content-center align-items-center t">
+                                                <h3 class="display-4 d-block l-h-n m-0 fw-500 text-center">
+                                                    <span id="Scheduled" class="text-success">@Model.ScheduledRemindersCount</span>
+                                                    <small class="m-0 l-h-n text-success" style="font-size:13px">@Common["Scheduled"]</small>
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-xs-12 goTo">
+                                    <a>
+                                        <div class="py-5 rounded bg-light numbers-rounded overflow-hidden position-relative mb-g shadow">
+                                            <div class="d-flex justify-content-center align-items-center t">
+                                                <h3 class="display-4 d-block l-h-n m-0 fw-500 text-center">
+                                                    <span id="DueSoon" class="text-warning">@Model.DueSoonRemindersCount</span>
+                                                    <small class="m-0 l-h-n text-warning" style="font-size:13px">@Common["DueSoon"]</small>
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-xs-12 goTo">
+                                    <a>
+                                        <div class="py-5 rounded bg-light numbers-rounded overflow-hidden position-relative mb-g shadow">
+                                            <div class="d-flex justify-content-center align-items-center t">
+                                                <h3 class="display-4 d-block l-h-n m-0 fw-500 text-center">
+                                                    <span id="Overdue" class="text-danger">@Model.OverdueRemindersCount</span>
+                                                    <small class="m-0 l-h-n text-danger" style="font-size:13px">@Common["Overdue"]</small>
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="demo-container d-flex justify-content-center">
+                                <div id="StatusPieChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["ServiceReminder"]</h2>
+                <div class="panel-toolbar">
+                    <button id="addnewBtn" type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#serviceReminderModal">
+                        <i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+                    </button>
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    @using (Html.BeginForm("Index", "ServiceReminder", FormMethod.Post))
+                    {
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>@Common["Label_Manufacturer"]</label>
+                                    @Html.DropDownListFor(model => model.ReminderForm.ManufacturerId,
+                                    new SelectList(ViewBag.manufacturers, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control", id = "_Manufacturer" })
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>@Common["Label_Vehicle"]</label>
+                                @Html.DropDownListFor(model => model.ReminderForm.VehicleId,
+                                                                new SelectList(ViewBag.vehicle, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control", id = "_Vehicle" })
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>@Common["Label_Model"]</label>
+                                @Html.DropDownListFor(model => model.ReminderForm.VehicleModelId,
+                                                                new SelectList(ViewBag.vehicle, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control", @id = "_Model", @name = "Model" })
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>@Common["Label_ServiceTask"]</label>
+                                @Html.DropDownListFor(model => model.ReminderForm.ItemId,
+                                                                new SelectList(ViewBag.services, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control", id = "_Services" })
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>@Common["Label_Year"]</label>
+                                @Html.EditorFor(model => model.ReminderForm.ManufacturingYear,
+                                                                new { htmlAttributes = new { @class = "form-control", @type = "number", id = "_Year" } })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" id="btnSearch"><i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                        <button id="btnReset" type="button" class="btn btn-secondary">
+                            <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                        </button>
+                    </div>
+                                        }
+                    <hr />
+                    @await Html.PartialAsync("_Services")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- service reminder modal -->
+<div class="modal fade" id="serviceReminderModal" aria-labelledby="matrixModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceReminderModalLabel">@Common["AddServiceReminderRule"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="serviceReminderForm" asp-action="Edit" asp-controller="ServiceReminder" method="post">
+                    <div class="row">
+
+                        @Html.EditorFor(model => model.ReminderForm.Id, new { htmlAttributes = new { @class = "form-control", @type = "hidden", @readonly = "readonly" } })
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Manufacturer"]</label>
+                            @Html.DropDownListFor(model => model.ReminderForm.ManufacturerId,
+                            new SelectList(ViewBag.manufacturers, "Value", "Text"),
+                                                        "Select",
+                                                        new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_Vehicle"]</label>
+                            @Html.DropDownListFor(model => model.ReminderForm.VehicleId,
+                                                        new SelectList(ViewBag.vehicle, "Value", "Text"),
+                                                        "Select",
+                                                        new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_Model"]</label>
+                            @Html.DropDownListFor(model => model.ReminderForm.VehicleModelId,
+                                                        new SelectList(ViewBag.services, "Value", "Text"),
+                                                        "Select",
+                                                        new { @class = "form-control", id = "Model" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_Year"]</label>
+                            @Html.EditorFor(model => model.ReminderForm.ManufacturingYear, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_VechileType"]</label>
+                            @Html.DropDownListFor(model => model.ReminderForm.VehicleGroupId,
+                                                        new SelectList(ViewBag.vehicleClasss, "Value", "Text"),
+                                                        "Select",
+                                                        new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_Services"]</label>
+                            @Html.DropDownListFor(model => model.ReminderForm.ItemId,
+                                                        new SelectList(ViewBag.services, "Value", "Text"),
+                                                        "Select",
+                                                        new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_Repeats"]</label>
+                            @Html.EditorFor(model => model.ReminderForm.Repates, new { htmlAttributes = new { @class = "form-control", @type = "number", @placeholder = @Common["Every"] } })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_TimeInterval"]</label>
+                            <div class="input-group flex-nowrap">
+                                @Html.EditorFor(model => model.ReminderForm.TimeInterval, new { htmlAttributes = new { @class = "form-control", @type = "number", @placeholder = @Common["Every"] } })
+                                @Html.DropDownListFor(model => model.ReminderForm.TimeIntervalUnit,
+                                                                new SelectList(ViewBag.dateUnits, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_TimeDuo"]</label>
+                            <div class="input-group flex-nowrap">
+                                @Html.EditorFor(model => model.ReminderForm.TimeDue, new { htmlAttributes = new { @class = "form-control", @type = "number", @placeholder = @Common["Every"] } })
+                                @Html.DropDownListFor(model => model.ReminderForm.TimeDueUnit,
+                                                                new SelectList(ViewBag.dateUnits, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_PrimaryMeterInterval"]</label>
+                            <div class="input-group flex-nowrap">
+                                @Html.EditorFor(model => model.ReminderForm.PrimaryMeterInterval, new { htmlAttributes = new { @class = "form-control", @type = "number", @placeholder = @Common["Every"] } })
+                                <div class="input-group-append">
+                                    <span class="input-group-text">@Common["Unit_Kilometer"]</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>@Common["Label_PrimaryMeterDue"]</label>
+                            <div class="input-group flex-nowrap">
+                                @Html.EditorFor(model => model.ReminderForm.PrimaryMeterDue, new { htmlAttributes = new { @class = "form-control", @type = "number", @placeholder = @Common["Every"] } })
+                                <div class="input-group-append">
+                                    <span class="input-group-text">@Common["Unit_Kilometer"]</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="custom-control custom-checkbox">
+                                @Html.CheckBoxFor(model => model.ReminderForm.IsManually, htmlAttributes: new { @class = "custom-control-input", id = "IsManually" })
+                                <label class="custom-control-label" for="IsManually">
+                                    @Common["Manually"]
+                                </label>
+                            </div>
+
+                            <div id="ManualControl" class="custom-control collapse">
+                                <div class="col-md-6 mb-3">
+                                    @Html.LabelFor(model => model.ReminderForm.ManualDate, @Common["ManualDate"])
+                                    @Html.TextBoxFor(model => model.ReminderForm.ManualDate,
+                                                                        new { @class = "form-control flat-picker", type = "date" })
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    @Html.LabelFor(model => model.ReminderForm.ManualPrimaryMeter, @Common["Label_ ManualMeterInterval"])
+                                    <div class="input-group flex-nowrap">
+                                        @Html.TextBoxFor(model => model.ReminderForm.ManualPrimaryMeter,
+                                                                                new { @class = "form-control", type = "number", @placeholder = @Common["Every"] })
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">@Common["Unit_Kilometer"]</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="custom-control custom-checkbox">
+                                @Html.CheckBoxFor(
+                                                                model => model.ReminderForm.HasNotification,
+                                                                new
+                                                                {
+                                                                    @class = "custom-control-input",
+                                                                    id = "HasNotification"
+                                                                }
+                                                                )
+                                <label class="custom-control-label" for="HasNotification">@Common["Notifications"]</label>
+                            </div>
+
+                            <div id="NoticationsControl" class="custom-control collapse">
+                                @Html.LabelFor(model => model.ReminderForm.NotificationsGroupId, @Common["Notify"])
+                                @Html.DropDownListFor(
+                                                                m => m.ReminderForm.NotificationsGroupId,
+                                                                new MultiSelectList(ViewBag.Groups, "Value", "Text"),
+                                                                "Select",
+                                                                new { @class = "form-control", @multiple = "multiple" }
+                                                                )
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="panel-tag">
+                                @Common["NotificationsDescription"]
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="submit" class="btn btn-primary" form="serviceReminderForm"><i class="fas fa-save"></i>&nbsp;@Common["Save"]</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Cancel"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Shared variables for other scripts
+    var RazorVars = {
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappened"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]',
+        btnSave: '@Html.Raw(Common["Save"])',
+        btnSaving: '@Html.Raw(Common["Saving"])',
+        btnTryAgain: '@Html.Raw(Common["TryAgain"])',
+        btnOk: '@Html.Raw(Common["Ok"])',
+        msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+        ErrorHappened: '@Html.Raw(Common["ErrorHappened"])',
+        loadingText: '@Html.Raw(Common["Loading"])',
+        requiredField: '@Html.Raw(Common["RequiredField"])',
+        totalText: '@Html.Raw(Common["Total"])',
+        placeholderSelect: '@Html.Raw(Common["Select"])',
+        editUrl: '@Url.Action("Edit", "ServiceReminder")',
+        getVehicleByManufacturerIdURL: '@Url.Action("GetVehicleByManufacturerId", "ServiceReminder")',
+        getDueServiceRemindersURL: '@Url.Action("GetDueServiceReminders", "ServiceReminder")'
+    };
+</script>
+
+<script src="~/js/site.js"></script>
+<script src="~/js/Definitions/ServiceReminder.js"></script>
+
+<script>
+    // Global Select2 + Bootstrap 5 setup (handles normal selects + modal selects)
+    (function ($) {
+
+        function initSelect2(context) {
+            var $ctx = context ? $(context) : $(document);
+
+            $ctx.find('select').each(function () {
+                var $select = $(this);
+
+                // Skip if explicitly disabled
+                if ($select.hasClass('no-select2')) {
+                    return;
+                }
+
+                // Destroy any previous instance so we can reconfigure safely
+                if ($select.data('select2')) {
+                    $select.select2('destroy');
+                }
+
+                var options = {
+                    theme: 'bootstrap-5', // requires Select2 Bootstrap 5 theme CSS
+                    width: '100%',
+                    placeholder: RazorVars.placeholderSelect || 'Select'
+                };
+
+                // Allow clear only for non-required single selects
+                if (!$select.is('[multiple]') && !$select.prop('required')) {
+                    options.allowClear = true;
+                }
+
+                // If inside a Bootstrap modal, keep dropdown/search inside the modal
+                var $modalParent = $select.closest('.modal');
+                if ($modalParent.length) {
+                    options.dropdownParent = $modalParent;
+                }
+
+                $select.select2(options);
+            });
+        }
+
+        $(document).ready(function () {
+            // Initial setup for all selects on the page
+            initSelect2();
+
+            // When any Bootstrap 5 modal is shown, re-init selects inside it
+            $(document).on('shown.bs.modal', '.modal', function () {
+                initSelect2(this);
+            });
+
+            // Fix Bootstrap's focus trap so the Select2 search field stays focusable & typeable
+            document.addEventListener('focusin', function (e) {
+                if (e.target.classList &&
+                    e.target.classList.contains('select2-search__field')) {
+                    e.stopPropagation();
+                }
+            }, true);
+        });
+
+    })(jQuery);
+</script>

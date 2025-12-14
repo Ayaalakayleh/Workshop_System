@@ -1,0 +1,282 @@
+﻿@page
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@using Workshop.Core.DTOs
+@model ReservationDTO
+@{
+    var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<div class="container-fluid py-2">
+    <!-- Reservations — Diary Controls -->
+    <div class="reservations-card mb-3 d-flex align-items-start gap-3 flex-wrap">
+        <div class="flex-grow-1">
+            <h4 class="text-muted">@Common["Label_ReservationsDiaryControls"]</h4>
+            <div class="viewbar mt-2">
+                <div class="segmented" role="tablist" aria-label="View switch">
+                    <button type="button" id="viewDay" class="active">@Common["Day"]</button>
+                    <button type="button" id="viewWeek">@Common["Week"]</button>
+                    <button type="button" id="viewMonth">@Common["Month"]</button>
+                </div>
+                <div id="viewTitle" class="view-title"></div>
+            </div>
+        </div>
+
+        <div class="ms-auto d-flex flex-wrap align-items-end gap-3">
+            <div>
+                <label class="form-label mb-0 sm-note">@Common["Label_Date"]</label>
+                <input type="date" class="form-control form-control-sm" id="dcDate" />
+            </div>
+            <div>
+                <label class="form-label mb-0 sm-note">@Common["Label_Slots30m"]</label>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="time" class="form-control form-control-sm" id="slotStart" value="08:00" />
+                    <span class="sm-note">—</span>
+                    <input type="time" class="form-control form-control-sm" id="slotEnd" value="17:00" />
+                </div>
+            </div>
+            <div class="panel-toolbar">
+                <button type="button" class="btn btn-outline-primary" id="BtnAddNew">
+                    <i class="fa fa-plus"></i>&nbsp;@Common["NewReservation"]
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="fw-bold">@Common["Label_DaySchedule"]</h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content text-start">
+                <div class="resv-scroll">
+                    <table class="table table-sm resv-grid mb-3 w-100">
+                        <thead>
+                            <tr class="text-muted" id="resvHead">
+                                <th class="text-uppercase time-cell">@Common["Label_Time"]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resvBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="resv-floater">
+                    <button type="button" id="btnClear" class="btn-clear">Clear (0)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-2" class="panel">
+        <div class="panel-hdr">
+            <h2 class="fw-bold">@Common["Label_ReservationsSelectedDay"]</h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content text-start">
+
+                <!-- 🔍 Filters section -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">@Common["Label_FromDate"]</label>
+                        <input type="date" class="form-control flat-picker" id="filterFromDate" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">@Common["Label_ToDate"]</label>
+                        <input type="date" class="form-control flat-picker" id="filterToDate" />
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>@Common["Label_VehicleName"]</label>
+                            @Html.DropDownListFor(model => model.Id,
+                            (SelectList)ViewBag.Vehicles,
+                                                        Common["Select"].Value,
+                                                        new { @class = "form-control", id = "filterPlateNumber" })
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>@Common["Label_Chassis"]</label>
+                            <input type="text" class="form-control" id="filterChassis" maxlength="200" autocomplete="off" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" id="btnSearch"><i class="fad fa-search"></i>@Common["Button_Search"]</button>
+                    <button class="btn btn-secondary" type="reset" id="btnReset"><i class="fas fa-times"></i>@Common["Button_Reset"]</button>
+                </div>
+                <div id="reservationsTableContainer" class="mt-2">
+                    @Html.Partial("_ReservationsTablePartial", ViewBag.Reservaions as IEnumerable<Workshop.Core.DTOs.ReservationListItemDTO>)
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal containers -->
+<div id="scheduleModalContainer"></div>
+<div id="reservationDetailsModalContainer"></div>
+
+@using System.Text.Json
+<script id="i18n" type="application/json">
+    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                label_reserved = Common["Label_Reserved"].Value
+        }))
+</script>
+<script>
+      window.API_BASE = {
+        getVehicleByPlate: '@Url.Action("GetVehicleByPlate", "Reservations")',
+        getRtsInfo: '@Url.Action("GetRtsInfo", "Reservations")',
+        getAvailableTechnicians: '@Url.Action("GetAvailableTechnicians", "Reservations")',
+        getAvailableSlots: '@Url.Action("GetAvailableSlots", "Reservations")',
+        getVehicleDefentionById: '@Url.Action("GetVehicleDefentionById", "Reservations")',
+        getAvaliableTechTime: '@Url.Action("GetAvailableTechnicians", "Reservations")',
+        saveReservation: '@Url.Action("InsertReservation", "Reservations")',
+        loadScheduleDialog: '@Url.Action("LoadScheduleDialog", "Reservations")',
+        getAllReservationsFiltered: '@Url.Action("GetAllReservationsFiltered", "Reservations")',
+        getAllReservationsFilteredJSON: '@Url.Action("GetAllReservationsFilteredJSON", "Reservations")',
+        getReservationsByIds: '@Url.Action("GetReservationsByIds", "Reservations")'
+    };
+
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/definitions/reservations.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#BtnAddNew").on("click", function () {
+            $.ajax({
+                url: window.API_BASE.loadScheduleDialog,
+                type: 'GET',
+                success: function (html) {
+                    $("#scheduleModalContainer").html(html);
+                    const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+                    modal.show();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading dialog:", error);
+                    alert("Failed to load dialog.");
+                }
+            });
+        });
+
+        $('#btnSearch').on('click', function () {
+            getReservations();
+        });
+
+        function getReservations(page) {
+            const dateFrom = $('#filterFromDate').val();
+            const dateTo = $('#filterToDate').val();
+            const vehicleId = $('#filterPlateNumber').val();
+            const chassis = $('#filterChassis').val();
+
+            const filter = {
+                DateFrom: dateFrom || null,
+                DateTo: dateTo || null,
+                VehicleId: vehicleId ? parseInt(vehicleId) : null,
+                Chassis: chassis ? chassis : null
+            };
+
+            if (page !== undefined && page !== null) {
+                filter.PageNumber = page;
+            }
+
+            $.ajax({
+                url:  window.API_BASE.getAllReservationsFiltered,
+                type: 'POST',
+                data: JSON.stringify(filter),
+                contentType: 'application/json; charset=utf-8',
+                success: function (html) {
+                    $('#reservationsTableContainer').html(html);
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+         $(document).on("click", "#btnReset", function () {
+
+        $("#filterFromDate").val("");
+        $("#filterToDate").val("");
+        $("#filterPlateNumber").val("");
+        $("#filterChassis").val("");
+
+        getReservations();
+    });
+
+        // Initial fetch for the grid
+        getActiveReservations();
+            // Handle segmented view buttons (Day / Week / Month)
+    $(".segmented button").on("click", function () {
+        // Toggle active state
+        $(".segmented button").removeClass("active");
+        $(this).addClass("active");
+
+        // Refresh reservations using current date and chosen view
+        getActiveReservations();
+    });
+
+    });
+
+        function getActiveReservations() {
+        const dateFrom = $("#dcDate").val();
+        let dateTo = null;
+
+        // Is "Week" view selected?
+        const isWeekView = $("#viewWeek").hasClass("active");
+
+        if (isWeekView && dateFrom) {
+            // Week view: dateTo = dateFrom + 6 days
+            const d = new Date(dateFrom);
+            d.setDate(d.getDate() + 6);
+
+            // Format as yyyy-MM-dd for the API / input[type=date]
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            dateTo = `${yyyy}-${mm}-${dd}`;
+        } else if ($("#dcDateTo").length) {
+            // Fallback to existing behavior if you ever have a dcDateTo field
+            dateTo = $("#dcDateTo").val();
+        }
+
+        const url = window.API_BASE.getAllReservationsFilteredJSON;
+        const filter = {
+            dateFrom: dateFrom,
+            dateTo: dateTo
+        };
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: filter,
+            dataType: "json",
+            success: function (response) {
+                if (response.sucess || response.success) {
+                    if (window.updateTechSchedule) {
+                        window.updateTechSchedule(response.data || []);
+                    }
+                } else {
+                    Swal.fire('@Common["ErrorHappend"]', response.message, "error");
+                }
+            },
+            error: function () {
+                Swal.fire('@Common["ErrorHappend"]', '@Common["ErrorHappend"]', "error");
+            }
+        });
+    }
+
+
+    // Refetch when date changes
+    $("#dcDate").on("change", function () {
+        getActiveReservations();
+    });
+       
+</script>
+
+

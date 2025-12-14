@@ -1,0 +1,1556 @@
+﻿@using Vehicle.Models;
+@using POCO;
+@using System.Configuration;
+<!DOCTYPE html>
+<html>
+@{
+    var language = Vehicle.Controllers.LanguageController.GetCurrentLanguage();
+    //var CompanyName = language == "en" ? ((POCO.CompanyInfo)Session["CompanyInfo"]).CompanyPrimaryName : ((POCO.CompanyInfo)Session["CompanyInfo"]).CompanySecondaryName;
+    //var menus = SessionManager.GetSessionPrimaryMenuListInfo.Where(p => p.ParentId != -1).ToList();
+
+    //var list = new List<dynamic>();
+    //foreach (var item in menus)
+    //{
+    //    list.Add(new { PrimaryName = item.PrimaryName, ControllerName = item.ControllerName, MethodName = item.MethodName });
+    //}
+
+    App.DecimalPoints = (((CompanyBranch)Session["BranchInfo"]).CountryCode == "KSA" ? 2 : 3);
+    App.DecimalStringPoints = (((CompanyBranch)Session["BranchInfo"]).CountryCode == "KSA" ? "0.00" : "0.000");
+    App.HostName = ConfigurationManager.AppSettings["HostName"];
+
+}
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - @Resources.Default.VehiclesSystem</title>
+
+    @Styles.Render("~/Content/smart_theme/dist/css")
+
+    <link href="~/Content/smart_theme/dist/css/themes/cust-theme-3.css" rel="stylesheet" />
+    @Styles.Render("~/Content/bootstrap-touchspin")
+    @Styles.Render("~/Content/colorpicker")
+    @Styles.Render("~/Content/cropper")
+    @Styles.Render("~/Content/Switchery")
+    @Styles.Render("~/Content/jasny")
+    @Styles.Render("~/Content/jasny")
+    @Styles.Render("~/Content/nouislider")
+    @Styles.Render("~/Content/rangeSlider")
+    @Styles.Render("~/Content/clockpicker")
+    @Styles.Render("~/Content/select2")
+    <link href="~/Content/js/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/Content/css/plugins/test/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link href="~/Content/smart_theme/dist/dynameter/css/jquery.dynameter.css" rel="stylesheet" />
+    <link href="~/Content/smart_theme/dist/dynameter/css/index.css" rel="stylesheet" />
+
+    <link href="~/Content/smart_theme/dist/css/miscellaneous/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" />
+    <link href="~/Content/css/animate.css" rel="stylesheet" />
+
+    <script>
+        var okVar = "@Resources.Default.OK";
+    </script>
+    <link id="mytheme" rel="stylesheet" media="screen, print">
+
+    @Styles.Render("~/Content/select2bootstrap4")
+    @Styles.Render("~/Content/style")
+    @Styles.Render("~/Content/bootstrap-markdown")
+    @Styles.Render("~/font-awesome/css")
+    @Styles.Render("~/Gallery/css")
+    @Styles.Render("~/Content/footer")
+    @Styles.Render("~/css/plugins/sweetalert")
+    @Styles.Render("~/Content/smart_theme/dist/EditorCss")
+    @Styles.Render("~/Content/simplePagination")
+
+    @if (Vehicle.Controllers.LanguageController.IsRighToLeft())
+    {
+        <link href="~/Content/css/plugins/bootstrap-rtl/bootstrap-rtl.css" rel="stylesheet" />
+    }
+    @*<script src="~/Content/smart_theme/dist/echarts/echarts.js"></script>*@
+    <!-- Mainly scripts -->
+    @Scripts.Render("~/Content/smart_theme/dist/js/vendors.bundle.js")
+
+
+    @Scripts.Render("~/plugins/Blueimp-gallery")
+
+    @Scripts.Render("~/js/plugins/nestable")
+    <!-- Flot -->
+    @Scripts.Render("~/plugins/flot")
+
+    <!--unobtrusive-ajax-->
+    @Scripts.Render("~/js/unobtrusive-ajax")
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+
+    <!-- Sparkline -->
+    @Scripts.Render("~/plugins/sparkline")
+
+
+    <!-- ChartJS-->
+    @Scripts.Render("~/plugins/chartJs")
+
+
+    <!-- Switchery -->
+    @Scripts.Render("~/plugins/Switchery")
+
+    <!-- MENU -->
+    @Scripts.Render("~/bundles/metisMenu")
+    <!-- Color picker -->
+    @Scripts.Render("~/plugins/bootstrap-colorpicker")
+
+
+
+    <!-- Date range use moment.js same as full calendar plugin -->
+    @Scripts.Render("~/plugins/moment")
+    <script src="~/Content/smart_theme/dist/js/slick-1.8.1/slick/slick.min.js"></script>
+    <!-- Select2 -->
+    @Scripts.Render("~/plugins/select2full")
+
+
+    <!-- TouchSpin -->
+    @Scripts.Render("~/plugins/touchspin")
+
+
+    <script src="~/Content/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <!-- Custom and plugin javascript -->
+    @Scripts.Render("~/bundles/inspinia")
+
+
+    <!--markdown-->
+    @Scripts.Render("~/plugins/bootstrap-markdown")
+
+
+    <!--sweet alert-->
+    @Scripts.Render("~/js/plugins/sweetalert")
+
+    <!--pwstrength-->
+
+    @Scripts.Render("~/js/plugins/pwstrength")
+
+    @Scripts.Render("~/plugins/footer")
+    @Scripts.Render("~/plugins/touch-punch")
+
+    <!---->
+
+    <script src="~/Content/smart_theme/dist/js/formplugins/inputmask/inputmask.bundle.js"></script>
+    @Scripts.Render("~/plugins/jasny")
+
+    <link href="~/Content/appstyle.css" rel="stylesheet" />
+    <link href="~/Content/smart_theme/dist/build/css/intlTelInput.css" rel="stylesheet" />
+    <link href="~/Content/smart_theme/dist/js/slick-1.8.1/slick/slick.css" rel="stylesheet" />
+    <link href="~/Content/smart_theme/dist/js/slick-1.8.1/slick/slick-theme.css" rel="stylesheet" />
+    @*@if (Request.Cookies["Language"] != null && Request.Cookies["Language"].Value == "ar")
+        {
+            <link href="~/Content/arStyle.css" rel="stylesheet" />
+        }*@
+
+    <style>
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    label.error {
+        color: red
+    }
+
+    .select2-dropdown {
+        z-index: 3051;
+    }
+        .scroll-overflow {
+            overflow: hidden;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+            .scroll-overflow::-webkit-scrollbar {
+                width: 3px;
+            }
+
+            .scroll-overflow::-webkit-scrollbar-track {
+                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            }
+
+            .scroll-overflow::-webkit-scrollbar-thumb {
+                background-color: #eee;
+                outline: 1px solid #eee;
+                border-radius:50px
+            }
+        .target-ratio {
+            border: 2px dashed var(--theme-info-400)
+        }
+
+    .dropdown-header.bg-trans-gradient {
+        padding: 1rem 1.5rem
+    }
+
+    .nav-function-top .page-sidebar .primary-nav .nav-menu > li > ul, .nav-function-top .page-sidebar2 .primary-nav .nav-menu > li > ul {
+        width: 16rem
+    }
+
+    .b24-widget-button-shadow {
+        display: none
+    }
+
+    .btn-danger.disabled, .btn-danger:disabled {
+        color: #fff;
+        background-color: #ed5565;
+        border-color: #ed5565;
+    }
+
+    .modal-dialog.modal-transparent .modal-header, .modal-dialog.modal-transparent .modal-body .form-group label {
+        color: #fff !important
+    }
+    .btn-info {
+        color: #fff;
+        background-color: #23c6c8;
+        border-color: #23c6c8;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #10c167;
+        border-color: #10c167;
+    }
+        body:not(.mod-main-boxed):not(.mobile-view-activated).chrome.modal-open{
+            padding-right:unset !important
+        }
+
+        .text-info {
+            color: #23c6c8
+        }
+
+    .text-success {
+        color: #10c167
+    }
+
+    .btn-primary.active {
+        background-color: #224681 !important;
+        font-weight: bold
+    }
+
+        .btn-primary.active::before {
+            content: "\f00c ";
+            font-family: FontAwesome;
+        }
+    /*************************/
+
+    .select2-container--bootstrap4 .select2-results__option--highlighted {
+        background-color: var(--theme-primary-800)
+    }
+
+    .badge-primary {
+        background-color: var(--theme-primary)
+    }
+
+    legend {
+        text-align: start !important
+    }
+
+    .page-logo img {
+        width: 177px;
+        height: 45px;
+    }
+
+    .page-logo {
+        height: auto;
+        border: none;
+    }
+
+    a[target]:not(.btn) {
+        text-decoration: none !important
+    }
+
+    .panel.panel-fullscreen .btn-panel[data-action="panel-fullscreen"] i, .panel.panel-fullscreen .js-panel-fullscreen i {
+        top: 5.7px !important;
+        left: 5.5px !important;
+    }
+
+    .header-icon {
+        cursor: pointer;
+    }
+
+    .modal-dialog.modal-transparent .modal-body .form-group .filepond--drop-label label {
+        color: #000 !important
+    }
+    /*        .nav-function-top .page-sidebar{
+            padding: 0 6.625rem;
+        }
+        table{
+            border-radius:5px;
+            overflow:hidden
+        }*/
+    .badge-purple {
+        background-color: #7a6aed;
+        color: #fff;
+    }
+
+    .bg-purple-gradient {
+        background-image: linear-gradient(250deg, rgba(41, 16, 112, 0.7), transparent);
+    }
+
+    .bg-purple-300 {
+        background-color: #7a6aed;
+    }
+    .nav-tabs {
+        border-bottom: 0;
+    }
+        .nav-tabs .nav-link {
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+            margin-bottom: 0;
+        }
+              .dx-datagrid-column-chooser .dx-overlay-content {
+
+            text-align:start
+        }
+    .tab-content {
+        border: 0;
+        box-shadow: 0px 0px 13px 0px rgb(62 44 90 / 17%);
+    }
+    .nav-tabs .nav-link {
+        background-color: #edf2f9;
+        margin-right: 10px;
+        border: 0;
+        color: var(--theme-dark);
+        box-shadow: 0px -6px 13px 0px rgb(62 44 90 / 11%);
+    }
+        .nav-tabs .nav-link.active {
+            background-color: #fff;
+            color: var(--theme-primary) !important;
+            border: 0;
+        }
+    .tabs-container .tab-pane .panel-body {
+        border: 0 !important;
+    }
+    select[readonly].select2-hidden-accessible + .select2-container {
+        pointer-events: none;
+        touch-action: none;
+    }
+
+    select[readonly].select2-hidden-accessible + .select2-container .select2-selection {
+        background: #eee;
+        box-shadow: none;
+    }
+
+    select[readonly].select2-hidden-accessible + .select2-container .select2-selection__arrow, select[readonly].select2-hidden-accessible + .select2-container .select2-selection__clear {
+        display: none;
+    }
+    .the-car-loader {
+        top: 0;
+        left: 0;
+        height: 100%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.7);
+        position: fixed;
+        width: 100%;
+        z-index: 9999999999999
+    }
+.car__line {
+  transform-origin: center right;
+  stroke-dasharray: 22;
+  -webkit-animation: line 0.8s ease-in-out infinite;
+          animation: line 0.8s ease-in-out infinite;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+}
+.car__line--top {
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+}
+.car__line--middle {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s;
+}
+.car__line--bottom {
+  -webkit-animation-delay: 0.4s;
+          animation-delay: 0.4s;
+}
+        .fc-content{
+            margin:0.5rem 0
+        }
+        @@-webkit-keyframes shake {
+            0% {
+    transform: translateY(-1%);
+  }
+  100% {
+    transform: translateY(3%);
+  }
+}
+
+@@keyframes shake {
+  0% {
+    transform: translateY(-1%);
+  }
+  100% {
+    transform: translateY(3%);
+  }
+}
+@@-webkit-keyframes line {
+  0% {
+    stroke-dashoffset: 22;
+  }
+  25% {
+    stroke-dashoffset: 22;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  51% {
+    stroke-dashoffset: 0;
+  }
+  80% {
+    stroke-dashoffset: -22;
+  }
+  100% {
+    stroke-dashoffset: -22;
+  }
+}
+@@keyframes line {
+  0% {
+    stroke-dashoffset: 22;
+  }
+  25% {
+    stroke-dashoffset: 22;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  51% {
+    stroke-dashoffset: 0;
+  }
+  80% {
+    stroke-dashoffset: -22;
+  }
+  100% {
+    stroke-dashoffset: -22;
+  }
+}
+    @(Vehicle.Controllers.LanguageController.IsRighToLeft() ? "" : "#js-nav-menu .menu-list li a {padding: 0.8125rem 2rem 0.8125rem 4rem !important}")
+    </style>
+    @if (Vehicle.Controllers.LanguageController.IsRighToLeft())
+    {
+        <style>
+            .panel-tag {
+                border-right: 3px solid #1dc9b7;
+                border-left: unset;
+                border-radius: unset
+            }
+        </style>
+    }
+
+    <link href="~/Content/data-grid/css/dx.common.css" rel="stylesheet" />
+    <link href="~/Content/data-grid/css/dx.light.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/Content/smart_theme/dist/signature/modernizr.js"></script>
+    <link href="~/Content/Print/print.min.css" rel="stylesheet" />
+    <script src="~/Content/Print/print.min.js"></script>
+    <script src="~/Content/js/Loader.js"></script>
+
+
+    <style>
+        @@media (min-width: 992px) {
+            .nav-function-top .page-content-wrapper {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body class="nav-function-top" dir="@(Vehicle.Controllers.LanguageController.IsRighToLeft() ? "rtl" : "ltr")">
+    <script>
+        $.validator.messages.email = '@Vehicle.Resources.validationTexts.validemail';
+        $.validator.messages.required = '@Resources.Default.Required';
+    </script>
+
+    <script>
+        /**
+         *	This script should be placed right after the body tag for fast execution
+         *	Note: the script is written in pure javascript and does not depend on thirdparty library
+         **/
+        'use strict';
+
+        var classHolder = document.getElementsByTagName("BODY")[0],
+            /**
+             * Load from localstorage
+             **/
+            themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
+                {},
+            themeURL = themeSettings.themeURL || '',
+            themeOptions = themeSettings.themeOptions || '';
+        /**
+         * Load theme options
+         **/
+        if (themeSettings.themeOptions) {
+            classHolder.className = themeSettings.themeOptions;
+            //console.log("%c✔ Theme settings loaded", "color: #148f32");
+        }
+        else {
+            //console.log("%c✔ Heads up! Theme settings is empty or does not exist, loading default settings...", "color: #ed1c24");
+        }
+        if (themeSettings.themeURL && !document.getElementById('mytheme')) {
+            var cssfile = document.createElement('link');
+            cssfile.id = 'mytheme';
+            cssfile.rel = 'stylesheet';
+            cssfile.href = themeURL;
+            document.getElementsByTagName('head')[0].appendChild(cssfile);
+
+        }
+        else if (themeSettings.themeURL && document.getElementById('mytheme')) {
+            document.getElementById('mytheme').href = themeSettings.themeURL;
+        }
+        /**
+         * Save to localstorage
+         **/
+        var saveSettings = function () {
+            themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
+                return /^(nav|header|footer|mod|display)-/i.test(item);
+            }).join(' ');
+            if (document.getElementById('mytheme')) {
+                themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
+            };
+            localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+        }
+        /**
+         * Reset settings
+         **/
+        var resetSettings = function () {
+            localStorage.setItem("themeSettings", "");
+        }
+
+
+        $(document).ready(function () {
+
+        $('.summernote').summernote({
+            tabsize: 4,
+            height: 200,
+            disableDragAndDrop: true,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link']],
+                ['view', ['fullscreen']],
+                ['fontsize', ['fontsize']],
+                ['fontname', ['fontname']],
+                ['misc', ['print']]
+            ]
+        });
+
+
+            FilePond.registerPlugin(
+                FilePondPluginFilePoster,
+                FilePondPluginFileValidateSize,
+                FilePondPluginImagePreview,
+                FilePondPluginPdfPreview,
+                FilePondPluginFileValidateType,
+                FilePondPluginFileMetadata
+            );
+
+        FilePond.setOptions({
+
+            labelIdle: "@Html.Raw(Resources.Default.DragAndDrop)",
+            labelMaxFileSizeExceeded: "@Resources.Default.Fileistoolarge",
+            labelMaxFileSize: '@Resources.Default.Maximumfilesizeis {filesize}',//@Resources.Default.MB
+        });
+
+            $(".select2").select2({
+                theme: 'bootstrap4',
+            });
+
+        });
+    </script>
+    <div class="dashboardLoading d-none" id="DashboardLoading">Loading&#8230;</div>
+
+    <div class="the-car-loader">
+        <img src="~/Content/img/fleetexpress_loader.gif" style="width:20%" />
+
+
+    </div>
+    <!-- BEGIN Page Wrapper -->
+    <div class="page-wrapper">
+        <div class="page-inner">
+            <!-- BEGIN Left Aside -->
+            <!-- END Left Aside -->
+            <div class="page-content-wrapper">
+                <!-- BEGIN Page Header -->
+                <!-- END Page Header -->
+                <!-- BEGIN Page Content -->
+                <!-- the #js-page-content id is needed for some plugins to initialize -->
+                <main id="js-page-content" role="main" class="page-content arabic-content">
+                    @RenderBody()
+                </main>
+                <!-- this overlay is activated only when mobile menu is triggered -->
+                <div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div> <!-- END Page Content -->
+                <!-- BEGIN Page Footer -->
+                <!-- END Page Footer -->
+                <!-- BEGIN Shortcuts -->
+                <div class="modal fade modal-backdrop-transparent p-0" id="modal-shortcut" tabindex="-1" role="dialog" aria-labelledby="modal-shortcut" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-top modal-transparent" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Shortcuts -->
+                <!-- BEGIN Color profile -->
+                <!-- this area is hidden and will not be seen on screens or screen readers -->
+                <!-- we use this only for CSS color refernce for JS stuff -->
+                <p id="js-color-profile" class="d-none">
+                    <span class="color-primary-50"></span>
+                    <span class="color-primary-100"></span>
+                    <span class="color-primary-200"></span>
+                    <span class="color-primary-300"></span>
+                    <span class="color-primary-400"></span>
+                    <span class="color-primary-500"></span>
+                    <span class="color-primary-600"></span>
+                    <span class="color-primary-700"></span>
+                    <span class="color-primary-800"></span>
+                    <span class="color-primary-900"></span>
+                    <span class="color-info-50"></span>
+                    <span class="color-info-100"></span>
+                    <span class="color-info-200"></span>
+                    <span class="color-info-300"></span>
+                    <span class="color-info-400"></span>
+                    <span class="color-info-500"></span>
+                    <span class="color-info-600"></span>
+                    <span class="color-info-700"></span>
+                    <span class="color-info-800"></span>
+                    <span class="color-info-900"></span>
+                    <span class="color-danger-50"></span>
+                    <span class="color-danger-100"></span>
+                    <span class="color-danger-200"></span>
+                    <span class="color-danger-300"></span>
+                    <span class="color-danger-400"></span>
+                    <span class="color-danger-500"></span>
+                    <span class="color-danger-600"></span>
+                    <span class="color-danger-700"></span>
+                    <span class="color-danger-800"></span>
+                    <span class="color-danger-900"></span>
+                    <span class="color-warning-50"></span>
+                    <span class="color-warning-100"></span>
+                    <span class="color-warning-200"></span>
+                    <span class="color-warning-300"></span>
+                    <span class="color-warning-400"></span>
+                    <span class="color-warning-500"></span>
+                    <span class="color-warning-600"></span>
+                    <span class="color-warning-700"></span>
+                    <span class="color-warning-800"></span>
+                    <span class="color-warning-900"></span>
+                    <span class="color-success-50"></span>
+                    <span class="color-success-100"></span>
+                    <span class="color-success-200"></span>
+                    <span class="color-success-300"></span>
+                    <span class="color-success-400"></span>
+                    <span class="color-success-500"></span>
+                    <span class="color-success-600"></span>
+                    <span class="color-success-700"></span>
+                    <span class="color-success-800"></span>
+                    <span class="color-success-900"></span>
+                    <span class="color-fusion-50"></span>
+                    <span class="color-fusion-100"></span>
+                    <span class="color-fusion-200"></span>
+                    <span class="color-fusion-300"></span>
+                    <span class="color-fusion-400"></span>
+                    <span class="color-fusion-500"></span>
+                    <span class="color-fusion-600"></span>
+                    <span class="color-fusion-700"></span>
+                    <span class="color-fusion-800"></span>
+                    <span class="color-fusion-900"></span>
+                </p>
+                <!-- END Color profile -->
+
+            </div>
+        </div>
+    </div>
+    <!-- END Page Wrapper -->
+    <!-- BEGIN Quick Menu -->
+    <!-- to add more items, please make sure to change the variable '$menu-items: number;' in your _page-components-shortcut.scss -->
+    @*<nav class="shortcut-menu d-none d-sm-block" hidden>
+            <input type="checkbox" class="menu-open" name="menu-open" id="menu_open" />
+            <label for="menu_open" class="menu-open-button ">
+                <span class="app-shortcut-icon d-block"></span>
+            </label>
+            <a href="#" class="menu-item btn" data-toggle="tooltip" data-placement="left" title="Scroll Top">
+                <i class="fal fa-arrow-up"></i>
+            </a>
+            <a href="page_login.html" class="menu-item btn" data-toggle="tooltip" data-placement="left" title="Logout">
+                <i class="fal fa-sign-out"></i>
+            </a>
+            <a href="#" class="menu-item btn" data-action="app-fullscreen" data-toggle="tooltip" data-placement="left" title="Full Screen">
+                <i class="fal fa-expand"></i>
+            </a>
+            <a href="#" class="menu-item btn" data-action="app-print" data-toggle="tooltip" data-placement="left" title="Print page">
+                <i class="fal fa-print"></i>
+            </a>
+            <a href="#" class="menu-item btn" data-action="app-voice" data-toggle="tooltip" data-placement="left" title="Voice command">
+                <i class="fal fa-microphone"></i>
+            </a>
+        </nav>*@
+    <!-- END Quick Menu -->
+    <!-- BEGIN Page Settings -->
+    <div class="modal fade js-modal-settings modal-backdrop-transparent" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog @(Vehicle.Controllers.LanguageController.IsRighToLeft() ?"modal-dialog-left" :"modal-dialog-right") modal-md">
+            <div class="modal-content text-start">
+                <div class="dropdown-header bg-trans-gradient d-flex justify-content-center align-items-center w-100">
+                    <h4 class="m-0 text-center color-white">
+                        @Resources.Default.LayoutSettings
+                        <small class="mb-0 opacity-80">@Resources.Default.UserInterfaceSettings</small>
+                    </h4>
+                    <button type="button" class="close text-white position-absolute pos-top pos-right p-2 m-1 mr-2" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="settings-panel">
+                        <div class="mt-4 d-table w-100 px-5">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0">
+                                    @Resources.Default.AppLayout
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="list" id="fh">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="header-function-fixed"></a>
+                            <span class="onoffswitch-title">@Resources.Default.FixedHeader</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.FixedHeaderInfo</span>
+                        </div>
+                        <div class="list" id="nff">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-function-fixed"></a>
+                            <span class="onoffswitch-title">@Resources.Default.FixedNavigation</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.FixedNavigationInfo</span>
+                        </div>
+                        <div class="list" id="nfm">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-function-minify"></a>
+                            <span class="onoffswitch-title">@Resources.Default.MinifyNavigation</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.MinifyNavigationInfo</span>
+                        </div>
+                        <div class="list" id="nfh">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-function-hidden"></a>
+                            <span class="onoffswitch-title">@Resources.Default.HideNavigation</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.HideNavigationIconsInfo</span>
+                        </div>
+                        @*<div class="list" id="nft">
+                                <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-function-top"></a>
+                                <span class="onoffswitch-title">@Resources.Default.TopNavigation</span>
+                                <span class="onoffswitch-title-desc">@Resources.Default.TopNavigationInfo</span>
+                            </div>*@
+                        <div class="list" id="fff">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="footer-function-fixed"></a>
+                            <span class="onoffswitch-title">@Resources.Default.FixedFooter</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.FixedFooterInfo</span>
+                        </div>
+                        <div class="list" id="mmb">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-main-boxed"></a>
+                            <span class="onoffswitch-title">@Resources.Default.BoxedLayout</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.BoxedLayoutInfo</span>
+                        </div>
+                        <div class="expanded">
+                            <ul class="mb-3 mt-1">
+                                <li>
+                                    <div class="bg-fusion-50" data-action="toggle" data-class="mod-bg-1"></div>
+                                </li>
+                                <li>
+                                    <div class="bg-warning-200" data-action="toggle" data-class="mod-bg-2"></div>
+                                </li>
+                                <li>
+                                    <div class="bg-primary-200" data-action="toggle" data-class="mod-bg-3"></div>
+                                </li>
+                                <li>
+                                    <div class="bg-success-300" data-action="toggle" data-class="mod-bg-4"></div>
+                                </li>
+                                <li>
+                                    <div class="bg-white border" data-action="toggle" data-class="mod-bg-none"></div>
+                                </li>
+                            </ul>
+                            <div class="list" id="mbgf">
+                                <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-fixed-bg"></a>
+                                <span class="onoffswitch-title">Fixed Background</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-table w-100 px-5">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0">
+                                    @Resources.Default.MobileMenu
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="list" id="nmp">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-mobile-push"></a>
+                            <span class="onoffswitch-title">@Resources.Default.PushContent</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.PushContentInfo</span>
+                        </div>
+                        <div class="list" id="nmno">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-mobile-no-overlay"></a>
+                            <span class="onoffswitch-title">@Resources.Default.NoOverlay</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.NoOverlayInfo</span>
+                        </div>
+                        <div class="list" id="sldo">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="nav-mobile-slide-out"></a>
+                            <span class="onoffswitch-title">@Resources.Default.Off_Canvas <sup>(@Resources.Default.Beta)</sup></span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.Off_CanvasInfo</span>
+                        </div>
+                        <div class="mt-4 d-table w-100 px-5">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0">
+                                    @Resources.Default.Accessibility
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="list" id="mbf">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-bigger-font"></a>
+                            <span class="onoffswitch-title">@Resources.Default.BiggerContentFont</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.BiggerContentFontInfo</span>
+                        </div>
+                        <div class="list" id="mhc">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-high-contrast"></a>
+                            <span class="onoffswitch-title">@Resources.Default.HighContrastText</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.Off_CanvasInfo</span>
+                        </div>
+                        <div class="list" id="mcb">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-color-blind"></a>
+                            <span class="onoffswitch-title">@Resources.Default.Daltonism <sup>(@Resources.Default.Beta)</sup> </span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.DaltonismInfo</span>
+                        </div>
+                        <div class="mt-4 d-table w-100 px-5">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0">
+                                    @Resources.Default.GlobalModifications
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="list" id="mcbg">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-clean-page-bg"></a>
+                            <span class="onoffswitch-title">@Resources.Default.CleanPageBackground</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.CleanPageBackgroundInfo</span>
+                        </div>
+                        <div class="list" id="mhni">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-hide-nav-icons"></a>
+                            <span class="onoffswitch-title">@Resources.Default.HideNavigationIcons</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.HideNavigationIconsInfo</span>
+                        </div>
+                        <div class="list" id="dan">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-disable-animation"></a>
+                            <span class="onoffswitch-title">@Resources.Default.DisableCSSAnimation</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.DisableCSSAnimationInfo</span>
+                        </div>
+                        <div class="list" id="mlph">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-lean-subheader"></a>
+                            <span class="onoffswitch-title">@Resources.Default.LeanSubheader</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.LeanSubheaderInfo</span>
+                        </div>
+                        <div class="list" id="mnl">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-nav-link"></a>
+                            <span class="onoffswitch-title">@Resources.Default.HierarchicalNavigation</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.HierarchicalNavigationInfo</span>
+                        </div>
+                        <div class="list" id="mdn">
+                            <a href="#" onclick="return false;" class="btn btn-switch" data-action="toggle" data-class="mod-nav-dark"></a>
+                            <span class="onoffswitch-title">@Resources.Default.DarkNavigation</span>
+                            <span class="onoffswitch-title-desc">@Resources.Default.DarkNavigationInfo</span>
+                        </div>
+                        <hr class="mb-0 mt-4">
+                        <div class="mt-4 d-table w-100 pl-5 pr-3">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0">
+                                    @Resources.Default.GlobalFontSize
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="list mt-1">
+                            <div class="btn-group btn-group-sm btn-group-toggle my-2" data-toggle="buttons">
+                                <label class="btn btn-default btn-sm" data-action="toggle-swap" data-class="root-text-sm" data-target="html">
+                                    <input type="radio" name="changeFrontSize"> SM
+                                </label>
+                                <label class="btn btn-default btn-sm" data-action="toggle-swap" data-class="root-text" data-target="html">
+                                    <input type="radio" name="changeFrontSize" checked=""> MD
+                                </label>
+                                <label class="btn btn-default btn-sm" data-action="toggle-swap" data-class="root-text-lg" data-target="html">
+                                    <input type="radio" name="changeFrontSize"> LG
+                                </label>
+                                <label class="btn btn-default btn-sm" data-action="toggle-swap" data-class="root-text-xl" data-target="html">
+                                    <input type="radio" name="changeFrontSize"> XL
+                                </label>
+                            </div>
+                            <span class="onoffswitch-title-desc d-block mb-0">
+                                @Resources.Default.GlobalFontSizeInfo
+                            </span>
+                        </div>
+                        <hr class="mb-0 mt-4">
+                        <div class="mt-4 d-table w-100 pl-5 pr-3">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0 pr-2 d-flex">
+                                    @Resources.Default.ThemeColors
+
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="expanded theme-colors pl-5 pr-3">
+                            <ul class="m-0">
+                                <li>
+                                    <a href="#" id="myapp-0" data-action="theme-update" data-themesave data-theme="" data-toggle="tooltip" data-placement="top" title="Wisteria (base css)" data-original-title="Wisteria (base css)"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-1" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-1.css" data-toggle="tooltip" data-placement="top" title="Tapestry" data-original-title="Tapestry"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-2" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-2.css" data-toggle="tooltip" data-placement="top" title="Atlantis" data-original-title="Atlantis"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-3" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-3.css" data-toggle="tooltip" data-placement="top" title="Indigo" data-original-title="Indigo"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-4" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-4.css" data-toggle="tooltip" data-placement="top" title="Dodger Blue" data-original-title="Dodger Blue"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-5" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-5.css" data-toggle="tooltip" data-placement="top" title="Tradewind" data-original-title="Tradewind"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-6" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-6.css" data-toggle="tooltip" data-placement="top" title="Cranberry" data-original-title="Cranberry"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-7" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-7.css" data-toggle="tooltip" data-placement="top" title="Oslo Gray" data-original-title="Oslo Gray"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-8" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-8.css" data-toggle="tooltip" data-placement="top" title="Chetwode Blue" data-original-title="Chetwode Blue"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-9" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-9.css" data-toggle="tooltip" data-placement="top" title="Apricot" data-original-title="Apricot"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-10" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-10.css" data-toggle="tooltip" data-placement="top" title="Blue Smoke" data-original-title="Blue Smoke"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-11" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-11.css" data-toggle="tooltip" data-placement="top" title="Green Smoke" data-original-title="Green Smoke"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-12" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-12.css" data-toggle="tooltip" data-placement="top" title="Wild Blue Yonder" data-original-title="Wild Blue Yonder"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-13" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-13.css" data-toggle="tooltip" data-placement="top" title="Emerald" data-original-title="Emerald"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-14" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-14.css" data-toggle="tooltip" data-placement="top" title="Supernova" data-original-title="Supernova"></a>
+                                </li>
+                                <li>
+                                    <a href="#" id="myapp-15" data-action="theme-update" data-themesave data-theme="../Content/smart_theme/dist/css/themes/cust-theme-15.css" data-toggle="tooltip" data-placement="top" title="Hoki" data-original-title="Hoki"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <hr class="mb-0 mt-4">
+                        <div class="mt-4 d-table w-100 pl-5 pr-3">
+                            <div class="d-table-cell align-middle">
+                                <h5 class="p-0 pr-2 d-flex">
+                                    @Resources.Default.ThemeModes
+
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="pl-5 pr-3 py-3">
+                            <div class="ie-only alert alert-warning d-none">
+                                <h6>Internet Explorer Issue</h6>
+                                This particular component may not work as expected in Internet Explorer. Please use with caution.
+                            </div>
+                            <div class="row no-gutters">
+                                <div class="col-4 pr-2 text-center">
+                                    <div id="skin-default" data-action="toggle-replace" data-replaceclass="mod-skin-light mod-skin-dark" data-class="" data-toggle="tooltip" data-placement="top" title="" class="d-flex bg-white border border-primary rounded overflow-hidden text-success js-waves-on" data-original-title="Default Mode" style="height: 80px">
+                                        <div class="bg-primary-600 bg-primary-gradient px-2 pt-0 border-right border-primary"></div>
+                                        <div class="d-flex flex-column flex-1">
+                                            <div class="bg-white border-bottom border-primary py-1"></div>
+                                            <div class="bg-faded flex-1 pt-3 pb-3 px-2">
+                                                <div class="py-3" style="background:url('Content/smart_theme/dist/img/demo/s-1.png') top left no-repeat;background-size: 100%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @Resources.Default.lblDefault
+                                </div>
+                                <div class="col-4 px-1 text-center">
+                                    <div id="skin-light" data-action="toggle-replace" data-replaceclass="mod-skin-dark" data-class="mod-skin-light" data-toggle="tooltip" data-placement="top" title="" class="d-flex bg-white border border-secondary rounded overflow-hidden text-success js-waves-on" data-original-title="Light Mode" style="height: 80px">
+                                        <div class="bg-white px-2 pt-0 border-right border-"></div>
+                                        <div class="d-flex flex-column flex-1">
+                                            <div class="bg-white border-bottom border- py-1"></div>
+                                            <div class="bg-white flex-1 pt-3 pb-3 px-2">
+                                                <div class="py-3" style="background: url('Content/smart_theme/dist/img/demo/s-1.png') top left no-repeat; background-size: 100%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @Resources.Default.Light
+                                </div>
+                                <div class="col-4 pl-2 text-center">
+                                    <div id="skin-dark" data-action="toggle-replace" data-replaceclass="mod-skin-light" data-class="mod-skin-dark" data-toggle="tooltip" data-placement="top" title="" class="d-flex bg-white border border-dark rounded overflow-hidden text-success js-waves-on" data-original-title="Dark Mode" style="height: 80px">
+                                        <div class="bg-fusion-500 px-2 pt-0 border-right"></div>
+                                        <div class="d-flex flex-column flex-1">
+                                            <div class="bg-fusion-600 border-bottom py-1"></div>
+                                            <div class="bg-fusion-300 flex-1 pt-3 pb-3 px-2">
+                                                <div class="py-3 opacity-30" style="background: url('Content/smart_theme/dist/img/demo/s-1.png') top left no-repeat; background-size: 100%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @Resources.Default.Dark
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="mb-0 mt-4">
+                        <div class="pl-5 pr-3 py-3 bg-faded">
+                            <div class="row no-gutters">
+                                <div class="col-12">
+                                    <a href="#" class="btn btn-outline-danger fw-500 btn-block" data-action="app-reset">@Resources.Default.ResetSettings</a>
+                                </div>
+                                @*<div class="col-6 pl-1">
+                                        <a href="#" class="btn btn-danger fw-500 btn-block" data-action="factory-reset">@Resources.Default.FactoryReset</a>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div> <span id="saving"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Page Settings -->
+    @*<script id="hide-script">
+            (function (w, d, u) {
+                var s = d.createElement('script'); s.async = true; s.src = u + '?' + (Date.now() / 60000 | 0);
+                var h = d.getElementsByTagName('script')[0]; h.parentNode.insertBefore(s, h);
+            })(window, document, 'https://cdn.bitrix24.com/b14405401/crm/site_button/loader_1_n9j9y0.js');
+            //})(window, document, '/Content/js/Bitrix_Support_loader_1_n9j9y0.js');
+        </script>*@
+    <script>
+        var IsRighToLeft ="@(Vehicle.Controllers.LanguageController.IsRighToLeft() == true ? "rtl" : "ltr")";
+    </script>
+    <script src="~/Content/js/jquery.ba-throttle-debounce.js"></script>
+    <script src="~/Content/smart_theme/dist/js/app.bundle.js"></script>
+    <script src="~/Content/smart_theme/dist/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script src="~/Content/smart_theme/dist/js/formplugins/select2/select2.bundle.js"></script>
+    <script src="~/Content/smart_theme/dist/hijri/js/bootstrap-hijri-datetimepicker.js"></script>
+
+    <script src="~/Content/data-grid/js/dx.all.js"></script>
+    <script src="~/Content/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <script src="~/Content/smart_theme/dist/js/formplugins/ion-rangeslider/ion-rangeslider.js"></script>
+    @Scripts.Render("~/Content/smart_theme/dist/Editor")
+    @Scripts.Render("~/bundles/simplePagination")
+    @Scripts.Render("~/bundles/filepond")
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>
+@if (((POCO.User)Session["UserInfo"]).Type == 3)
+{
+    <script>
+
+            $.ajax({
+                    type: "GET",
+              url: '@Url.Action("GetTargetBranch", "Dashboard")',
+              data: '',
+              contentType: "application/json;charset=utf-8",
+              dataType: "json",
+              success: function(result)
+                  {
+
+                  $("#targetofmonth").html(round(result.TargetOfMonth, 2).toFixed(2));
+                  $("#Revenue").html(round(result.Revenues, 2).toFixed(2));
+                  $("#Revenue").css('width', round(result.Revenues, 2).toFixed(2) + '%');
+                  $("#Remming").html(round(result.Remain, 2).toFixed(2));
+                  $("#empratio").html('@Resources.Default.AmountDueEmployee ' + round(result.TargetEmployeeRatio, 2).toFixed(2) + ' % ');
+                  $("#empvalue").html(round(result.TargetEmployeeValue, 2).toFixed(2));
+                        if (result.Remain == 0) {
+                       $(".text-target").removeClass("text-danger");
+                      $(".text-target").addClass("text-success");
+                        }
+                        else {
+                       $(".text-target").removeClass("text-success");
+                      $(".text-target").addClass("text-danger");
+                        }
+                        //$(".js-modal-target").modal();
+
+                    },
+            error: function(response) {
+
+                        swal("@Resources.Default.Error", '@Resources.Default.ErrorHappend', "error");
+                    }
+                });
+    </script>
+}
+<script>
+    $("#changePassword").click(function () {
+    });
+    //document.oncontextmenu = document.body.oncontextmenu = function () { return false; }// The Labib to disable mouse right click work
+     $(function () {
+            initHijrDatePicker();
+         initHijrDatePickerMin();
+         initHijrDatePickerWoutHijri();
+
+            initHijrDatePickerDefault();
+     });
+
+        function initHijrDatePicker() {
+                $(".hijri-date-input-general").hijriDatePicker({
+                format: "DD-MM-YYYY",
+                hijriFormat: "iDD-iMM-iYYYY",
+                dayViewHeaderFormat: "MMMM YYYY",
+                hijriDayViewHeaderFormat: "iMMMM iYYYY",
+                showTodayButton: true,
+                minDate: "1900-01-01",
+                locale: lang == "en" ? "en" : "ar-SA",
+                hijriText: "@Resources.Default.Hijri",
+                gregorianText: "@Resources.Default.Gregorian",
+                icons: {
+                    today: '@Resources.Default.Today'
+                }
+            });
+        }
+
+    function initHijrDatePickerWoutHijri() {
+        $(".hijri-date-input-generalWout").hijriDatePicker({
+                format: "DD-MM-YYYY",
+                hijriFormat: "iDD-iMM-iYYYY",
+                dayViewHeaderFormat: "MMMM YYYY",
+                hijriDayViewHeaderFormat: "iMMMM iYYYY",
+                showTodayButton: true,
+                minDate: "1900-01-01",
+                locale: lang == "en" ? "en" : "ar-SA",
+                hijriText: "@Resources.Default.Hijri",
+                gregorianText: "@Resources.Default.Gregorian",
+                icons: {
+                    today: '@Resources.Default.Today'
+            },
+            hijri: false,
+            showSwitcher: false
+            });
+        }
+
+    function initHijrDatePickerMin() {
+                $(".hijri-date-input-general-min").hijriDatePicker({
+                format: "DD-MM-YYYY",
+                hijriFormat: "iDD-iMM-iYYYY",
+                dayViewHeaderFormat: "MMMM YYYY",
+                hijriDayViewHeaderFormat: "iMMMM iYYYY",
+                showTodayButton: true,
+                minDate: new Date(),
+                locale: lang == "en" ? "en" : "ar-SA",
+                hijriText: "@Resources.Default.Hijri",
+                gregorianText: "@Resources.Default.Gregorian",
+                icons: {
+                    today: '@Resources.Default.Today'
+                }
+            });
+        }
+
+
+    function initHijrDatePickerDefault() {
+            $(".hijri-date-default").hijriDatePicker();
+
+    }
+    var emailRegex = /^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    var lang = "@(Vehicle.Controllers.LanguageController.GetCurrentLanguage())";
+    var fileSizeAllowed = "@System.Configuration.ConfigurationManager.AppSettings["AllowedFileSize"].ToString()";
+    var fileSizeUnit = "MB";
+
+
+    $(document).ready(function () {
+        $(".panel-toolbar .btn.btn-panel").click(function () {
+            $(this).children().toggleClass("fa-minus");
+            //$(".panel-container.collapse").toggleClass("active");
+        });
+
+        //when a collapse group is shown, save it as the active collapse group
+        $("#sidebarmenu99").on("shown.bs.collapse", function () {
+            var active = $("#sidebarmenu99 .show");
+            var submenuActive = active.find(".show").attr("id");
+            localStorage.setItem("activeCollapseGroup", active.attr("id"));
+            if (submenuActive) {
+                localStorage.setItem("activeCollapseGroupSubmenu", submenuActive);
+            }
+        });
+        $("#sidebarmenu99").on("hidden.bs.collapse", function () {
+            localStorage.removeItem("activeCollapseGroup");
+            localStorage.removeItem("activeCollapseGroupSubmenu");
+        });
+        var last = localStorage.getItem("activeCollapseGroup");
+        var lastSubmenu = localStorage.getItem("activeCollapseGroupSubmenu");
+        if (last !== null) {
+            //remove default collapse settings
+            $("#sidebarmenu99 .panel-collapse").removeClass("show");
+            //show the account_last visible group
+            $("#" + last).addClass("show");
+            if (lastSubmenu) {
+                $("#" + last).find("#" + lastSubmenu).addClass("show");
+            }
+        }
+
+        $('.fa-calendar-alt').click(function () {
+            $(this).parent().parent().parent().children().focus();
+        });
+        $(document).on("click",".hidden-lg-up",function () {
+            $("body").addClass("mobile-nav-on");
+        });
+            function getInt(val) {
+                let v = parseFloat(val);
+                if (v % 1 === 0) {
+                    return v;
+                } else {
+                    let n = v.toString().split('.').join('');
+                    return parseInt(n);
+                }
+            }
+        Inputmask({ alias: "datetime", inputFormat: "dd/MM/yyyy" }).mask(".hijri-date-default,.hijri-date-input1,.hijri-date-input-general,.hijri-date-input-reservation,.hijri-date-input-general-min,#NationalityResedincyExpirationDate,#LicenseExpirationDate,.hijri-date-input");
+            var d = new Date();
+            var n = d.getFullYear();
+
+            $('input[type ="datetime"]').attr("autocomplete", "off");
+            //$('input[type ="datetime"]').keypress(function (event) { event.preventDefault(); });
+            $('[data-toggle="tooltip"]').tooltip();
+
+            //$(".select2").select2({
+            //    theme: 'bootstrap4',
+            //});
+
+        });
+
+     function SearchFor(searchVal) {
+
+        var oldSearchVal = $("#hidQuickSearch").val();
+        $("#search-" + oldSearchVal).css({ "text-decoration": "none", "color": "inherit" });
+        $("#search-" + searchVal).css({ "text-decoration": "underline", "color": "#0000FF" });
+
+        $("#hidQuickSearch").val(searchVal);
+
+        var searchText = $("#txtSearch").val();
+        var searchNumber = $("#hidQuickSearch").val();
+        var searchCustomer = $("input[name='rdiCustomer']:checked").val();
+
+        if (searchNumber == 1) {
+            if (searchCustomer == 1) {
+                $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerName");
+            }
+            if (searchCustomer == 2) {
+                $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerPhoneNumber");
+            }
+            if (searchCustomer == 3) {
+                $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerEmail");
+            }
+
+            $("#searchCustomerRadio").attr("hidden", false);
+        } else if (searchNumber == 2) {
+
+            $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerAgreementNumber");
+            $("#searchCustomerRadio").attr("hidden", true);
+        } else if (searchNumber == 3) {
+            $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.ReservationNumber");
+            $("#searchCustomerRadio").attr("hidden", true);
+        } else if (searchNumber == 4) {
+            $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.VehicleNumber");
+            $("#searchCustomerRadio").attr("hidden", true);
+        }
+
+
+        if (searchText != "") {
+
+            var quickLookupData = {'searchText': searchText, 'searchNumber': searchNumber, 'searchCustomer': searchCustomer};
+
+            $.ajax({
+
+             type: 'post',
+             url: '@Url.Action("QuickLookup_Get", "Dashboard")',
+             contentType: 'application/json',
+             dataType: 'json',
+            data: JSON.stringify(quickLookupData),
+                success: function (result) {
+                    if (result != false) {
+                        if (searchNumber == 1) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Name</td><td>PhoneNo</td><td>Email</td><td>Address</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr><td>' + result.CustomerPrimaryName + '</td><td>' + result.CustomerPhoneNumber + '</td><td>' + result.CustomerEmail + '</td><td>' + result.HomeAdress + '</td></tr>');
+                        } else if (searchNumber == 2) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Customer</td><td>Vehicle Manufacturer</td><td>Vehicle Model</td><td>Start Date</td><td>End Date</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr><td>' + result.RefReservation.RefCustomerInfo.CustomerPrimaryName + '</td><td>' + result.RefReservation.Refmanufacturers.ManufacturerPrimaryName + '</td><td>' + result.RefReservation.RefvehicleModel.VehicleModelPrimaryName + '</td><td>' + moment(result.StartDate).format('DD/MM/YYYY') + '</td><td>' + moment(result.EndDate).format('DD/MM/YYYY') + '</td></tr>');
+                        } else if (searchNumber == 3) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Customer</td><td>Vehicle Manufacturer</td><td>Vehicle Model</td><td>Exit Branch</td><td>Return Branch</td><td>Pickup Date</td><td>Return Date</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr><td>' + result.CustomerId + '</td><td>' + result.ManufactureId + '</td><td>' + result.VehicleModelId + '</td><td>' + result.ExitBranchId + '</td><td>' + result.ReceivedBranchId + '</td><td>' + moment(result.PickupDate).format('DD/MM/YYYY') + '</td><td>' + moment(result.ReturnDate).format('DD/MM/YYYY') + '</td></tr>');
+                        } else if (searchNumber == 4) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Vehicle Manufacturer</td><td>Vehicle Model</td><td>Vehicle Class</td><td>Fule Type</td><td>Transmetion Type</td><td>Vehicle Status</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr><td>' + result.RefManufacturers.ManufacturerPrimaryName + '</td><td>' + result.RefVehicleModels.VehicleModelPrimaryName + '</td><td>' + result.RefVehicleClasses.VehicleClassPrimaryName + '</td><td>' + result.RefFuleTypes.FuleTypePrimaryName + '</td><td>' + result.RefTransmetionTypes.TransmetionTypePrimaryName + '</td><td>' + result.RefVehicleStatus.VehicleStatusPrimaryName + '</td></tr>');
+                        }
+                    } else {
+                        $("#tblSearchResult thead").empty();
+                        $("#tblSearchResult tbody").empty();
+
+                        $("#tblSearchResult tbody").append('<tr><td>No Result Found</td></tr>');
+                    }
+
+
+
+                 },
+             error: function () { }
+             });
+        }
+
+    }
+
+    $("#btnSearch").click(function () {
+        var searchText = $("#txtSearch").val();
+        var searchNumber = $("#hidQuickSearch").val();
+        var searchCustomer = $("input[name='rdiCustomer']:checked").val();
+
+        if (searchText != "") {
+
+            var quickLookupData = {'searchText': searchText, 'searchNumber': searchNumber, 'searchCustomer': searchCustomer };
+
+            $.ajax({
+
+             type: 'post',
+             url: '@Url.Action("QuickLookup_Get", "Dashboard")',
+             contentType: 'application/json',
+             dataType: 'json',
+            data: JSON.stringify(quickLookupData),
+                success: function (result) {
+                    if (result != false) {
+                        $("#btnSearch").removeClass("btn-danger").addClass("btn-primary");
+
+                        if (searchNumber == 1) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Name</td><td>PhoneNo</td><td>Email</td><td>Address</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr><td>' + result.CustomerPrimaryName + '</td><td>' + result.CustomerPhoneNumber + '</td><td>' + result.CustomerEmail + '</td><td>' + result.HomeAdress + '</td></tr>');
+                        } else if (searchNumber == 2) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Customer</td><td>Vehicle Manufacturer</td><td>Vehicle Model</td><td>Start Date</td><td>End Date</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr><td>' + result.RefReservation.RefCustomerInfo.CustomerPrimaryName + '</td><td>' + result.RefReservation.Refmanufacturers.ManufacturerPrimaryName + '</td><td>' + result.RefReservation.RefvehicleModel.VehicleModelPrimaryName + '</td><td>' + moment(result.StartDate).format('DD/MM/YYYY') + '</td><td>' + moment(result.EndDate).format('DD/MM/YYYY') + '</td></tr>');
+                        } else if (searchNumber == 3) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Customer</td><td>Vehicle Manufacturer</td><td>Vehicle Model</td><td>Exit Branch</td><td>Return Branch</td>');
+                            $("#tblSearchResult tbody").append('<tr onclick= getdatareserv(' + result.Id +')><td >' + result.CustomerId + '</td><td>' + result.ManufactureId + '</td><td>' + result.VehicleModelId + '</td><td>' + result.ExitBranchId + '</td><td>' + result.ReceivedBranchId + '</td></tr>');
+                        } else if (searchNumber == 4) {
+                            $("#tblSearchResult thead").empty();
+                            $("#tblSearchResult tbody").empty();
+
+                            $("#tblSearchResult thead").append('<tr><td>Vehicle Manufacturer</td><td>Vehicle Model</td><td>Vehicle Class</td><td>Fule Type</td><td>Transmetion Type</td><td>Vehicle Status</td></tr>');
+                            $("#tblSearchResult tbody").append('<tr onclick= getdatavhecile(' + result.Id +')><td>' + result.RefManufacturers.ManufacturerPrimaryName + '</td><td>' + result.RefVehicleModels.VehicleModelPrimaryName + '</td><td>' + result.RefVehicleClasses.VehicleClassPrimaryName + '</td><td>' + result.RefFuleTypes.FuleTypePrimaryName + '</td><td>' + result.RefTransmetionTypes.TransmetionTypePrimaryName + '</td><td>' + result.RefVehicleStatus.VehicleStatusPrimaryName + '</td></tr>');
+                        }
+
+                        $("#mm").modal("show");
+
+                    } else {
+                        $("#btnSearch").removeClass("btn-primary").addClass("btn-danger");
+
+
+                        $("#tblSearchResult thead").empty();
+                        $("#tblSearchResult tbody").empty();
+
+                        $("#tblSearchResult tbody").append('<tr><td>No Result Found</td></tr>');
+                    }
+                 },
+             error: function () { }
+             });
+        }
+
+
+    });
+    function getdatavhecile(vid) {
+        window.location = "/VehicleDefinition/Details/" + vid
+    }
+    function getdatareserv(rid) {
+        window.location = "/Reservation/Details/" + rid
+    }
+
+    $("input[name='rdiCustomer']").change(function () {
+
+
+        if ($("input[name='rdiCustomer']:checked").val() == 1) {
+            $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerName");
+        }
+        if ($("input[name='rdiCustomer']:checked").val() == 2) {
+            $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerPhoneNumber");
+        }
+        if ($("input[name='rdiCustomer']:checked").val() == 3) {
+            $("#txtSearch").attr("placeholder", "@Vehicle.Resources.DashboardTexts.CustomerEmail");
+        }
+    });
+
+
+    //var firebaseConfig = {
+    //    apiKey: "AIzaSyCrN-xmSfzRyzLdw5p6yjKD8xwNJIXeJ2U",
+    //    authDomain: "fir-charmvc.firebaseapp.com",
+    //    databaseURL: "https://fir-charmvc.firebaseio.com",
+    //    projectId: "fir-charmvc",
+    //    storageBucket: "fir-charmvc.appspot.com",
+    //    messagingSenderId: "43351765857",
+    //    appId: "1:43351765857:web:925b384a69b94f5a5ccb20"
+    //};
+    //// Initialize Firebase
+    //firebase.initializeApp(firebaseConfig);
+
+
+
+    //// Get a reference to the database service
+    //var database = firebase.database();
+
+</script>
+
+<!--
+Filepond status
+    {
+    INIT: 1,
+    IDLE: 2,
+    PROCESSING_QUEUED: 9,
+    PROCESSING: 3,
+    PROCESSING_COMPLETE: 5,
+    PROCESSING_ERROR: 6,
+    PROCESSING_REVERT_ERROR: 10,
+    LOADING: 7,
+    LOAD_ERROR: 8
+}
+    https://pqina.nl/filepond/docs/api/exports/#filestatus
+-->
+
+<script>
+
+    $(function () {
+        // Reference the auto-generated proxy for the hub.
+        var connection = $.connection.VehicleHub;
+        connection.client.addGroupMessage = function ( message,armessage,link) {
+
+            // Add the message to the page.
+            var count = parseInt($("#notificationCount").text()) + 1;
+            $("#notificationCount").text(count);
+
+            var lin = "@Url.Action("Details","Notifications")/" + link;
+            var msg = lang == "en" ? message : armessage;
+            $('#notification').append('<li>' +
+                '<a href="'+lin+'" class="d-flex align-items-center">'+
+                    '<span class="d-flex flex-column flex-1 ml-1">'+
+                '<span class="name">' + msg+'</span>'+
+                        '<span class="msg-b fs-xs"></span>'+
+                    '</span>'+
+                '</a>'+
+                 '</li>');
+        };
+
+        // Start the connection.
+        $.connection.hub.start().done(function () {
+            connection.server.addToGroup("Branch_" + '@Session["branch"]');
+            connection.server.addToGroup("User_" + '@(((POCO.User)Session["UserInfo"]).UserID)');
+            connection.server.addToGroup("Role_" + '@(((POCO.User)Session["UserInfo"]).Role_Id)');
+
+        }).catch(function () { err => console.error(err.toString()) });
+
+        $.connection.hub.disconnected(function () {
+            console.log('Connection disconnected')
+        });
+
+    });
+
+</script>
+@*Signature Scripts*@
+<script>
+    (function ($) {
+        var topics = {};
+        $.publish = function (topic, args) {
+            if (topics[topic]) {
+                var currentTopic = topics[topic],
+                    args = args || {};
+
+                for (var i = 0, j = currentTopic.length; i < j; i++) {
+                    currentTopic[i].call($, args);
+                }
+            }
+        };
+        $.subscribe = function (topic, callback) {
+            if (!topics[topic]) {
+                topics[topic] = [];
+            }
+            topics[topic].push(callback);
+            return {
+                "topic": topic,
+                "callback": callback
+            };
+        };
+        $.unsubscribe = function (handle) {
+            var topic = handle.topic;
+            if (topics[topic]) {
+                var currentTopic = topics[topic];
+
+                for (var i = 0, j = currentTopic.length; i < j; i++) {
+                    if (currentTopic[i] === handle.callback) {
+                        currentTopic.splice(i, 1);
+                    }
+                }
+            }
+        };
+    })(jQuery);
+
+</script>
+<script src="~/Content/smart_theme/dist/signature/jSignature.js"></script>
+<script src="~/Content/smart_theme/dist/signature/plugins/jSignature.CompressorBase30.js"></script>
+<script src="~/Content/smart_theme/dist/signature/plugins/jSignature.CompressorSVG.js"></script>
+<script src="~/Content/smart_theme/dist/signature/plugins/jSignature.UndoButton.js"></script>
+<script src="~/Content/smart_theme/dist/signature/plugins/signhere/jSignature.SignHere.js"></script>
+<script src="~/Content/smart_theme/dist/js/datagrid/datatables/datatables.export.js"></script>
+
+<script>
+    /*Start Modal Target timer js*/
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth();
+    const DateTime = new Date(year, month+1, 0+1).getTime();
+
+    function round(value, decimals, NotDefault) {
+
+        if (NotDefault == true) decimals = 4;
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
+
+    function toFixeds(num, fixed) {
+        try {
+            var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+            return num.toString().match(re)[0];
+        }
+        catch
+        {
+            return num;
+        }
+    }
+
+
+    $('#AreaId').change(function () {
+        var area = $('#AreaId').val();
+
+        $("#CityId option").remove();
+        $('#CityId').append('<option value>@Resources.Default.Select</option>');
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetCitiesByAreaId", "Accounting")' + '?AreaId=' + area,
+            dataType: 'json',
+        }).done(function (result) {
+
+            $("#CityId option").remove();
+            $('#CityId').append('<option value>@Resources.Default.Select</option>');
+            for (var i = 0; i < result.length; i++) {
+                $('#CityId').append('<option value="' + result[i].Id + '">' + result[i].Name + '</option>');
+            }
+        });
+    })
+</script>

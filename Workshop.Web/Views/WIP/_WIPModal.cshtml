@@ -1,0 +1,97 @@
+﻿@model Workshop.Core.DTOs.WIPDTO;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+
+<!-- WIP Modal -->
+<div class="modal fade" id="wipModal" tabindex="-1" aria-labelledby="wipModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="wipModalLabel">@Common["Add WIP"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="wipForm">
+                    @Html.HiddenFor(a => a.Id)
+
+                    <!-- Default WIP form wrapper -->
+                    <div id="wipFormWrapper">
+                        <div class="row">
+
+                            <!-- PrimaryName -->
+                            @* <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label>@Common["Label_PrimaryName"]</label>
+                                    @Html.TextBoxFor(m => m.PrimaryName, new { @class = "form-control copyInput" })
+                                    @Html.ValidationMessageFor(m => m.PrimaryName, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div> *@
+
+                            <!-- SecondaryName -->
+                            @* <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label>@Common["Label_SecondaryName"]</label>
+                                    @Html.TextBoxFor(m => m.SecondaryName, new { @class = "form-control pasteInput" })
+                                    @Html.ValidationMessageFor(m => m.SecondaryName, "", new { @class = "text-danger" })
+
+                                </div>
+                            </div> *@
+
+                            <!-- Vehicle input group with primary search button -->
+                            <div class="col-md-12 mb-3">
+                                <label>@Common["Label_Vehicle"]</label>
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.VehicleId, new { @class = "form-control" })
+                                    <button class="btn btn-primary" type="button" id="btnFindVehicle" title="@Common["Tooltip_SearchVehicle"]">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Date -->
+                            @* <div class="col-md-3 mb-3">
+                                <label>@Common["Label_Date"]</label>
+                                <input type="date" class="form-control" name="WipDate" id="WipDate">
+                            </div> *@
+
+                            <!-- Notes -->
+                            @* <div class="col-md-12 mb-3">
+                                <label>@Common["Label_Notes"]</label>
+                                <textarea class="form-control" name="Notes" id="Notes" rows="3" placeholder="@Common["Placeholder_Notes"]"></textarea>
+                            </div> *@
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Search wrapper (hidden by default) -->
+                    <div id="vehicleSearchWrapper" class="d-none">
+                        @{
+                            await Html.RenderPartialAsync("_VehicleFilter.cshtml", new Workshop.Core.DTOs.Vehicle.VehicleDefinitions());
+                        }
+                        <hr>
+                        <div class="row" id="vehicleList"></div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-secondary d-none" id="btnBackToWip">
+                    <i class="fas fa-arrow-left"></i>&nbsp;@Common["Button_Back"]
+                </button>
+
+                <button type="submit" class="btn btn-primary" id="btnSaveWip" form="wipForm">
+                    <i class="fas fa-save"></i>&nbsp;@Common["Save"]
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>&nbsp;@Common["Cancel"]
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/js/site.js"></script>

@@ -1,0 +1,135 @@
+﻿@using Workshop.Core.DTOs;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model ShiftDTO
+
+@{
+	var isEdit = Model.Id > 0;
+	ViewBag.Title = isEdit ? Common["Title_EditShift"] : Common["Title_CreateShift"];
+}
+
+<form id="shiftForm">
+	@Html.AntiForgeryToken()
+	<div class="modal-body">
+		<input type="hidden" id="ShiftId" name="Id" value="0" />
+		<input type="hidden" id="CompanyId" name="CompanyId" value="@Model.CompanyId" />
+		<input type="hidden" id="DOW" name="DOW" value="@Model.DOW">
+
+		<div class="row">
+
+			<div class="col-md-6 mb-3">
+				<label class="form-label">@Common["Code"] <span class="text-danger">*</span></label>
+				<input type="text" class="form-control make-integer" id="CodeInput" name="Code" required>
+			</div>
+			<div class="col-md-6 mb-3">
+				<label class="form-label">@Common["ShortName"] <span class="text-danger">*</span></label>
+				<input type="text" class="form-control" id="ShortInput" name="Short" required>
+			</div>
+			<div class="col-md-6 mb-3">
+				<label class="form-label">@Common["Label_NameEN"] <span class="text-danger">*</span></label>
+				<input type="text" class="form-control copyInput" id="PrimaryNameInput" name="PrimaryName" required>
+			</div>
+			<div class="col-md-6 mb-3">
+				<label class="form-label">@Common["Label_NameAR"]</label>
+				<input type="text" class="form-control pasteInput" id="SecondaryNameInput" name="SecondaryName">
+			</div>
+			<div class="col-md-6 mb-3">
+				<label class="form-label">@Common["Color"]</label>
+				<input type="color" class="form-control" id="ColorInput" name="Color" value="#ffcc00">
+			</div>
+				<div class="col-md-6 mb-3">
+					<div class="form-group">
+						<label class="form-label">
+							@Common["Label_TimeRange"] <span class="text-danger">*</span>
+						</label>
+						<div class="d-flex gap-2">
+							<input type="time" id="WorkingFromTime" name="WorkingFromTime" class="form-control" />
+							<input type="time" id="WorkingToTime" name="WorkingToTime" class="form-control" />
+						</div>
+						<!-- single error place for the whole range -->
+						<span id="WorkingTimeError" class="text-danger"></span>
+					</div>
+				</div>
+					<div class="col-md-6 mb-3">
+						<div class="form-group">
+							<label class="form-label">
+								@Common["Label_BreakTimeRange"] <span class="text-danger">*</span>
+							</label>
+							<div class="d-flex gap-2">
+								<input type="time" id="BreakFromTime" name="BreakFromTime" class="form-control" />
+								<input type="time" id="BreakToTime" name="BreakToTime" class="form-control" />
+							</div>
+							<!-- single error place for the whole range -->
+							<span id="BreakTimeError" class="text-danger"></span>
+						</div>
+					</div>
+	
+
+
+			<!-- Days of Week -->
+			<div class="col-12 mb-3">
+				<label class="form-label">@Common["DOW"]</label>
+				<div class="row">
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="SunInput" name="Sun" value="true">
+							<label class="form-check-label">@Common["Sunday"]</label>
+						</div>
+					</div>
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="MonInput" name="Mon" value="true">
+							<label class="form-check-label">@Common["Monday"]</label>
+						</div>
+					</div>
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="TueInput" name="Tue" value="true">
+							<label class="form-check-label">@Common["Tuesday"]</label>
+						</div>
+					</div>
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="WedInput" name="Wed" value="true">
+							<label class="form-check-label">@Common["Wednesday"]</label>
+						</div>
+					</div>
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="ThuInput" name="Thu" value="true">
+							<label class="form-check-label">@Common["Thursday"]</label>
+						</div>
+					</div>
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="FriInput" name="Fri" value="true">
+							<label class="form-check-label">@Common["Friday"]</label>
+						</div>
+					</div>
+					<div class="col-md-2 col-4 mb-2">
+						<div class="form-check">
+							<input class="form-check-input day-checkbox" type="checkbox" id="SatInput" name="Sat" value="true">
+							<label class="form-check-label">@Common["Saturday"]</label>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-6 mb-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="SpanMidnightInput" name="SpanMidnight" value="true">
+					<label class="form-check-label">@Common["SpanMidnight"]</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer justify-content-center">
+		<button type="submit" class="btn btn-primary"><i class="fad fa-save"></i>&nbsp;@Common["Save"]</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+	</div>
+</form>
+
+<script src="~/js/definitions/Shifts.js"></script>

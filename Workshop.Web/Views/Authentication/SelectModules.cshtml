@@ -1,0 +1,547 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.General.Modules>
+@{
+    ViewBag.Title = "SelectModule";
+    Layout = null;
+    string Lang = "en";
+}
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Inventory System</title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-tap-highlight" content="no">
+
+    @*   @if (Vehicle.Controllers.LanguageController.IsRighToLeft())
+    {
+        <link href="~/Content/css/plugins/bootstrap-rtl/bootstrap-rtl.css" rel="stylesheet" />
+    }
+    *@
+    <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/vendors.bundle.css">
+    <link id="appbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/app.bundle.css">
+    <link id="mytheme" rel="stylesheet" media="screen, print">
+    <link id="myskin" rel="stylesheet" media="screen, print" href="~/auth-assets/css/skins/skin-master.css">
+    <link rel="stylesheet" media="screen, print" href="~/auth-assets/css/page-login-alt.css">
+    <link href="~/auth-assets/css/themes/cust-theme-3.css" rel="stylesheet" />
+
+    <style>
+        @@font-face {
+            font-family: 'Tajawal-Bold';
+            src: url('../../smartadmin-5-styles/tajwal-arabic-font/Tajawal-Bold.ttf') format('truetype');
+        }
+
+        body {
+            overflow-y: scroll;
+        }
+
+        .blankpage-form-field {
+            margin: auto;
+        }
+
+        .select2-container {
+            z-index: 9999999 !important
+        }
+
+        #hidden-word {
+            width: 200px;
+            height: 50px;
+            white-space: nowrap;
+            padding-right: 40px
+        }
+
+        .page-logo-text {
+            text-align: start;
+            color: var(--theme-dark) !important
+        }
+
+        .blankpage-form-field .page-logo, .blankpage-form-field .card {
+            background-image: unset !important;
+            background-color: unset !important;
+            background: rgba(255,255,255,.25) !important;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,.37) !important;
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
+        }
+
+        .btn.btn-outline-danger {
+            color: #dc3545 !important;
+            border: 1px solid #dc3545 !important
+        }
+
+            .btn.btn-outline-danger:hover {
+                background-color: #dc3545 !important;
+                border: 1px solid #dc3545 !important;
+                color: #fff !important
+            }
+
+        address {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Tajawal-Bold';
+        }
+
+        /* ===== design variables & styles ===== */
+        :root {
+            --button-active: -1;
+            --debug: 0;
+            --color-accent-off: hsl(267 16% 43%);
+            --color-accent-off-darker: hsl(258 29% 39%);
+            --color-accent-on-code: var(--angle) 100% 72%;
+            --color-accent-on-darker-code: var(--angle) 98% 61%;
+            --color-accent-on: hsl(var(--color-accent-on-code) / 1);
+            --color-accent-on-darker: hsl(var(--color-accent-on-darker-code) / 1);
+            --inner-bg: hsl(0deg 0% 90.98%);
+            --outer-bg: hsl(223.81 0% 93%);
+            --border-bg: hsl(0deg 0% 85%);
+            --invert: 0%;
+            --color-grey: hsl(0 0% 87%);
+            --color-dark-grey: hsl(0 0% 95.69%);
+            --angle: -90deg;
+            --rotation: 0;
+            --angle-offset: 90deg;
+            --is-active: 0;
+            --icon-offset: 100;
+            --shadow: rgba(0,0,0,.125) 0 0 2px -.5px, rgba(0,0,0,.125) 0 1px 5px -1px, rgba(0,0,0,.125) 0 4px 12px -1.5px, rgba(0,0,0,.125) 0 9px 28px -2px, rgba(0,0,0,.125) 0 24px 72px -2.5px;
+            --icon-opacity: .4;
+            --item-opacity: 0;
+            --cubic-bezier: cubic-bezier(0.44, -0.9, 0.31, 1.55);
+        }
+
+        .btn.btn-glass {
+            background: rgba(255,255,255,.25);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.18);
+        }
+
+        /* Background Elements for Glassmorphism */
+        .background-elements {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .blur-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .3;
+        }
+
+        .blur-1 {
+            top: 80px;
+            left: 80px;
+            width: 288px;
+            height: 288px;
+            background: rgba(59,130,246,.2);
+        }
+
+        .blur-2 {
+            bottom: 80px;
+            right: 80px;
+            width: 384px;
+            height: 384px;
+            background: rgba(147,51,234,.2);
+        }
+
+        .blur-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 320px;
+            height: 320px;
+            background: rgba(20,184,166,.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .content-wrapper {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #444;
+            margin-bottom: 32px;
+        }
+
+        .module-list {
+            backdrop-filter: blur(16px);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            padding: 24px;
+            cursor: pointer;
+            transition: all .3s ease;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+
+            .module-item:last-child {
+                border-bottom: none;
+            }
+
+            .module-item:hover {
+                background: rgba(255,255,255,.05);
+            }
+
+                .module-item:hover .icon-container {
+                    transform: scale(1.1);
+                }
+
+                .module-item:hover .module-title {
+                    color: #F0822D;
+                }
+
+                .module-item:hover .arrow-container {
+                    opacity: 1;
+                }
+
+        .icon-container {
+            padding: 12px;
+            border-radius: 12px;
+            margin-right: 24px;
+            transition: transform .3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,.2);
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+            color: #FFF;
+        }
+
+        .gradient-blue-cyan {
+            background: linear-gradient(135deg,#3b82f6,#06b6d4);
+        }
+
+        .gradient-green-emerald {
+            background: linear-gradient(135deg,#10b981,#059669);
+        }
+
+        .gradient-orange-red {
+            background: linear-gradient(135deg,#f97316,#ef4444);
+        }
+
+        .gradient-purple-pink {
+            background: linear-gradient(135deg,#8b5cf6,#ec4899);
+        }
+
+        .gradient-teal-blue {
+            background: linear-gradient(135deg,#14b8a6,#3b82f6);
+        }
+
+        .gradient-indigo-purple {
+            background: linear-gradient(135deg,#6366f1,#8b5cf6);
+        }
+
+        .gradient-gray {
+            background: linear-gradient(135deg,#ffffff,#d0dff5);
+        }
+
+        .module-content {
+            flex: 1;
+        }
+
+        .module-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 0;
+            transition: color .3s ease;
+        }
+
+        .arrow-container {
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+
+        .arrow-circle {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arrow-icon {
+            width: 20px;
+            height: 20px;
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        @@media (max-width:768px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .module-item {
+                padding: 20px;
+            }
+
+            .icon-container {
+                margin-right: 16px;
+                padding: 10px;
+            }
+
+            .icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .module-title {
+                font-size: 1.125rem;
+            }
+        }
+
+        @@media (max-width:480px) {
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .module-item {
+                padding: 16px;
+            }
+
+            .icon-container {
+                margin-right: 12px;
+            }
+
+            .module-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body style="display:-webkit-box;padding:10px 0">
+    <script>
+        'use strict';
+        var classHolder = document.getElementsByTagName("BODY")[0],
+            themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) : {},
+            themeURL = themeSettings.themeURL || '',
+            themeOptions = themeSettings.themeOptions || '';
+        if (themeSettings.themeOptions) { classHolder.className = themeSettings.themeOptions; }
+        if (themeSettings.themeURL && !document.getElementById('mytheme')) {
+            var cssfile = document.createElement('link'); cssfile.id = 'mytheme'; cssfile.rel = 'stylesheet'; cssfile.href = themeURL;
+            document.getElementsByTagName('head')[0].appendChild(cssfile);
+        } else if (themeSettings.themeURL && document.getElementById('mytheme')) {
+            document.getElementById('mytheme').href = themeSettings.themeURL;
+        }
+        var saveSettings = function () {
+            themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
+                return /^(nav|header|footer|mod|display)-/i.test(item);
+            }).join(' ');
+            if (document.getElementById('mytheme')) { themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href"); }
+            localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+        }
+        var resetSettings = function () { localStorage.setItem("themeSettings", ""); }
+    </script>
+
+    <a href="@Url.Action("SelectBranch")" class="btn btn-glass text-dark font-weight-bold">Back To Branches</a>
+
+    <div class="row w-100 justify-content-center">
+        <main>
+            <div class="main-container">
+                <!-- Background Elements for Glassmorphism -->
+                <div class="background-elements">
+                    <div class="blur-element blur-1"></div>
+                    <div class="blur-element blur-2"></div>
+                    <div class="blur-element blur-3"></div>
+                </div>
+
+                <div class="container">
+                    <div class="content-wrapper">
+                        <!-- Header -->
+                        <div class="header">
+                            <img class="change-width-on-mobile w-75" src="~/smartadmin-5-styles/img/fleetexpresslogo.png" />
+                            <h3 class="subtitle text-dark">Select Module</h3>
+                        </div>
+
+                        <!-- Module List (dynamic) -->
+                        <div class="module-list">
+                            @foreach (var item in Model)
+                            {
+                                // choose a gradient/icon per known module id
+                                var gradientClass = "gradient-gray";
+                                var iconName = "grid";
+                                switch (item.Id)
+                                {
+                                    case 1: gradientClass = "gradient-blue-cyan"; iconName = "calendar"; break;          // Accounting
+                                    case 2: gradientClass = "gradient-green-emerald"; iconName = "truck"; break;         // Vehicle Fleet
+                                    case 3: gradientClass = "gradient-indigo-purple"; iconName = "wrench"; break;        // Workshop
+                                    case 4: gradientClass = "gradient-purple-pink"; iconName = "grid"; break;           // ERP Main
+                                    case 5: gradientClass = "gradient-orange-red"; iconName = "cart"; break;            // Sales/Procurement
+                                    case 9: gradientClass = "gradient-teal-blue"; iconName = "buildings"; break;        // Procurement/Other
+                                    case 10: gradientClass = "gradient-purple-pink"; iconName = "box"; break;           // Inventory
+                                }
+                                var moduleTitle = (Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName);
+                                <div class="module-item"
+                                     role="button"
+                                     tabindex="0"
+                                     data-link="@item.Url"
+                                     data-toggle="tooltip"
+                                     data-placement="left"
+                                     data-original-title="@moduleTitle">
+                                    <div class="icon-container @gradientClass">
+                                        @* inline SVG icons *@
+                                        @if (iconName == "calendar")
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="4" y="3" width="16" height="18" rx="2" ry="2" />
+                                                <line x1="16" y1="7" x2="16" y2="11" />
+                                                <line x1="8" y1="7" x2="8" y2="11" />
+                                                <line x1="16" y1="15" x2="16" y2="19" />
+                                                <line x1="8" y1="15" x2="8" y2="19" />
+                                            </svg>
+                                        }
+                                        else if (iconName == "truck")
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="1" y="3" width="15" height="13" />
+                                                <polygon points="16,8 20,8 23,11 23,16 16,16" />
+                                                <circle cx="5.5" cy="18.5" r="2.5" />
+                                                <circle cx="18.5" cy="18.5" r="2.5" />
+                                            </svg>
+                                        }
+                                        else if (iconName == "wrench")
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                            </svg>
+                                        }
+                                        else if (iconName == "cart")
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="9" cy="21" r="1" />
+                                                <circle cx="20" cy="21" r="1" />
+                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                                            </svg>
+                                        }
+                                        else if (iconName == "box")
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
+                                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                                <polyline points="3.27,6.96 12,12.01 20.73,6.96" />
+                                                <line x1="12" y1="22.08" x2="12" y2="12" />
+                                            </svg>
+                                        }
+                                        else if (iconName == "buildings")
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3 22h18" />
+                                                <path d="M6 22V4a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v18" />
+                                                <path d="M6 12h13" />
+                                                <path d="M10 6h1M13 6h1M10 9h1M13 9h1M10 15h1M13 15h1" />
+                                            </svg>
+                                        }
+                                        else
+                                        {
+                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="3" y="3" width="7" height="7" />
+                                                <rect x="14" y="3" width="7" height="7" />
+                                                <rect x="14" y="14" width="7" height="7" />
+                                                <rect x="3" y="14" width="7" height="7" />
+                                            </svg>
+                                        }
+                                    </div>
+
+                                    <div class="module-content">
+                                        <h3 class="module-title">
+                                            @moduleTitle
+                                        </h3>
+                                    </div>
+
+                                    <div class="arrow-container">
+                                        <div class="arrow-circle">
+                                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="19" y1="12" x2="5" y2="12" />
+                                                <polyline points="12,19 5,12 12,5" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <video poster="~/smartadmin-5-styles/img/clouds.png" id="bgvid" playsinline autoplay muted loop>
+        <source src="~/auth-assets/media/video/cc.webm" type="video/webm">
+    </video>
+
+    <script src="~/auth-assets/js/vendors.bundle.js"></script>
+    <script src="~/auth-assets/js/app.bundle.js"></script>
+    <script>
+        // Navigate on click
+        $(document).on('click', '.module-item', function () {
+            var link = $(this).data('link');
+            if (link) {
+                window.location.href = link;
+            }
+        });
+
+        // Keyboard accessibility
+        $(document).on('keydown', '.module-item', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                $(this).click();
+            }
+        });
+
+        // Enable bootstrap tooltip titles
+        if ($.fn.tooltip) {
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+    </script>
+</body>
+</html>

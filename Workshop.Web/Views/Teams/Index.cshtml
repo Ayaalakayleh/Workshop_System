@@ -1,0 +1,168 @@
+﻿@using Newtonsoft.Json
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@using System.Configuration;
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model TeamModel
+
+@{
+	string BASEURL = Configuration["ApiSettings:BaseApiUrl"] ?? "";
+	var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+@functions {
+	public static string IntToHexString(int colorInt)
+	{
+		return "#" + (colorInt & 0xFFFFFF).ToString("X6");
+	}
+}
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["Teams"]</h2>
+				<div class="panel-toolbar">
+					<!-- Modal trigger -->
+					<button type="button" id="addBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#teamModal">
+						<i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+					</button>
+				</div>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+					
+					<!-- Search Filters -->
+					
+					@using (Html.BeginForm("Index", "Teams", FormMethod.Post, new { id = "searchForm" }))
+					{
+						@Html.HiddenFor(model => model.PageNumber)
+						@Html.HiddenFor(model => model.PageSize)
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									@Html.Label(Model.TeamFilter.Name, Common["Label_Name"].ToString(), new { @for = "_Name" })
+									@Html.TextBoxFor(model => model.TeamFilter.Name, new { id = "_Name", @class = "form-control" })
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									@Html.Label(Model.TeamFilter.Code, Common["Code"].ToString(), new { @for = "_Code" })
+									@Html.TextBoxFor(model => model.TeamFilter.Code, new { @id = "_Code", @class = "form-control" })
+								</div>
+							</div>
+						</div>
+							<div class="text-center mt-3">
+								<button type="submit" id="btnSearch" class="btn btn-primary">
+									<i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+								</button>
+								<button type="button" id="btnReset" class="btn btn-secondary">
+									<i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+								</button>
+							</div>
+						}
+						
+					<!-- Table -->
+					<hr />
+					<div id="contentList">
+						@await Html.PartialAsync("_Teams", Model)
+					</div>
+					
+					<!-- Pagination Info -->
+					<div id="paginationWrapper"></div>
+					<!-- Pagination Pager -->
+					<div class="d-flex align-items-center justify-content-end mt-2">
+						<div class="mb-3 row" id="contentPager" hidden></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Team Modal -->
+<div class="modal fade" id="teamModal" tabindex="-1" aria-labelledby="teamModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="teamModalLabel">@Common["Teams"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="teamForm" asp-action="EditTeam" asp-controller="Teams" method="post">
+					<div class="row">
+
+						@Html.Hidden("updatedTeam.Id", "", new { @id = "Id", @class = "form-control" })
+
+						<div class="col-md-6 mb-3">
+							@Html.Label("updatedTeam.Code", Common["Code"].ToString(), new { @for = "Code" })
+							@Html.TextBox("updatedTeam.Code", "", new { @id = "Code", @class = "form-control", @required = "required" })
+						</div>
+						<div class="col-md-6 mb-3">
+							@Html.Label("updatedTeam.Short", Common["ShortName"].ToString(), new { @for = "Short" })
+							@Html.TextBox("updatedTeam.Short", "", new { @id = "Short", @class = "form-control", @required = "required" })
+						</div>
+						<div class="col-md-6 mb-3">
+							@Html.Label("updatedTeam.PrimaryName", Common["Label_PrimaryName"].ToString(), new { @for = "Description" })
+							@Html.TextBox("updatedTeam.PrimaryName", "", new { @id = "Description", @class = "form-control copyInput", @required = "required" })
+						</div>
+						<div class="col-md-6 mb-3">
+							@Html.Label("updatedTeam.SecondaryName", Common["Label_Secondaryname"].ToString(), new { @for = "SecondDescription" })
+							@Html.TextBox("updatedTeam.SecondaryName", "", new { @id = "SecondDescription", @class = "form-control pasteInput" })
+						</div>
+						<div class="col-md-6 mb-3">
+							@Html.Label("Color", Common["Color"].ToString(), new { @for = "Color" })
+							@Html.TextBox("Color", "#000000", new { @type = "color", @id = "Color", @class = "form-control" })
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<div class="form-group">
+								@Html.Label("updatedTeam.Technicians", Common["Label_Technicians"].ToString(), new { @for = "Technicians" })
+								@Html.DropDownList("updatedTeam.Technicians", ViewBag.TechsList as IEnumerable<SelectListItem>, new { @id = "Technicians", @multiple = "multiple", @class = "form-control" })
+							</div>
+						</div>
+
+
+					</div>
+				</form>
+
+			</div>
+			<div class="modal-footer justify-content-center">
+				<button id="btnCreate" type="submit" class="btn btn-primary" form="teamForm"><i class="fad fa-save"></i>&nbsp;@Common["Save"]</button>
+				<button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+
+			</div>
+		</div>
+	</div>
+</div>
+@section Scripts{
+<script>
+	var RazorVars = {
+		editUrl: '@Url.Action("Edit", "Teams")',
+		deleteUrl: '@Url.Action("Delete", "Teams")',
+		deleteTeamAjaxUrl: '@Url.Action("DeleteTeamAjax", "Teams")',
+		indexUrl: '@Url.Action("Index", "Teams")',
+		getTeamsPartialUrl: '@Url.Action("GetTeamsPartial", "Teams")',
+		getTeamByIdUrl: '@Url.Action("getTeamByID", "Teams")',
+		// Swal texts
+		swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+		swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+		swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+		swalErrorHappened: '@Message["ErrorHappend"]',
+		swalDeleted: '@Message["Deleted"]',
+		swalCancelled: '@Message["Cancelled"]',
+		BaseURL:'@BASEURL',
+		btnSave: '@Html.Raw(Common["Save"])',
+		btnSaving: '@Html.Raw(Common["Saving"])',
+		btnTryAgain: '@Html.Raw(Common["TryAgain"])',
+		btnOk: '@Html.Raw(Common["Ok"])',
+		msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+		ErrorHappend: '@Html.Raw(Common["ErrorHappend"])',
+		loadingText: '@Html.Raw(Common["Loading"])'
+	};
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/Definitions/Teams.js"></script>
+}

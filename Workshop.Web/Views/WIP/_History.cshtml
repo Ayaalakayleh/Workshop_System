@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.M_WIPServiceHistoryDTO>
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-3" id="tblHistory">
+                <thead>
+                    <tr class="small text-muted">
+                        <th>@Common["Label_Date"]</th>
+                        <th>@Common["Label_InvoiceDate"]</th>
+                        <th>@Common["Label_Event"]</th>
+                        <th>@Common["Label_Odometer"]</th>
+                        <th>@Common["Label_Description"]</th>
+                        <th>@Common["Label_WIP"]</th>
+                        <th>@Common["Label_Account"]</th>
+                        <th class="text-end">@Common["Label_Value"]</th>
+                        <th class="text-center">@Common["Button_Details"]</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.WIPDate.ToString("dd-MMM-yyyy")</td>
+                                <td>@item.InvoiceDate.ToString("dd-MMM-yyyy")</td>
+                                <td>@Common["Label_Event"]</td>
+                                <td>@item.OdometerCurrentOUT.ToString("N0")</td>
+                                <td>@(item.VehServiceDesc ?? "-")</td>
+                                <td>@item.WIPId</td>
+                                <td>@(item.SalesTypePrimaryName ?? "-")</td>
+                                <td class="text-end">SAR @(item.Total?.ToString("N2") ?? "0")</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-primary btn-sm btn-history-details collapsed"
+                                            onclick="ShowHistoryDetails(this)"
+                                            data-wip-id="@item.WIPId">
+                                        <i class="fas fa-eye"></i> @Common["Button_Details"]
+                                    </button>
+                                </td> 
+                            </tr>
+                        }
+                    }
+                    else
+                    {}
+                </tbody>
+            </table>
+        </div>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center text-muted py-3">
+                <i class="fas fa-info-circle me-2"></i>
+                @Common["NoServiceHistoryFound"]
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
+        <div id="TR-@item.WIPId" class="collapse">
+            <div role="tabpanel">
+                @await Html.PartialAsync("_HistoryDetails", item)
+            </div>
+        </div>
+    }
+}
+
+
+<script src="~/js/definitions/wiphistory.js"></script>

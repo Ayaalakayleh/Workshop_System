@@ -1,0 +1,24 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+	var lang = "en";
+}
+
+<div>
+	@{
+		await Html.RenderPartialAsync("_VehicleFilter.cshtml", new Workshop.Core.DTOs.Vehicle.VehicleDefinitions());
+	}
+	<hr>
+	<div id="vehicleList"></div>
+</div>
+<script>
+
+
+	// $(document).ready(function (){})
+
+
+</script>

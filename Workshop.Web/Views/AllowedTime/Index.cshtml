@@ -1,0 +1,132 @@
+﻿@using Workshop.Core.DTOs;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model List<AllowedTimeListItemDTO>
+
+@{
+	ViewBag.Title = Common["AllowedTimes"];
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["Label_AllowedTime"]</h2>
+				<div class="panel-toolbar">
+					<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#allowedTimeModal" onclick="resetModal()">
+						<i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+					</button>
+				</div>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					<!-- Search Filters -->
+					@* @using (Html.BeginForm("Index", "AllowedTime", FormMethod.Get, new { id = "filterForm" })) *@
+					@* { *@
+					<div class="row">
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<div class="form-group">
+								@Html.Label("Make", Common["Label_Make"].Value)
+								@Html.DropDownList("Make", ViewBag.Makes as List<SelectListItem>, Common["Select"].Value,
+																	new { @class = "form-control", id = "Make" })
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<div class="form-group">
+								@Html.Label("Model", Common["Label_Model"].Value)
+								@Html.DropDownList("Model", new List<SelectListItem>(), Common["Select"].Value,
+																	new { @class = "form-control", id = "Model" })
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<div class="form-group">
+								@Html.Label("Year", Common["Label_Year"].Value)
+								@Html.Editor("Year", new { htmlAttributes = new { id = "Year", @class = "form-control", min = "1900", max = "2100" } })
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<div class="form-group">
+								@Html.Label("Engine", Common["Label_Engine"].Value)
+								@Html.Editor("Engine", new { htmlAttributes = new { id = "Engine", @class = "form-control" } })
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<div class="form-group">
+								<label>@Common["Label_RTSCode"]</label>
+								<select asp-items="ViewBag.RTSCodes" class="form-control">
+									<option value="">@Common["Select"].Value</option>
+								</select>
+								@Html.DropDownList("Model", ViewBag.RTSCodes , Common["Select"].Value, new { @class = "form-control", id = "Model" })
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12 text-center mt-3">
+							<button type="submit" class="btn btn-primary" id="btnSearch">
+								<i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+							</button>
+							<button type="button" class="btn btn-secondary" onclick="resetFilter()">
+								<i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+							</button>
+						</div>
+					</div>
+
+					@* } *@
+
+					<!-- Table Container -->
+					<hr />
+					<div id="allowedTimeListContainer">
+						@await Html.PartialAsync("_AllowedTimesList", Model)
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Allowed Time Modal -->
+<div class="modal fade" id="allowedTimeModal" tabindex="-1" aria-labelledby="allowedTimeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="allowedTimeModalLabel">@Common["Label_AllowedTime"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body" id="allowedTimeModalBody">
+				@await Html.PartialAsync("Edit", new AllowedTimeDTO())
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var RazorVars = {
+		editUrl: '@Url.Action("Edit", "AllowedTime")',
+		indexUrl: '@Url.Action("Index", "AllowedTime")',
+		deleteUrl: '@Url.Action("Delete", "AllowedTime")',
+		fillVehicleModelUrl: '@Url.Action("FillVehicleModel", "VehicleDefinition")',
+
+		// Swal texts
+		msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+		btnOk: '@Html.Raw(Common["Ok"])',
+		swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+		swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+		swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+		swalErrorHappened: '@Message["ErrorHappend"]',
+		swalDeleted: '@Message["Deleted"]',
+		swalCancelled: '@Message["Cancelled"]',
+		year_min_message: '@Message["YearMinMessage"]',
+		year_max_message: '@Message["YearMaxMessage"]',
+
+	};
+
+	var lang = '@lang';
+</script>
+<script src="~/js/definitions/AllowedTime.js"></script>

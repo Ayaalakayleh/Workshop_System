@@ -1,0 +1,138 @@
+﻿@model Workshop.Core.DTOs.WIPSChedule;
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@using Workshop.Domain.Enum;
+@{
+    var WIPstatus = Convert.ToInt32(ViewData["WIPstatus"]);
+}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
+
+<style>
+        .selected-row {
+        background-color: #e0f0ff;
+        font-weight: bold;
+    }
+
+    .dx-overlay-shader {
+        background-color: rgba(0,0,0,0.5) !important;
+    }
+
+    .dx-popup-wrapper {
+        background: transparent !important;
+    }
+
+    .dx-overlay {
+        background: transparent !important;
+    }
+
+</style>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">@Common["Title_LabourLines"]</h5>
+        <div class="d-flex gap-2">
+            @if (WIPstatus != (int)WIPStatusEnum.G && WIPstatus != (int)WIPStatusEnum.Invoiced)
+            {
+                @if (PermissionHelper.UserHasPermission(Permissions.WIP.AddRTS))
+                {
+                }
+                    <button class="btn btn-outline-primary btn-sm" id="addRts" data-bs-toggle="modal" data-bs-target="#addRtsModal">
+                        <i class="fas fa-plus"></i>&nbsp;@Common["Button_AddRTS"]
+                    </button>
+                @if (PermissionHelper.UserHasPermission(Permissions.WIP.Transfer))
+                {
+                }
+                    @if(WIPstatus==0){}
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#transferModal">
+                        <i class="fa fa-globe-europe"></i>&nbsp; @Common["TransferVehicle"]
+                    </button>
+            }
+        </div>
+    </div>
+    <div id="descPopup">
+        @* <textarea id="descEditor"></textarea> *@
+    </div>
+    <div class="card-body p-0">
+        <div id="mainRTSGrid" class="gridContainer"></div>
+    </div>
+</div>
+
+
+<!-- add rts labour modal -->
+<div class="modal fade" id="addRtsModal" tabindex="-1" aria-labelledby="addRtsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRtsModalLabel">@Common["Title_AddRTSLabour"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-primary btn-sm active" id="btnAddRTS">@Common["Button_AddRTS"]</button>
+                    <button type="button" id="btnAddMenu" class="btn btn-outline-primary btn-sm">Add Menu</button>
+                </div>
+                <div id="rtsSelection" class="gridContainer"></div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Common["Button_Close"]</button>
+                <button type="button" class="btn btn-primary" id="selectBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- schedule labour modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleModalLabel">@Common["Title_ScheduleLabour"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm" class="row g-3">
+                    <div class="col-lg-4"><label class="form-label">@Common["Label_Date"]</label><input type="text" class="form-control flat-picker-future" name="Date" id="schDate" value=""></div>
+                    <div class="col-lg-4">
+                        <label class="form-label">@Common["Label_Technician"]</label>
+                        @Html.DropDownListFor(
+                        m => m.TechnicianId, new SelectList(new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "schTech" }) 
+                    </div>
+                    @Html.HiddenFor(model => model.RTSId)
+                    <div class="col-lg-4"><label class="form-label">@Common["Label_Start"]</label><input type="text" class="form-control" id="schStart"  value="08:00"></div>
+                    <div class="col-lg-4"><label class="form-label">@Common["Label_DurationMins"]</label><input type="number" class="form-control" id="schDuration" min="1"  value="30"></div>
+                    <div class="col-lg-4"><label class="form-label">@Common["Label_Ends"]</label><input type="time" class="form-control" id="schEnd"  readonly></div>
+                    <div class="col-12"><span class="badge bg-secondary me-2" id="schJobChip">@Common["Label_Job"]</span><span class="badge bg-secondary" id="schAllowedChip">@Common["Label_Allowed"]: 0m</span></div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-primary" id="btnSaveSchedule"><i class="fad fa-save"></i>&nbsp;@Common["Button_Save"]</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/definitions/wipmaingridrts.js"></script>
+<script src="~/js/definitions/wipselectiongridrts.js"></script>
+<script>
+    const wipStatus = @WIPstatus;
+    const Gone = @((int)WIPStatusEnum.G);
+    const Invoiced = @((int)WIPStatusEnum.Invoiced);
+    window.URL = Object.assign({}, window.URL || {}, {
+        getAvailableTechnicians: '@Url.Action("GetAvailableTechnicians", "WIP")',
+        getAvailableSlots: '@Url.Action("GetAvailableSlots", "Reservations")',
+        getAvaliableTechTime: '@Url.Action("GetAvailableTechnicians", "Reservations")',
+    });
+
+     
+</script>
+
+<script>
+</script>

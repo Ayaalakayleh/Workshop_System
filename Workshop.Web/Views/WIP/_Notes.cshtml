@@ -1,0 +1,19 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="tab-pane fade" id="tabNotes" role="tabpanel">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12"><label class="form-label">@Common["Label_Note"]</label><textarea class="form-control" rows="4" id="WipNote"></textarea></div>
+                @* <div class="col-lg-6 col-md-6 col-sm-12"><label class="form-label">@Common["Label_CustomerContact"]</label><input class="form-control" id="CustomerContact1"></div>
+                <div class="col-lg-6 col-md-6 col-sm-12"><label class="form-label d-lg-block d-none">&nbsp;</label><input class="form-control" id="CustomerContact2"></div> *@
+                @* <div class="col-12">
+                    <small class="text-muted">@Common["Label_CreatedBy"]: <strong>Abdallah Labib</strong> &nbsp;|&nbsp; @Common["Label_CreatedAt"]: <strong>12-Sep-2025</strong></small>
+                </div> *@
+            </div>
+        </div>
+    </div>
+</div>

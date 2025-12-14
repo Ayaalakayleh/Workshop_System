@@ -1,0 +1,225 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Workshop.Core.DTOs
+@using Workshop.Core.DTOs.AccountingDTOs
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@inject IConfiguration Configuration
+@model PriceMatrixModel
+
+@{
+	string BASEURL = Configuration["ApiSettings:BaseApiUrl"] ?? "";
+	var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["PriceMatrix"]</h2>
+				<div class="panel-toolbar">
+					<!-- Modal trigger -->
+					<button type="button" id="addButton" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#matrixModal">
+						<i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+					</button>
+				</div>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+					@using (Html.BeginForm("Index", "PriceMatrix", FormMethod.Post, new { @id = "searchForm" }))
+					{
+						@Html.HiddenFor(model => model.PriceMatrixFilter.PageNumber)
+						@Html.HiddenFor(model => model.PriceMatrixFilter.PageSize)
+						<!-- Search Filters -->
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-group">
+									@Html.LabelFor(model => model.PriceMatrixFilter.Name, @Common["Label_Name"])
+									@Html.TextBoxFor(model => model.PriceMatrixFilter.Name, new { @class = "form-control", @id = "_Name", @name = "Name" })
+
+
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+
+									@Html.LabelFor(model => model.PriceMatrixFilter.AppliesTo, @Common["Label_Applies"])
+									@Html.TextBoxFor(model => model.PriceMatrixFilter.AppliesTo, new { @class = "form-control", @id = "AppliesTo", @name = "AppliesTo" })
+
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+
+									@Html.LabelFor(model => model.PriceMatrixFilter.Basis, @Common["Label_Basis"])
+									@Html.TextBoxFor(model => model.PriceMatrixFilter.Basis, new { @class = "form-control", @id = "BasisId", @name = "BasisId" })
+
+								</div>
+							</div>
+						</div>
+						<div class="text-center mt-3">
+							<button class="btn btn-primary" id="btnSearch"><i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+							<button type="button" id="btnReset" class="btn btn-secondary">
+								<i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+							</button>
+						</div>
+						<div class="d-flex align-items-center justify-content-end">
+							<div class="mb-5 row" id="contentPager" hidden></div>
+						</div>
+
+					}
+					<!-- Table -->
+					<hr />
+					<table id="data" class="table table-bordered table-hover text-center w-100 main-table">
+						<thead>
+							<tr>
+								<th>@Common["Label_Name"]</th>
+								<th>@Common["Label_Applies"]</th>
+								<th>@Common["Label_Basis"]</th>
+								<th>@Common["Label_Match"]</th>
+								<th>@Common["Label_Rate"]</th>
+								<th>@Common["Label_Markup"]</th>
+								<th>@Common["Label_Actions"]</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in Model.PriceMatrixList)
+							{
+								<tr>
+
+									<td>@item.Name</td>
+									<td>@item.AppliesTo</td>
+									<td>@((Basis)@item.BasisId)</td>
+									<td>@String.Join(", ", @item.MatchValueTextPair.Select(s => s.Value))</td>
+									<td>@item.RatePerHour</td>
+									<td>@item.Markup</td>
+									<td>
+										<button onclick="editButtonClick(this)" class="btn btn-info my-1 btn-sm" data-bs-toggle="modal" data-bs-target="#matrixModal" data-id="@item.Id"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</button>
+										<button class="btn btn-danger btn-sm my-1" onclick="deletePrice(@item.Id)" data-id="@item.Id"><i class="fad fa-trash"></i>&nbsp;@Common["Delete"]</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- matrix Modal -->
+<div class="modal fade" id="matrixModal" tabindex="-1" aria-labelledby="matrixModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="matrixModalLabel">@Common["DefinePriceMatrixRule"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				@using (Html.BeginForm("Edit", "PriceMatrix", FormMethod.Post, new { @id = "matrixForm" }))
+				{
+					<input type="hidden" name="Id" id="Id" value="Id" />
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_Applies"]</label>
+							<select class="form-control" name="Applies" id="Applies">
+
+								<option>@Common["Label_Labour"]</option>
+								<option>@Common["Label_Parts"]</option>
+
+							</select>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_AccountType"]</label>
+							<select onchange="onAccountTypeChange(this)" class="form-control" name="AccountType" id="AccountType">
+								@foreach (var account in ViewBag.AccountTypes)
+								{
+									<option value="@account.Value">@account.Text</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_SaleType"]</label>
+							<select class="form-control" name="AccountId" id="AccountId">
+								@foreach (var account in ViewBag.SalesType)
+								{
+									<option value="@account.Value">@account.Text</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label class="form-label">@Common["Label_Customer"]</label>
+							@Html.DropDownList("Customers", ViewBag.Customers as IEnumerable<SelectListItem>, new { @id = "Customers", @multiple = "multiple", @class = "form-control" })
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_Basis"] <span class="text-danger">*</span></label>
+							<select onchange="onBasisChange(this)" class="form-control" name="Basis" id="Basis">
+								@foreach (var bas in Enum.GetValues(typeof(Basis)))
+								{
+									<option value="@((int)bas)">@bas</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_Match"] <span class="text-danger">*</span></label>
+							<select class="form-control" name="MatchValue" id="MatchValue" multiple>
+								@foreach (var match in ViewBag.MatchValues)
+								{
+									<option value=@match.Id>@match.Code</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_RatePerHour"] <span class="text-danger">*</span></label>
+							<input type="number" class="form-control" name="RatePerHour" id="RatePerHour">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_Markup"]% <span class="text-danger">*</span></label>
+							<input type="number" class="form-control" name="Markup" id="Markup" min="0" max="100" step="0.1">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>@Common["Label_Name"] <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" name="Name" id="Name">
+						</div>
+					</div>
+				}
+			</div>
+			<div class="modal-footer justify-content-center">
+				<button id="btnCreate" type="submit" class="btn btn-primary" form="matrixForm"><i class="fas fa-save"></i>&nbsp;@Common["Save"]</button>
+				<button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var RazorVars = {
+		swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+		swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+		swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+		swalErrorHappened: '@Message["ErrorHappend"]',
+		swalDeleted: '@Message["Deleted"]',
+		swalCancelled: '@Message["Cancelled"]',
+		BaseURL:'@BASEURL',
+
+        // Action URLs for AJAX calls
+        editUrl: '@Url.Action("Edit", "PriceMatrix")',
+        setBasisUrl: '@Url.Action("SetBasis", "PriceMatrix")',
+        setAccountTypeUrl: '@Url.Action("SetAccountType", "PriceMatrix")',
+        getMatchedValuesUrl: '@Url.Action("GetMatchedValues", "PriceMatrix")',
+        getPriceUrl: '@Url.Action("GetPriceById", "PriceMatrix")',
+        deletePriceUrl: '@Url.Action("DeletePriceAjax", "PriceMatrix")',
+		btnSave: '@Html.Raw(Common["Save"])',
+		btnSaving: '@Html.Raw(Common["Saving"])',
+		btnTryAgain: '@Html.Raw(Common["TryAgain"])',
+		btnOk: '@Html.Raw(Common["Ok"])',
+		msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+		ErrorHappend: '@Html.Raw(Common["ErrorHappend"])',
+		loadingText: '@Html.Raw(Common["Loading"])'
+	};
+</script>
+@if (Model.TotalPages > 0)
+{
+	<input id="total_pages" value="@Model.TotalPages" hidden />
+}
+<script src="~/js/site.js"></script>
+<script src="~/js/definitions/PriceMatrix.js"></script>

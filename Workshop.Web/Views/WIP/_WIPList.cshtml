@@ -1,0 +1,49 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.WIPDTO>
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<table class="table table-bordered table-hover text-center w-100 main-table">
+    <thead>
+        <tr>
+            <th>@Common["Label_WIPNo"]</th>
+            <th>@Common["Label_Status"]</th>
+            <th>@Common["Label_Type"]</th>
+            <th>@Common["Label_Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.LookupCode - @item.LookupPrimaryName</td>
+                    <td>@(item.IsExternal ? "External" : "Internal")</td>
+                    <td class="d-flex gap-1 justify-content-center">
+                        <a href="@Url.Action("Edit", "WIP", new { id = item.Id })" class="btn btn-success btn-sm">
+                            <i class="fad fa-folder-open"></i>&nbsp;@Common["Button_Open"]
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+@*             <tr>
+                <td colspan="4">@Common["NoData"]</td>
+            </tr> *@
+        }
+    </tbody>
+</table>
+
+@if (Model != null && Model.Any())
+{
+    // Assuming TotalPages on DTO holds total record count (same pattern as Technician)
+    var first = Model.First();
+    var totalPages = Math.Ceiling((decimal)first.TotalPages / 25);
+
+    <input id="total_pages" value="@totalPages" hidden />
+}

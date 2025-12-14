@@ -1,0 +1,81 @@
+﻿@model Workshop.Core.DTOs.RTSCodeWithAllowedTimeDTO;
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["RTSCodeDefinition"]</h2>
+                <div class="panel-toolbar">
+
+                    <a href="@Url.Action("Edit", "RTSCode")" class="btn btn-outline-primary add-record btn-sm"><i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]</a>
+
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_Name"]</label>
+                                <input type="text" id="_Name" name="Name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Code"]</label>
+                                <input type="text" id="_Code" name="Code" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" id="btnSearch">
+                            <i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+                            <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                        </button>
+                    </div>
+                    <hr />
+                    <div id="contentList">
+                        @await Html.PartialAsync("_RTSCodeList", Model)
+                    </div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <div class="mb-5 row" id="contentPager" hidden></div>
+                    </div>
+                    <!-- datatable end -->
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        editUrl: '@Url.Action("Edit", "RTSCode")',
+        deleteUrl: '@Url.Action("Delete", "RTSCode")',
+        indexUrl: '@Url.Action("Index", "RTSCode")',
+        fillVehicleModelUrl: '@Url.Action("FillVehicleModel", "RTSCode")',
+        deleteCodeUrl: '@Url.Action("DeleteCode", "RTSCode")',
+
+    // Swal texts
+    swalDeleteTitle: '@Html.Raw(Message["SwalDeleteTitle"])',
+    swalDeleteConfirm: '@Html.Raw(Message["SwalDeleteConfirm"])',
+    swalDeleteCancel: '@Html.Raw(Message["SwalDeleteCancel"])',
+    swalErrorHappened: '@Html.Raw(Message["ErrorHappend"])',
+    swalDeleted: '@Html.Raw(Message["Deleted"])',
+    swalCancelled: '@Html.Raw(Message["Cancelled"])',
+
+    // DevExpress Columns Labels
+    DXManufacturer: '@Html.Raw(Common["Label_Manufacturer"])',
+    DXVehicleModel: '@Html.Raw(Common["Label_Model"])',
+    DXVehicleClass: '@Html.Raw(Common["Label_VehicleClass"])',
+    DXYear: '@Html.Raw(Common["Label_Year"])',
+    DXAllowedHour: '@Html.Raw(Common["Label_AllowedHour"])',
+
+    });
+</script>
+<script src="~/js/definitions/RTSCode.js"></script>

@@ -1,0 +1,596 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.General.Modules>
+@{
+    ViewBag.Title = "SelectModule";
+    Layout = null;
+    string Lang = "en";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>VehiclesSystem</title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+
+    <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="~/Content/smart_theme/dist/css/vendors.bundle.css">
+    <link id="appbundle" rel="stylesheet" media="screen, print" href="~/Content/smart_theme/dist/css/app.bundle.css">
+    <link id="mytheme" rel="stylesheet" media="screen, print">
+    <link id="myskin" rel="stylesheet" media="screen, print" href="~/Content/smart_theme/dist/css/skins/skin-master.css">
+    <link rel="stylesheet" media="screen, print" href="~/Content/smart_theme/dist/css/page-login-alt.css">
+    <link href="../Content/smart_theme/dist/css/themes/cust-theme-3.css" rel="stylesheet" />
+
+    <style>
+        @@font-face {
+            font-family: 'Tajawal-Bold';
+            src: url('../Content/css/plugins/bootstrap-rtl/tajwal-arabic-font/Tajawal-Bold.ttf') format('truetype');
+        }
+
+        body {
+            overflow-y: scroll;
+        }
+
+        .blankpage-form-field {
+            margin: auto;
+        }
+
+        .select2-container {
+            z-index: 9999999 !important
+        }
+
+        #hidden-word {
+            width: 200px;
+            height: 50px;
+            white-space: nowrap;
+            padding-right: 40px
+        }
+
+        .page-logo-text {
+            text-align: start;
+            color: var(--theme-dark) !important
+        }
+
+        .blankpage-form-field .page-logo, .blankpage-form-field .card {
+            background-image: unset !important;
+            background-color: unset !important;
+            background: rgba(255,255,255,.25) !important;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,.37) !important;
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
+        }
+
+        .btn.btn-outline-danger {
+            color: #dc3545 !important;
+            border: 1px solid #dc3545 !important
+        }
+
+            .btn.btn-outline-danger:hover {
+                background-color: #dc3545 !important;
+                border: 1px solid #dc3545 !important;
+                color: #fff !important
+            }
+
+        address {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Tajawal-Bold';
+        }
+
+        /* ---- Dial base (unchanged) ---- */
+        :root {
+            --icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+            --icon-star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 7.13.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z'/%3E%3C/svg%3E");
+            --icon-more: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/%3E%3C/svg%3E");
+            --icon-refresh: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'/%3E%3C/svg%3E");
+            --icon-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            --icon-house: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z'/%3E%3C/svg%3E");
+            --icon-1: var(--icon-house);
+            --icon-2: var(--icon-search);
+            --icon-3: var(--icon-star);
+            --icon-4: var(--icon-more);
+            --icon-5: var(--icon-refresh);
+            --icon-6: var(--icon-back);
+            --button-active: -1;
+            --debug: 0;
+            --color-accent-off: hsl(267 16% 43%);
+            --color-accent-off-darker: hsl(258 29% 39%);
+            --color-accent-on-code: var(--angle) 100% 72%;
+            --color-accent-on-darker-code: var(--angle) 98% 61%;
+            --color-accent-on: hsl(var(--color-accent-on-code)/1);
+            --color-accent-on-darker: hsl(var(--color-accent-on-darker-code)/1);
+            --inner-bg: hsl(0deg 0% 90.98%);
+            --outer-bg: hsl(223.81 0% 93%);
+            --border-bg: hsl(0deg 0% 85%);
+            --invert: 0%;
+            --color-grey: hsl(0 0% 87%);
+            --color-dark-grey: hsl(0 0% 95.69%);
+            --angle: -90deg;
+            --rotation: 0;
+            --angle-offset: 90deg;
+            --is-active: 0;
+            --icon-offset: 100;
+            --shadow: rgba(0,0,0,.125) 0 0 2px -.5px, rgba(0,0,0,.125) 0 1px 5px -1px, rgba(0,0,0,.125) 0 4px 12px -1.5px, rgba(0,0,0,.125) 0 9px 28px -2px, rgba(0,0,0,.125) 0 24px 72px -2.5px;
+            --icon-opacity: .4;
+            --item-opacity: 0;
+            --cubic-bezier: cubic-bezier(0.44, -0.9, 0.31, 1.55);
+        }
+
+        @@media (max-width:565px) {
+            main {
+                --col-height: 50vh !important;
+                --radius: clamp(25vw,85px,7vw) !important;
+            }
+
+            .change-width-on-mobile {
+                width: 75%
+            }
+        }
+
+        main {
+            --col-height: 35vh;
+            --radius: clamp(5vw,90px,10vw);
+        }
+
+            main > div {
+                width: 100%;
+                height: var(--col-height);
+                display: grid;
+                place-items: center;
+                background: var(--scene-bg);
+            }
+
+        .selector {
+            --shadow-width: calc(var(--radius) / 13);
+            --knob-color: linear-gradient(to bottom, var(--color-accent-off), var(--color-accent-off-darker));
+            width: var(--radius);
+            aspect-ratio: 1/1;
+            position: relative;
+            border-radius: 9999px;
+            background: var(--color-dark-grey);
+            box-shadow: inset rgba(0,0,0,.13) 0 0 2px -1px, inset rgba(0,0,0,.13) 0 2px 8px -2px, inset rgba(0,0,0,.13) 0 8px 34px -2px;
+        }
+
+            .selector .knob {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                display: grid;
+                place-items: center;
+                transform: rotate(calc(var(--angle) + var(--angle-offset)));
+                transition: transform .4s var(--cubic-bezier);
+                z-index: 2;
+                cursor: pointer;
+                border-radius: 9999px;
+            }
+
+                .selector .knob:after {
+                    content: "";
+                    position: absolute;
+                    width: 4%;
+                    height: 14%;
+                    background: var(--knob-color);
+                    box-shadow: 0 0 1px rgba(0,0,0,.4), 0 0 2px 1px rgba(0,0,0,.2), inset 0 1px 2px var(--color-accent-on), inset 0 -1px 2px var(--color-accent-on-darker), 0 0 calc(var(--is-active)*4px) var(--color-accent-on), 0 0 calc(var(--is-active)*16px) hsl(var(--color-accent-on-code)/.5);
+                    top: 16px;
+                    border-radius: 9999px;
+                }
+
+            .selector.active {
+                --is-active: 1;
+                transition: --color-accent-on .3s ease .2s, --color-accent-on-darker .3s ease .2s, --color-accent-on-code .3s ease .2s, --color-accent-on-darker-code .3s ease .2s;
+            }
+
+                .selector.active ul {
+                    --selector-width: 260;
+                    --border-width: 13;
+                    --rotation: 0;
+                    --icon-offset: 7;
+                    --item-opacity: 1;
+                }
+
+            .selector:after {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border-radius: 9999px;
+                background-image: linear-gradient(to bottom,var(--scene-bg),var(--color-grey));
+                box-shadow: 0 0 calc(var(--radius)/30) rgba(0,0,0,.3);
+                transition: background-image .2s ease, transform .15s ease;
+                transform: scale(1);
+            }
+
+            .selector ul {
+                --selector-width: 90;
+                --border-width: 0;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                list-style: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+                .selector ul:before {
+                    content: "";
+                    position: absolute;
+                    width: calc(var(--selector-width)*1%);
+                    height: calc(var(--selector-width)*1%);
+                    border-radius: 9999px;
+                    box-shadow: var(--shadow), 0 calc(var(--radius)/-10) 120px calc(var(--radius)/5) rgba(0,0,0,.05);
+                }
+
+                .selector ul:after {
+                    content: "";
+                    position: absolute;
+                    width: calc(100% + calc(var(--radius)/9) + calc(var(--border-width)*2*1px));
+                    height: calc(100% + calc(var(--radius)/9) + calc(var(--border-width)*2*1px));
+                    border-radius: 9999px;
+                    background: rgba(255,255,255,.25);
+                    box-shadow: 0 8px 32px 0 rgba(31,38,135,.37);
+                    backdrop-filter: blur(3px);
+                    -webkit-backdrop-filter: blur(3px);
+                    border: 1px solid rgba(255,255,255,.18);
+                }
+
+                .selector ul li {
+                    position: absolute;
+                    width: 25%;
+                    height: 120%;
+                    left: 0;
+                    right: 0;
+                    top: -70%;
+                    margin: auto;
+                    transform-origin: bottom center;
+                    display: flex;
+                    align-items: start;
+                    justify-content: center;
+                    opacity: var(--item-opacity);
+                }
+
+                    .selector ul li > span {
+                        display: none;
+                    }
+
+                    .selector ul li > input[type=radio] {
+                        all: unset;
+                        position: absolute;
+                        width: 100%;
+                        aspect-ratio: 1/1;
+                        cursor: pointer;
+                        top: 0;
+                        left: 0;
+                    }
+
+                    .selector ul li:before {
+                        content: "";
+                        position: absolute;
+                        width: 100%;
+                        aspect-ratio: 1/1;
+                        background: var(--color-accent-on);
+                        box-shadow: 0 0 6px var(--color-accent-on-darker);
+                        transform: translateY(175%) scaleX(1.5);
+                        filter: blur(12px) opacity(var(--is-selected)) saturate(2);
+                        transition: --is-selected .2s ease .2s;
+                        opacity: .5
+                    }
+
+                    .selector ul li:after {
+                        content: "";
+                        position: absolute;
+                        width: 100%;
+                        aspect-ratio: 1/1;
+                        pointer-events: none;
+                        opacity: var(--icon-opacity);
+                        filter: invert(var(--invert));
+                    }
+                /* Icons per id */
+                .selector ul #module_1:after {
+                    background: url('../Content/img/accounting.png') no-repeat center top 15%/contain;
+                }
+
+                .selector ul #module_2:after {
+                    background: url('../Content/img/car.png') no-repeat center top 15%/contain;
+                }
+
+                .selector ul #module_3:after {
+                    background: url('../Content/img/screwdriver.png') no-repeat center top 15%/contain;
+                }
+
+                .selector ul #module_4:after {
+                    background: url('../Content/img/erp.png') no-repeat center top 15%/contain;
+                    transform: rotate(180deg);
+                }
+
+                .selector ul #module_5:after {
+                    background: url('../Content/img/invoice.png') no-repeat center top 15%/contain;
+                    transform: rotate(300deg);
+                }
+
+                .selector ul #module_9:after {
+                    background: url('../Content/img/procurement.png') no-repeat center top 15%/contain;
+                }
+
+                .selector ul #module_10:after {
+                    background: url('../Content/img/inventory.png') no-repeat center top 15%/contain;
+                }
+
+            /* ---- Layout for 6 items (existing behavior) ---- */
+            .selector.active ul li:nth-child(1) {
+                transform: rotate(0deg);
+                transition: transform .5s ease .05s;
+            }
+
+            .selector.active ul li:nth-child(2) {
+                transform: rotate(60deg);
+                transition: transform .5s ease .10s;
+            }
+
+            .selector.active ul li:nth-child(3) {
+                transform: rotate(120deg);
+                transition: transform .5s ease .15s;
+            }
+
+            .selector.active ul li:nth-child(4) {
+                transform: rotate(180deg);
+                transition: transform .5s ease .20s;
+            }
+
+            .selector.active ul li:nth-child(5) {
+                transform: rotate(240deg);
+                transition: transform .5s ease .25s;
+            }
+
+            .selector.active ul li:nth-child(6) {
+                transform: rotate(300deg);
+                transition: transform .5s ease .30s;
+            }
+
+            .selector:has(li:nth-child(1) input[type=radio]:checked) {
+                --angle: calc(calc((360deg / 6) * 0) - var(--angle-offset));
+            }
+
+            .selector:has(li:nth-child(2) input[type=radio]:checked) {
+                --angle: calc(calc((360deg / 6) * 1) - var(--angle-offset));
+            }
+
+            .selector:has(li:nth-child(3) input[type=radio]:checked) {
+                --angle: calc(calc((360deg / 6) * 2) - var(--angle-offset));
+            }
+
+            .selector:has(li:nth-child(4) input[type=radio]:checked) {
+                --angle: calc(calc((360deg / 6) * 3) - var(--angle-offset));
+            }
+
+            .selector:has(li:nth-child(5) input[type=radio]:checked) {
+                --angle: calc(calc((360deg / 6) * 4) - var(--angle-offset));
+            }
+
+            .selector:has(li:nth-child(6) input[type=radio]:checked) {
+                --angle: calc(calc((360deg / 6) * 5) - var(--angle-offset));
+            }
+
+            /* ---- NEW: Layout for 7 items ---- */
+            .selector.items-7.active ul li:nth-child(1) {
+                transform: rotate(0deg);
+                transition: transform .5s ease .05s;
+            }
+
+            .selector.items-7.active ul li:nth-child(2) {
+                transform: rotate(calc(360deg/7 * 1));
+                transition: transform .5s ease .10s;
+            }
+
+            .selector.items-7.active ul li:nth-child(3) {
+                transform: rotate(calc(360deg/7 * 2));
+                transition: transform .5s ease .15s;
+            }
+
+            .selector.items-7.active ul li:nth-child(4) {
+                transform: rotate(calc(360deg/7 * 3));
+                transition: transform .5s ease .20s;
+            }
+
+            .selector.items-7.active ul li:nth-child(5) {
+                transform: rotate(calc(360deg/7 * 4));
+                transition: transform .5s ease .25s;
+            }
+
+            .selector.items-7.active ul li:nth-child(6) {
+                transform: rotate(calc(360deg/7 * 5));
+                transition: transform .5s ease .30s;
+            }
+
+            .selector.items-7.active ul li:nth-child(7) {
+                transform: rotate(calc(360deg/7 * 6));
+                transition: transform .5s ease .35s;
+            }
+
+            .selector.items-7:has(li:nth-child(1) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 0) - var(--angle-offset));
+            }
+
+            .selector.items-7:has(li:nth-child(2) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 1) - var(--angle-offset));
+            }
+
+            .selector.items-7:has(li:nth-child(3) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 2) - var(--angle-offset));
+            }
+
+            .selector.items-7:has(li:nth-child(4) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 3) - var(--angle-offset));
+            }
+
+            .selector.items-7:has(li:nth-child(5) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 4) - var(--angle-offset));
+            }
+
+            .selector.items-7:has(li:nth-child(6) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 5) - var(--angle-offset));
+            }
+
+            .selector.items-7:has(li:nth-child(7) input[type=radio]:checked) {
+                --angle: calc(calc((360deg/7) * 6) - var(--angle-offset));
+            }
+
+        .btn.btn-glass {
+            background: rgba(255,255,255,.25);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.18);
+        }
+    </style>
+</head>
+
+<body style="display:-webkit-box;padding:10px 0">
+    <script>
+        'use strict';
+        var classHolder = document.getElementsByTagName("BODY")[0],
+            themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) : {},
+            themeURL = themeSettings.themeURL || '',
+            themeOptions = themeSettings.themeOptions || '';
+        if (themeSettings.themeOptions) { classHolder.className = themeSettings.themeOptions; }
+        if (themeSettings.themeURL && !document.getElementById('mytheme')) {
+            var cssfile = document.createElement('link'); cssfile.id = 'mytheme'; cssfile.rel = 'stylesheet'; cssfile.href = themeURL;
+            document.getElementsByTagName('head')[0].appendChild(cssfile);
+        } else if (themeSettings.themeURL && document.getElementById('mytheme')) {
+            document.getElementById('mytheme').href = themeSettings.themeURL;
+        }
+        var saveSettings = function () {
+            themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
+                return /^(nav|header|footer|mod|display)-/i.test(item);
+            }).join(' ');
+            if (document.getElementById('mytheme')) { themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href"); }
+            localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+        }
+        var resetSettings = function () { localStorage.setItem("themeSettings", ""); }
+    </script>
+
+    <a href="@Url.Action("SelectBranch")" class="btn btn-glass text-dark font-weight-bold">BackToBranches</a>
+
+    <div class="row w-100 justify-content-center">
+        <main>
+            <div>
+                <div class="selector">
+                    <div class="knob"></div>
+                    <ul>
+                        @foreach (var item in Model)
+                        {
+                            if (item.Id == 1)
+                            {
+                                <li id="module_1">
+                                    <span>Back</span><a></a>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                            else if (item.Id == 2)
+                            {
+                                <li id="module_2">
+                                    <span>Home</span>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                            else if (item.Id == 3)
+                            {
+                                <li id="module_3">
+                                    <span>Search</span>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                            else if (item.Id == 4)
+                            {
+                                <li id="module_4">
+                                    <span>Star</span>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                            else if (item.Id == 5)
+                            {
+                                <li id="module_5">
+                                    <span>More</span>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                            else if (item.Id == 9)
+                            {
+                                <li id="module_9">
+                                    <span>Refresh</span>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                            else if (item.Id == 10)
+                            {
+                                <li id="module_10">
+                                    <span>Inventory</span>
+                                    <input type="radio" class="module-link" data-toggle="tooltip" data-placement="left"
+                                           data-original-title="@(Lang == "en" ? "Inventory" : item.ModuleSecondaryName)"
+                                           name="choice-a" data-link="@item.Url" />
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <h1 class="text-black mt-5">SelectModule</h1>
+    <div class="text-center">
+        <img class="change-width-on-mobile" src="~/Content/img/fleetexpresslogo.png" />
+    </div>
+
+    <video poster="~/Content/smart_theme/dist/img/backgrounds/clouds.png" id="bgvid" playsinline autoplay muted loop>
+        <source src="~/Content/smart_theme/dist/media/video/cc.webm" type="video/webm">
+    </video>
+
+    <script src="~/Content/smart_theme/dist/js/vendors.bundle.js"></script>
+    <script src="~/Content/smart_theme/dist/js/app.bundle.js"></script>
+    <script>
+        const selectors = document.querySelectorAll(".selector");
+
+        selectors.forEach((selector) => {
+            const knob = selector.querySelector(".knob");
+            const ul = selector.querySelector("ul");
+            const radios = selector.querySelectorAll('input[type="radio"]');
+
+            // NEW: tag selector with item-count class so CSS can lay out 7 items
+            const count = ul.querySelectorAll('li').length;
+            selector.classList.add(`items-${count}`);
+
+            function handleClick() {
+                selector.classList.toggle("active");
+                if (selector.classList.contains("active")) {
+                    selector.style.removeProperty("--angle");
+                } else {
+                    selector.style.setProperty("--angle", "-90deg");
+                    radios.forEach((radio, index) => { radio.checked = index === 0; });
+                }
+            }
+
+            knob.addEventListener("click", handleClick);
+        });
+
+        $(".module-link").on('change', function () {
+            window.location.href = $(this).attr('data-link');
+        });
+    </script>
+</body>
+</html>

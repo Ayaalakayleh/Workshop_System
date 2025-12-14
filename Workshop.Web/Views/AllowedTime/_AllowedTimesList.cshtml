@@ -1,0 +1,56 @@
+﻿@model List<Workshop.Core.DTOs.AllowedTimeListItemDTO>
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-hover text-center w-100 main-table">
+        <thead>
+            <tr>
+                <th>@Common["ID"]</th>
+                <th>@Common["Label_Make"]</th>
+                <th>@Common["Label_Model"]</th>
+                <th>@Common["Label_Year"]</th>
+                <th>@Common["Label_Year"]</th>
+                <th>@Common["Label_RTSCode"]</th>
+                <th>@Common["Label_AllowedHours"]</th>
+                <th>@Common["Label_SupervisorOverride"]</th>
+                <th>@Common["Label_Actions"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                    <td>@Html.DisplayFor(modelItem => item.MakeName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ModelName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Year)</td>
+                    <td>@Html.DisplayFor(modelItem => item.RTSCode_Code)</td>
+                    <td>@Html.DisplayFor(modelItem => item.AllowedHours)</td>
+                    <td>@Html.DisplayFor(modelItem => item.SupervisorOverride)</td>
+                    <td>
+                        <a onclick="loadAllowedTimeForEdit(@item.Id)"
+                           class="btn btn-info btn-sm">
+                            <i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
+                        </a>
+                        <button class="btn btn-danger btn-sm"
+                                onclick="deleteAllowedTime(@item.Id)">
+                            <i class="fad fa-trash"></i>&nbsp;@Common["Delete"]
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.First().TotalCount > 0)
+    {
+        <div class="d-flex justify-content-between align-items-center">
+            <div>@string.Format(Common["ShowingXofYRecords"].Value, Model.Count, Model.First().TotalCount)</div>
+        </div>
+    }
+}
+<script src="~/js/site.js"></script>

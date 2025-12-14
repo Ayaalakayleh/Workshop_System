@@ -1,0 +1,399 @@
+﻿@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.Vehicle.VehicleMovement;
+
+@Html.HiddenFor(a => a.MovementId)
+@Html.HiddenFor(a => a.VehicleID)
+@Html.HiddenFor(a => a.CreatedBy)
+@Html.HiddenFor(a => a.MasterId)
+@Html.HiddenFor(a => a.ReceivedBranchId)
+@Html.HiddenFor(a => a.ReceivedMeter)
+@Html.HiddenFor(a => a.MoveInWorkshopId)
+@Html.HiddenFor(a => a.VehicleID)
+
+@{
+    var workOrderId = Model.AddService.HasValue && Model.AddService.Value ? (Model.WorkOrderId.HasValue ? Model.WorkOrderId : 0) : 0;
+}
+<input type="hidden" id="OdoMeter" name="OdoMeter" value="@Model.ExitMeter" />
+
+<form id="MovementForm">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label class="">
+                    @Common["Label_MovementDate"]
+                    <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                    @Html.EditorFor(model => model.GregorianMovementDate,
+                    new { htmlAttributes = new { @class = "form-control flat-picker", @id = "GregorianMovementDate" } })
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label>
+                    @Common["Label_ExitTime"]
+                    <span class="text-danger">*</span>
+                </label>
+                @Html.EditorFor(model => model.ExitTime,
+                                new { htmlAttributes = new { @type = "time", @class = "form-control", @id = "ExitTime" } })
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="">
+                    @Common["Label_Workshop"]
+                    <span class="text-danger">*</span>
+                </label>
+                @Html.DropDownListFor(
+                                model => model.WorkshopId,
+                                new SelectList(ViewBag.workshops ?? new List<Workshop.Core.DTOs.WorkshopDTOs.WorkShopDefinitionDTO>(), "Id", "Name"),
+                                @Common["Select"],
+                                new { @class = "form-control select2", @id = "Workshop" })
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="">
+                    @Common["Label_FuelLevel"]
+                    <span class="text-danger">*</span>
+                </label>
+                @Html.DropDownListFor(
+                                model => model.FuelLevelId,
+                                new SelectList(ViewBag.fuelLevels ?? new List<Workshop.Core.DTOs.General.FuleLevel>(), "Id", "FuleLevelPrimaryName"),
+                                @Common["Select"],
+                                new { @class = "form-control select2", @id = "TransferfuelLevelId" })
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                <label class="">
+                    @Common["Label_ExpectedReturnDate"]
+                    <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                    @Html.EditorFor(model => model.GregorianMovementEndDate,
+                                        new { htmlAttributes = new { @class = "form-control flat-picker", @id = "GregorianMovementEndDate" } })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group mt-1">
+                <label class="">
+                    @Common["Label_ExpectedReturnTime"]
+                </label>
+                @Html.EditorFor(model => model.ReceivedTime, new
+                                {
+                    htmlAttributes = new { @class = "form-control", @id = "RecivedcurrentTime", @type = "time" }
+                                })
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class=" ">
+                    @Common["Label_ExitMeter"]
+                    <span class="text-danger">*</span>
+                </label>
+                @Html.TextBoxFor(a => a.ExitMeter,
+                                htmlAttributes: new { @class = "form-control", @id = "TransferExitMeter" })
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class=" ">
+                    @Common["Label_Driver"]
+                    <span class="text-danger">*</span>
+                </label>
+                @Html.TextBoxFor(a => a.ExitDriverId,
+                                htmlAttributes: new { @class = "form-control", @id = "ExitDriver" })
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="form-group">
+                @Html.Label(Common["Label_Services"])
+                &nbsp;<span class="text-danger">*</span>
+                <select id="ServicesIds" name="ServicesIds" multiple class="form-control" required>
+                    <option value="">@Common["Select"]</option>
+                    @foreach (var item in ViewBag.Services ?? new List<dynamic>())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label>
+                    @Common["Label_VehicleSubStatus"]
+                    <span class="text-danger">*</span>
+                </label>
+                @Html.DropDownListFor(
+                a => a.VehicleSubStatusId,
+                                new SelectList(Model.RefVehicledefinitions != null ? Model.RefVehicledefinitions.ColVehicleSubStatus : new List<Workshop.Core.DTOs.Vehicle.VehicleSubStatus>(), "Id", "Name"),
+                                Common["Select"],
+                                htmlAttributes: new { @class = "form-control select2", style = "width: 100%;", id = "VehicleSubStatusId" })
+            </div>
+        </div>
+
+        <!-- IsPart checkbox -->
+        <div class="col-lg-6">
+            <div class="form-group form-check mt-3">
+                <input type="checkbox" class="form-check-input" id="IsPart" />
+                <label class="form-check-label" for="IsPart">@Common["Label_PartSublet"]</label>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="form-group">
+                <label for="Reason" class="">
+                    @Common["Label_Reason"]
+                    <span class="text-danger">*</span>
+                </label>
+                <textarea class="form-control" id="Reason" name="Reason" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <button type="button" id="btnCreate" onclick="Transfer();" class="btn btn-primary">
+            <i class="fa fa-save"></i>&nbsp;@Common["Save"]
+        </button>
+    </div>
+</form>
+
+<script src="~/js/site.js"></script>
+<script>
+    var rowCount = $('#tblMainteneance2  >tbody >tr').length;
+
+    $(document).ready(function () {
+        var d = new Date(),
+            h = d.getHours(),
+            m = d.getMinutes();
+
+        if (h < 10) h = '0' + h;
+        if (m < 10) m = '0' + m;
+
+        $('#RecivedcurrentTime').val(h + ":" + m);
+        $('#ExitTime').val(h + ":" + m);
+
+        // Clear dates by default (no auto-filled "today")
+        $("#GregorianMovementEndDate").val('');
+        $("#GregorianMovementDate").val('');
+
+        // jQuery Validate: require MovementDate & ExpectedReturnDate
+        $("#MovementForm").validate({
+            ignore: [],
+            errorElement: "span",
+            errorClass: "text-danger",
+            rules: {
+                GregorianMovementDate: {
+                    required: true
+                },
+                GregorianMovementEndDate: {
+                    required: true
+                }
+            },
+            // default messages used (no custom messages)
+            errorPlacement: function (error, element) {
+                // make message block-level and under field
+                error.addClass("d-block");
+                error.appendTo(element.closest(".form-group"));
+            }
+        });
+
+        $('#IsPart').change(function () { toggleIsPart(); });
+        toggleIsPart();
+    });
+
+    function toggleIsPart() {
+        var isPart = $('#IsPart').is(':checked');
+        // fields to disable when IsPart is checked
+        var disableSelectors = ['#TransferfuelLevelId', '#TransferExitMeter', '#ExitDriver', '#VehicleSubStatusId'];
+        for (var i = 0; i < disableSelectors.length; i++) {
+            var sel = disableSelectors[i];
+            if (isPart) {
+                // disable and clear value
+                $(sel).prop('disabled', true);
+                if ($(sel).is('select')) {
+                    $(sel).val(null).trigger('change');
+                } else {
+                    $(sel).val('');
+                }
+                $(sel).removeClass('invalids');
+            } else {
+                // enable
+                $(sel).prop('disabled', false);
+                $(sel).trigger('change');
+            }
+        }
+    }
+
+    function Transfer() {
+        debugger;
+        var isValid = true;
+        var isPart = $('#IsPart').is(':checked');
+
+        // Run jQuery Validate first (this will catch empty Movement / Expected return dates)
+        if (!$("#MovementForm").valid()) {
+            isValid = false;
+        }
+
+        if (!isPart) {
+            if ($("#Workshop").val() == "") {
+                $("#Workshop").next().children(':first-child').children(':first-child').css("border-color", "red");
+                isValid = false;
+            }
+            else {
+                $("#Workshop").next().children(':first-child').children(':first-child').css("border-color", "");
+            }
+
+            if ($("#TransferfuelLevelId").val() == "") {
+                $("#TransferfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red");
+                isValid = false;
+            }
+            else {
+                $("#TransferfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "");
+            }
+
+            if ($("#ExitTime").val() == "") {
+                $("#ExitTime").next().children(':first-child').children(':first-child')
+                    .css("border-color", "red").css("background-color", "#ffdddd");
+                isValid = false;
+            } else {
+                $("#ExitTime").next().children(':first-child').children(':first-child').css("border-color", "");
+            }
+
+            if ($("#TransferExitMeter").val() == "" || $("#TransferExitMeter").val() == 0) {
+                $("#TransferExitMeter").addClass("invalids");
+                isValid = false;
+            }
+            else {
+                $("#TransferExitMeter").removeClass("invalids");
+            }
+
+            if ($("#VehicleSubStatusId").val() == "" || $("#VehicleSubStatusId").val() == 0) {
+                $("#VehicleSubStatusId").next().children(':first-child').children(':first-child').css("border-color", "red");
+                isValid = false;
+            }
+            else {
+                $("#VehicleSubStatusId").next().children(':first-child').children(':first-child').css("border-color", "");
+            }
+
+            if (parseInt($('#TransferExitMeter').val() || 0) < parseInt($("#OdoMeter").val() || 0)) {
+                $("#TransferExitMeter").next().children(':first-child').children(':first-child')
+                    .css("border-color", "red").css("background-color", "#ffdddd");
+                Swal.fire("@Common["Error"]",
+                    "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " +
+                    parseInt($("#OdoMeter").val()) + " " + "@Common["KiloMeter"]");
+
+                isValid = false;
+
+            } else {
+                $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+            }
+
+            if ($("#ExitDriver").val() == "") {
+                $("#ExitDriver").addClass("invalids");
+                isValid = false;
+
+            }
+            else {
+                $("#ExitDriver").removeClass("invalids");
+            }
+
+            if ($("#Reason").val() == "") {
+                $("#Reason").addClass("invalids");
+                isValid = false;
+            }
+            else {
+                $("#Reason").removeClass("invalids");
+            }
+
+            if ($("#ServicesIds").val() == "") {
+                $("#ServicesIds").addClass("invalids");
+                isValid = false;
+            }
+            else {
+                $("#ServicesIds").removeClass("invalids");
+            }
+        } else {
+            // When isPart is checked, still validate required fields that are unrelated
+            if ($("#ExitTime").val() == "") {
+                $("#ExitTime").next().children(':first-child').children(':first-child')
+                    .css("border-color", "red").css("background-color", "#ffdddd");
+                isValid = false;
+            }
+            if ($("#Reason").val() == "") {
+                $("#Reason").addClass("invalids");
+                isValid = false;
+            }
+        }
+
+        if (isValid) {
+            var itemForm = new FormData();
+            itemForm.append('MovementId', '@Model.MovementId');
+            itemForm.append('VehicleID', $('#VehicleID').val());
+            itemForm.append('MoveInWorkshopId', $('#Workshop').val());
+            itemForm.append('MasterId', $('#MasterId').val());
+            itemForm.append('MovementInId', $('#MovementId').val());
+            itemForm.append('ExitMeter', $('#TransferExitMeter').val());
+            itemForm.append('fuelLevelId', $("#TransferfuelLevelId").val());
+            itemForm.append('ExitDriverId', $('#ExitDriver').val());
+            itemForm.append('CreatedBy', $('#CreatedBy').val());
+            itemForm.append('Reason', $('#Reason').val());
+            itemForm.append('GregorianMovementEndDate', $("#GregorianMovementEndDate").val());
+            itemForm.append('ReceivedTime', $("#RecivedcurrentTime").val());
+            itemForm.append('GregorianMovementDate', $("#GregorianMovementDate").val());
+            itemForm.append('ExitTime', $("#ExitTime").val());
+            itemForm.append('VehicleSubStatusId', $("#VehicleSubStatusId").val());
+            itemForm.append('SelectedServicesIds', ($('#ServicesIds').val() || []).join(','));
+            itemForm.append('IsPart', isPart);
+
+            $.ajax({
+                url: "@Url.Action("TransferMaintenanceMovemet", "WIP")",
+                type: 'POST',
+                data: itemForm,
+                dataType: 'JSON',
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+
+                    if (data.isSuccess) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Transfer request sent",
+                            confirmButtonText: '@Common["Ok"]',
+                            confirmButtonColor: 'var(--primary-600)',
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+
+                            window.location.reload();
+                        });
+                    }
+                    else {
+                        Swal.fire("@Common["Error"]", data.message);
+                    }
+                },
+                error: function (data) {
+                    Swal.fire("@Common["Error"]", data.message);
+                }
+            });
+        }
+    }
+</script>

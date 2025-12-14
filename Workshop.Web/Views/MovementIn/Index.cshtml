@@ -1,0 +1,445 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model Workshop.Core.DTOs.Vehicle.VehicleMovement
+
+@{
+    Layout = "_Layout";
+}
+
+<link href="~/js/literallycanvas/_assets/literallycanvas.css" rel="stylesheet" />
+<link href="~/smartadmin-5-styles/plugins/dynameter/css/jquery.dynameter.css" rel="stylesheet" />
+<link href="~/smartadmin-5-styles/plugins/dynameter/css/index.css" rel="stylesheet" />
+
+<style>
+    /* === SCRATCH CANVAS + CURSORS === */
+
+    /* main scratch panel */
+    #panel.scratch-inner,
+    #panel {
+        position: relative;
+        min-height: 280px;
+        /* optionally show a car silhouette behind */
+        /* background: url('@Url.Content("~/images/tajeer-car-assets/car-body.png")') no-repeat center center;
+           background-size: contain; */
+        background-color: #f5f5f5;
+        border-radius: .5rem;
+        border: 1px dashed #ccc;
+    }
+
+    /* cursor while marking deep / small / very deep / bend */
+    #panel.deep-scratch-cursor {
+        cursor: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")') 16 16, auto;
+    }
+
+    #panel.small-scratch-cursor {
+        cursor: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")') 16 16, auto;
+    }
+
+    #panel.very-deep-cursor {
+        cursor: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")') 16 16, auto;
+    }
+
+    #panel.bend-body-cursor {
+        cursor: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")') 16 16, auto;
+    }
+
+    /* generic sprite (marker) */
+    #panel .shape {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        transform: translate(-50%, -50%); /* center on click position */
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        z-index: 10;
+        pointer-events: auto; /* so contextmenu works */
+    }
+
+    /* icon per data-type */
+    #panel .shape[data-type="deep-scratch"] {
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
+    }
+
+    #panel .shape[data-type="small-scratch"] {
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
+    }
+
+    #panel .shape[data-type="very-deep-scratch"] {
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
+    }
+
+    #panel .shape[data-type="bend-in-body"] {
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
+    }
+</style>
+
+@using (Html.BeginForm("VehicleMovementInInsert", "MovementIn", FormMethod.Post, new { id = "movements", enctype = "multipart/form-data", @class = "the-movements" }))
+{
+    @Html.HiddenFor(model => model.VehicleID, new { id = "VehicleID" })
+    @Html.HiddenFor(model => model.strikes, new { id = "strikes" })
+    @Html.HiddenFor(model => model.IsRegularMaintenance, new { id = "IsRegularMaintenance" })
+    @Html.HiddenFor(model => model.LastVehicleStatus, new { id = "LastVehicleStatus" })
+    <input type="hidden" id="VehicleOdoMeter" value="0" />
+    <input type="hidden" id="GettingVehicleId" value="@Model?.VehicleID" />
+    @* <input type="hidden" id="VehicleTypeId" value="@Model?.VehicleTypeId" /> *@
+
+    <div class="row">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="fw-bold">@Common["Label_MovementIn"]</h2>
+                    <div class="panel-toolbar">
+                        <button type="button" class="btn btn-info btn-w-m mx-2" data-bs-toggle="modal" data-bs-target="#OpenAddVehicleModal">
+                            <i class="fa fa-cars"></i>&nbsp;@Common["Label_VehiclesList"]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-container show">
+                    <div class="panel-content">
+
+                        <!-- ===== VEHICLE HERO ===== -->
+                        <div class="vehicle-hero">
+                            <div class="vehicle-hero__card">
+                                <div class="vehicle-hero__grid">
+                                    <!-- Facts -->
+                                    <div class="vehicle-hero__facts">
+                                        <div class="vehicle-hero__row">
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_VehicleClass"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehicleClass"></label></div>
+                                            </div>
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_Manufacturer"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehicleManufacturer"></label></div>
+                                            </div>
+                                        </div>
+                                        <div class="vehicle-hero__row">
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_PlateNumber"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehiclePlateNo"></label></div>
+                                            </div>
+                                            <div class="vehicle-hero__fact">
+                                                <div class="vehicle-hero__label">@Common["Label_Model"]</div>
+                                                <div class="vehicle-hero__value"><label id="VehicleModel"></label></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="vehicle-hero__meta">
+                                            <div class="meta-item"><i class="fal fa-calendar"></i><span>@Common["Label_MovementDate"]</span><b id="movementDateText"></b></div>
+                                            <div class="meta-item"><i class="fal fa-tachometer"></i><span>@Common["Label_ReceivedMeter"]</span><b id="receivedMeterText"></b></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status radios -->
+                                    <div class="vehicle-hero__status">
+                                        <div class="status-stack" role="group" aria-label="maintenance-type">
+                                            <label class="w-100 mb-0">
+                                                <input name="Type" type="radio" value="option1" class="maintenance-radio" />
+                                                <div class="status-btn">
+                                                    <img src="~/images/maintenance1.png" alt="">
+                                                    <span>@Common["Label_RegularMaintenance"]</span>
+                                                </div>
+                                            </label>
+                                            <label class="w-100 mb-0">
+                                                <input name="Type" type="radio" value="option2" class="maintenance-radio" />
+                                                <div class="status-btn">
+                                                    <img src="~/images/insurance1.png" alt="">
+                                                    <span>@Common["Label_Insurance"]</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Customer -->
+                                    <div>
+                                        <div class="customer-card">
+                                            <div class="customer-card__icon" aria-hidden="true">
+                                                <i class="fal fa-user-circle"></i>
+                                            </div>
+                                            <div class="customer-card__body">
+                                                <h4>@Common["Label_CustomerName"]: <span class="val"><label id="customerName"></label></span></h4>
+                                                <h4>@Common["Label_PhoneNo"]: <span class="val"><label id="CustomerPhone"></label></span></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <fieldset class="mt-3 ui-fieldset">
+                            <legend>@Common["Label_MovementIn"]</legend>
+                            <div class="row g-3">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>@Common["Label_MovementDate"]</label>
+                                        @Html.TextBoxFor(model => model.GregorianMovementDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text", id = "GregorianMovementDate" })
+                                        <label id="GregorianMovementDate-error" class="error" for="GregorianMovementDate"></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>@Common["Label_ReceivedTime"]</label>
+                                        @Html.EditorFor(model => model.ReceivedTime, new { htmlAttributes = new { @class = "form-control", id = "ReceivedTime", type = "time" } })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>@Common["Label_ReceivedMeter"]</label>
+                                        @Html.EditorFor(model => model.ReceivedMeter, new { htmlAttributes = new { @class = "form-control", id = "ReceivedMeter", type = "number" } })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="font-normal">@Common["Label_Driver"]</label>
+                                        @Html.EditorFor(model => model.ResivedDriverId, new { htmlAttributes = new { @class = "form-control", id = "ResivedDriverId", type = "text" } })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>@Common["Label_VehicleSubStatus"]</label>
+                                        @Html.DropDownListFor(
+                                        model => model.VehicleSubStatusId,
+                                                                        (IEnumerable<SelectListItem>)(ViewBag.SubStatuses ?? new List<SelectListItem>()),
+                                                                        @Common["Label_Select"],
+                                                                        new { @class = "form-control", id = "VehicleSubStatusId" } )
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="Note">@Common["Label_Note"]</label>
+                                    @Html.TextAreaFor(model => model.Note, new { @class = "form-control", id = "Note", rows = "3", placeholder = Common["Label_Note"] })
+                                </div>
+                            </div>
+
+                            <!-- Fuel gauge + slider -->
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <div id="fuelMeterDiv" class="mb-2"></div>
+                                    <input id="fuelSlider" type="range" min="0" max="100" step="5" value="50" class="form-range" />
+                                    <small class="text-muted">
+                                        <span id="fuelSliderValue">50</span>%
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="panel-tag text-start mt-2 mb-2">
+                                    @Common["Label_Note"]: @Common["Label_AddVehiclePhoto"]
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-bold">@Common["Label_Upload"]&nbsp;<span class="text-warning font-normal"> @Common["Label_AllowedExtensions"]: pdf, png , jpeg</span></label>
+                                    <input type="file" id="Uploadfile" name="filepondfordoc" />
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="my-3 ui-fieldset">
+                        <legend>@Common["Label_MaintenanceTypes"]</legend>
+                        <div class="table-wrap">
+                            <table class="table table-bordered table-hover text-center align-middle" id="tblMainteneance">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>@Common["Label_WorkOrder"] / @Common["Label_AccidentNo"]</th>
+                                        <th>@Common["Label_Description"]</th>
+                                        <th>@Common["Label_MaintenanceTypes"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblData">
+                                    <tr>
+                                        <td>
+                                            <select id="WorkOrderId" name="WorkOrderId" class="form-control"></select>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="MaintenanceDesc" name="MaintenanceDesc" class="form-control MaintenanceDesc" placeholder="@Common["Label_Description"]">
+                                        </td>
+                                        <td>
+                                            <label class="Status m-0"></label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="my-3 ui-fieldset">
+                        @* <legend>@Common["Label_MaintenanceTypes"]</legend> *@
+                        <div class="table-wrap">
+                            <table class="table table-bordered table-hover text-center align-middle" id="tblMainteneance">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th> Complaint </th>
+                                        <th>@Common["Label_Note"]</th>
+                                        <th>@Common["Label_MaintenanceTypes"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblData">
+                                    <tr>
+                                        <td>
+                                            <textarea type="text" id="Complaint" name="Complaint" class="form-control "></textarea>
+                                        </td>
+                                        <td>
+                                            <textarea type="text" id="ComplaintNote" name="ComplaintNote" class="form-control "></textarea>
+                                        </td>
+                                        <td>
+                                            <label class="Status m-0"></label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <fieldset class="ui-fieldset">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" name="IsMechanicCheck" value="true" class="form-check-input" id="customSwitch2">
+                                    <label class="form-check-label" for="customSwitch2">@Common["Label_IsMechanicCheck"]</label>
+                                </div>
+
+                                <!-- Scratches -->
+                                <div class="row mark-scratces-section">
+                                    <div class="col-12">
+                                        <div class="text-center mb-2 scratch-controls">
+                                            <button type="button" class="btn btn-outline-primary btn-sm btn-w-m workOrder-btn" id="DeepScratch-btn">
+                                                <img src="~/images/tajeer-car-assets/DeepScratch.png" />&nbsp;@Common["Label_DeepScratch"]
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning btn-sm btn-w-m workOrder-btn" id="SmallScratch-btn">
+                                                <img src="~/images/tajeer-car-assets/MinorScratch.png" />&nbsp;@Common["Label_SmallScratch"]
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm btn-w-m workOrder-btn" id="VeryDeepScratch-btn">
+                                                <img src="~/images/tajeer-car-assets/VeryDeepScratch.png" />&nbsp;@Common["Label_VeryDeepScratch"]
+                                            </button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm btn-w-m workOrder-btn" id="BendInBody-btn">
+                                                <img src="~/images/tajeer-car-assets/CurvatureStructure.png" />&nbsp;@Common["Label_BendInBody"]
+                                            </button>
+                                        </div>
+
+                                        <div class="scratch-wrap">
+                                            <div id="panel" class="scratch-inner"></div>
+                                        </div>
+
+                                        <div class="text-center mt-3">
+                                            <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button"><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
+                                            <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button"><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
+                                        </div>
+
+                                        <div id="coordinates" class="d-none"></div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <div class="col-lg-6 col-md-12 col-sm-12 mt-3">
+                            <fieldset class="ui-fieldset">
+                                <legend>@Common["Label_EmployeeSignature"]</legend>
+                                <div class="signature" id="EmployeeSignature"></div>
+                            </fieldset>
+                        </div>
+
+                        <div class="col-lg-6 col-md-12 col-sm-12 mt-3">
+                            <fieldset class="ui-fieldset">
+                                <legend>@Common["Label_DriverSignature"]</legend>
+                                <div class="signature" id="DriverSignature"></div>
+                            </fieldset>
+                        </div>
+
+                        <div class="d-flex justify-content-center align-items-center gap-2 mt-3 flex-wrap">
+                            <button type="button" class="btn btn-warning btn-w-m" id="resetSignatureBtn">
+                                @Common["Label_ResetSignature"]
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-w-m" id="submitMovement">
+                                <i class="fad fa-save"></i>&nbsp;@Common["Label_Button_Save"]
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vehicles modal -->
+<div class="modal fade" id="OpenAddVehicleModal" tabindex="-1" aria-labelledby="shiftModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shiftModalLabel">@Common["Label_VehiclesList"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("_VehicleSelect")
+            </div>
+        </div>
+    </div>
+</div>
+}
+<input type="hidden" id="VehicleFromReservation" value="@ViewBag.FromReservationVehicleId" />
+
+<!-- Vendor scripts -->
+<script src="~/js/site.js"></script>
+<script src="~/smartadmin-5-styles/plugins/dynameter/js/jquery.dynameter.js"></script>
+
+<script>
+    window.RazorVars = {
+        VehicleID: "@Model.VehicleID",
+        ReceivedBranchId: '@Model.ReceivedBranchId',
+        RefVehicledefinitionsVehicleId: "@Model?.RefVehicledefinitions?.VehicleId",
+
+        indexUrl: '@Url.Action("Index", "MovementIn")',
+        indexMovementsUrl: '@Url.Action("Index", "Movements")',
+        getLastOutMaintenanceUrl: '@Url.Action("GetLastOutMaintenanceCard", "MovementIn")',
+        vehicleMovementInInsertUrl: '@Url.Action("VehicleMovementInInsert", "MovementIn")',
+        getAgreementByVehicleIdUrl: '@Url.Action("GetAgreementbyVehicleId", "MovementIn")',
+
+        getDetailsUrl: '@Url.Action("GetDetails", "VehicleDefinition")',
+        vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',
+        insertNewVehicleUrl: '@Url.Action("InsertNewVehicle", "VehicleDefinition")',
+
+        vehicleWorkOrderListUrl: '@Url.Action("VehicleWorkOrderList", "WorkOrder")',
+        GetWIPByVehicleIdUrl: '@Url.Action("GetWIPByVehicleId", "WIP")',
+        branchesUrl: '@Url.Action("Branches", "ERPAPI")',
+
+        msgSuccessTitle: '@Html.Raw(Common["Label_SuccessTitle"])',
+        btnOk: '@Html.Raw(Common["Label_Ok"])',
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappend"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]',
+
+        requiredField: '@Common["Label_RequiredField"]',
+        moreThan: '@Common["Label_Morethan"]',
+        selectVehicle: '@Common["Label_selectVehicle"]',
+        chooseVehicle: '@Common["Label_ChooseVehicle"]',
+        chooseMovementType: '@Common["Label_ChooseMovementType"]',
+        addFilesForVehicle: '@Common["Label_AddFilesForVehicle"]',
+        odometerError: '@Common["Label_OdometerMustMatchTheVreviousReadingOrExceedsIt"]',
+        kiloMeter: '@Common["Label_KiloMeter"]',
+        subStatus: '@Common["Label_SubStatus"]',
+        doneSuccessfully: '@Common["Label_DoneSuccessfully"]',
+        error: '@Common["Label_Error"]',
+        regularMaintenance: '@Common["Label_RegularMaintenance"]',
+        workOrderMaintenance: '@Common["Label_WorkOrderMaintenance"]',
+        select: '@Common["Label_Select"]',
+        today: '@Common["Label_Today"]',
+        hijri: '@Common["Label_Hijri"]',
+        gregorian: '@Common["Label_Gregorian"]',
+        filepondDragDrop: '@Common["filepondDragDrop"]',
+        vehicleSubStatusesUrl: '@Url.Action("VehicleSubStatuses", "VehicleDefinition")'
+    };
+</script>
+<script src="~/js/Movements/MovementIn.js"></script>

@@ -1,0 +1,437 @@
+﻿@using Workshop.Core.DTOs
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@model Workshop.Web.Models.ClockingModel
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["Title_Clocking"]</h2>
+			</div>
+
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					<!-- New clocking -->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h5 class="mb-0">@Common["Title_NewClocking"]</h5>
+						</div>
+
+						<div class="card-body">
+							@using (Html.BeginForm("EditClock", "TechnicianDashboard", FormMethod.Post, new { id = "clockingForm" }))
+							{
+								@Html.HiddenFor(cm => cm.ClockingForm.StatusID)
+								<div class="row g-3">
+									<div class="col-lg-6">
+										<label class="form-label">@Common["Label_Technician"]</label>
+										@Html.DropDownListFor(
+											cm => cm.ClockingForm.TechnicianID,
+											new SelectList(
+												Model.Technicians.Where(t => t.Id != 0),
+												"Id",
+												"PrimaryName"
+												@*,ClockingForm.TechnicianID > 0 ? Model.ClockingForm.TechnicianID : null*@
+											),
+											@Common["Label_Select"],
+											new { @class = "form-control", id = "techSelect", onchange = "TechnicianChange(this)" }
+										)
+									</div>
+
+									<div class="col-lg-6">
+										<label class="form-label">@Common["Label_WIP"]</label>
+										@Html.DropDownListFor(
+																		cm => cm.ClockingForm.WIPID,
+																		new SelectList(
+																		(Model?.WIPSSelectList ?? new List<SelectListItem>()).Select(w => new { w.Value, Text = "WIP - " + w.Value }),
+																		"Value",
+																		"Text"
+																		@*,Model?.ClockingForm?.WIPID*@
+																		),
+																		@Common["Label_Select"],
+																		new { @class = "form-control", id = "wipSelect", onchange = "WIPChange(this)" }
+																		)
+								</div>
+
+								<div class="col-12">
+									<label class="form-label">@Common["Label_LabourLine"]</label>
+									@Html.DropDownListFor(
+																		cm => cm.ClockingForm.RTSID,
+																		new SelectList(Model.LabourlinesSelectList, "Value", "Text", Model.ClockingForm.RTSID),
+																		@Common["Label_Select"],
+																		new { @class = "form-control", id = "labourSelect" }
+																		)
+								</div>
+
+								<div class="col-12 d-flex flex-wrap gap-2">
+									<button type="submit" class="btn btn-success" id="ClockInBtn" onclick="return setClockStatus(1)">
+										<i class="fas fa-play"></i>&nbsp;@Common["Button_ClockIn"]
+									</button>
+									@* Break & GoToWIP removed *@
+								</div>
+							</div>
+														}
+						</div>
+					</div>
+
+					<!-- Active clockings -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<h5 class="mb-0">@Common["Title_ActiveClockings"]</h5>
+							@using (Html.BeginForm("ClockAllOut", "TechnicianDashboard", FormMethod.Post))
+							{
+								<button type="submit" class="btn btn-danger" id="btnClockAllOut">
+									<i class="fas fa-stop-circle"></i>&nbsp;@Common["Button_ClockAllOut"]
+								</button>
+							}
+						</div>
+						<div class="card-body">
+							<table class="table mb-0 align-middle table-bordered" id="activeTable">
+								<thead>
+									<tr class="text-muted">
+										<th>@Common["Label_Technician"]</th>
+										<th>@Common["Label_WIP"]</th>
+										<th>@Common["Label_Description"]</th>
+										<th>@Common["Label_Status"]</th>
+										<th>@Common["Label_ElapsedWorked"]</th>
+										<th>@Common["Label_AllowedTime"]</th>
+										<th class="text-end">@Common["Label_Actions"]</th>
+									</tr>
+								</thead>
+								<tbody>
+									@if (Model.ClockingList != null && Model.Technicians != null && Model.ClockingList.Any())
+									{
+										foreach (var item in Model.ClockingList)
+										{
+											@using (Html.BeginForm("BreakClock", "TechnicianDashboard", FormMethod.Post, new { id = "clockingList" }))
+											{
+												<tr id="@item.ID">
+													@Html.Hidden("ID", item.ID)
+													@Html.Hidden("Status", item.StatusID, new { @class = "Status" })
+													<td>@item.TechnicianName</td>
+													<td>@item.WIPName</td>
+													<td>
+														<span class="rts-ellipsis"
+															  data-fulltext="@item.RTSName">
+															@item.RTSName
+														</span>
+													</td>
+
+
+													<td>
+														@{
+															var isBreak = item.StatusID == (int)Status.Break;
+															var isWorking = item.StatusID == (int)Status.Working;
+
+															if (isWorking)
+															{
+																<span class="badge bg-success-subtle text-success-dark">
+																	<i class="fas fa-play"></i> @Common["Label_Working"]
+																</span>
+															}
+															else if (isBreak)
+															{
+																<span class="badge bg-warning-subtle text-warning-dark">
+																	<i class="fas fa-pause"></i> @Common["Label_Idle"]
+																</span>
+																@Html.Hidden("LastBreakStartedAt", item.LastBreak?.StartAt, new { @class = "StartedAt" })
+																@if (item.StatusID == (int)Status.Break)
+																{
+																	@* Last break elapsed display *@
+																	<div class="last-break-elapsed"></div>
+																}
+															}
+															else
+															{
+																<span class="badge bg-info-subtle text-info">@item.StatusName</span>
+															}
+														}
+													</td>
+													<td>
+														@* Session start hidden input *@
+														@if (item.StatusID != (int)Status.Break)
+														{
+															@Html.Hidden("StartedAt", item.StartedAt?.ToString("o"), new { @class = "StartedAt" })
+															@* Total working time display *@
+															<div class="total-elapsed"></div>
+														
+														}
+
+														@* Last break start hidden input (optional, can remove if you use break-starts) *@
+														@Html.Hidden("LStartedAt", item.LastBreak?.StartAt?.ToString("o"), new { @class = "LStartedAt" })
+
+			
+
+														@* All break hidden inputs *@
+														@foreach (var br in item.ClockingBreaksLogs ?? new List<ClockingBreakDTO>())
+														{
+															@Html.Hidden("LStartedAt", br.StartAt?.ToString("o"), new { @class = "break-start" })
+															@Html.Hidden("LEndAt", br.EndAt?.ToString("o"), new { @class = "break-end" })
+														}
+													</td>
+													<td>@item.AllowedTime</td>
+													<td class="text-center">
+											@if (item.StatusID.Equals((int)Status.Break))
+														{
+															<button type="submit" class="btn btn-primary btn-w-m my-1" onclick="return setListClockStatus(this, 1)">
+																<i class="fas fa-play"></i>&nbsp;@Common["Button_Resume"]
+															</button>
+														}
+														else if (item.StatusID.Equals((int)Status.Working))
+														{
+															<button id="btnBreakModal" type="button" class="btn btn-warning btn-w-m my-1" onclick="return setBreak(this, 2)">
+																<i class="fas fa-pause"></i>&nbsp;@Common["Label_Idle"]
+															</button>
+														}
+
+														<button type="submit" class="btn btn-danger btn-w-m my-1" id="btnClockOut" onclick="return setListClockStatus(this, 3)">
+															<i class="fas fa-stop-circle"></i>&nbsp;@Common["Button_ClockOut"]
+														</button>
+
+														<button type="button" class="btn btn-secondary btn-w-m my-1" id="btnLogs" onclick="return ShowLogs(this, @item.ID)">
+															<i class="fas fa-clipboard-list"></i>&nbsp;@Common["Button_Logs"]
+														</button>
+													</td>
+												</tr>
+											}
+										}
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Today's history -->
+					<div class="card">
+						<div class="card-header">
+							<h5 class="mb-0">@Common["Title_TodaysHistory"]</h5>
+						</div>
+						<div class="card-body">
+							<table class="table mb-0 align-middle" id="historyTable">
+								<thead>
+									<tr class="text-muted">
+										<th>@Common["Label_Technician"]</th>
+										<th>@Common["Label_WIP"]</th>
+										<th>@Common["Label_Description"]</th>
+										<th>@Common["Label_Period"]</th>
+										<th>@Common["Label_Started At"]</th>
+										<th>@Common["Label_Breaks"]</th>
+										<th>@Common["Button_Logs"]</th>
+									</tr>
+								</thead>
+								<tbody>
+									@if (Model.ClockingHistory != null && Model.Technicians != null && Model.ClockingHistory.Any())
+									{
+										foreach (var item in Model.ClockingHistory)
+										{
+											<tr data-id="@item.ID">
+												<td>@item.TechnicianName</td>
+												<td>@item.WIPName</td>
+												<td>
+													<span class="rts-ellipsis"
+														  data-fulltext="@item.RTSName">
+														@item.RTSName
+													</span>
+												</td>
+
+
+												<td class="elapsed">@item.Elapsed</td>
+												<td>@(item.StartedAt?.ToString("yyyy-MM-dd"))</td>
+												<td>@item.ClockingBreaksLogs?.Count()</td>
+												<td>
+													<button type="button" class="btn btn-secondary" onclick="return ShowLogs(this, @item.ID)">
+														<i class="fas fa-clipboard-list"></i>&nbsp;@Common["Button_Logs"]
+													</button>
+												</td>
+											</tr>
+										}
+									}
+									else
+									{
+@* 										<tr id="noHistoryRow">
+											<td colspan="7" class="text-center text-muted">
+												@Common["Label_NoHistory"]
+											</td>
+										</tr> *@
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+				</div> <!-- /panel-content -->
+			</div>
+		</div>
+	</div>
+
+	<!-- Idle (Break) Logs Modal -->
+	<div class="modal fade" id="breakLogsModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header bg-light text-dark">
+					<h5 class="modal-title">@Common["Title_BreakLogs"]</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+				</div>
+				<div class="modal-body">
+					<div id="breakLogsContainer">
+						<p class="text-muted">@Common["Text_Loading"]</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Start Idle Modal -->
+	<div class="modal fade" id="breakModal" tabindex="-1" aria-labelledby="breakModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="breakModalLabel">@Common["Title_StartBreak"]</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+				</div>
+
+				<div class="modal-body">
+					@using (Html.BeginForm("EditBreakClock", "TechnicianDashboard", FormMethod.Post, new { id = "breakForm" }))
+					{
+						@Html.HiddenFor(
+						m => m.ClockingBreakForm.ClockingID,
+										new { @id = "breakRowId" }
+										)
+					<div class="col-lg-6">
+						<label class="form-label">@Common["Label_Reason"]</label>
+						@Html.DropDownListFor(
+												cm => Model.ClockingBreakForm.Reason,
+												new SelectList(Model.Reasons, "Id", "PrimaryName", Model.ClockingBreakForm.Reason),
+												@Common["Label_Select"],
+												new { @class = "form-control", id = "breakReason" }
+												)
+					</div>
+					<div class="col-lg-6">
+						<label class="form-label">@Common["Label_NoteOptional"]</label>
+						@Html.EditorFor(cm => cm.ClockingBreakForm.Note, new { htmlAttributes = new { @class = "form-control", id = "breakNote" } })
+					</div>
+					<div class="col-12 mt-3">
+						<div class="panel-tag text-start">
+							<strong>@Common["Label_Hint"]</strong>&nbsp;<span>@Common["Hint_desc"]</span>
+						</div>
+					</div>
+					<div class="modal-footer justify-content-center gap-2">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Common["Button_Cancel"]</button>
+						<button type="submit" class="btn btn-success" id="btnStartBreak">@Common["Button_StartBreak"]</button>
+					</div>
+										}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Always initialize resources object first
+		window.resources = Object.assign({}, window.resources || {}, {
+			// Titles / text
+			title_break_logs: "@Common["Title_BreakLogs"]",
+			loading: "@Common["Text_Loading"]",
+			no_logs_found: "@Common["Text_NoLogsFound"]",
+			load_error: "@Common["Text_LoadError"]",
+
+			// Column labels for logs modal
+			col_id: "@Common["Col_ID"]",
+			col_reason: "@Common["Col_Reason"]",
+			col_note: "@Common["Col_Note"]",
+			col_hint: "@Common["Col_Hint"]",
+			col_period: "@Common["Col_Period"]",
+			col_start_date: "@Common["Col_StartDate"]",
+			col_end_date: "@Common["Col_EndDate"]",
+
+			// Status/Buttons
+			label_working: "@Common["Label_Working"]",
+			label_break: "@Common["Label_Idle"]",
+			label_idle: "@Common["Label_Idle"]",
+			button_resume: "@Common["Button_Resume"]",
+			button_idle: "@Common["Button_Idle"]",
+			button_log: "@Common["Button_Log"]",
+			button_clock_out: "@Common["Button_ClockOut"]",
+			button_details: "@Common["Button_Details"]",
+			label_from_to: "@Common["Label_FromTo"]",
+
+			// DataTables i18n
+			dt_search: "@Common["DT_Search"]",
+			dt_search_placeholder: "@Common["DT_SearchPlaceholder"]",
+			dt_empty_table: "@Common["DT_EmptyTable"]",
+			dt_info: "@Common["DT_Info"]",
+			dt_info_empty: "@Common["DT_InfoEmpty"]",
+			dt_info_filtered: "@Common["DT_InfoFiltered"]",
+			dt_length_menu: "@Common["DT_LengthMenu"]",
+			dt_loading_records: "@Common["DT_LoadingRecords"]",
+			dt_processing: "@Common["DT_Processing"]",
+			dt_zero_records: "@Common["DT_ZeroRecords"]",
+			dt_paginate_first: "@Common["DT_Paginate_First"]",
+			dt_paginate_last: "@Common["DT_Paginate_Last"]",
+			dt_paginate_next: "@Common["DT_Paginate_Next"]",
+			dt_paginate_previous: "@Common["DT_Paginate_Previous"]"
+		});
+
+		// Global alias so any global functions in Clocking.js can safely read R
+		window.R = window.resources;
+
+		// Add URL constants for AJAX calls
+		window.appUrls = {
+			setWIP: '@Url.Action("SetWIP", "TechnicianDashboard")',
+			setTechnician: '@Url.Action("SetTechnician", "TechnicianDashboard")',
+			getLogs: '@Url.Action("GetLogs", "TechnicianDashboard")'
+		};
+			function initRtsPopovers() {
+				var els = document.querySelectorAll('.rts-ellipsis');
+
+				els.forEach(function (el) {
+					// If we initialized before, clean it up
+					if (el._rtsPopover) {
+						el._rtsPopover.dispose();
+						el._rtsPopover = null;
+					}
+
+					// Check if the content is overflowing (i.e., clamped)
+					var isOverflowing =
+						el.scrollHeight > el.clientHeight ||
+						el.scrollWidth > el.clientWidth;
+
+					if (isOverflowing) {
+						// Add popover attributes only when needed
+						el.setAttribute('tabindex', '0'); // so focus works
+						el.setAttribute('data-bs-toggle', 'popover');
+						el.setAttribute('data-bs-trigger', 'hover focus');
+						el.setAttribute('data-bs-container', 'body');
+						el.setAttribute('data-bs-placement', 'top');
+
+						var content = el.getAttribute('data-fulltext') || el.textContent;
+						el.setAttribute('data-bs-content', content);
+
+						// Initialize the Bootstrap 5 popover
+						el._rtsPopover = new bootstrap.Popover(el);
+					} else {
+						// Ensure clean markup if not overflowing
+						el.removeAttribute('data-bs-toggle');
+						el.removeAttribute('data-bs-trigger');
+						el.removeAttribute('data-bs-container');
+						el.removeAttribute('data-bs-placement');
+						el.removeAttribute('data-bs-content');
+					}
+				});
+			}
+
+			document.addEventListener('DOMContentLoaded', function () {
+				initRtsPopovers();
+
+				// Optional: re-evaluate on window resize if table can resize
+				window.addEventListener('resize', function () {
+					initRtsPopovers();
+				});
+			});
+
+	</script>
+
+	<!-- Your behavior script (now safe to use R/resources) -->
+	<script src="~/js/Definitions/Clocking.js"></script>
+</div>

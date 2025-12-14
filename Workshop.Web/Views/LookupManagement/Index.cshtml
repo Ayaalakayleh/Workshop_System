@@ -1,0 +1,86 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+<div id="panel-1" class="panel">
+    <div class="panel-hdr">
+        <h2 class="font-weight-bold">@Common["LookupManagement"]</h2>
+    </div>
+    <div class="panel-container show">
+        <div class="panel-content">
+            <div id="categoriesFilter">
+                <div class="row">
+                    <div class="col-md-4 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label>@Common["LookupCategories"]</label>
+                            <div class="input-group">
+                                @Html.DropDownList("HeaderId", new SelectList(ViewBag.lookupHeaders, "Id", "Name"), Common["Select"], new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button id="searchCategoryFilter" onclick="search()" type="button" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                    <button type="reset" class="btn btn-secondary btn-w-m reset-btn" id="reset-btn"><i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
+                    <input type="hidden" id="hidSearchCategoryFilter" value="0" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="panel-2" class="panel">
+    <div class="panel-hdr px-2">
+        <h2 class="font-weight-bold">@Common["LookupManagementList"]</h2>
+        <div class="panel-toolbar">
+
+            <button class="btn btn-outline-primary btn-sm add-record addNewLKP">
+                    <i class="fa fa-plus"></i>&nbsp;
+                @Common["Button_AddNew"]
+                </button>
+        </div>
+    </div>
+    <div class="panel-container show">
+        <div class="panel-content">
+            <div id="lookupsList">
+                @using (Html.BeginForm("LookupCreate", "LookupManagement", FormMethod.Post, new { @id = "LookupForm" }))
+                {
+                    <table class="table table-bordered table-hover table-striped w-100 text-center" id="tbl_posts">
+                        <thead>
+                            <tr>
+                                <th>@Common["Code"]</th>
+                                <th>@Common["Label_PrimaryName"]</th>
+                                <th>@Common["Label_Secondaryname"]</th>
+                                <th>@Common["Label_Actions"]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl_lookup_body">
+                            @{
+                                Html.RenderPartial("_LookupDetailsList");
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var lookupFindUrl = '@Url.Action("Lookup_Find", "LookupManagement")';
+    window.RazorVars = {
+        deleteUrl: '@Url.Action("DeleteLookup", "LookupManagement")',
+        indexUrl: '@Url.Action("Index", "LookupManagement")',
+        createUrl: '@Url.Action("LookupCreate", "LookupManagement")',
+        getDetailsByCategory: '@Url.Action("GetDetailsByCategory", "LookupManagement")',
+        // Swal texts
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappend"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]',
+
+        save:'@Common["Button_Save"]',
+        cancel:'@Common["Button_Cancel"]',
+    };
+</script>
+<script src="~/js/Definitions/LookupScript.js"></script>

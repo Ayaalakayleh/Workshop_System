@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.TechnicianDTO>;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Label_TechniciansProfile"]</h2>
+                <div class="panel-toolbar">
+
+                    <a href="@Url.Action("Edit", "TechnicianProfileDefinition")" class="btn btn-outline-primary add-record btn-sm"><i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]</a>
+
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <div class="row">
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group mb-3">
+                                <label>@Common["Name"]</label>
+                                <input type="text" id="_Name" name="Name" class="form-control" id="txtname">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group mb-3">
+                                <label>@Common["Email"]</label>
+                                <input type="text" id="_Email" name="Email" class="form-control" id="txtname">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" id="btnSearch">
+                            <i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+                            <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                        </button>
+                    </div>
+                    <hr />
+                    <!-- datatable start -->
+                    <div id="contentList">
+                        @Html.Partial("_TechniciansProfileList", Model)
+                    </div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <div class="mb-5 row" id="contentPager" hidden></div>
+                    </div>
+
+                    <!-- datatable end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var RazorVars = {
+        editTechnicianUrl: '@Url.Action("Edit", "TechnicianProfileDefinition")',
+        deleteTechnicianUrl: '@Url.Action("Delete", "TechnicianProfileDefinition")',
+        indexTechnicianUrl: '@Url.Action("Index", "TechnicianProfileDefinition")',
+
+        // Swal texts
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappend"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]'
+    };
+</script>
+<script src="~/js/definitions/techniciansprofile.js"></script>

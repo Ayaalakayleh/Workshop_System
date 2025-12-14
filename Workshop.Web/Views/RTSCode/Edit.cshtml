@@ -1,0 +1,195 @@
+﻿@model Workshop.Core.DTOs.RTSCodeWithAllowedTimeDTO
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = "RTSCode";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<ol class="breadcrumb bg-transparent mb-3">
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("Index", "RTSCode")">@Common["RTSCodeDefinition"]</a>
+    </li>
+    <li class="breadcrumb-item active">
+        @if (Model.RTSCode.Id == 0)
+        {
+            <strong>@Common["Create"]</strong>
+        }
+        else
+        {
+            <strong>@Common["Edit"]</strong>
+        }
+    </li>
+</ol>
+
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("Edit", "RTSCode", FormMethod.Post, new { enctype = "multipart/form-data", id = "rtsform" }))
+        {
+            
+            @Html.AntiForgeryToken()
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-weight-bold">@Common["RTSCodeDefinition"]</h2>
+                    <div class="">
+                        <div class="form-check form-switch">
+                            @Html.CheckBoxFor(m => m.RTSCode.IsActive, new { @class = "form-check-input", id = "IsActive" })
+                            <label class="form-check-label" for="IsActive">@Common["IsActive"]</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row" id="RTSForm">
+                            @Html.HiddenFor(m => m.RTSCode.Id)
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_Code"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.RTSCode.Code, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.RTSCode.Code, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_PrimaryName"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.RTSCode.PrimaryName, new { @class = "form-control copyInput2", @required = "required", maxlength = "200" })
+                                    @Html.ValidationMessageFor(m => m.RTSCode.PrimaryName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_Secondaryname"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.RTSCode.SecondaryName, new { @class = "form-control pasteInput2" })
+                                    @Html.ValidationMessageFor(m => m.RTSCode.SecondaryName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_EffectiveDate"] <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(m => m.RTSCode.EffectiveDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_Category"] <span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(m => m.RTSCode.FK_CategoryId,
+                                    new SelectList(ViewBag.category, "Value", "Text"), Common["Select"], new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.RTSCode.FK_CategoryId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["Label_Skills"] <span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(m => m.RTSCode.FK_SkillId, new SelectList(ViewBag.Skills, "Value", "Text"), Common["Select"],  new { @class = "form-control", id = "txt_SkillId" })
+                                @Html.ValidationMessageFor(m => m.RTSCode.FK_SkillId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["StandardHours"] <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(m => m.RTSCode.StandardHours, new { @class = "form-control", id = "txtUnitOfLabour", Type="number" })
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["DefaultRate"]</label>
+                                @Html.TextBoxFor(m => m.RTSCode.DefaultRate, new { @class = "form-control", Type = "number" })
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["Label_Franchise"]</label>
+                                @Html.ListBoxFor(model => model.RTSCode.FranchiseIds, new SelectList(ViewBag.make ?? new List<object>(), "Value", "Text", Model.RTSCode.FranchiseIds))
+                                @Html.ValidationMessageFor(m => m.RTSCode.FranchiseIds, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                       
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["Label_VehicleClass"]</label>
+                                @Html.ListBoxFor(model => model.RTSCode.VehicleClassIds, new SelectList(ViewBag.Vehicle ?? new List<object>(), "Value", "Text", Model.RTSCode.VehicleClassIds), new { id = "RTSCodeVehicleClassIds" })
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["Label_PrimaryDescription"] <span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(m => m.RTSCode.PrimaryDescription, new { @class = "form-control copyInput" })
+                                @Html.ValidationMessageFor(m => m.RTSCode.PrimaryDescription, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["Label_SecondaryDescription"] <span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(m => m.RTSCode.SecondaryDescription, new { @class = "form-control pasteInput" })
+                                @Html.ValidationMessageFor(m => m.RTSCode.SecondaryDescription, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                <label>@Common["Label_Note"]</label>
+                                @Html.TextAreaFor(m => m.RTSCode.Notes, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        
+                       
+
+  
+                    </div>
+                    <!--Allowed Times-->
+                    @await Html.PartialAsync("_AllowedTimes",Model)
+                    <!--<input type="hidden" id="AllowedTimesJson" name="AllowedTimesJson" /> -->
+                    @Html.Hidden("AllowedTimesJson", "", new { id = "AllowedTimesJson" })
+                    <!---->
+                    <div class="text-center text-white my-3">
+                        <button type="submit" id="btnCreate" class="btn btn-primary btn-w-m">
+                            <i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-secondary btn-w-m">
+                            <i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+                }
+    </div>
+</div>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        editUrl: '@Url.Action("Edit", "RTSCode")',
+        deleteUrl: '@Url.Action("Delete", "RTSCode")',
+        indexUrl: '@Url.Action("Index", "RTSCode")',
+        fillVehicleModelUrl: '@Url.Action("FillVehicleModel", "RTSCode")',
+        deleteCodeUrl: '@Url.Action("DeleteCode", "RTSCode")',
+
+    // Swal texts
+    swalDeleteTitle: '@Html.Raw(Message["SwalDeleteTitle"])',
+    swalDeleteConfirm: '@Html.Raw(Message["SwalDeleteConfirm"])',
+    swalDeleteCancel: '@Html.Raw(Message["SwalDeleteCancel"])',
+    swalErrorHappened: '@Html.Raw(Message["ErrorHappend"])',
+    swalDeleted: '@Html.Raw(Message["Deleted"])',
+    swalCancelled: '@Html.Raw(Message["Cancelled"])',
+
+    // DevExpress Columns Labels
+    DXManufacturer: '@Html.Raw(Common["Label_Manufacturer"])',
+    DXVehicleModel: '@Html.Raw(Common["Label_Model"])',
+    DXVehicleClass: '@Html.Raw(Common["Label_VehicleClass"])',
+    DXYear: '@Html.Raw(Common["Label_Year"])',
+    DXAllowedHour: '@Html.Raw(Common["Label_AllowedHour"])',
+    DXNoData: '@Html.Raw(Common["DX_NoData"])',
+
+    });
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/Definitions/RTSCode.js"></script>
+<script src="~/js/Definitions/AllowedTime.js"></script>

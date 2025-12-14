@@ -1,0 +1,1283 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Core.DTOs
+@using Workshop.Core.DTOs.General
+@using Workshop.Resources
+@inject IStringLocalizer<Common> CommonLocalizer
+@inject IStringLocalizer<Messages> MessagesLocalizer
+
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      class="set-nav-dark"
+      dir="@(System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("ar") ? "rtl" : "ltr")"
+      lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
+
+@{
+        var CompanyInfo = System.Text.Json.JsonSerializer.Deserialize<CompanyInfo>(Context.Session.GetString("CompanyInfo"));
+        var BranchInfo = System.Text.Json.JsonSerializer.Deserialize<CompanyBranch>(Context.Session.GetString("BranchInfo"));
+        var userInfo = System.Text.Json.JsonSerializer.Deserialize<User>(Context.Session.GetString("UserInfo"));
+        var menus = System.Text.Json.JsonSerializer.Deserialize<Menu>(Context.Session.GetString("PrimaryMenuList"));
+}
+
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"] - @CommonLocalizer["WorkshopSystem"]</title>
+    <meta name="description" content="Page Description">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=5">
+    @*     <link rel="icon" href="img/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="img/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="img/favicon-192x192.png" type="image/png" sizes="192x192"> *@
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- DataTables CSS -->
+    <link href="~/smartadmin-5-styles/cdn/css/datatables.css" rel="stylesheet" />
+    <link href="~/smartadmin-5-styles/cdn/css/datatable-buttons.css" rel="stylesheet" />
+    <link href="~/smartadmin-5-styles/cdn/css/datatable-select.css" rel="stylesheet" />
+    <link href="~/smartadmin-5-styles/cdn/css/datatables-all.css" rel="stylesheet" />
+    <!-- Select2 CSS -->
+    <link href="~/smartadmin-5-styles/cdn/css/select2.css" rel="stylesheet" />
+    <!-- FilePond CSS -->
+    <link href="~/smartadmin-5-styles/cdn/css/filepond.css" rel="stylesheet" />
+    <link href="~/smartadmin-5-styles/cdn/css/filepond-image-preview.css" rel="stylesheet" />
+
+    <!-- Bootstrap TouchSpin CSS -->
+    @* <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-touchspin/4.3.0/jquery.bootstrap-touchspin.min.css" rel="stylesheet" /> *@
+    <!-- Flatpickr CSS -->
+    <link href="~/smartadmin-5-styles/cdn/css/flatpicker.css" rel="stylesheet" />
+    <!-- DX CSS -->
+    @* <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.1.3/css/dx.light.css"> *@
+    <link href="~/smartadmin-5-styles/plugins/data-grid/css/dx.common.css" rel="stylesheet" />
+    <link href="~/smartadmin-5-styles/plugins/data-grid/css/dx.light.css" rel="stylesheet" />
+    @* <link href="~/smartadmin-5-styles/cdn/css/dx.css" rel="stylesheet" /> *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.css" />
+
+    @if (System.Globalization.CultureInfo.CurrentUICulture.Name == "ar")
+    {
+        <link href="~/smartadmin-5-styles/css/smartapp-rtl.min.css" rel="stylesheet" />
+        <link href="~/smartadmin-5-styles/css/custom-styles-rtl.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link rel="stylesheet" media="screen, print" href="~/smartadmin-5-styles/css/smartapp.min.css" />
+    }
+    <link rel="stylesheet" media="screen, print" href="~/smartadmin-5-styles/plugins/waves/waves.min.css" />
+
+    <link rel="stylesheet" media="screen, print" href="~/smartadmin-5-styles/webfonts/smartadmin/sa-icons.css" />
+    <link rel="stylesheet" media="screen, print" href="~/smartadmin-5-styles/webfonts/fontawesome/fontawesome.css" />
+    <link rel="stylesheet" media="screen, print" href="~/smartadmin-5-styles/css/custom-styles.css" rel="stylesheet" />
+    <link href="~/smartadmin-5-styles/cdn/css/sweetalert2.css" rel="stylesheet" />
+    <!-- International Phone Input -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="~/smartadmin-5-styles/scripts/core/saveloadscript.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/jquery/jquery.min.js"></script>
+    <!-- DataTables Core JS -->
+    <script src="~/smartadmin-5-styles/cdn/js/datatables.js"></script>
+    <script src="~/smartadmin-5-styles/cdn/js/datatables-bootstrap5.js"></script>
+    <!-- DataTables Extensions JS -->
+    <script src="~/smartadmin-5-styles/cdn/js/datatables-all.js"></script>
+    <script src="~/js/loader.js"></script>
+</head>
+<body>
+    <div class="loader-overlay">
+        <div class="the-accouting-loader">
+            <div class="loader__image">
+                <div class="loader__coin animate__animated animate__jackInTheBox animate__infinite text-center">
+                    <img src="~/smartadmin-5-styles/img/fleetexpress_loader.gif" class="w-50" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="app-wrap">
+        <header class="app-header">
+            <!-- Collapse icon -->
+            <div class="d-flex flex-grow-1 w-100 me-auto align-items-center">
+
+                <!-- App logo -->
+                <a href="@Url.Action("Index", "QuickAccess")" class="app-logo flex-shrink-0" data-action="playsound" data-soundpath="media/sound/" data-soundfile="sawhisp.mp3" dir="ltr">
+                    <!-- <img src="img/logo.svg" alt="logo"> -->
+
+                    <svg class="dir-ltr" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 574.4 84.8"><defs><linearGradient id="linear-gradient" x1="236.64" y1="83.09" x2="332.68" y2="83.09" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#27348b" /><stop offset="0.04" stop-color="#383b83" /><stop offset="0.17" stop-color="#694d6c" /><stop offset="0.3" stop-color="#925e59" /><stop offset="0.43" stop-color="#b46b49" /><stop offset="0.57" stop-color="#ce753d" /><stop offset="0.7" stop-color="#e17c34" /><stop offset="0.85" stop-color="#ec812f" /><stop offset="1" stop-color="#f0822d" /></linearGradient><linearGradient id="linear-gradient-2" x1="199.13" y1="81.88" x2="338.9" y2="81.88" xlink:href="#linear-gradient" /><linearGradient id="linear-gradient-3" x1="216.14" y1="77.74" x2="333.85" y2="77.74" xlink:href="#linear-gradient" /></defs><title>fleetexpress logo(1)</title><polyline points="332.7 81.5 236.6 83 332 84.7" style="fill:url(#linear-gradient)" /><path d="M199.1,81.6l124.1,2L338,84l.9-4.2Z" transform="translate(-3.9 -9.3)" style="fill:url(#linear-gradient-2)" /><polygon points="216.1 77.7 333.1 79.4 333.8 76.1 216.1 77.7" style="fill:url(#linear-gradient-3)" /><polygon points="16.2 64.4 0 64.4 12.8 3.9 48.5 3.9 45.7 17 26.2 17 23.8 28.6 41.8 28.6 39 41.8 20.9 41.8 16.2 64.4" style="fill:#ffffff" /><polygon points="68 64.4 52 64.4 65.6 0 81.7 0 68 64.4" style="fill:#ffffff" /><path d="M108.8,74.5c-5.9,0-10.4-1.7-13.7-4.9s-4.9-7.8-4.9-13.7a35.2,35.2,0,0,1,3.5-15.7,24.4,24.4,0,0,1,9.4-10.6,26.2,26.2,0,0,1,14-3.7q7.8,0,12.3,3.6A11.3,11.3,0,0,1,134,39c0,5.5-2.2,9.8-6.5,12.7s-10.6,4.5-18.7,4.5h-2.5v.7c0,4,2.3,6.1,6.8,6.1a19.9,19.9,0,0,0,6.4-1,41,41,0,0,0,7.2-3.1V70.3a47.6,47.6,0,0,1-8.7,3.3,42.2,42.2,0,0,1-9.2.9m6.5-37.7c-1.7,0-3.3.9-4.7,2.9a12.9,12.9,0,0,0-2.7,6.5h1.2a13.1,13.1,0,0,0,7.1-1.7,5.4,5.4,0,0,0,2.6-4.6,2.9,2.9,0,0,0-.9-2.2,3.3,3.3,0,0,0-2.6-.9" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><path d="M162.1,74.5c-5.9,0-10.4-1.7-13.7-4.9s-4.9-7.8-4.9-13.7A35.2,35.2,0,0,1,147,40.2a24.6,24.6,0,0,1,9.5-10.6,25.6,25.6,0,0,1,13.9-3.7c5.2,0,9.4,1.2,12.4,3.6a11.5,11.5,0,0,1,4.5,9.5c0,5.5-2.2,9.8-6.5,12.7s-10.6,4.5-18.7,4.5h-2.5v.7c0,4,2.3,6.1,6.8,6.1a19.9,19.9,0,0,0,6.4-1,41,41,0,0,0,7.2-3.1V70.3a47.6,47.6,0,0,1-8.7,3.3,41.5,41.5,0,0,1-9.2.9m6.5-37.7c-1.7,0-3.2.9-4.7,2.9a12.9,12.9,0,0,0-2.7,6.5h1.2a12.8,12.8,0,0,0,7.1-1.7,5.4,5.4,0,0,0,2.6-4.6,3.3,3.3,0,0,0-.8-2.2,3.7,3.7,0,0,0-2.7-.9" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><path d="M216.8,61.6a21.3,21.3,0,0,0,7.6-1.9v12c-3.7,1.9-8.4,2.8-14.1,2.8-4,0-7.1-.9-9.3-2.6s-3.1-4.7-3.1-8.7a36.1,36.1,0,0,1,1-7.8l3.5-16.6H196l1.7-7.8,9-3.7,5.7-9.9H223l-2,9.4h11.9l-2.6,12H218.4l-3.5,15.9a21.1,21.1,0,0,0-.7,4.3,2.3,2.3,0,0,0,2.6,2.6" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><polygon points="269.8 64.4 233.8 64.4 246.6 3.9 282.6 3.9 279.9 17 260.1 17 258.2 26.5 276.6 26.5 273.6 39.6 255.2 39.6 252.8 51.1 272.6 51.1 269.8 64.4" style="fill:#ffffff" /><polygon points="306.9 50.8 298.2 64.4 279.4 64.4 299 40.5 290.4 17.5 307.9 17.5 311 30.5 318.7 17.5 337.7 17.5 318.5 41.3 327.9 64.4 310.2 64.4 306.9 50.8" style="fill:#ffffff" /><path d="M367.4,74.5q-6,0-9.6-6h-.3a108.7,108.7,0,0,1-2.4,15.3L353,94H337l14.3-67.2H364l-.5,5.2h.4c2.6-4,6.2-6.1,10.7-6.1a12.3,12.3,0,0,1,10.1,4.7c2.4,3,3.7,7.3,3.7,12.6a44.4,44.4,0,0,1-2.9,15.9c-2,4.9-4.5,8.7-7.7,11.4a15.8,15.8,0,0,1-10.4,4m1.1-35.7c-1.4,0-2.7.8-4,2.4a17.6,17.6,0,0,0-2.9,6.3,28.5,28.5,0,0,0-1.1,8.2,8.9,8.9,0,0,0,.9,4.3,3.1,3.1,0,0,0,2.7,1.6c1.3,0,2.6-.8,3.8-2.3a20.1,20.1,0,0,0,3-6.4,31,31,0,0,0,1.1-8.1c0-4-1.2-6-3.5-6" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><path d="M433.4,25.9a12.2,12.2,0,0,1,3.3.4l-3.5,15.8a13.6,13.6,0,0,0-5.1-.9,8.8,8.8,0,0,0-6.8,2.9c-1.7,2-3,4.9-3.9,8.9l-4.3,20.7H397l9.9-46.9h12.8l-.7,7.8h.3a19.6,19.6,0,0,1,5.8-6.7,15.7,15.7,0,0,1,8.3-2" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><path d="M459.4,74.5c-5.9,0-10.4-1.7-13.7-4.9s-4.9-7.8-4.9-13.7a35.2,35.2,0,0,1,3.5-15.7,24.6,24.6,0,0,1,9.5-10.6,25.6,25.6,0,0,1,13.9-3.7c5.2,0,9.4,1.2,12.4,3.6a11.5,11.5,0,0,1,4.5,9.5c0,5.5-2.2,9.8-6.5,12.7s-10.6,4.5-18.7,4.5h-2.5v.7c0,4,2.3,6.1,6.8,6.1a19.9,19.9,0,0,0,6.4-1,41,41,0,0,0,7.2-3.1V70.3a47.6,47.6,0,0,1-8.7,3.3,41.5,41.5,0,0,1-9.2.9m6.5-37.7c-1.7,0-3.2.9-4.7,2.9a13.9,13.9,0,0,0-2.7,6.5h1.2a12.8,12.8,0,0,0,7.1-1.7,5.4,5.4,0,0,0,2.6-4.6,3.3,3.3,0,0,0-.8-2.2,3.7,3.7,0,0,0-2.7-.9" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><path d="M527.5,57.4c0,5.5-1.7,9.7-5.3,12.7s-8.8,4.4-15.5,4.4-11-.9-14.7-2.6V59a28.2,28.2,0,0,0,7,2.9,25.1,25.1,0,0,0,6.7.8,9.6,9.6,0,0,0,4.2-.7,2.5,2.5,0,0,0,1.4-2.2,3.6,3.6,0,0,0-1.1-2.5,35.7,35.7,0,0,0-5.4-3.5,17.7,17.7,0,0,1-6.4-5.5,13.7,13.7,0,0,1-2-7.5c0-4.8,1.7-8.4,5-11s8.1-3.9,14.3-3.9a31.1,31.1,0,0,1,8.4,1.1,27.1,27.1,0,0,1,7.4,3.3l-5,10.5a27.1,27.1,0,0,0-5.6-2.9,15.7,15.7,0,0,0-5.1-1c-2.1,0-3.1.9-3.1,2.8a2.5,2.5,0,0,0,1.3,2.1l4.2,2.4c6.2,3,9.3,7.5,9.3,13.2" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /><path d="M574.3,57.4c0,5.5-1.8,9.7-5.4,12.7s-8.7,4.4-15.4,4.4-11.1-.9-14.8-2.6V59a28.7,28.7,0,0,0,7.1,2.9,24.8,24.8,0,0,0,6.6.8,9.8,9.8,0,0,0,4.3-.7,2.5,2.5,0,0,0,1.4-2.2,3.6,3.6,0,0,0-1.1-2.5,35.7,35.7,0,0,0-5.4-3.5,17.7,17.7,0,0,1-6.4-5.5,13.7,13.7,0,0,1-2-7.5c0-4.8,1.7-8.4,5-11s8.1-3.9,14.3-3.9a31.6,31.6,0,0,1,8.4,1.1,28.5,28.5,0,0,1,7.4,3.3l-5,10.5a25.5,25.5,0,0,0-5.7-2.9,14.7,14.7,0,0,0-5-1c-2.1,0-3.1.9-3.1,2.8a2.5,2.5,0,0,0,1.3,2.1,38.1,38.1,0,0,0,4.2,2.4c6.2,3,9.3,7.5,9.3,13.2" transform="translate(-3.9 -9.3)" style="fill:#ffffff" /></svg>
+
+                    <!-- Logo Backdrop Animation -->
+                    <div class="logo-backdrop">
+                        <div class="blobs">
+                            <svg viewbox="0 0 1200 1200">
+                                <g class="blob blob-1">
+                                    <path d="M 100 600 q 0 -700, 500 -500 t 500 500 t -500 500 T 100 600 z" />
+                                </g>
+                                <g class="blob blob-2">
+                                    <path d="M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z" />
+                                </g>
+                                <g class="blob blob-3">
+                                    <path d="M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z" />
+                                </g>
+                                <g class="blob blob-4">
+                                    <path d="M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z" />
+                                </g>
+                                <g class="blob blob-1 alt">
+                                    <path d="M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z" />
+                                </g>
+                                <g class="blob blob-2 alt">
+                                    <path d="M 100 600 q 100 -600, 500 -500 t 400 500 t -500 500 T 100 600 z" />
+                                </g>
+                                <g class="blob blob-3 alt">
+                                    <path d="M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z" />
+                                </g>
+                                <g class="blob blob-4 alt">
+                                    <path d="M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z" />
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <button class="mobile-menu-icon me-2 d-flex d-sm-flex d-md-flex d-lg-none flex-shrink-0" data-action="toggle-swap" data-toggleclass="app-mobile-menu-open" aria-label="Toggle Mobile Menu">
+                    <svg class="icon sa-icon">
+                        <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#menu")"></use>
+                    </svg>
+                </button>
+
+                <!-- Collapse icon -->
+                <button type="button" class="collapse-icon me-3 d-none d-lg-inline-flex d-xl-inline-flex d-xxl-inline-flex" data-action="toggle" data-class="set-nav-minified" aria-label="Toggle Navigation Size">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 8">
+                        <polygon fill="#878787" points="4.5,1 3.8,0.2 0,4 3.8,7.8 4.5,7 1.5,4" />
+                    </svg>
+                </button>
+
+                <form class="app-search" role="search" action="search.html" autocomplete="off">
+                    <input type="text" class="form-control" placeholder="@CommonLocalizer["SearchOnAllPages"]">
+                </form>
+            </div>
+
+            <!-- Settings -->
+            <button type="button" class="btn btn-system hidden-mobile" data-action="toggle-swap" data-toggleclass="open" data-target="aside.js-drawer-settings" aria-label="Open Settings">
+                <svg class="icon sa-icon sa-icon-2x">
+                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#settings")"></use>
+                </svg>
+            </button>
+
+            <!-- Theme modes -->
+            <button type="button" class="btn btn-system" data-action="toggle-theme" aria-label="Toggle Dark Mode" aria-pressed="false">
+                <svg class="icon sa-icon sa-icon-2x sa-mode-light">
+                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#sun")"></use>
+                </svg>
+                <svg class="icon sa-icon sa-icon-2x sa-mode-dark">
+                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#moon")"></use>
+                </svg>
+            </button>
+
+            <!-- Notifications -->
+@*             <button type="button" class="btn btn-system dropdown-toggle no-arrow" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open Notifications">
+                <span class="badge badge-icon pos-top pos-end">5</span>
+                <svg class="icon sa-icon sa-icon-2x">
+                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#bell")"></use>
+                </svg>
+            </button> *@
+
+            <!-- Notifications dropdown -->
+            <div class="dropdown-menu dropdown-menu-animated dropdown-xl dropdown-menu-end p-0">
+                <div class="notification-header rounded-top mb-2">
+                    <h4 class="m-0">
+                        5 New
+                        <small class="mb-0 opacity-80">User Notifications</small>
+                    </h4>
+                </div>
+
+                <ul class="nav nav-tabs nav-tabs-clean" role="tablist">
+                    <li class="nav-item d-none">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-default" role="tab" aria-selected="true">Hidden</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-4 fs-md fw-500" data-bs-toggle="tab" href="#tab-messages" role="tab" aria-selected="false">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-4 fs-md fw-500" data-bs-toggle="tab" href="#tab-feeds" role="tab" aria-selected="false">Feeds</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-4 fs-md fw-500" data-bs-toggle="tab" href="#tab-events" role="tab" aria-selected="false">Events</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content tab-notification">
+                    <!--Security message-->
+                    <div class="tab-pane fade show active" id="tab-default" role="tabpanel">
+                        <div class="d-flex h-100">
+                            <div class="px-4 d-flex flex-column align-items-center justify-content-center">
+
+                                <svg class="icon sa-icon sa-icon-5x sa-icon-primary">
+                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#arrow-up-circle")"></use>
+                                </svg>
+                                <span class="text-center fw-300" style="font-size: 1.25rem;">
+                                    Select a tab above
+                                </span>
+                                <div class="mb-0 py-3 text-center fs-md fw-300 text-muted">
+                                    This blank page helps protect your privacy.
+                                    To change this default message, <a href="#">update your settings</a>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Messages -->
+                    <div class="tab-pane fade" id="tab-messages" role="tabpanel">
+                        <div class="custom-scroll h-100">
+                            <ul class="notification">
+                                <li class="unread alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-c.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <!-- <span class="name">Melissa Ayre <span class="badge bg-primary fw-n position-absolute top-0 end-0 mt-1">INBOX</span></span> -->
+                                            <span class="name">Melissa Ayre</span>
+                                            <span class="msg-a fs-sm">Re: New security codes</span>
+                                            <span class="msg-b fs-xs">Hello again and thanks for being part...</span>
+                                            <span class="fs-nano text-muted mt-1">56 seconds ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="unread alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-a.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <span class="name">Adison Lee</span>
+                                            <span class="msg-a fs-sm">Msed quia non numquam eius</span>
+                                            <span class="fs-nano text-muted mt-1">2 minutes ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status status-success me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-b.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <span class="name">Oliver Kopyuv</span>
+                                            <span class="msg-a fs-sm">Msed quia non numquam eius</span>
+                                            <span class="fs-nano text-muted mt-1">3 days ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status status-warning me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-e.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <span class="name">Dr. John Cook PhD</span>
+                                            <span class="msg-a fs-sm">Msed quia non numquam eius</span>
+                                            <span class="fs-nano text-muted mt-1">2 weeks ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status status-success me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-h.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <span class="name">Sarah McBrook</span>
+                                            <span class="msg-a fs-sm">Msed quia non numquam eius</span>
+                                            <span class="fs-nano text-muted mt-1">3 weeks ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status status-success me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-m.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <span class="name">Anothony Bezyeth</span>
+                                            <span class="msg-a fs-sm">Msed quia non numquam eius</span>
+                                            <span class="fs-nano text-muted mt-1">one month ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center">
+                                        <span class="status status-danger me-2">
+                                            <span class="profile-image rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-j.png')"></span>
+                                        </span>
+                                        <span class="d-flex flex-column flex-1 ms-1">
+                                            <span class="name">Lisa Hatchensen</span>
+                                            <span class="msg-a fs-sm">Msed quia non numquam eius</span>
+                                            <span class="fs-nano text-muted mt-1">one year ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                            </ul>
+                            <div class="notification-empty-msg">
+                                <svg class="icon sa-icon sa-icon-5x sa-icon-primary">
+                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#coffee")"></use>
+                                </svg>
+                                <span>
+                                    No new messages
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feeds -->
+                    <div class="tab-pane fade" id="tab-feeds" role="tabpanel">
+                        <div class="custom-scroll h-100">
+                            <ul class="notification">
+                                <li class="unread alert alert-dismissable">
+                                    <div class="d-flex align-items-center show-child-on-hover">
+                                        <span class="d-flex flex-column flex-1">
+                                            <span class="name d-flex align-items-center">Administrator <span class="badge bg-success fw-n ms-1">UPDATE</span></span>
+                                            <span class="msg-a fs-sm">
+                                                System updated to version <strong>5.0</strong> <a href="buildnotes.html">(build notes)</a>
+                                            </span>
+                                            <span class="fs-nano text-muted mt-1">5 mins ago</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center show-child-on-hover">
+                                        <div class="d-flex flex-column flex-1">
+                                            <span class="name">
+                                                Adison Lee <span class="fw-300 d-inline">replied to your video <a href="#" class="fw-400"> Cancer Drug</a> </span>
+                                            </span>
+                                            <span class="msg-a fs-sm mt-2">Bring to the table win-win survival strategies to ensure proactive domination. At the end of the day...</span>
+                                            <span class="fs-nano text-muted mt-1">10 minutes ago</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center show-child-on-hover">
+                                        <div class="d-flex flex-column flex-1">
+                                            <span class="name">
+                                                Troy Norman'<span class="fw-300">s new connections</span>
+                                            </span>
+                                            <div class="fs-sm d-flex align-items-center mt-2">
+                                                <span class="profile-image-md ms-1 rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-a.png'); background-size: cover;"></span>
+                                                <span class="profile-image-md ms-1 rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-b.png'); background-size: cover;"></span>
+                                                <span class="profile-image-md ms-1 rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-c.png'); background-size: cover;"></span>
+                                                <span class="profile-image-md ms-1 rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-e.png'); background-size: cover;"></span>
+                                                <div data-hasmore="+3" class="rounded-circle profile-image-md ms-1">
+                                                    <span class="profile-image-md ms-1 rounded-circle d-inline-block" style="background-image:url('img/demo/avatars/avatar-h.png'); background-size: cover;"></span>
+                                                </div>
+                                            </div>
+                                            <span class="fs-nano text-muted mt-1">55 minutes ago</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center show-child-on-hover">
+                                        <div class="d-flex flex-column flex-1">
+                                            <span class="name">Dr John Cook <span class="fw-300">sent a <span class="text-danger">new signal</span></span></span>
+                                            <span class="msg-a fs-sm mt-2">Nanotechnology immersion along the information highway will close the loop on focusing solely on the bottom line.</span>
+                                            <span class="fs-nano text-muted mt-1">10 minutes ago</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center show-child-on-hover">
+                                        <div class="d-flex flex-column flex-1">
+                                            <span class="name">Lab Images <span class="fw-300">were updated!</span></span>
+                                            <div class="fs-sm d-flex align-items-center mt-1">
+                                                <a href="#" class="ms-1 mt-1" title="Cell A-0012">
+                                                    <span class="d-block img-share" style="background-image:url('img/thumbs/pic-7.png'); background-size: cover;"></span>
+                                                </a>
+                                                <a href="#" class="ms-1 mt-1" title="Patient A-473 saliva">
+                                                    <span class="d-block img-share" style="background-image:url('img/thumbs/pic-8.png'); background-size: cover;"></span>
+                                                </a>
+                                                <a href="#" class="ms-1 mt-1" title="Patient A-473 blood cells">
+                                                    <span class="d-block img-share" style="background-image:url('img/thumbs/pic-11.png'); background-size: cover;"></span>
+                                                </a>
+                                                <a href="#" class="ms-1 mt-1" title="Patient A-473 Membrane O.C">
+                                                    <span class="d-block img-share" style="background-image:url('img/thumbs/pic-12.png'); background-size: cover;"></span>
+                                                </a>
+                                            </div>
+                                            <span class="fs-nano text-muted mt-1">55 minutes ago</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                                <li class="alert alert-dismissable">
+                                    <div class="d-flex align-items-center show-child-on-hover">
+                                        <div class="d-flex flex-column flex-1 w-100">
+                                            <div class="name mb-2">
+                                                Lisa Lamar<span class="fw-300"> updated project</span>
+                                            </div>
+                                            <div class="row fs-b fw-300">
+                                                <div class="col text-start"> Progress </div>
+                                                <div class="col text-end fw-500"> 45% </div>
+                                            </div>
+                                            <div class="progress progress-sm d-flex mt-1">
+                                                <span class="progress-bar bg-primary progress-bar-striped" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></span>
+                                            </div>
+                                            <span class="fs-nano text-muted mt-1">2 hrs ago</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </li>
+                            </ul>
+                            <div class="notification-empty-msg">
+                                <svg class="icon sa-icon sa-icon-5x sa-icon-primary">
+                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#smile")"></use>
+                                </svg>
+                                <span>
+                                    You are all set!
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Events -->
+                    <div class="tab-pane fade" id="tab-events" role="tabpanel">
+                        <div class="d-flex flex-column h-100">
+                            <div class="h-auto">
+                                <table class="table-calendar m-0 w-100 h-100 border-0">
+                                    <tr>
+                                        <th colspan="7" class="pt-3 pb-2 px-3 text-center">
+                                            <div class="js-get-date h6 fw-600 mb-2">Fake Day, October 15th, 2090</div>
+                                        </th>
+                                    </tr>
+                                    <tr class="text-center">
+                                        <th>Sun</th>
+                                        <th>Mon</th>
+                                        <th>Tue</th>
+                                        <th>Wed</th>
+                                        <th>Thu</th>
+                                        <th>Fri</th>
+                                        <th>Sat</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted bg-faded">30</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>5</td>
+                                        <td>
+                                            <svg class="icon sa-icon sa-icon-warning m-1 position-absolute pos-left pos-top" style="--sa-icon-size: 0.85rem; --sa-fill-opacity: 0.5;">
+                                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#star")"></use>
+                                            </svg>
+                                            6
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>8</td>
+                                        <td>9</td>
+                                        <td class="bg-primary-600 text-white pattern-0">10</td>
+                                        <td>11</td>
+                                        <td>12</td>
+                                        <td>13</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14</td>
+                                        <td>15</td>
+                                        <td>16</td>
+                                        <td>17</td>
+                                        <td>18</td>
+                                        <td>19</td>
+                                        <td>20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>21</td>
+                                        <td>
+                                            <svg class="icon sa-icon sa-icon-info m-1 position-absolute pos-left pos-top" style="--sa-icon-size: 0.85rem; --sa-fill-opacity: 0.5;">
+                                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#shield")"></use>
+                                            </svg>
+                                            22
+                                        </td>
+                                        <td>23</td>
+                                        <td>24</td>
+                                        <td>25</td>
+                                        <td>26</td>
+                                        <td>27</td>
+                                    </tr>
+                                    <tr>
+                                        <td>28</td>
+                                        <td>29</td>
+                                        <td>30</td>
+                                        <td>31</td>
+                                        <td class="text-muted bg-faded">1</td>
+                                        <td class="text-muted bg-faded">2</td>
+                                        <td class="text-muted bg-faded">3</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="flex-1 custom-scroll shadow-inset-3">
+                                <div class="p-2">
+                                    <div class="d-flex align-items-center text-left mb-3">
+                                        <div class="width-5 text-primary align-self-start table-calendar-appointment-date fw-300 text-center">
+                                            15
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="d-flex flex-column">
+                                                <span class="l-h-n fs-md fw-500">
+                                                    October 2020
+                                                </span>
+                                                <span class="l-h-n fs-nano fw-400 text-secondary">
+                                                    Monday
+                                                </span>
+                                            </div>
+                                            <div class="d-flex flex-column gap-2 mt-2">
+                                                <div>
+                                                    <strong>2:30PM</strong> - Doctor's appointment
+                                                </div>
+                                                <div>
+                                                    <strong>3:30PM</strong> - Report overview
+                                                </div>
+                                                <div>
+                                                    <strong>4:30PM</strong> - Meeting with Donnah V.
+                                                </div>
+                                                <div>
+                                                    <strong>5:30PM</strong> - Late Lunch
+                                                </div>
+                                                <div>
+                                                    <strong>6:30PM</strong> - Report Compression
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="py-2 px-3 d-block rounded-bottom text-end border-light border-bottom-0 border-end-0 border-start-0">
+                    <a href="#" class="fs-xs fw-500 ms-auto">view all notifications</a>
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <button type="button"
+                    data-bs-toggle="dropdown"
+                    title="@($"{userInfo?.FirstName} {userInfo?.LastName}")"
+                    class="btn-system bg-transparent d-flex flex-shrink-0 align-items-center justify-content-center"
+                    aria-label="Open Profile Dropdown">
+                <img src="~/smartadmin-5-styles/img/demo/avatars/avatar-admin.png" class="profile-image profile-image-md rounded-circle" />
+            </button>
+
+            <!-- Profile dropdown -->
+            <div class="dropdown-menu dropdown-menu-animated">
+                <div class="notification-header rounded-top mb-2">
+                    <div class="d-flex flex-row align-items-center mt-1 mb-1 color-white">
+                        <span class="status status-success d-inline-block me-2">
+                            <img src="~/smartadmin-5-styles/img/demo/avatars/avatar-admin.png" class="profile-image profile-image-md rounded-circle" />
+                        </span>
+                        <div class="info-card-text">
+                            <div class="fs-lg text-truncate text-truncate-lg">@userInfo?.FirstName @userInfo?.LastName</div>
+                            @* If you have email property:
+                            <span class="text-truncate text-truncate-md opacity-80 fs-sm">@userInfo?.Email</span>
+                            *@
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="dropdown-divider m-0"></div>
+
+                <!-- Company / Branch / Module from Session -->
+                <div class="dropdown-multilevel dropdown-multilevel-left">
+                    <div class="dropdown-item d-flex justify-content-between align-items-center">
+                        <span class="d-flex align-items-center">
+                            <svg class="icon sa-icon me-2">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#layers")"></use>
+                            </svg>
+                            @CompanyInfo?.CompanyPrimaryName - (@BranchInfo?.BranchPrimaryName)
+                        </span>
+                        <i class="sa sa-chevron-right"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="@Url.Action("SelectCompany", "Authentication")"
+                           class="dropdown-item d-flex align-items-center">
+                            <span class="flex-grow-1 ms-2">@CommonLocalizer["Change Company"]</span>
+                        </a>
+                        <a href="@Url.Action("SelectBranch", "Authentication")"
+                           class="dropdown-item d-flex align-items-center">
+                            <span class="flex-grow-1 ms-2">@CommonLocalizer["Change Branch"]</span>
+                        </a>
+                        <a href="@Url.Action("SelectModules", "Authentication")"
+                           class="dropdown-item d-flex align-items-center">
+                            <span class="flex-grow-1 ms-2">@CommonLocalizer["Change Module"]</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider m-0"></div>
+
+                <div class="dropdown-multilevel dropdown-multilevel-left">
+                    <div class="dropdown-item d-flex justify-content-between align-items-center">
+                        <span class="d-flex align-items-center">
+                            <svg class="icon sa-icon me-2">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#globe")"></use>
+                            </svg>
+                            @CommonLocalizer["Language"]
+                        </span>
+                        <i class="sa sa-chevron-right"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        <button type="button"
+                                class="dropdown-item d-flex align-items-center @(System.Globalization.CultureInfo.CurrentUICulture.Name == "en" ? "active" : "")"
+                                onclick="switchLanguage('en')">
+                            <span class="mr-2">🇺🇸</span>
+                            <span class="flex-grow-1 ms-2">English</span>
+                            @if (System.Globalization.CultureInfo.CurrentUICulture.Name == "en")
+                            {
+                                <svg class="icon sa-icon sa-icon-success ms-2">
+                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#check")"></use>
+                                </svg>
+                            }
+                        </button>
+                        <button type="button"
+                                class="dropdown-item d-flex align-items-center @(System.Globalization.CultureInfo.CurrentUICulture.Name == "ar" ? "active" : "")"
+                                onclick="switchLanguage('ar')">
+                            <span class="mr-2">🇸🇦</span>
+                            <span class="flex-grow-1 ms-2">العربية</span>
+                            @if (System.Globalization.CultureInfo.CurrentUICulture.Name == "ar")
+                            {
+                                <svg class="icon sa-icon sa-icon-success ms-2">
+                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#check")"></use>
+                                </svg>
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider m-0"></div>
+
+                <a class="dropdown-item py-3 fw-500 d-flex justify-content-between" href="@Url.Action("Logout", "Authentication")">
+                    <span class="text-danger" data-i18n="drpdwn.page-logout">Logout</span>
+                    <span class="d-block text-truncate text-truncate-sm">@userInfo?.FirstName</span>
+                </a>
+            </div>
+        </header>
+        <aside class="app-sidebar d-flex flex-column">
+
+            <a href="dashboard-control-center.html" class="app-logo flex-shrink-0" data-prefix="v5.2.0" data-action="playsound" data-soundpath="media/sound/" data-soundfile="sawhisp.mp3">
+                <!-- <img src="img/logo.svg" alt="logo"> -->
+
+                <svg class="custom-logo">
+                    <use href="../smartadmin-5-styles/img/app-logo.svg#custom-logo"></use>
+                </svg>
+
+                <!-- Logo Backdrop Animation -->
+                <div class="logo-backdrop">
+                    <div class="blobs">
+                        <svg viewbox="0 0 1200 1200">
+                            <g class="blob blob-1">
+                                <path d="M 100 600 q 0 -700, 500 -500 t 500 500 t -500 500 T 100 600 z" />
+                            </g>
+                            <g class="blob blob-2">
+                                <path d="M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z" />
+                            </g>
+                            <g class="blob blob-3">
+                                <path d="M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z" />
+                            </g>
+                            <g class="blob blob-4">
+                                <path d="M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z" />
+                            </g>
+                            <g class="blob blob-1 alt">
+                                <path d="M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z" />
+                            </g>
+                            <g class="blob blob-2 alt">
+                                <path d="M 100 600 q 100 -600, 500 -500 t 400 500 t -500 500 T 100 600 z" />
+                            </g>
+                            <g class="blob blob-3 alt">
+                                <path d="M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z" />
+                            </g>
+                            <g class="blob blob-4 alt">
+                                <path d="M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z" />
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </a>
+
+            <form class="app-menu-filter-container px-4">
+                <input type="text" class="form-control" id="searchInput" placeholder="@CommonLocalizer["Filter"]" autocomplete="off">
+                <div class="js-filter-message nav-filter-msg badge bg-secondary btn" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Clear filter"></div>
+            </form>
+
+            <nav id="js-primary-nav" class="primary-nav flex-grow-1 custom-scroll">
+                <ul id="js-nav-menu" class="nav-menu">
+
+                    <!-- Definitions -->
+                    <li class="nav-item">
+                        <a href="#" title="Definitions">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+                            <span class="nav-link-text" data-i18n>@CommonLocalizer["Definitions"]</span>
+                        </a>
+                        <ul>
+                            <li><a href="@Url.Action("Index", "TechnicianProfileDefinition")"><span class="nav-link-text">@CommonLocalizer["Label_Technicians"]</span></a></li>
+                            <li><a href="@Url.Action("Index", "AccountDefinition")"><span class="nav-link-text">@CommonLocalizer["AccountDefinition"]</span></a></li>
+                            @*                             <li><a href="@Url.Action("Index", "WorkScheduleDefinition")"><span class="nav-link-text">Technician Work Schedule</span></a></li>
+ *@                            <li><a href="@Url.Action("Index", "LookupManagement")"><span class="nav-link-text">@CommonLocalizer["LookupManagement"]</span></a></li>
+                            <li><a href="@Url.Action("Index", "Recall")"><span class="nav-link-text">@CommonLocalizer["Recall"]</span></a></li>
+                            @*                             <li><a href="@Url.Action("Index", "LabourRateManagement")"><span class="nav-link-text">Labour Rate Management</span></a></li>
+ *@
+                            <!-- RTS Submenu -->
+                            <li>
+                                <a href="#" title="RTS">
+                                    <span class="nav-link-text">@CommonLocalizer["RTS"]</span>
+                                </a>
+                                <ul>
+                                    <li class="link-item"><a href="@Url.Action("Index", "RTSCode")"><span class="nav-link-text">@CommonLocalizer["RTSCodeDefinition"]</span></a></li>
+                                    <li class="link-item"><a href="@Url.Action("Index", "Menu")"><span class="nav-link-text">@CommonLocalizer["MenuRTS"]</span></a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="@Url.Action("Index", "Teams")"><span class="nav-link-text">@CommonLocalizer["Teams"]</span></a></li>
+                            <li><a href="@Url.Action("Index", "Shifts")"><span class="nav-link-text">@CommonLocalizer["Shifts"]</span></a></li>
+                            @* <li><a href="@Url.Action("Index", "AllowedTime")"><span class="nav-link-text">@CommonLocalizer["AllowedTimes"]</span></a></li> *@
+                            <li><a href="@Url.Action("Index", "PriceMatrix")"><span class="nav-link-text">@CommonLocalizer["PriceMatrix"]</span></a></li>
+                            <li><a href="@Url.Action("Index", "ServiceReminder")"><span class="nav-link-text">@CommonLocalizer["ServiceReminder"]</span></a></li>
+
+                            @* <li><a href="@Url.Action("Index", "TechnicianDashboard")"><span class="nav-link-text">@CommonLocalizer["TechniciansDashboard"]</span></a></li> *@
+                            <li class="link-item"><a href="@Url.Action("Index", "WorkshopDefinitions")"><span class="nav-link-text">@CommonLocalizer["WorkshopDefinition"]</span></a></li>
+                            <li class="link-item"><a href="@Url.Action("Index", "VehicleDefinition")"><span class="nav-link-text">@CommonLocalizer["VehicleDefinition"]</span></a></li>
+                            @* <li class="link-item"><a href="@Url.Action("Index", "WorkshopLoading")"><span class="nav-link-text">@CommonLocalizer["Label_WorkshopLoading"]</span></a></li> *@
+                            @* <li class="link-item"><a href="@Url.Action("Index", "Reservations")"><span class="nav-link-text">@CommonLocalizer["Label_Reservations"]</span></a></li> *@
+                            @* <li><a href="@Url.Action("Index", "WorkOrder")"><span class="nav-link-text">@CommonLocalizer["WorkOrder"]</span></a></li> *@
+                        </ul>
+                    </li>
+
+                    <!-- Workshop Loading -->
+
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "WorkshopLoading")">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+
+                            <span class="nav-link-text">@CommonLocalizer["Label_WorkshopLoading"]</span>
+                        </a>
+                    </li>
+
+                    <!-- Work Order -->
+
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "WorkOrder")">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+
+                            <span class="nav-link-text">@CommonLocalizer["WorkOrder"]</span>
+                        </a>
+                    </li>
+
+                    <!-- WIP -->
+
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "WIP")">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+
+                            <span class="nav-link-text">@CommonLocalizer["Title_RepairOrdersWIP"]</span>
+                        </a>
+                    </li>
+
+                    <!-- Technician Dashboard -->
+
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "TechnicianDashboard")">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+
+                            <span class="nav-link-text">@CommonLocalizer["TechniciansDashboard"]</span>
+                        </a>
+                    </li>
+
+                    <!-- Reservations -->
+
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "Reservations")">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+
+                            <span class="nav-link-text">@CommonLocalizer["Label_Reservations"]</span>
+                        </a>
+                    </li>
+
+                    <!-- External -->
+                    <li class="nav-item">
+                        <a href="#" title="External">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+                            <span class="nav-link-text">@CommonLocalizer["ExternalWorkshop"]</span>
+                        </a>
+                        <ul>
+                            <!-- External Definition -->
+                            <li class="nav-item">
+                                <a href="#" title="Definition">
+                                    <span class="nav-link-text">@CommonLocalizer["Definitions"]</span>
+                                </a>
+                                <ul>
+                                    <li class="link-item"><a href="@Url.Action("CollectionMappingIndex", "CollectionMapping")"><span class="nav-link-text">@CommonLocalizer["ExternalWorkshopTemplate"]</span></a></li>
+                                </ul>
+                            </li>
+
+                            <!-- External Mapping -->
+                            <li class="nav-item">
+                                <a href="#" title="Mapping">
+                                    <span class="nav-link-text">@CommonLocalizer["ExternalInvoices"]</span>
+                                </a>
+                                <ul>
+                                    <li class="link-item"><a href="@Url.Action("Index", "Collection")"><span class="nav-link-text">@CommonLocalizer["ExternalWorkshopMaintenanceInvoice"]</span></a></li>
+                                    <li class="link-item"><a href="@Url.Action("Index", "ExternalWorkshopInvoice")"><span class="nav-link-text">@CommonLocalizer["ExternalWorkshopInvoice"]</span></a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Externally Transported Vehicle -->
+                            <li class="nav-item">
+                                <a href="@Url.Action("TransferMovements", "WIP")"><span class="nav-link-text">@CommonLocalizer["ExternallyTransportedVehicle"]</span></a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" title="External">
+                            <svg class="icon sa-icon">
+                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
+                            </svg>
+                            <span class="nav-link-text">@CommonLocalizer["Movements"]</span>
+                        </a>
+                        <ul>
+                            <!-- External Definition -->
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "MovementIn")" title="Definition">
+                                    <span class="nav-link-text">@CommonLocalizer["MovementIn"]</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "Movements")" title="Definition">
+                                    <span class="nav-link-text">@CommonLocalizer["Movements"]</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <!-- No Results Message -->
+                <div class="no-results-msg pt-3 info-container">
+                    <h6 class="mb-1"> No menu items found.</h6>
+                    <p class="fs-sm">Try searching with different keywords.</p>
+                    <div class="d-flex align-items-center gap-1 fs-xs fw-500 font-style-italic">
+                        <kbd class="kbd-key">
+                            <svg width="15" height="15" aria-label="Escape key" role="img">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2">
+                                    <path d="M13.6167 8.936c-.1065.3583-.6883.962-1.4875.962-.7993 0-1.653-.9165-1.653-2.1258v-.5678c0-1.2548.7896-2.1016 1.653-2.1016.8634 0 1.3601.4778 1.4875 1.0724M9 6c-.1352-.4735-.7506-.9219-1.46-.8972-.7092.0246-1.344.57-1.344 1.2166s.4198.8812 1.3445.9805C8.465 7.3992 8.968 7.9337 9 8.5c.032.5663-.454 1.398-1.4595 1.398C6.6593 9.898 6 9 5.963 8.4851m-1.4748.5368c-.2635.5941-.8099.876-1.5443.876s-1.7073-.6248-1.7073-2.204v-.4603c0-1.0416.721-2.131 1.7073-2.131.9864 0 1.6425 1.031 1.5443 2.2492h-2.956"></path>
+                                </g>
+                            </svg>
+                        </kbd> to reset
+                    </div>
+                </div>
+            </nav>
+
+            <div class="nav-footer">
+                <svg class="icon sa-icon sa-thin">
+                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#wifi")"></use>
+                </svg>
+            </div>
+        </aside>
+        <div class="backdrop" data-action="toggle-swap" data-toggleclass="app-mobile-menu-open"></div>
+        <main class="app-body">
+            <div class="app-content">
+
+                <div class="content-wrapper">
+                    @RenderBody()
+                </div>
+
+            </div>
+
+            <footer class="app-footer">
+                <div class="app-footer-content flex-grow-1">
+                    ACS Techs &copy;
+
+                    <script>document.write(new Date().getFullYear());</script>
+
+                    @* <span class="hidden-mobile">@CommonLocalizer["AllRightsReserved"], </span> *@
+
+                    <a href="#top" class="ms-auto hidden-mobile" aria-label="Back to top">
+                        <svg class="icon sa-icon sa-thick sa-icon-primary">
+                            <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#arrow-up")"></use>
+                        </svg>
+                    </a>
+                </div>
+            </footer>
+
+        </main>
+        <aside class="app-drawer js-app-drawer">
+            <button type="button" class="btn btn-system position-absolute top-0 end-0 z-2 overflow-hidden p-3" data-action="toggle-swap" data-toggleclass="open" data-target="aside.js-app-drawer" aria-label="Close">
+                <svg class="icon sa-icon sa-icon-2x">
+                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#x")"></use>
+                </svg>
+            </button>
+
+            <div class="custom-scrollbar h-100 p-0">
+                <div class="d-flex flex-grow-1 p-0 w-100 h-100">
+                    <!-- left sidebar -->
+                    <div class="d-flex flex-column flex-grow-1 flex-0 overflow-x-auto h-100">
+
+                        <div class="flex-wrap align-items-center flex-grow-1 position-relative bg-gray-50">
+                            <div class="position-absolute top-0 bottom-0 w-100 overflow-hidden d-flex flex-column">
+
+                                <!-- chat container -->
+                                <div class="w-100 p-4 pb-0 px-lg-3 bg-subtlelight-fade custom-scroll flex-grow-1 d-flex flex-column">
+
+                                    <div class="mb-g">
+                                        <h4 class="fw-600">Hi Sunny,</h4>
+                                        <span class="text-muted">how can I help you today?</span>
+                                    </div>
+                                    <div class="mt-auto ms-auto mb-2 btn btn-outline-default px-2 py-1 fw-500 fs-xs text-gradient">
+                                        Analyze my data
+                                    </div>
+                                    <p class="ms-auto mb-2 btn btn-outline-default px-2 py-1 fs-xs fw-500 text-gradient">
+                                        Create a new report
+                                    </p>
+                                    <p class="ms-auto mb-2 btn btn-outline-default px-2 py-1 fs-xs fw-500 text-gradient">
+                                        Summarize my Calendar
+                                    </p>
+
+                                </div>
+
+                                <!-- chat input -->
+                                <div class="bg-faded m-3 rounded height-auto">
+                                    <textarea rows="2" class="form-control px-2 rounded-top" placeholder="Ask me anything"></textarea>
+                                    <div class="d-flex align-items-center py-2 px-2 border border-top-0 rounded-bottom">
+                                        <div class="d-flex gap-1 flex-row align-items-center flex-wrap flex-shrink-0">
+                                            <button class="btn btn-icon fs-xl flex-shrink-0" aria-label="Attach Files or Photos" type="button" data-bs-toggle="tooltip" data-bs-original-title="Attach Files or Photos" data-bs-placement="top">
+                                                <svg class="icon sa-icon sa-bold sa-icon-subtlelight">
+                                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#file")"></use>
+                                                </svg>
+                                            </button>
+                                            <button class="btn btn-icon fs-xl width-1 flex-shrink-0" aria-label="Voice" type="button" data-bs-toggle="tooltip" data-bs-original-title="Voice" data-bs-placement="top">
+                                                <svg class="icon sa-icon sa-bold sa-icon-subtlelight">
+                                                    <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#mic")"></use>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <button class="btn btn-icon fs-xl width-1 flex-shrink-0 ms-auto" aria-label="Send" type="button" data-bs-toggle="tooltip" data-bs-original-title="Send" data-bs-placement="top">
+                                            <svg class="icon sa-icon sa-bold sa-icon-subtlelight sa-icon-2x">
+                                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#arrow-up-circle")"></use>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="backdrop" data-action="toggle-swap" data-toggleclass="open" data-target="aside.js-app-drawer"></div>
+
+        <aside class="app-drawer js-drawer-settings">
+            <div class="app-drawer-header">
+                <div class="h4 mb-0">
+                    App Builder
+                </div>
+                <button type="button" class="btn btn-system ms-auto" data-action="toggle-swap" data-toggleclass="open" data-target="aside.js-drawer-settings" aria-label="Close">
+                    <svg class="icon sa-icon sa-icon-2x">
+                        <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#x")"></use>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="custom-scrollbar h-100">
+
+                <div class="info-container">
+                    Unlock limitless design potential with 16+ layout combinations and extensive customization options—tailor your dashboard to fit your exact needs.
+                    <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-action="playsound" data-soundpath="media/sound/" data-soundfile="settings-voice.mp3" aria-label="Play Settings Voice">
+                        <svg class="icon sa-icon">
+                            <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#volume-2")"></use>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="d-flex justify-content-spaced w-100 app-fob-showcase-text" data-prefix="Preview">
+                    <div class="app-fob app-fob-lg app-fob-showcase">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+
+                <div class="mod-status primary-mod" data-prefix="Primary Settings">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="actionHeaderFixed" data-action="toggle" data-class="set-header-fixed">
+                        <label class="form-check-label" for="actionHeaderFixed">
+                            Header position fixed
+                        </label>
+                    </div>
+                    <div class="form-check d-none d-lg-block d-xl-block d-xxl-block">
+                        <input class="form-check-input" type="checkbox" id="actionNavFull" data-action="toggle" data-class="set-nav-full" data-codependence="set-nav-collapsed">
+                        <label class="form-check-label" for="actionNavFull">
+                            Navigation full height
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mod-status d-none d-lg-block d-xl-block d-xxl-block" data-prefix="Addon Settings">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="actionNavFixed" data-action="toggle" data-class="set-nav-fixed">
+                        <label class="form-check-label" for="actionNavFixed">
+                            Navigation position fixed
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="actionNavCollapsed" data-action="toggle" data-class="set-nav-collapsed" data-dependency="set-nav-full">
+                        <label class="form-check-label" for="actionNavCollapsed">
+                            Navigation collapsed
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mod-status" data-prefix="Misc Settings">
+                    <div class="form-check d-none d-lg-block d-xl-block d-xxl-block">
+                        <input class="form-check-input" type="checkbox" id="actionNavMinified" data-action="toggle" data-class="set-nav-minified">
+                        <label class="form-check-label" for="actionNavMinified">
+                            Navigation Minified
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="darkNavigation" data-action="toggle" data-class="set-nav-dark">
+                        <label class="form-check-label" for="darkNavigation">
+                            Dark Navigation
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mod-status" data-prefix="Aria Settings">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="actionColorblindMode" data-action="toggle" data-class="set-colorblind-mode">
+                        <label class="form-check-label" for="actionColorblindMode">
+                            Colorblind Mode
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="actionHighContrastMode" data-action="toggle" data-class="set-high-contrast-mode">
+                        <label class="form-check-label" for="actionHighContrastMode">
+                            High Contrast Mode
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mod-status app-themes" data-prefix="Themes">
+                    <div class="clickable-boxes">
+                        <!-- Default -->
+                        <input type="radio" id="option0" name="options" data-action="theme-style" data-theme-style="" checked>
+                        <label for="option0" data-prefix="Default" style="background: linear-gradient(135deg, #FF6A00, #F6A2D5, #4C91BF, #7A8B92, #AB7C9A);"></label>
+
+                        <!-- Nebula -->
+                        <input type="radio" id="option1" name="options" data-action="theme-style" data-theme-style="nebula">
+                        <label for="option1" data-prefix="Nebula" style="background: linear-gradient(135deg, #2a7dbf, #2a9d8f, #766cbc, #f4a261, #e76f51);"></label>
+
+                        <!-- Olive -->
+                        <input type="radio" id="option2" name="options" data-action="theme-style" data-theme-style="olive">
+                        <label for="option2" data-prefix="Olive" style="background: linear-gradient(135deg, #556B2F, #6B8E23, #8B9A3D, #A9B83E, #BDB76B);"></label>
+
+                        <!-- Solar -->
+                        <input type="radio" id="option3" name="options" data-action="theme-style" data-theme-style="solar">
+                        <label for="option3" data-prefix="Solar" style="background: linear-gradient(135deg, #FF8C00, #FFD700, #FF4500, #F1C40F, #F39C12);"></label>
+
+                        <!-- Lunar -->
+                        <input type="radio" id="option4" name="options" data-action="theme-style" data-theme-style="lunar">
+                        <label for="option4" data-prefix="Lunar" style="background: linear-gradient(135deg, #2C3E50, #34495E, #5F6368, #AAB7B8, #E6E6FA, #F1F3F4);"></label>
+
+                        <!-- Night -->
+                        <input type="radio" id="option5" name="options" data-action="theme-style" data-theme-style="night">
+                        <label for="option5" data-prefix="Night" style="background: linear-gradient(135deg, #1e2a47, #2b3654, #363d6c, #4f5d79, #717b91, #b6c4d1);"></label>
+
+                        <!-- Aurora -->
+                        <input type="radio" id="option6" name="options" data-action="theme-style" data-theme-style="aurora">
+                        <label for="option6" data-prefix="Aurora" style="background: linear-gradient(135deg, #337e7e, #527a4a, #63279b, #7FFF00, #87CEFA, #B0E0E6);"></label>
+
+                        <!-- Earth -->
+                        <input type="radio" id="option7" name="options" data-action="theme-style" data-theme-style="earth">
+                        <label for="option7" data-prefix="Earth" style="background: linear-gradient(135deg, #2198f3, #3173a5, #3f6888, #618d48, #52bf11);"></label>
+
+                        <!-- Flare -->
+                        <input type="radio" id="option8" name="options" data-action="theme-style" data-theme-style="flare">
+                        <label for="option8" data-prefix="Flare" style="background: linear-gradient(135deg, #FF4500, #FF6347, #F44336, #D32F2F, #B71C1C);"></label>
+
+                        <!-- Storm -->
+                        <input type="radio" id="option9" name="options" data-action="theme-style" data-theme-style="storm">
+                        <label for="option9" data-prefix="Storm" style="background: linear-gradient(135deg, #2F4F4F, #3B5360, #4B6A6E, #5A7980, #A9A9A9, #FFD700);"></label>
+
+                    </div>
+                </div>
+
+                <div class="d-flex" style="gap:10px">
+                    <button type="button" onclick="appDOM.resetStyle();" class="btn reset-button btn-outline-danger flex-grow-1"> <i class="sa sa-reload align-base me-1"></i> Factory Reset</button>
+                    <button type="button" onclick="resetPanelState();" class="btn btn-outline-secondary flex-grow-1"><i class="sa sa-reload align-base me-1"></i> Reset Panel</button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="backdrop" data-action="toggle-swap" data-toggleclass="open" data-target="aside.js-drawer-settings"></div>
+    </div>
+
+    <!-- Export dependencies -->
+    @*  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script> 
+*@
+
+    <script src="~/smartadmin-5-styles/cdn/js/validate.js"></script>
+    <script src="~/smartadmin-5-styles/cdn/js/validate-new.js"></script>
+    <!-- Select2 JS -->
+    <script src="~/smartadmin-5-styles/cdn/js/select2.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="~/smartadmin-5-styles/cdn/js/flatpicker.js"></script>
+    <!-- SweetAlert 2 JS -->
+    <script src="~/smartadmin-5-styles/cdn/js/sweetalert2.js"></script>
+    <!-- DX JS -->
+    @* <script src="~/smartadmin-5-styles/cdn/js/dx.js"></script> *@
+    <script src="https://cdn3.devexpress.com/jslib/23.2.4/js/jszip.min.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/data-grid/js/dx.all.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/data-grid/js/exceljs.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/data-grid/js/filesaver.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/data-grid/js/localization/dx.messages.en.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/data-grid/js/localization/dx.messages.ar.js"></script>
+    <!-- FilePond JS -->
+    <script src="~/smartadmin-5-styles/cdn/js/filepond.js"></script>
+    <script src="~/smartadmin-5-styles/cdn/js/filepond-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
+    <!-- Input Mask -->
+    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
+    <!-- Bootstrap TouchSpin JS -->
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-touchspin/4.3.0/jquery.bootstrap-touchspin.min.js"></script> *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <!-- Core scripts -->
+    <script src="~/smartadmin-5-styles/plugins/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="~/smartadmin-5-styles/scripts/core/smartnavigation.js"></script>
+    <script src="~/smartadmin-5-styles/scripts/core/smartfilter.js"></script>
+    <script src="~/smartadmin-5-styles/scripts/core/smartslimscroll.js"></script>
+    <!-- Dependable scripts -->
+    <script src="~/smartadmin-5-styles/plugins/sortablejs/sortable.min.js"></script>
+    <script src="~/smartadmin-5-styles/plugins/waves/waves.min.js"></script>
+    <!-- App.js -->
+    <script src="~/smartadmin-5-styles/scripts/core/smartapp.js"></script>
+    @if (System.Globalization.CultureInfo.CurrentUICulture.Name == "ar")
+    {
+        <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/localization/messages_ar.js"></script>
+    }
+
+    <script src="~/js/sidemenu.js"></script>
+    <script src="~/js/signature/jsignature.js"></script>
+    <script src="~/js/signature/plugins/jsignature.compressorbase30.js"></script>
+    <script src="~/js/signature/plugins/jsignature.undobutton.js"></script>
+    <script src="~/js/signature/plugins/signhere/jsignature.signhere.js"></script>
+    <!-- Define Resources variables -->
+    <script>
+
+        function switchLanguage(culture) {
+            // Show loading indicator
+            Swal.fire({
+                title: culture === 'ar' ? 'جاري تغيير اللغة...' : 'Changing Language...',
+                text: culture === 'ar' ? 'يرجى الانتظار' : 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Send request to change language
+            $.ajax({
+                url: '@Url.Action("SetLanguage", "Language")',
+                type: 'POST',
+                data: {
+                    culture: culture,
+                    returnUrl: window.location.pathname + window.location.search
+                },
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: culture === 'ar' ? 'خطأ!' : 'Error!',
+                        text: culture === 'ar' ? 'حدث خطأ أثناء تغيير اللغة' : 'An error occurred while changing the language',
+                        confirmButtonText: culture === 'ar' ? 'حسناً' : 'OK'
+                    });
+                }
+            });
+        }
+
+        // Initialize RTL/LTR on page load
+        $(document).ready(function () {
+            const currentCulture = document.documentElement.lang;
+            document.documentElement.dir = currentCulture === 'ar' ? 'rtl' : 'ltr';
+        });
+        var resources = {
+            select: '@Html.Raw(CommonLocalizer["Select"])',
+            description: '@Html.Raw(CommonLocalizer["Description"])',
+            drag_drop_files: '@Html.Raw(CommonLocalizer["DragDropFiles"])',
+            EmptyData: '@Html.Raw(CommonLocalizer["EmptyData"])',
+            areYouSure: '@Html.Raw(MessagesLocalizer["SwalDeleteTitle"])',
+            yes: '@Html.Raw(MessagesLocalizer["Yes"])',
+            no: '@Html.Raw(MessagesLocalizer["No"])',
+            success: '@Html.Raw(MessagesLocalizer["Success"])',
+            failed: '@Html.Raw(MessagesLocalizer["Failed"])',
+            all_required_fields: '@Html.Raw(MessagesLocalizer["AllRequiredFields"])',
+            required_field: '@Html.Raw(MessagesLocalizer["RequiredField"])',
+            valid_email: '@Html.Raw(MessagesLocalizer["ValidEmail"])',
+            error: '@Html.Raw(MessagesLocalizer["Error"])',
+            error_msg: '@Html.Raw(MessagesLocalizer["ErrorMessage"])',
+            success_msg: '@Html.Raw(MessagesLocalizer["SuccessMessage"])',
+            deleted_success: '@Html.Raw(MessagesLocalizer["DeletedSuccess"])',
+            ok: '@Html.Raw(MessagesLocalizer["Ok"])',
+            letters_numbers: '@Html.Raw(MessagesLocalizer["LettersNumbers"])',
+            already_exists: '@Html.Raw(MessagesLocalizer["AlreadyExists"])',
+            delete_not_allowed: '@Html.Raw(MessagesLocalizer["DeleteNotAllowed"])',
+            NoDataInTable: '@Html.Raw(CommonLocalizer["NoDataInTable"])',
+            filepondDragDrop: '@Html.Raw(CommonLocalizer["filepondDragDrop"])',
+        };
+        $(document).ready(function () {
+            $(".link-item a").on("click", function (e) {
+                let targetUrl = $(this).attr("href");
+                if (targetUrl && targetUrl !== "#") {
+                    window.location.href = targetUrl;
+                }
+            });
+        });
+        $(function () {
+            $(".plate-mask").inputmask("9999 - A A A", {
+                definitions: {
+                    'A': {
+                        validator: "[A-Za-z]",
+                        casing: "upper"
+                    }
+                },
+                placeholder: "_"
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

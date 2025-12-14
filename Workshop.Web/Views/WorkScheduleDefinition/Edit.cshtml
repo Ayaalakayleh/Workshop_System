@@ -1,0 +1,120 @@
+﻿@model Workshop.Core.DTOs.TechnicianWorkScheduleDTO;
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = "WorkSchedule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<ol class="breadcrumb bg-transparent mb-3">
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("Index", "WorkScheduleDefinition")">@Common["Label_Technicians"]</a>
+    </li>
+    <li class="breadcrumb-item active">
+        @if (Model.Id == 0)
+        {
+            <strong>
+                @Common["Button_Add"]
+            </strong>
+        }
+        else
+        {
+            <strong>
+                @Common["Button_Edit"]
+            </strong>
+        }
+    </li>
+</ol>
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("Edit", "WorkScheduleDefinition", FormMethod.Post, new { enctype = "multipart/form-data", id = "workshopform" }))
+        {
+            @Html.HiddenFor(a => a.Id)
+            @Html.HiddenFor(a => a.FK_TechnicianId)
+            @Html.AntiForgeryToken()
+
+            <!-- Hidden fields to store the separated values for form submission -->
+            @Html.HiddenFor(m => m.WorkingDateFrom, new { id = "WorkingDateFrom" })
+            @Html.HiddenFor(m => m.WorkingDateTo, new { id = "WorkingDateTo" })
+            @Html.HiddenFor(m => m.WorkingTimeFrom, new { id = "WorkingTimeFrom" })
+            @Html.HiddenFor(m => m.WorkingTimeTo, new { id = "WorkingTimeTo" })
+
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr px-2">
+                    <h2 class="font-weight-bold">@Common["TechnicianWorkSchedule"]</h2>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row">
+                            <!--Technician Id-->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                @if (Model.FK_TechnicianId > 0)
+                                {
+                                    <div class="form-group">
+                                        @Html.Label(Common["Label_Technicians"])
+                                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="form-group">
+                                        @Html.Label(Common["Label_Technicians"])
+                                        @Html.ListBoxFor(model => model.TechnicianIds_List,
+                                        new MultiSelectList(ViewBag.Technicians ?? new List<object>(), "Value", "Text"),
+                                                                new { @class = "form-control select2", multiple = "multiple" })
+                                        @Html.ValidationMessageFor(m => m.TechnicianIds_List, "", new { @class = "text-danger" })
+                                    </div>
+                                }
+                            </div>
+                            <!--Working Date & Time Range-->
+                            <div class="col-lg-6 col-md-12 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label for="workingDateTimeRange">@Common["Label_WorkingDateTimeRange"]</label>
+                                    <input type="text" id="workingDateTimeRange" class="form-control" placeholder="Select date and time range..." readonly />
+                                    <div class="text-danger" id="workingDateTimeRange-validation"></div>
+                                    @Html.HiddenFor(m => m.WorkingDateFrom, new { id = "selectedFromDate" })
+                                    @Html.HiddenFor(m => m.WorkingDateTo, new { id = "selectedToDate" })
+                                    @Html.HiddenFor(m => m.WorkingTimeFrom, new { id = "selectedFromTime" })
+                                    @Html.HiddenFor(m => m.WorkingTimeTo, new { id = "selectedToTime" })
+
+                                </div>
+                            </div>
+                            <!--SlotMinutes-->
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_Slot"])
+                                    @Html.DropDownListFor(model => model.FK_SlotMinutes_Id, new SelectList(ViewBag.SlotMinutes ?? new List<object>(), "Value", "Text"), "Select", htmlAttributes: new { @class = "form-control select2", data_val = false })
+                                    @Html.ValidationMessageFor(m => m.FK_SlotMinutes_Id, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="text-center text-white my-3">
+                            <button type="submit" id="btnCreate" class="btn btn-primary btn-w-m"><i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]</button>
+                            <a href="@Url.Action("Index")" class="btn btn-secondary btn-w-m"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+    </div>
+</div>
+
+<!-- Include DateRangePicker CSS and JS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        getWorkScheduleIndexUrl: '@Url.Action("Index", "WorkScheduleDefinition")'
+    });
+</script>
+<script src="~/js/definitions/WorkSchedule.js"></script>

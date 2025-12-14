@@ -1,0 +1,111 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.WIPInvoiceDTO>;
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-3" id="tblInvoiceList">
+                <thead>
+                    <tr class="small text-muted">
+                        <th>@Common["Label_AccountType"]</th>
+                        <th>Invoice No.</th>
+                        <th>Invoice Type</th>
+                        <th>Referance No.</th>
+                        <th>@Common["Label_Date"]</th>
+                        <th>Total</th>
+                        <th>Discount</th>
+                        <th>Tax</th>
+                        <th>Net</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @if (item.AccountType == 1)
+                                    {
+                                        <label>Internal</label>
+                                    }
+                                    else
+                                    {
+                                        <label>
+                                            External
+                                        </label>
+                                    }
+                                </td>
+                                <td>@item.InvoiceNo</td>
+                                <td>
+                                    @if (item.InvoiceType==1)
+                                    {
+                                        <label>Invoice</label>
+                                    }
+                                    else
+                                    {
+                                        <label>
+                                            Credit Note
+                                        </label>
+                                    }
+                                </td>
+                                <td>@item.ReferanceNo</td>
+                                <td>@item.InvoiceDate.Value.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Total</td>
+                                <td>@item.Discount</td>
+                                <td>@item.Tax</td>
+                                <td>@item.Net</td>
+                                <td>
+                                    @if (@item.AccountType==1)
+                                    {
+                                        <a href="@Url.Action("PrintInternal", "WIP")?WIPId=@item.WIPId&TransactionMasterId=@item.TransactionMasterId" class="btn btn-outline-primary btn-sm collapsed" target="_blank">
+                                            <i class="fas fa-print"></i> Print
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("PrintExternal", "WIP")?InvoiceType=@item.InvoiceType&InvoiceNo=@item.InvoiceNo" class="btn btn-outline-primary btn-sm collapsed" target="_blank">
+                                            <i class="fas fa-print"></i> Print
+                                        </a>
+                                    }
+
+                                    @if (item.IsReturn ==false && item.InvoiceType==1)
+                                    {
+                                        <button class="btn btn-outline-primary btn-sm " onclick=CreditNote("@item.WIPId")>
+                                            <i class="fas fa-print"></i> Cridt Note
+                                        </button>
+                                    }
+
+                                </td>
+        
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                @Common["NoInvoicesFound"]
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+  
+   
+</script>
+<script src="~/js/definitions/invoicetab.js"></script>

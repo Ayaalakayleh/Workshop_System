@@ -1,0 +1,76 @@
+﻿@using Workshop.Core.DTOs;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model AllowedTimeDTO
+
+@{
+	var isEdit = Model.Id > 0;
+	ViewBag.Title = isEdit ? Common["Edit"] : Common["Create"];
+}
+
+@using (Html.BeginForm("Edit", "AllowedTime", FormMethod.Post, new { id = "allowedTimeForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(m => m.Id)
+
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-6 mb-3">
+				@Html.LabelFor(m => m.Make, Common["Label_Make"].Value, new { @class = "form-label" })
+				@Html.DropDownListFor(m => m.Make, ViewBag.Makes as List<SelectListItem>, Common["Select"].Value,
+								new { @class = "form-control", required = "required", id = "MakeEditId" })
+				@Html.ValidationMessageFor(m => m.Make, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-6 mb-3">
+			@Html.LabelFor(m => m.Model, Common["Label_Model"].Value, new { @class = "form-label" })
+				@Html.DropDownListFor(m => m.Model, new List<SelectListItem>(), Common["Select"].Value,
+								new { @class = "form-control", required = "required", id = "ModelEditId" })
+				@Html.ValidationMessageFor(m => m.Model, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6 mb-3">
+			@Html.LabelFor(m => m.Year, Common["Label_Year"].Value, new { @class = "form-label" })
+				@Html.EditorFor(m => m.Year, new { htmlAttributes = new { @class = "form-control", min = "1900", max = "2100", required = "required", value = Model.Year == 0 ? DateTime.Now.Year : Model.Year } })
+				@Html.ValidationMessageFor(m => m.Year, "", new { @class = "text-danger" })
+			</div>
+
+		</div>
+
+		<div class="row">
+			<div class="col-md-6 mb-3">
+				@Html.LabelFor(m => m.RTSCode, Common["Label_RTSCode"].Value, new { @class = "form-label" })
+				@Html.DropDownListFor(m => m.RTSCode, ViewBag.RTSCodes as List<SelectListItem>, Common["SelectRTSCode"].Value,
+								new { @class = "form-control", required = "required" })
+				@Html.ValidationMessageFor(m => m.RTSCode, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-6 mb-3">
+				@Html.LabelFor(m => m.AllowedHours, Common["Label_AllowedHour"].Value, new { @class = "form-label",@maxlength="3" })
+			@Html.EditorFor(m => m.AllowedHours, new { htmlAttributes = new { @class = "form-control", step = "0.001", min = "0", required = "required" , @type="number"} })
+				@Html.ValidationMessageFor(m => m.AllowedHours, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12 mb-3">
+				@Html.LabelFor(m => m.SupervisorOverride, Common["Label_SupervisorOverride"].Value, new { @class = "form-label" })
+				@Html.EditorFor(m => m.SupervisorOverride, new { htmlAttributes = new { @class = "form-control" } })
+				@Html.ValidationMessageFor(m => m.SupervisorOverride, "", new { @class = "text-danger" })
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer justify-content-center">
+		<button type="submit" class="btn btn-primary"><i class="fad fa-save"></i>&nbsp;@Common["Button_Save"]</button>
+	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fad fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+	</div>
+}
+
+<script>
+	var vehicleModelId = '@Model.Model';
+</script>
+
+<script src="~/js/definitions/AllowedTime.js"></script>

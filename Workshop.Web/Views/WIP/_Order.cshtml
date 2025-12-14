@@ -1,0 +1,38 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="tab-pane fade" id="tabOrder" role="tabpanel">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3">
+                @* <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_OrderNo"]</label><input class="form-control" id="OrderNo"></div>
+                <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_EstimateNo"]</label><input type="number" class="form-control" id="EstimateNo" value="0"></div>
+                <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_JobcardNo"]</label><input type="number" class="form-control" id="JobcardNo" value="0"></div> *@
+                @* <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_Contact"]</label><input class="form-control" id="OrderContact"></div> *@
+
+                @* <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_Salutation"]</label><input class="form-control" id="Salutation"></div> *@
+
+                @* <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-check form-switch mt-4">
+                        <input type="checkbox" class="form-check-input" id="CustomerWaiting">
+                        <label class="form-check-label" for="CustomerWaiting">@Common["Label_CustomerWaiting"]</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-check form-switch mt-4">
+                        <input type="checkbox" class="form-check-input" id="LoanVehicle">
+                        <label class="form-check-label" for="LoanVehicle">@Common["Label_LoanVehicle"]</label>
+                    </div>
+                </div> *@
+
+                <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_DueIn_Date"]</label><input type="text" class="form-control flat-picker" id="DueInDate" value="@ViewBag.DueInDate"></div>
+                @* <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_DueIn_Time"]</label><input type="time" class="form-control" id="DueInTime" value="12:00"></div> *@
+                <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_DueOut_Date"]</label><input type="text" class="form-control flat-picker" id="DueOutDate" value="@ViewBag.DueInDate"></div>
+                @* <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_DueOut_Time"]</label><input type="time" class="form-control" id="DueOutTime" value="12:00"></div> *@
+                <div class="col-lg-3 col-md-6 col-sm-12"><label class="form-label">@Common["Label_CreationDate"]</label><input type="text" class="form-control flat-picker" id="CreationDate" value="@ViewBag.CreationDate"></div>
+            </div>
+        </div>
+    </div>
+</div>

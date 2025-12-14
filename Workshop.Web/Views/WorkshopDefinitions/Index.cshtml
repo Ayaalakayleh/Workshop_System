@@ -1,0 +1,141 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources;
+
+@model List<Workshop.Core.DTOs.WorkshopDTOs.WorkshopListDTO>
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+	ViewBag.Title = Common["WorkshopList"];
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["Label_WorkshopDefinition"]</h2>
+				<div class="panel-toolbar">
+					@* @if (BaseHttpContext.UserHasPermission(Permissions.WorkshopDefinitionsCreate)) *@
+					@if (true)
+					{
+						<a href="@Url.Action("Edit")" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddNew"]</a>
+					}
+				</div>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					<div id="Workshop" class="collapse show">
+
+						<div class="row">
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_Id"]</label>
+									@Html.Editor("Id", new { htmlAttributes = new { @class = "form-control", @type = "number", id = "Id" } })
+
+								</div>
+							</div>
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_ParentWorkshop"]</label>
+									@Html.DropDownList("ParentId", (IEnumerable<SelectListItem>)ViewBag.ParentWorkshops, Common["Select"], htmlAttributes: new { @class = "form-control", id = "ParentId" })
+								</div>
+							</div>
+
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_NameEN"]</label>
+									@Html.Editor("PrimaryName", new { htmlAttributes = new { @class = "form-control", id = "PrimaryName" } })
+								</div>
+							</div>
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_NameAR"]</label>
+									@Html.Editor("SecondaryName", new { htmlAttributes = new { @class = "form-control", id = "SecondaryName" } })
+								</div>
+							</div>
+
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_City"]</label>
+									@Html.DropDownList("CityId", new SelectList(ViewBag.ColCity, "Id", "Name"), Common["Select"], htmlAttributes: new { @class = "form-control select2", id = "CityId" })
+								</div>
+							</div>
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_Email"]</label>
+									@Html.Editor("Email", new { htmlAttributes = new { @class = "form-control", id = "Email" } })
+								</div>
+							</div>
+
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_PhoneNumber"]</label>
+									@Html.Editor("Phone", new { htmlAttributes = new { @class = "form-control phone-number", placeholder = "", @tabindex = 5, id = "Phone",dir="ltr" } })
+								</div>
+							</div>
+
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_PrimaryAddress"]</label>
+									@Html.Editor("PrimaryAddress", new { htmlAttributes = new { @class = "form-control" }, id = "PrimaryAddress" })
+								</div>
+							</div>
+
+							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								<div class="form-group">
+									<label>@Common["Label_SecondaryAddress"]</label>
+									@Html.Editor("SecondaryAddress", new { htmlAttributes = new { @class = "form-control" }, id = "SecondaryAddress" })
+								</div>
+							</div>
+
+
+						</div>
+
+					</div>
+					<div class="text-center mt-2">
+						<button type="submit" id="btnSearchWorkshop" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+						<button id="btnClearWorkshop" type="button" class="btn btn-secondary btn-w-m" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
+					</div>
+
+					
+					@* <div class="row" id="WorkshopList"></div> *@
+					<!--=====================================================================================================-->
+					<hr />
+					<!-- datatable start -->
+					<div id="contentList">
+						@Html.Partial("_WorkshopList", Model)
+					</div>
+					<div class="d-flex align-items-center justify-content-end">
+						<div class="mb-5 row" id="contentPager" hidden></div>
+					</div>
+					<!-- datatable end -->
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script>
+	var RazorVars = {
+		indexUrl: '@Url.Action("Index", "WorkshopDefinitions")',
+
+		// Swal texts
+		msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+		btnOk: '@Html.Raw(Common["Ok"])',
+		swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+		swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+		swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+		swalErrorHappened: '@Message["ErrorHappend"]',
+		swalDeleted: '@Message["Deleted"]',
+		swalCancelled: '@Message["Cancelled"]'
+	};
+</script>
+<script src="~/js/definitions/WorkshopDefinitions.js"></script>
+
+
+

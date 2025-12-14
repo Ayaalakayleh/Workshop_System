@@ -1,0 +1,97 @@
+﻿@model Workshop.Core.DTOs.M_WIPServiceHistoryDTO;
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <h5 class="mb-0">@Common["Title_Parts"]</h5>
+            <table class="table table-hover mb-3" id="tblHistory">
+                <thead>
+                    <tr class="small text-muted">
+                        <th>@Common["Label_Product"]</th>
+                        <th>@Common["Label_Quantity"]</th>
+                        <th>@Common["Label_Price"]</th>
+                        <th>@Common["Label_Cost"]</th>
+                        <th>@Common["Label_Total"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.HistoryParts.Any())
+                    {
+                        @foreach (var item in Model.HistoryParts)
+                        {
+                            <tr>
+                                <td>@(item.Product)</td>
+                                <td>@(item.Quantity)</td>
+                                <td>@item.Price</td>
+                                <td>@(item.Cost)</td>
+                                <td>@(item.Total)</td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+@*                         <tr>
+                            <td colspan="9" class="text-center text-muted py-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                @Common["NoPartsHistoryFound"]
+                            </td>
+                        </tr> *@
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <h5 class="mb-0">@Common["Title_Labours"]</h5>
+            <table class="table table-hover mb-3" id="tblHistory">
+                <thead>
+                    <tr class="small text-muted">
+                        <th>@Common["Label_RTSCode"]</th>
+                        <th>@Common["Label_Description"]</th>
+                        <th>@Common["Label_Time"]</th>
+                        <th>@Common["Label_Rate"]</th>
+                        <th>@Common["Label_Cost"]</th>
+                        <th>@Common["Label_Technician"]</th>
+                        <th class="text-end">@Common["Label_Total"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.HistoryLabours.Any())
+                    {
+                        @foreach (var item in Model.HistoryLabours)
+                        {
+                            <tr>
+                                <td>@(item.RTSCodeText)</td>
+                                <td>@(item.RTSPrimaryDescription)</td>
+                                <td>@item.Time</td>
+                                <td>@(item.Rate)</td>
+                                <td>@(item.Cost)</td>
+                                <td>@(item.TechnicianPrimaryName)</td>
+                                <td>@(item.Total)</td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                      @*   <tr>
+                            <td colspan="9" class="text-center text-muted py-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                @Common["NoLabourHistoryFound"]
+                            </td>
+                        </tr> *@
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

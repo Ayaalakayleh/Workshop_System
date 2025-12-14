@@ -1,0 +1,103 @@
+﻿@using Workshop.Core.DTOs;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model ShiftFilterDTO
+
+@{
+	ViewBag.Title = Common["Shifts"];
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["Shifts"]</h2>
+				<div class="panel-toolbar">
+					<!-- Modal trigger -->
+					<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#shiftModal" onclick="resetModal()">
+						<i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+					</button>
+				</div>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					<!-- Search Filters -->
+					<form id="filterForm">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>@Common["Label_Name"]</label>
+									<input type="text" id="Name" name="Name" class="form-control" value="@Model.Name">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>@Common["Code"]</label>
+									<input type="text" id="Code" name="Code" class="form-control" value="@Model.Code">
+								</div>
+							</div>
+							<input type="hidden" name="CompanyId" value="@Model.CompanyId" />
+							<input type="hidden" name="Page" value="1" />
+							<input type="hidden" name="PageSize" value="25" />
+						</div>
+						<div class="text-center mt-3">
+							<button type="button" class="btn btn-primary" id="btnSearch">
+								<i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+							</button>
+							<button type="button" class="btn btn-secondary" onclick="resetFilter()">
+								<i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+							</button>
+						</div>
+					</form>
+
+					<!-- Table Container -->
+					<hr />
+					<div id="shiftListContainer">
+						@await Html.PartialAsync("_ShiftsList", new List<ShiftListItemDTO>())
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Shift Modal -->
+<div class="modal fade" id="shiftModal" tabindex="-1" aria-labelledby="shiftModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="shiftModalLabel">@Common["Shifts"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			@await Html.PartialAsync("Edit", new ShiftDTO())
+		</div>
+	</div>
+</div>
+
+<script>
+	var RazorVars = {
+		editUrl: '@Url.Action("Edit", "Shifts")',
+		deleteUrl: '@Url.Action("Delete", "Shifts")',
+		indexUrl: '@Url.Action("Index", "Shifts")',
+
+		// Swal texts
+		msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+		btnOk: '@Html.Raw(Common["Ok"])',
+		swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+		swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+		swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+		swalErrorHappened: '@Message["ErrorHappend"]',
+		swalDeleted: '@Message["Deleted"]',
+		swalCancelled: '@Message["Cancelled"]',
+		required_field: '@Html.Raw(Message["RequiredField"])',
+		required_week_days: '@Html.Raw(Common["PleaseSelectTheDaysOfTheWeek"])',
+	}
+</script>
+
+<script src="~/js/definitions/Shifts.js"></script>

@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Workshop.Core.DTOs
+@using Workshop.Core.DTOs.AccountingDTOs
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model WorkOrderModel
+@inject IConfiguration Configuration
+
+@{
+	string BASEURL = Configuration["ApiSettings:BaseApiUrl"] ?? "";
+	var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+
+<table id="data" class="table table-bordered table-hover text-center w-100 main-table">
+	<thead>
+		<tr>
+			<th>@Common["Label_Vehicle"]</th>
+			<th>@Common["WorkOrderType"]</th>
+			<th>@Common["Label_Date"]</th>
+			<th>@Common["Agreement"] / @Common["Movement"]</th>
+			<th>@Common["Label_IsFixed"]</th>
+			<th>@Common["Label_WorkOrder_Status"]</th>
+			<th>@Common["Label_InvoiceType"]</th>
+			<th>@Common["ServiceTime"]</th>
+			<th>@Common["Label_Action"]</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.WorkOrderDTOs != null)
+			@foreach (var item in Model.WorkOrderDTOs)
+			{
+				<tr>
+					<td>@(item.VehicleName ?? "")</td>
+					<td>@(item.WorkOrderType != null ? ((JobCardType)item.WorkOrderType).ToString() : ((JobCardType.Maintenance)))</td>
+					<td>@(item.GregorianDamageDate?.ToString("yyyy-MM-dd") ?? "")</td>
+					<td>
+						@("Agreement No " +
+										((item.FkAgreementId != null && item.FkAgreementId != 0)
+										? item.FkAgreementId.ToString()
+										: "-")
+										+ " / Movement No " +
+										((item.FkVehicleMovementId != null && item.FkVehicleMovementId != 0)
+										? item.FkVehicleMovementId.ToString()
+										: "-"))
+			</td>
+			<td>@(item.IsFix?.ToString() ?? "")</td>
+			<td>@(item.WorkOrderStatusName != null ? (item.WorkOrderStatusName).ToString() : "")</td>
+			<td>@(item.InvoicingStatus != null && item.InvoicingStatus != 0 ? ((InvoicingStatus)item.InvoicingStatus).ToString() : "-")</td>
+			<td>@(item.AccidentTime.HasValue? item.AccidentTime.Value.ToString(@"hh\:mm") : "")</td>
+
+					<td>
+						<button class="btn btn-info btn-sm" onclick="loadEditModal(@item.Id)" data-bs-toggle="modal" data-bs-target="#workOrderModal">
+							<i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
+						</button>
+
+					</td>
+				</tr>
+
+				}
+	</tbody>
+</table>
+@if (Model?.WorkOrderDTOs != null && Model.WorkOrderDTOs.Any())
+{
+	var first = Model.WorkOrderDTOs.First();
+	var totalPages = first.TotalPages ?? 0;
+	if (totalPages > 0)
+	{
+		<input id="total_pages" value="@totalPages" hidden />
+	}
+}
+
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        loadWorkOrderDataUrl: '@Url.Action("loadWorkOrderData", "WorkOrder")',
+        vehicleListUrl: '@Url.Action("VehicleList", "WorkOrder")',
+        getAgreementUrl: '@Url.Action("M_Agreement_GetAgreementId", "WorkOrder")',
+        getMovementUrl: '@Url.Action("M_Agreement_GetMovementId", "WorkOrder")',
+        workOrderListUrl: '@Url.Action("WorkOrderList", "WorkOrder")'
+    });
+</script>
+
+<script src="~/js/Definitions/WorkOrder.js"></script>

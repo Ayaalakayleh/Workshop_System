@@ -1,0 +1,274 @@
+﻿@model Workshop.Core.DTOs.TechnicianDTO;
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+
+<ol class="breadcrumb bg-transparent mb-3">
+    <li class="breadcrumb-item">
+        <a href="@Url.Action("Index", "TechnicianProfileDefinition")">@Common["Label_Technicians"]</a>
+    </li>
+    <li class="breadcrumb-item active">
+        @if (Model.Id == 0)
+        {
+            <strong>
+                @Common["Button_Add"]
+            </strong>
+        }
+        else
+        {
+            <strong>
+                @Common["Button_Edit"]
+            </strong>
+        }
+    </li>
+</ol>
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("Edit", "TechnicianProfileDefinition", FormMethod.Post, new { enctype = "multipart/form-data", id = "workshopform" }))
+        {
+            @Html.HiddenFor(a => a.Id)
+            @Html.AntiForgeryToken()
+
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-bold">@Common["Label_Technicians"]</h2>
+                </div>
+
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-12 my-1 tech-photo">
+                                @* <a href="@Url.Action("GetImage", "Base", new { Name = Model.FilePath, D = 15 })" target="_blank"> <input type="file" name="TechnicianPhoto" class="TechnicianPhoto" /></a> *@
+                                    <input type="file" name="TechnicianPhoto" class="TechnicianPhoto" src="@Model.FilePath" />
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_Number"])
+                                    @Html.TextBoxFor(model => model.Code, new { @class = "form-control make-integer" })
+                                    @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_PrimaryName"]) <span class="text-danger">*</span>
+                                    @Html.TextBoxFor(model => model.PrimaryName, new { @class = "form-control copyInput" })
+                                    @Html.ValidationMessageFor(m => m.PrimaryName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_Secondaryname"])
+                                    @Html.TextBoxFor(model => model.SecondaryName, new { @class = "form-control pasteInput" })
+                                    @* @Html.ValidationMessageFor(m => m.SecondaryName, "", new { @class = "text-danger" })*@ 
+                                    </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_Email"])
+                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control",@type="email", @Id="Email" })
+                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_StarsPID"])
+                                    @Html.TextBoxFor(model => model.FordPID, new { @class = "form-control", @type = "number" })
+                                    @Html.ValidationMessageFor(m => m.FordPID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                           
+                            <!-- No need this Fields for AJVLA-->
+                            @* <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    <label>@Common["Label_PhoneNumber"]</label>
+                                    @Html.TextBoxFor(model => model.Phone, new {
+                                    @class = "form-control w-100",
+                                                                inputmode = "tel",
+                                                                autocomplete = "tel",
+                                                                placeholder = "",
+                                                                tabindex = 5,
+                                                                id = "Phone"
+                                                                })
+                            </div>
+                            <span class="field-validation-valid text-danger"
+                                  data-valmsg-for="CustomerPhoneNumber"
+                                  data-valmsg-replace="true">&nbsp;</span>
+
+                                <span class="field-validation-valid text-danger" data-valmsg-for="CustomerPhoneNumber" data-valmsg-replace="true"> &nbsp;</span>
+                            </div> 
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_PrimaryAddress"])
+                                    @Html.TextBoxFor(model => model.PrimaryAddress, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.PrimaryAddress, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_SecondaryAddress"])
+                                    @Html.TextBoxFor(model => model.SecondaryAddress, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.SecondaryAddress, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_BirthDate"])
+                                    @Html.TextBoxFor(model => model.BirthDate, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control flat-picker" })
+                                    
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_Type"])
+                                    @Html.DropDownListFor(model => model.Type, new SelectList(ViewBag.JobTypes ?? new List<object>(), "Value", "Text"), "Techniticans")
+                                    @Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_HourCost"])
+                                    @Html.TextBoxFor(model => model.HourCost, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.HourCost, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                              <div class="form-group">
+                                <label for="PIN">@Html.Label(Common["Label_PIN"])&nbsp;<span class="text-danger">*</span></label>
+                                <div class="pin-field">
+                                 @*  <input class="form-control" id="PIN" maxlength="6" name="PIN" type="password" value="@Model.PIN" aria-invalid="false"> *@
+                                   @Html.TextBoxFor(model => model.PIN, new { @id="PIN", @class = "form-control", @type = "password", name="PIN", maxlength="6", pattern = "[0-9]*", inputmode = "numeric", oninput = "this.value = this.value.replace(/[^0-9]/g,'');"})
+                                    @Html.ValidationMessageFor(m => m.PIN, "", new { @class = "text-danger" })
+                              
+                                      <button type="button"
+                                              class="toggle-pin"
+                                              aria-label="Show PIN"
+                                              aria-pressed="false"
+                                              aria-controls="PIN"
+                                              title="Show PIN">
+                                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="blue">
+                                          <path d="M12 5c5.05 0 9.27 3.11 10.93 7.5C21.27 16.89 17.05 20 12 20S2.73 16.89 1.07 12.5C2.73 8.11 6.95 5 12 5zm0 2C7.89 7 4.27 9.54 2.86 12.5 4.27 15.46 7.89 18 12 18s7.73-2.54 9.14-5.5C19.73 9.54 16.11 7 12 7zm0 2.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
+                                        </svg>
+                                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="blue">
+                                          <path d="M2 4.27 3.28 3 21 20.72 19.73 22l-3.24-3.24A12.28 12.28 0 0 1 12 20C6.95 20 2.73 16.89 1.07 12.5a12.59 12.59 0 0 1 4.23-5.21L2 4.27zM12 7c4.11 0 7.73 2.54 9.14 5.5-.68 1.49-1.76 2.8-3.12 3.84l-2.06-2.06a3.5 3.5 0 0 0-4.7-4.7L8.16 7.56C9.37 7.2 10.65 7 12 7zm0 3.5c.26 0 .5.05.73.14l-4.09-4.09a3.5 3.5 0 0 0 4.5 4.5c-.09-.23-.14-.47-.14-.73z"/>
+                                        </svg>
+                                      </button>
+                                    </div>
+
+                                    <span class="text-danger field-validation-valid"
+                                          data-valmsg-for="PIN"
+                                          data-valmsg-replace="true"
+                                          style="display:none;"></span>
+                                  </div>
+                                </div>
+
+                          <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-check form-switch mt-5">
+                                    @Html.CheckBox("Resigned", new { @class = "form-check-input", id = "ResignedSwitch" })
+                                    @Html.Label("Resigned", Common["Label_ResignedDate"], new { @class = "form-check-label", @for = "ResignedSwitch" })
+                                </div>
+
+                            </div>
+
+                           
+                               <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                    <div class="form-group">
+                                        @Html.Label(Common["Label_ResignedDate"])
+                                        @Html.TextBoxFor(model => model.ResignedDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", @type = "text", disabled = "disabled" })
+                                        @Html.ValidationMessageFor(m => m.ResignedDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                               
+
+
+
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                @Html.Label(Common["Label_Skills"]) <span class="text-danger">*</span>
+                                    @Html.ListBoxFor(model => model.FK_SkillId, new SelectList(ViewBag.Skill ?? new List<object>(), "Value", "Text", Common["Select"]))
+                                @Html.ValidationMessageFor(m => m.FK_SkillId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                        @Html.Label(Common["Label_Shift"]) <span class="text-danger">*</span>
+                                    @Html.DropDownListFor(
+                                        m => m.FK_ShiftId,
+                                        new SelectList(ViewBag.Shift ?? new List<object>(), "Value", "Text"),
+                                        Common["Select"]
+                                    )
+                                        @Html.ValidationMessageFor(m => m.FK_ShiftId, "", new { @class = "text-danger" })
+                                    </div>
+
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                                <div class="form-group">
+                                    @Html.Label(Common["Label_Teams"])
+                                    @Html.ListBoxFor(model => model.Teams, new SelectList(ViewBag.Teams ?? new List<object>(), "Value", "Text", ViewBag.TeamsValue))
+                                    @Html.ValidationMessageFor(m => m.Teams, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
+                            <div class="form-check form-switch mt-5">
+                                @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" }) 
+                                @Html.LabelFor(model => model.IsActive, Common["Label_IsActive"], new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="submit" id="btnCreate" class="btn btn-primary btn-w-m"><i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]</button>
+                            <a href="@Url.Action("Index")" class="btn btn-secondary btn-w-m"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+    </div>
+</div>
+<script>
+     window.RazorVars =@Html.Raw(System.Text.Json.JsonSerializer.Serialize<object>(new {
+            label_UploadTechnicianPhoto = Common["label_UploadTechnicianPhoto"].Value,
+            imgUrl = Url.Action(
+                "GetImage",
+                "Base",
+                new {
+                    Name = Model?.FileName,
+                    D = 17,
+                    BasePath = Model?.FilePath,
+                    IsExternal = false
+                }
+            ),
+
+            // SweetAlert strings
+            swalDeleteTitle = Message["SwalDeleteTitle"].Value,
+            swalDeleteConfirm = Message["SwalDeleteConfirm"].Value,
+            swalDeleteCancel = Message["SwalDeleteCancel"].Value,
+            swalErrorHappened = Message["ErrorHappend"].Value,
+            swalDeleted = Message["Deleted"].Value,
+            swalCancelled = Message["Cancelled"].Value,
+
+            // Validation & Form texts
+            val_PrimaryNameMin = Common["PrimaryNameMin"].Value,
+            val_PrimaryNameMax = Common["PrimaryNameMax"].Value,
+            val_SecondaryNameMin = Common["SecondaryNameMin"].Value,
+            val_SecondaryNameMax = Common["SecondaryNameMax"].Value,
+            val_BirthDateInvalid = Common["BirthDateInvalid"].Value,
+            val_BirthDateMinAge = Common["BirthDateMinAge"].Value,
+            val_InvalidPhoneNumber = Message["InvalidPhoneNumber"].Value,
+
+            // Buttons & Alerts
+            btnSave = Common["Save"].Value,
+            btnSaving = Common["Saving"].Value,
+            btnTryAgain = Common["TryAgain"].Value,
+            btnOk = Common["Ok"].Value,
+            msgSuccessTitle = Common["SuccessTitle"].Value,
+            ErrorHappend = Common["ErrorHappend"].Value,
+            loadingText = Common["Loading"].Value
+        }));
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/definitions/techniciansprofile.js"></script>

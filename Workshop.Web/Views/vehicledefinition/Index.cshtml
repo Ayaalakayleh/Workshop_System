@@ -1,0 +1,116 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+
+@model Workshop.Core.DTOs.Vehicle.CreateVehicleDefinitionsModel
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = Common["VehicleDefinitions"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Labrl_VehicleDefinitions"]</h2>
+                <div class="panel-toolbar">
+                    @* @if (BaseHttpContext.UserHasPermission(Permissions.AddVehicleDefinitions)) *@
+                    @* { *@
+                        <a href="@Url.Action("Edit", "VehicleDefinition")" class="btn btn-outline-primary btn-sm add-record"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddNew"]</a>
+                    @* } *@
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content text-start">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                <label>@Common["Labrl_Manufacturer"]</label>
+                                @Html.DropDownListFor(
+                                model => model.ManufacturerId,
+                                                                new SelectList(Model.ColManufacturers, "Id", "Name"),
+                                                                Common["Select"],
+                                                                new { @class = "form-control" }
+                                                                )
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            @* @if ((((POCO.CompanyBranch)Session["BranchInfo"]).CountryCode) == "JOR") *@
+                            @if (true)
+                            {
+                                <div class="form-group">
+                                    <label calss=" text-white">@Common["Label_PlateNumber"]</label>
+                                    @if (!string.IsNullOrEmpty(Model.PlateNumber))
+                                    {
+                                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="15" name="PlateNumber" value="@Model.PlateNumber">
+
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="15" name="PlateNumber" value="@Model.PlateNumber">
+
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group">
+                                    <label calss=" text-white">@Common["Label_PlateNumber"]</label>
+                                    <div class="input-group">
+                                        @if (!string.IsNullOrEmpty(Model.PlateNumber))
+                                        {
+                                            <input type="text" class="form-control plate-mask" value="@Model.PlateNumber" id="PlateNumber" maxlength="12" name="PlateNumber">
+                                        }
+                                        else
+                                        {
+                                            <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="12" name="PlateNumber">
+
+                                        }
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button" onclick="convertPlateNumber()"><i class="fas fa-language"></i></button>
+                                        </div>
+                                    </div>
+                                    <p class="mt-1" id="plateText"><p>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="text-center mt-3">
+                        <button id="searchVehicle" type="button" class="btn btn-primary btn-w-m"><i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                        <button id="clearVehicleFilter" type="button" class="btn btn-secondary btn-w-m"><i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
+                    </div>
+                    <hr />
+                    <div id="VehicleList"></div>
+                    <div id="contentPager" hidden></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var RazorVars = {
+        indexUrl: '@Url.Action("Index", "VehicleDefinition")',
+        editUrl: '@Url.Action("Edit", "VehicleDefinition")',
+        listUrl: '@Url.Action("GetDataList", "VehicleDefinition")',
+        fillVehicleModel: '@Url.Action("FillVehicleModel", "VehicleDefinition")',
+
+        // Swal texts
+        msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+        btnOk: '@Html.Raw(Common["Ok"])',
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappend"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]'
+    };
+    var lang = '@lang';
+</script>
+<script src="~/js/definitions/Vehicle.js"></script>
+

@@ -1,0 +1,88 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.LabourRateDTO>;
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div id="panel-1" class="panel">
+    <div class="panel-hdr">
+        <h2 class="font-weight-bold">Labour Rate Management</h2>
+    </div>
+    <div class="panel-container show">
+        <div class="panel-content">
+            <div id="Filter">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group mb-3">
+                            <label>@Common["Name"]</label>
+                            <input type="text" id="_Name" name="Name" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" id="btnSearch">
+                        <i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+                        <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                    </button>
+                    <input type="hidden" id="hidSearchCategoryFilter" value="0" />
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="panel-2" class="panel">
+    <div class="panel-hdr px-2">
+        <h2 class="font-weight-bold">Labour Rate List</h2>
+        <div class="panel-toolbar">
+            <button class="btn btn-outline-primary add-record addNewLKP" id="addNewCode">
+                <i class="fa fa-plus"></i>&nbsp; Add New Code
+            </button>
+        </div>
+    </div>
+    <div class="panel-container show">
+        <div class="panel-content">
+            <div id="labourRateList">
+                @using (Html.BeginForm("Create", "LabourRateManagement", FormMethod.Post, new { @id = "LabourRateForm" }))
+                {
+                    <table class="table table-bordered table-hover table-striped w-100 text-center" id="tbl_posts">
+                        <thead>
+                            <tr>
+                                <th>@Common["Code"]</th>
+                                <th>@Common["Description En"]</th>
+                                <th>@Common["Description Ar"]</th>
+                                <th>@Common["Label_Actions"]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl_labourRate_body">
+                            @{
+                                Html.Partial("_LabourRateList", Model);
+                            }
+                           </tbody>
+                      </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var lookupFindUrl = '@Url.Action("Find", "LabourRateManagement")';
+
+    var RazorVars = {
+        editUrl: '@Url.Action("Edit", "LabourRateManagement")',
+        indexUrl: '@Url.Action("Index", "LabourRateManagement")',
+        deleteUrl: '@Url.Action("Delete", "LabourRateManagement")',
+
+        // Swal texts
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappend"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]'
+    };
+</script>
+<script src="~/js/definitions/LabourRate.js"></script>

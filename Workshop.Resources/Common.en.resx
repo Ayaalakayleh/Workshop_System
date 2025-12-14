@@ -1,0 +1,2373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Button_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Button_AddNew" xml:space="preserve">
+    <value>Add New</value>
+  </data>
+  <data name="Button_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Label_Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="Label_NextDue" xml:space="preserve">
+    <value>Next Due</value>
+  </data>
+  <data name="Label_Model" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="Label_ServiceTask" xml:space="preserve">
+    <value>Service Task</value>
+  </data>
+  <data name="Label_VechileType" xml:space="preserve">
+    <value>Vehicle Type</value>
+  </data>
+  <data name="Label_Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Label_Repeats" xml:space="preserve">
+    <value>Repeats</value>
+  </data>
+  <data name="Label_TimeInterval" xml:space="preserve">
+    <value>Time Interval</value>
+  </data>
+  <data name="Label_PrimaryName" xml:space="preserve">
+    <value>Name (EN)</value>
+  </data>
+  <data name="Label_Secondaryname" xml:space="preserve">
+    <value>Name (AR)</value>
+  </data>
+  <data name="Label_Technicians" xml:space="preserve">
+    <value>Technicians</value>
+  </data>
+  <data name="Label_UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="Label_WorkingDateFrom" xml:space="preserve">
+    <value>Working Date From</value>
+  </data>
+  <data name="Label_WorkingDateTo" xml:space="preserve">
+    <value>Working Date To</value>
+  </data>
+  <data name="Label_WorkingTimeFrom" xml:space="preserve">
+    <value>Working Time From</value>
+  </data>
+  <data name="Label_WorkingTimeTo" xml:space="preserve">
+    <value>Working Time To</value>
+  </data>
+  <data name="Label_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Label_Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="Label_PhoneNumber" xml:space="preserve">
+    <value>Phone Number</value>
+  </data>
+  <data name="Label_BackToList" xml:space="preserve">
+    <value>Back to List</value>
+  </data>
+  <data name="Label_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Label_Slot" xml:space="preserve">
+    <value>Slot</value>
+  </data>
+  <data name="Label_Skills" xml:space="preserve">
+    <value>Skills</value>
+  </data>
+  <data name="Label_Domain" xml:space="preserve">
+    <value>Domain</value>
+  </data>
+  <data name="Label_Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="Label_BirthDate" xml:space="preserve">
+    <value>Birth Date</value>
+  </data>
+  <data name="Label_PrimaryAddress" xml:space="preserve">
+    <value>Primary Address</value>
+  </data>
+  <data name="Label_SecondaryAddress" xml:space="preserve">
+    <value>Secondary Address</value>
+  </data>
+  <data name="Label_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Label_TechniciansProfile" xml:space="preserve">
+    <value>Technicians  Profile</value>
+  </data>
+  <data name="Label_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Label_Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Label_WorkingHours" xml:space="preserve">
+    <value>Working Hours</value>
+  </data>
+  <data name="SearchOnAllPages" xml:space="preserve">
+    <value>Search On All Pages</value>
+  </data>
+  <data name="UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Button_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Button_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="label_UploadTechnicianPhoto" xml:space="preserve">
+    <value>Upload Technician Photo</value>
+  </data>
+  <data name="Label_City" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="Label_Id" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Label_ParentWorkshop" xml:space="preserve">
+    <value>Parent Workshop</value>
+  </data>
+  <data name="Label_PrimaryLanguage" xml:space="preserve">
+    <value>Primary Language</value>
+  </data>
+  <data name="Label_SecondaryLanguage" xml:space="preserve">
+    <value>Secondary Language</value>
+  </data>
+  <data name="Label_Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="FilePondPluginImagePreview" xml:space="preserve">
+    <value>Image Preview</value>
+  </data>
+  <data name="FilePondPluginFileValidateType" xml:space="preserve">
+    <value>File Type Validation</value>
+  </data>
+  <data name="FilePondPluginFileValidateSize" xml:space="preserve">
+    <value>File Size Validation</value>
+  </data>
+  <data name="FilePondPluginImageCrop" xml:space="preserve">
+    <value>Image Crop</value>
+  </data>
+  <data name="SwalDeleteTitle" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="SwalDeleteConfirm" xml:space="preserve">
+    <value>Yes, delete it</value>
+  </data>
+  <data name="swalDeleteNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="ErrorHappend" xml:space="preserve">
+    <value>An error has occurred</value>
+  </data>
+  <data name="Deleted" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="val_PrimaryNameMin" xml:space="preserve">
+    <value>Primary name must be at least 2 characters</value>
+  </data>
+  <data name="val_PrimaryNameMax" xml:space="preserve">
+    <value>Primary name cannot exceed 50 characters</value>
+  </data>
+  <data name="val_SecondaryNameMin" xml:space="preserve">
+    <value>Secondary name must be at least 2 characters</value>
+  </data>
+  <data name="val_SecondaryNameMax" xml:space="preserve">
+    <value>Secondary name cannot exceed 50 characters</value>
+  </data>
+  <data name="val_BirthDateInvalid" xml:space="preserve">
+    <value>Please enter a valid date</value>
+  </data>
+  <data name="val_BirthDateMinAge" xml:space="preserve">
+    <value>Technician must be at least 18 years old</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>Saving...</value>
+  </data>
+  <data name="TryAgain" xml:space="preserve">
+    <value>Try Again</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="msgSuccessTitle" xml:space="preserve">
+    <value>The operation was successful</value>
+  </data>
+  <data name="loadingText" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="TechnicianWorkSchedule" xml:space="preserve">
+    <value>Technician Work Schedule</value>
+  </data>
+  <data name="WorkingDateTimeRange" xml:space="preserve">
+    <value>Working Date &amp; Time Range</value>
+  </data>
+  <data name="LookupManagement" xml:space="preserve">
+    <value>Lookup Management</value>
+  </data>
+  <data name="LookupCategories" xml:space="preserve">
+    <value>Lookup Categories</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="LookupManagementList" xml:space="preserve">
+    <value>Lookup Management List</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="Label_Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ShortName" xml:space="preserve">
+    <value>Short Name</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="AllowedUnits" xml:space="preserve">
+    <value>Allowed Units</value>
+  </data>
+  <data name="UnitOfLabour" xml:space="preserve">
+    <value>Unit Of Labour</value>
+  </data>
+  <data name="MinutesPerUnit" xml:space="preserve">
+    <value>Minutes Per Unit</value>
+  </data>
+  <data name="StandardTime" xml:space="preserve">
+    <value>Standard Time</value>
+  </data>
+  <data name="LabourGroup" xml:space="preserve">
+    <value>Labour Group</value>
+  </data>
+  <data name="LaborRate" xml:space="preserve">
+    <value>Labor Rate</value>
+  </data>
+  <data name="VATRate" xml:space="preserve">
+    <value>VAT Rate</value>
+  </data>
+  <data name="ApplicableModels" xml:space="preserve">
+    <value>Applicable Models</value>
+  </data>
+  <data name="Label_EffectiveDate" xml:space="preserve">
+    <value>Effective Date</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="IsWarranty" xml:space="preserve">
+    <value>Is Warranty?</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Label_PricingMethod" xml:space="preserve">
+    <value>Pricing Method</value>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>Fixed</value>
+  </data>
+  <data name="SummationPrice" xml:space="preserve">
+    <value>Summation Price</value>
+  </data>
+  <data name="Label_TotalTime" xml:space="preserve">
+    <value>Total Time</value>
+  </data>
+  <data name="IsActive" xml:space="preserve">
+    <value>Is Active?</value>
+  </data>
+  <data name="SequenceNo" xml:space="preserve">
+    <value>Sequence Number</value>
+  </data>
+  <data name="Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="AddNewRow" xml:space="preserve">
+    <value>Add New Row</value>
+  </data>
+  <data name="Teams" xml:space="preserve">
+    <value>Teams</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Shifts" xml:space="preserve">
+    <value>Shifts</value>
+  </data>
+  <data name="Technicians" xml:space="preserve">
+    <value>Technicians</value>
+  </data>
+  <data name="Skills" xml:space="preserve">
+    <value>Skills</value>
+  </data>
+  <data name="Efficiency" xml:space="preserve">
+    <value>Efficiency</value>
+  </data>
+  <data name="DOW" xml:space="preserve">
+    <value>Day Of Week</value>
+  </data>
+  <data name="SpanMidnight" xml:space="preserve">
+    <value>Span Midnight</value>
+  </data>
+  <data name="PrimaryName" xml:space="preserve">
+    <value>Primary Name</value>
+  </data>
+  <data name="SecondaryName" xml:space="preserve">
+    <value>Secondary Name</value>
+  </data>
+  <data name="Sunday" xml:space="preserve">
+    <value>Sunday</value>
+  </data>
+  <data name="Monday" xml:space="preserve">
+    <value>Monday</value>
+  </data>
+  <data name="Tuesday" xml:space="preserve">
+    <value>Tuesday</value>
+  </data>
+  <data name="Wednesday" xml:space="preserve">
+    <value>Wednesday</value>
+  </data>
+  <data name="Thursday" xml:space="preserve">
+    <value>Thursday</value>
+  </data>
+  <data name="Friday" xml:space="preserve">
+    <value>Friday</value>
+  </data>
+  <data name="Saturday" xml:space="preserve">
+    <value>Saturday</value>
+  </data>
+  <data name="Title_CreateShift" xml:space="preserve">
+    <value>Create Shift</value>
+  </data>
+  <data name="Title_EditShift" xml:space="preserve">
+    <value>Edit Shift</value>
+  </data>
+  <data name="Label_NameEN" xml:space="preserve">
+    <value>Name (EN)</value>
+  </data>
+  <data name="Label_NameAR" xml:space="preserve">
+    <value>Name (AR)</value>
+  </data>
+  <data name="Label_WorkshopDefinition" xml:space="preserve">
+    <value>Workshop Definition</value>
+  </data>
+  <data name="Label_CreatedDate" xml:space="preserve">
+    <value>Created Date</value>
+  </data>
+  <data name="Label_ParentId" xml:space="preserve">
+    <value>Parent</value>
+  </data>
+  <data name="Label_GoogleURL" xml:space="preserve">
+    <value>Google URL</value>
+  </data>
+  <data name="Label_CityId" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="Label_InsuranceCompany" xml:space="preserve">
+    <value>Insurance Company</value>
+  </data>
+  <data name="Label_Vat" xml:space="preserve">
+    <value>VAT</value>
+  </data>
+  <data name="Label_Supplier" xml:space="preserve">
+    <value>Supplier</value>
+  </data>
+  <data name="Button_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Button_BackToList" xml:space="preserve">
+    <value>Back to list</value>
+  </data>
+  <data name="Labrl_VehicleDefinitions" xml:space="preserve">
+    <value>Vehicle Definitions</value>
+  </data>
+  <data name="Labrl_Manufacturer" xml:space="preserve">
+    <value>Manufacturer</value>
+  </data>
+  <data name="Label_PlateNumber" xml:space="preserve">
+    <value>Plate Number</value>
+  </data>
+  <data name="Title_RepairOrdersWIP" xml:space="preserve">
+    <value>Repair Orders / WIP</value>
+  </data>
+  <data name="Label_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Label_WIPNo" xml:space="preserve">
+    <value>WIP Number</value>
+  </data>
+  <data name="Label_Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Label_Customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="Label_Vehicle" xml:space="preserve">
+    <value>Vehicle</value>
+  </data>
+  <data name="Label_Mileage" xml:space="preserve">
+    <value>Mileage</value>
+  </data>
+  <data name="Label_Lines" xml:space="preserve">
+    <value>Lines</value>
+  </data>
+  <data name="Button_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Button_Invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="Title_AddEditRepairOrderWIP" xml:space="preserve">
+    <value>Add Repair Order / WIP</value>
+  </data>
+  <data name="Label_AccountNumber" xml:space="preserve">
+    <value>Account number</value>
+  </data>
+  <data name="Label_ServiceAdvisor" xml:space="preserve">
+    <value>Service Advisor</value>
+  </data>
+  <data name="Label_Notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="VIN" xml:space="preserve">
+    <value>VIN</value>
+  </data>
+  <data name="Label_DoorNumber" xml:space="preserve">
+    <value>Door Number</value>
+  </data>
+  <data name="Button_Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Button_Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Button_Booking" xml:space="preserve">
+    <value>Booking</value>
+  </data>
+  <data name="Title_WIPDetails" xml:space="preserve">
+    <value>WIP details</value>
+  </data>
+  <data name="Title_LabourLines" xml:space="preserve">
+    <value>Labour lines</value>
+  </data>
+  <data name="Title_PartsLines" xml:space="preserve">
+    <value>Parts lines</value>
+  </data>
+  <data name="Title_Totals" xml:space="preserve">
+    <value>Totals</value>
+  </data>
+  <data name="Title_AddRTSLabour" xml:space="preserve">
+    <value>Add RTS labour</value>
+  </data>
+  <data name="Title_AddPart" xml:space="preserve">
+    <value>Add part</value>
+  </data>
+  <data name="Title_ScheduleLabour" xml:space="preserve">
+    <value>Schedule labour</value>
+  </data>
+  <data name="Title_VehicleInformation" xml:space="preserve">
+    <value>Vehicle information</value>
+  </data>
+  <data name="Title_OdometerReadings" xml:space="preserve">
+    <value>Odometer readings</value>
+  </data>
+  <data name="Title_VehicleDetails" xml:space="preserve">
+    <value>Vehicle details</value>
+  </data>
+  <data name="Title_Warranty" xml:space="preserve">
+    <value>Warranty</value>
+  </data>
+  <data name="Title_Dates" xml:space="preserve">
+    <value>Dates</value>
+  </data>
+  <data name="Title_Parts" xml:space="preserve">
+    <value>Parts</value>
+  </data>
+  <data name="Title_Labour" xml:space="preserve">
+    <value>Labour</value>
+  </data>
+  <data name="Title_ServiceDetails" xml:space="preserve">
+    <value>Service details</value>
+  </data>
+  <data name="Title_Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Title_Done" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="Button_AddRTS" xml:space="preserve">
+    <value>Add RTS</value>
+  </data>
+  <data name="Button_AddParts" xml:space="preserve">
+    <value>Add parts</value>
+  </data>
+  <data name="Button_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Button_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Button_SaveSchedule" xml:space="preserve">
+    <value>Save schedule</value>
+  </data>
+  <data name="Button_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Label_AccountType" xml:space="preserve">
+    <value>Account type</value>
+  </data>
+  <data name="Label_Retail" xml:space="preserve">
+    <value>Retail</value>
+  </data>
+  <data name="Label_Warranty" xml:space="preserve">
+    <value>Warranty</value>
+  </data>
+  <data name="Label_Internal" xml:space="preserve">
+    <value>Internal</value>
+  </data>
+  <data name="Label_Insurance" xml:space="preserve">
+    <value>Insurance</value>
+  </data>
+  <data name="Label_InProgress" xml:space="preserve">
+    <value>In progress</value>
+  </data>
+  <data name="Label_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Label_OnHold" xml:space="preserve">
+    <value>On hold</value>
+  </data>
+  <data name="Label_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Label_Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="Label_VIN" xml:space="preserve">
+    <value>VIN</value>
+  </data>
+  <data name="Label_Reg" xml:space="preserve">
+    <value>Reg</value>
+  </data>
+  <data name="Label_Appt" xml:space="preserve">
+    <value>Appt</value>
+  </data>
+  <data name="Label_Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Label_Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Label_Order" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="Label_Codes" xml:space="preserve">
+    <value>Codes</value>
+  </data>
+  <data name="Label_Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="Label_Operators" xml:space="preserve">
+    <value>Operators</value>
+  </data>
+  <data name="Label_ServiceHistory" xml:space="preserve">
+    <value>Service history</value>
+  </data>
+  <data name="Label_ServiceHistoryDetails" xml:space="preserve">
+    <value>Service history details</value>
+  </data>
+  <data name="Label_AdditionalNotes" xml:space="preserve">
+    <value>Additional notes</value>
+  </data>
+  <data name="Label_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="Label_PaymentDate" xml:space="preserve">
+    <value>Payment date</value>
+  </data>
+  <data name="Label_Terms" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="Label_AvailableCredit" xml:space="preserve">
+    <value>Available credit</value>
+  </data>
+  <data name="Label_WIPstatus" xml:space="preserve">
+    <value>WIP status</value>
+  </data>
+  <data name="Label_JobOpenBy" xml:space="preserve">
+    <value>Job opened by</value>
+  </data>
+  <data name="Label_Advisor" xml:space="preserve">
+    <value>Advisor</value>
+  </data>
+  <data name="Label_Reception" xml:space="preserve">
+    <value>Reception</value>
+  </data>
+  <data name="Label_Memo" xml:space="preserve">
+    <value>Memo</value>
+  </data>
+  <data name="Label_RTS" xml:space="preserve">
+    <value>RTS</value>
+  </data>
+  <data name="Label_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Label_Allowed" xml:space="preserve">
+    <value>Allowed</value>
+  </data>
+  <data name="Label_RatePerHour" xml:space="preserve">
+    <value>Rate/hr</value>
+  </data>
+  <data name="Label_Hours" xml:space="preserve">
+    <value>Hours</value>
+  </data>
+  <data name="Label_TimeTaken" xml:space="preserve">
+    <value>Time taken</value>
+  </data>
+  <data name="Label_LineTotal" xml:space="preserve">
+    <value>Line total</value>
+  </data>
+  <data name="Label_Draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="Label_Code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="Label_Number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="Label_Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="Label_UnitPrice" xml:space="preserve">
+    <value>Unit price</value>
+  </data>
+  <data name="Label_ACCompressorReplace" xml:space="preserve">
+    <value>AC compressor replace</value>
+  </data>
+  <data name="Label_InterimService" xml:space="preserve">
+    <value>Interim Service</value>
+  </data>
+  <data name="Label_FrontBrakePads" xml:space="preserve">
+    <value>Front brake pads</value>
+  </data>
+  <data name="Label_OilFilter" xml:space="preserve">
+    <value>Oil filter</value>
+  </data>
+  <data name="Label_EngineOil5W30" xml:space="preserve">
+    <value>Engine oil 5W30 (4L)</value>
+  </data>
+  <data name="Label_BrakePads" xml:space="preserve">
+    <value>Brake pads</value>
+  </data>
+  <data name="Label_Labour" xml:space="preserve">
+    <value>Labour</value>
+  </data>
+  <data name="Label_Parts" xml:space="preserve">
+    <value>Parts</value>
+  </data>
+  <data name="Label_Subtotal" xml:space="preserve">
+    <value>Subtotal</value>
+  </data>
+  <data name="Label_Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Label_FilterByDescriptionDemoOnly" xml:space="preserve">
+    <value>Filter by description (demo only)</value>
+  </data>
+  <data name="Label_All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Label_Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Label_Std" xml:space="preserve">
+    <value>Std</value>
+  </data>
+  <data name="Label_SKU" xml:space="preserve">
+    <value>SKU</value>
+  </data>
+  <data name="Label_CostSAR" xml:space="preserve">
+    <value>Cost (SAR)</value>
+  </data>
+  <data name="Label_Sell" xml:space="preserve">
+    <value>Sell (auto 25% markup if 0)</value>
+  </data>
+  <data name="Label_DiscountPct" xml:space="preserve">
+    <value>Discount %</value>
+  </data>
+  <data name="Label_Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="Label_Posted" xml:space="preserve">
+    <value>Posted</value>
+  </data>
+  <data name="Label_Technician" xml:space="preserve">
+    <value>Technician</value>
+  </data>
+  <data name="Label_Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Label_DurationMins" xml:space="preserve">
+    <value>Duration (mins)</value>
+  </data>
+  <data name="Label_Ends" xml:space="preserve">
+    <value>Ends</value>
+  </data>
+  <data name="Label_Job" xml:space="preserve">
+    <value>Job</value>
+  </data>
+  <data name="Label_FillRequired" xml:space="preserve">
+    <value>Please fill required fields</value>
+  </data>
+  <data name="Label_SaleType" xml:space="preserve">
+    <value>Sale type</value>
+  </data>
+  <data name="Label_CarPark" xml:space="preserve">
+    <value>Car park</value>
+  </data>
+  <data name="Label_Workshop" xml:space="preserve">
+    <value>Workshop</value>
+  </data>
+  <data name="Label_BodyShop" xml:space="preserve">
+    <value>Body shop</value>
+  </data>
+  <data name="Label_VehicleHere" xml:space="preserve">
+    <value>Vehicle here</value>
+  </data>
+  <data name="Label_Outside" xml:space="preserve">
+    <value>Outside</value>
+  </data>
+  <data name="Label_Note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="Label_CustomerContact" xml:space="preserve">
+    <value>Customer contact</value>
+  </data>
+  <data name="Label_CreatedBy" xml:space="preserve">
+    <value>Created by</value>
+  </data>
+  <data name="Label_CreatedAt" xml:space="preserve">
+    <value>Created at</value>
+  </data>
+  <data name="Label_Registration" xml:space="preserve">
+    <value>Registration</value>
+  </data>
+  <data name="Label_MakeModel" xml:space="preserve">
+    <value>Make/Model</value>
+  </data>
+  <data name="Label_Year" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="Label_Engine" xml:space="preserve">
+    <value>Engine</value>
+  </data>
+  <data name="Label_ServiceDescription" xml:space="preserve">
+    <value>Service description</value>
+  </data>
+  <data name="Label_CustomerConcerns" xml:space="preserve">
+    <value>Customer concerns</value>
+  </data>
+  <data name="Label_AdvisorNotes" xml:space="preserve">
+    <value>Advisor notes</value>
+  </data>
+  <data name="Label_Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Label_CurrentIn" xml:space="preserve">
+    <value>Current (in)</value>
+  </data>
+  <data name="Label_CurrentOut" xml:space="preserve">
+    <value>Current (out)</value>
+  </data>
+  <data name="Label_Manufacturer" xml:space="preserve">
+    <value>Manufacturer</value>
+  </data>
+  <data name="Label_Body" xml:space="preserve">
+    <value>Body</value>
+  </data>
+  <data name="Label_Extended" xml:space="preserve">
+    <value>Extended</value>
+  </data>
+  <data name="Label_MOT" xml:space="preserve">
+    <value>MOT</value>
+  </data>
+  <data name="Label_Emissions" xml:space="preserve">
+    <value>Emissions</value>
+  </data>
+  <data name="Label_Registered" xml:space="preserve">
+    <value>Registered</value>
+  </data>
+  <data name="Label_Delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="Label_CreatingOperator" xml:space="preserve">
+    <value>Creating operator</value>
+  </data>
+  <data name="Label_BookedInOperator" xml:space="preserve">
+    <value>Booked in operator</value>
+  </data>
+  <data name="Label_InvoicingOperator" xml:space="preserve">
+    <value>Invoicing operator</value>
+  </data>
+  <data name="Label_BookedOutOperator" xml:space="preserve">
+    <value>Booked out operator</value>
+  </data>
+  <data name="Label_OwningOperator" xml:space="preserve">
+    <value>Owning operator</value>
+  </data>
+  <data name="Label_DecardingOption" xml:space="preserve">
+    <value>Decarding option</value>
+  </data>
+  <data name="Label_Requisition" xml:space="preserve">
+    <value>Requisition</value>
+  </data>
+  <data name="Label_Issue" xml:space="preserve">
+    <value>Issue</value>
+  </data>
+  <data name="Label_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Label_ReturnParts" xml:space="preserve">
+    <value>Return parts</value>
+  </data>
+  <data name="Label_RepeatRepair" xml:space="preserve">
+    <value>Repeat repair</value>
+  </data>
+  <data name="Label_UpdateDemand" xml:space="preserve">
+    <value>Update demand</value>
+  </data>
+  <data name="Label_PartialInvoicing" xml:space="preserve">
+    <value>Partial invoicing</value>
+  </data>
+  <data name="Label_OrderNo" xml:space="preserve">
+    <value>Order no.</value>
+  </data>
+  <data name="Label_EstimateNo" xml:space="preserve">
+    <value>Estimate no.</value>
+  </data>
+  <data name="Label_JobcardNo" xml:space="preserve">
+    <value>Jobcard no.</value>
+  </data>
+  <data name="Label_Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Label_Salutation" xml:space="preserve">
+    <value>Salutation</value>
+  </data>
+  <data name="Label_CustomerWaiting" xml:space="preserve">
+    <value>Customer waiting</value>
+  </data>
+  <data name="Label_LoanVehicle" xml:space="preserve">
+    <value>Loan vehicle</value>
+  </data>
+  <data name="Label_DueIn_Date" xml:space="preserve">
+    <value>Due in (date)</value>
+  </data>
+  <data name="Label_DueIn_Time" xml:space="preserve">
+    <value>Due in (time)</value>
+  </data>
+  <data name="Label_DueOut_Date" xml:space="preserve">
+    <value>Due out (date)</value>
+  </data>
+  <data name="Label_DueOut_Time" xml:space="preserve">
+    <value>Due out (time)</value>
+  </data>
+  <data name="Label_CreationDate" xml:space="preserve">
+    <value>Creation date</value>
+  </data>
+  <data name="Label_InvoiceDate" xml:space="preserve">
+    <value>Invoice date</value>
+  </data>
+  <data name="Label_Event" xml:space="preserve">
+    <value>Event</value>
+  </data>
+  <data name="Label_Odometer" xml:space="preserve">
+    <value>Odometer</value>
+  </data>
+  <data name="Label_Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="Label_Repair" xml:space="preserve">
+    <value>Repair</value>
+  </data>
+  <data name="Label_Product" xml:space="preserve">
+    <value>Product</value>
+  </data>
+  <data name="Label_W" xml:space="preserve">
+    <value>W</value>
+  </data>
+  <data name="Label_Quantity" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="Label_Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="Label_ContribPct" xml:space="preserve">
+    <value>Contrib%</value>
+  </data>
+  <data name="Label_Cost" xml:space="preserve">
+    <value>Cost</value>
+  </data>
+  <data name="Label_RTSCode" xml:space="preserve">
+    <value>RTS code</value>
+  </data>
+  <data name="Label_Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Label_Rate" xml:space="preserve">
+    <value>Rate</value>
+  </data>
+  <data name="Label_ExtValue" xml:space="preserve">
+    <value>Ext. value</value>
+  </data>
+  <data name="Label_PointOfSaleAccount" xml:space="preserve">
+    <value>Point of sale account</value>
+  </data>
+  <data name="Label_AftersalesBranch" xml:space="preserve">
+    <value>Aftersales branch</value>
+  </data>
+  <data name="Label_AftersalesExecutive" xml:space="preserve">
+    <value>Aftersales executive</value>
+  </data>
+  <data name="Label_DisplayOdometerAs" xml:space="preserve">
+    <value>Display odometer as</value>
+  </data>
+  <data name="Label_Kilometres" xml:space="preserve">
+    <value>Kilometres</value>
+  </data>
+  <data name="Label_LastServiceDate" xml:space="preserve">
+    <value>Last service date</value>
+  </data>
+  <data name="Label_NextServiceDue" xml:space="preserve">
+    <value>Next service due</value>
+  </data>
+  <data name="Label_DateOfLastWork" xml:space="preserve">
+    <value>Date of last work</value>
+  </data>
+  <data name="Label_LastKnownOdometer" xml:space="preserve">
+    <value>Last known odometer</value>
+  </data>
+  <data name="Label_TimingBelt" xml:space="preserve">
+    <value>Timing belt</value>
+  </data>
+  <data name="Label_ServiceInterval" xml:space="preserve">
+    <value>Service interval</value>
+  </data>
+  <data name="Label_Months" xml:space="preserve">
+    <value>Months</value>
+  </data>
+  <data name="Label_Or" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="Label_MSCompany" xml:space="preserve">
+    <value>MS Company</value>
+  </data>
+  <data name="Label_ServiceFlag1" xml:space="preserve">
+    <value>Last road safety test</value>
+  </data>
+  <data name="Label_ServiceFlag2" xml:space="preserve">
+    <value>First road safety test interval</value>
+  </data>
+  <data name="Label_ServiceFlag3" xml:space="preserve">
+    <value>Road safety test expiry</value>
+  </data>
+  <data name="Label_ServiceFlag4" xml:space="preserve">
+    <value>Road safety test interval</value>
+  </data>
+  <data name="Label_ServiceFlag5" xml:space="preserve">
+    <value>Next emission</value>
+  </data>
+  <data name="Label_ServiceFlag6" xml:space="preserve">
+    <value>Brake fluid</value>
+  </data>
+  <data name="Label_ServiceFlag7" xml:space="preserve">
+    <value>Air con inspection</value>
+  </data>
+  <data name="Label_ServiceFlag8" xml:space="preserve">
+    <value>Cambelt inspection</value>
+  </data>
+  <data name="Label_ServiceFlag9" xml:space="preserve">
+    <value>Transmission oil change</value>
+  </data>
+  <data name="Label_ServiceFlag10" xml:space="preserve">
+    <value>Return parts</value>
+  </data>
+  <data name="Label_RequiredField" xml:space="preserve">
+    <value>Required field</value>
+  </data>
+  <data name="Label_AreYouSure" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="Label_Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="Title_Clocking" xml:space="preserve">
+    <value>Clocking</value>
+  </data>
+  <data name="Title_NewClocking" xml:space="preserve">
+    <value>New Clocking</value>
+  </data>
+  <data name="Title_ActiveClockings" xml:space="preserve">
+    <value>Active Clockings</value>
+  </data>
+  <data name="Title_TodaysHistory" xml:space="preserve">
+    <value>Today's History</value>
+  </data>
+  <data name="Title_StartBreak" xml:space="preserve">
+    <value>Start Idle</value>
+  </data>
+  <data name="Label_WIP" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="Label_LabourLine" xml:space="preserve">
+    <value>Labour Line</value>
+  </data>
+  <data name="Label_ElapsedWorked" xml:space="preserve">
+    <value>Elapsed Worked</value>
+  </data>
+  <data name="Label_AllowedTime" xml:space="preserve">
+    <value>Allowed Time</value>
+  </data>
+  <data name="Label_Period" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="Label_Worked" xml:space="preserve">
+    <value>Worked</value>
+  </data>
+  <data name="Label_Breaks" xml:space="preserve">
+    <value>Breaks</value>
+  </data>
+  <data name="Label_Reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="Label_NoteOptional" xml:space="preserve">
+    <value>Note (optional)</value>
+  </data>
+  <data name="Label_ShortNote" xml:space="preserve">
+    <value>Short note</value>
+  </data>
+  <data name="Label_Hint" xml:space="preserve">
+    <value>Hint</value>
+  </data>
+  <data name="Label_Hint_BreakExcludedFromJobTime" xml:space="preserve">
+    <value>Break time is excluded from job time.</value>
+  </data>
+  <data name="Label_NoOneClockedIn" xml:space="preserve">
+    <value>No one is clocked in.</value>
+  </data>
+  <data name="Label_NoHistoryToday" xml:space="preserve">
+    <value>No history yet today.</value>
+  </data>
+  <data name="Label_Working" xml:space="preserve">
+    <value>Working</value>
+  </data>
+  <data name="Label_Break" xml:space="preserve">
+    <value>Break</value>
+  </data>
+  <data name="Label_FromTo" xml:space="preserve">
+    <value>to</value>
+  </data>
+  <data name="Button_ClockIn" xml:space="preserve">
+    <value>Clock In</value>
+  </data>
+  <data name="Button_Break" xml:space="preserve">
+    <value>Break</value>
+  </data>
+  <data name="Button_GoToWIP" xml:space="preserve">
+    <value>Go to WIP</value>
+  </data>
+  <data name="Button_ClockAllOut" xml:space="preserve">
+    <value>Clock All Out</value>
+  </data>
+  <data name="Button_Resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="Button_Log" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="Button_ClockOut" xml:space="preserve">
+    <value>Clock Out</value>
+  </data>
+  <data name="Button_StartBreak" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Label_FordPID" xml:space="preserve">
+    <value>Ford PID</value>
+  </data>
+  <data name="Label_StarsPID" xml:space="preserve">
+    <value>Stars PID</value>
+  </data>
+  <data name="Label_HourCost" xml:space="preserve">
+    <value>Hour Cost</value>
+  </data>
+  <data name="Label_PIN" xml:space="preserve">
+    <value>PIN</value>
+  </data>
+  <data name="Label_ResignedDate" xml:space="preserve">
+    <value>Resigned Date</value>
+  </data>
+  <data name="Label_IsActive" xml:space="preserve">
+    <value>Is Active</value>
+  </data>
+  <data name="Label_Teams" xml:space="preserve">
+    <value>Teams</value>
+  </data>
+  <data name="Label_Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="RTSCodeDefinition" xml:space="preserve">
+    <value>RTS Code </value>
+  </data>
+  <data name="Label_Franchise" xml:space="preserve">
+    <value>Franchise</value>
+  </data>
+  <data name="Label_VehicleClass" xml:space="preserve">
+    <value>Vehicle Class</value>
+  </data>
+  <data name="MenuRTS" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="StandardHours" xml:space="preserve">
+    <value>Standard Hours</value>
+  </data>
+  <data name="Label_Make" xml:space="preserve">
+    <value>Manufacturer</value>
+  </data>
+  <data name="Label_AllowedHours" xml:space="preserve">
+    <value>Allowed Hours</value>
+  </data>
+  <data name="Definitions" xml:space="preserve">
+    <value>Definitions</value>
+  </data>
+  <data name="Recall" xml:space="preserve">
+    <value>Recall</value>
+  </data>
+  <data name="EmptyData" xml:space="preserve">
+    <value>No data available in table</value>
+  </data>
+  <data name="AllowedTimes" xml:space="preserve">
+    <value>Allowed Time</value>
+  </data>
+  <data name="WorkshopDefinition" xml:space="preserve">
+    <value>Workshop Definition</value>
+  </data>
+  <data name="VehicleDefinition" xml:space="preserve">
+    <value>Vehicle Definition</value>
+  </data>
+  <data name="ExternalWorkshop" xml:space="preserve">
+    <value>External Workshop</value>
+  </data>
+  <data name="ExternalWorkshopTemplate" xml:space="preserve">
+    <value>External Workshop Template</value>
+  </data>
+  <data name="ExternalInvoices" xml:space="preserve">
+    <value>External Invoices</value>
+  </data>
+  <data name="ExternalWorkshopMaintenanceInvoice" xml:space="preserve">
+    <value>External Workshop Maintenance Invoices</value>
+  </data>
+  <data name="ExternalWorkshopInvoice" xml:space="preserve">
+    <value>External Workshop Invoice</value>
+  </data>
+  <data name="Movements" xml:space="preserve">
+    <value>Movements</value>
+  </data>
+  <data name="MovementIn" xml:space="preserve">
+    <value>Movement In</value>
+  </data>
+  <data name="PriceMatrix" xml:space="preserve">
+    <value>Price Matrix</value>
+  </data>
+  <data name="TechniciansDashboard" xml:space="preserve">
+    <value>Technicians Dashboard</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="Title_Menus" xml:space="preserve">
+    <value>Menus</value>
+  </data>
+  <data name="Title_MenuDefinition" xml:space="preserve">
+    <value>Menu Definition</value>
+  </data>
+  <data name="Label_GroupCode" xml:space="preserve">
+    <value>Group Code</value>
+  </data>
+  <data name="Label_GroupName" xml:space="preserve">
+    <value>Group Name</value>
+  </data>
+  <data name="Label_DescriptionEn" xml:space="preserve">
+    <value>Description (EN)</value>
+  </data>
+  <data name="Label_DescriptionAr" xml:space="preserve">
+    <value>Description (AR)</value>
+  </data>
+  <data name="Title_SelectPart" xml:space="preserve">
+    <value>Select Part</value>
+  </data>
+  <data name="Label_Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="Label_SubCategory" xml:space="preserve">
+    <value>Sub-Category</value>
+  </data>
+  <data name="PartId" xml:space="preserve">
+    <value>Part Id</value>
+  </data>
+  <data name="PartName" xml:space="preserve">
+    <value>Part Name</value>
+  </data>
+  <data name="Label_IsPart" xml:space="preserve">
+    <value>Is Part?</value>
+  </data>
+  <data name="TableData" xml:space="preserve">
+    <value>Please enter the table data</value>
+  </data>
+  <data name="NoDataInTable" xml:space="preserve">
+    <value>No Data In The Table</value>
+  </data>
+  <data name="PleaseSelectTheDaysOfTheWeek" xml:space="preserve">
+    <value>Please select the days of the week</value>
+  </data>
+  <data name="Label_SupervisorOverride" xml:space="preserve">
+    <value>Supervisor Override</value>
+  </data>
+  <data name="Label_AllowedHour" xml:space="preserve">
+    <value>Allowed Hour</value>
+  </data>
+  <data name="Label_Applies" xml:space="preserve">
+    <value>Applies</value>
+  </data>
+  <data name="Label_Basis" xml:space="preserve">
+    <value>Basis</value>
+  </data>
+  <data name="Label_Match" xml:space="preserve">
+    <value>Match </value>
+  </data>
+  <data name="Label_Markup" xml:space="preserve">
+    <value>Markup</value>
+  </data>
+  <data name="DefinePriceMatrixRule" xml:space="preserve">
+    <value>Define Price Matrix Rule</value>
+  </data>
+  <data name="Label_ManufacturerYear" xml:space="preserve">
+    <value>Manufacturer Year</value>
+  </data>
+  <data name="Label_ChassisNumber" xml:space="preserve">
+    <value>Chassis Number</value>
+  </data>
+  <data name="Title_MaintenanceList" xml:space="preserve">
+    <value>Maintenance List</value>
+  </data>
+  <data name="Title_CollectionMapping" xml:space="preserve">
+    <value>Collection Mapping</value>
+  </data>
+  <data name="Label_StartedRow" xml:space="preserve">
+    <value>Started Row</value>
+  </data>
+  <data name="Label_StartedColumn" xml:space="preserve">
+    <value>Started Column</value>
+  </data>
+  <data name="Label_UploadTemplateFile" xml:space="preserve">
+    <value>Upload Template File</value>
+  </data>
+  <data name="Label_DownloadTemplate" xml:space="preserve">
+    <value>Download Template</value>
+  </data>
+  <data name="Button_Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="Label_ColumnName" xml:space="preserve">
+    <value>Column Name</value>
+  </data>
+  <data name="Label_AdditionColumnName" xml:space="preserve">
+    <value>Addition Column Name</value>
+  </data>
+  <data name="Label_MappingColumnDB" xml:space="preserve">
+    <value>Mapping Column DB</value>
+  </data>
+  <data name="Label_MappingColumnIndex" xml:space="preserve">
+    <value>Mapping Column Index</value>
+  </data>
+  <data name="Label_IsVatIncluded" xml:space="preserve">
+    <value>Is Vat Included?</value>
+  </data>
+  <data name="Label_AdditionData" xml:space="preserve">
+    <value>Addition Data</value>
+  </data>
+  <data name="Label_FromDate" xml:space="preserve">
+    <value>From Date</value>
+  </data>
+  <data name="Label_ToDate" xml:space="preserve">
+    <value>To Date</value>
+  </data>
+  <data name="Label_UploadFile" xml:space="preserve">
+    <value>Upload File</value>
+  </data>
+  <data name="Label_ExcelDate" xml:space="preserve">
+    <value>Excel Date</value>
+  </data>
+  <data name="Label_InvoiceType" xml:space="preserve">
+    <value>Invoice Type</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="Label_InvoiceNo" xml:space="preserve">
+    <value>Invoice No</value>
+  </data>
+  <data name="Label_Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Label_BusinessLine" xml:space="preserve">
+    <value>Business Line</value>
+  </data>
+  <data name="Label_Milage" xml:space="preserve">
+    <value>Milage</value>
+  </data>
+  <data name="Label_Maker" xml:space="preserve">
+    <value>Marker</value>
+  </data>
+  <data name="Label_ServiceType" xml:space="preserve">
+    <value>Service Type</value>
+  </data>
+  <data name="Label_SubTotalBeforVat" xml:space="preserve">
+    <value>Sub-Total Before Vat</value>
+  </data>
+  <data name="Label_ErrorReason" xml:space="preserve">
+    <value>Error Reason</value>
+  </data>
+  <data name="Button_Check" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="Button_ClearFields" xml:space="preserve">
+    <value>Clear Fields</value>
+  </data>
+  <data name="Button_GetWorkOrders" xml:space="preserve">
+    <value> Get Work Orders</value>
+  </data>
+  <data name="Label_Month" xml:space="preserve">
+    <value>Month</value>
+  </data>
+  <data name="Label_WorkOrderNumber" xml:space="preserve">
+    <value>Work Order Number</value>
+  </data>
+  <data name="Label_LaborCost" xml:space="preserve">
+    <value>Labor Cost</value>
+  </data>
+  <data name="Label_PartsCost" xml:space="preserve">
+    <value>Parts Cost</value>
+  </data>
+  <data name="Label_TotalInvoice" xml:space="preserve">
+    <value>Total Invoice</value>
+  </data>
+  <data name="VehicleWorkshopSystem" xml:space="preserve">
+    <value>Vehicle Workshop System</value>
+  </data>
+  <data name="ChoosePINType" xml:space="preserve">
+    <value>Choose PIN Type</value>
+  </data>
+  <data name="Pattern" xml:space="preserve">
+    <value>Pattern</value>
+  </data>
+  <data name="NumericPIN" xml:space="preserve">
+    <value>Numeric PIN</value>
+  </data>
+  <data name="DrawYourPatternToUnlock" xml:space="preserve">
+    <value>Draw your pattern to unlock</value>
+  </data>
+  <data name="Enter6DigitPIN" xml:space="preserve">
+    <value>Enter 6-digit PIN</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="NumericKeyboard" xml:space="preserve">
+    <value>Numeric Keyboard</value>
+  </data>
+  <data name="PIN" xml:space="preserve">
+    <value>PIN</value>
+  </data>
+  <data name="NOWOR" xml:space="preserve">
+    <value>NOWOR</value>
+  </data>
+  <data name="TimeUnknown" xml:space="preserve">
+    <value>Time unknown</value>
+  </data>
+  <data name="PINCorrectRedirecting" xml:space="preserve">
+    <value>PIN correct! Redirecting...</value>
+  </data>
+  <data name="IncorrectPINTryAgain" xml:space="preserve">
+    <value>Incorrect PIN. Try again.</value>
+  </data>
+  <data name="PatternTooShortConnectAtLeast4" xml:space="preserve">
+    <value>Pattern too short. Connect at least 4 dots.</value>
+  </data>
+  <data name="PatternCorrectRedirecting" xml:space="preserve">
+    <value>Pattern correct! Redirecting...</value>
+  </data>
+  <data name="IncorrectPatternTryAgain" xml:space="preserve">
+    <value>Incorrect pattern. Try again.</value>
+  </data>
+  <data name="DX_NoData" xml:space="preserve">
+    <value>No Data</value>
+  </data>
+  <data name="BreakTimeRange" xml:space="preserve">
+    <value>Break Time Range</value>
+  </data>
+  <data name="BreakTime" xml:space="preserve">
+    <value>Break Time</value>
+  </data>
+  <data name="WorkOrder" xml:space="preserve">
+    <value>Work Order</value>
+  </data>
+  <data name="WorkOrderType" xml:space="preserve">
+    <value>Work Order Type</value>
+  </data>
+  <data name="Label_WorkOrder_Status" xml:space="preserve">
+    <value>Work Order Status</value>
+  </data>
+  <data name="Label_InvoicingStatus" xml:space="preserve">
+    <value>Invoicing Status</value>
+  </data>
+  <data name="Agreement" xml:space="preserve">
+    <value>Agreement</value>
+  </data>
+  <data name="Movement" xml:space="preserve">
+    <value>Movement</value>
+  </data>
+  <data name="ServiceTime" xml:space="preserve">
+    <value>Service Time</value>
+  </data>
+  <data name="Label_WorkshopLoading" xml:space="preserve">
+    <value>Workshop Loading</value>
+  </data>
+  <data name="Label_Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="Label_Techs" xml:space="preserve">
+    <value>Techs</value>
+  </data>
+  <data name="Label_Capacity" xml:space="preserve">
+    <value>Capacity</value>
+  </data>
+  <data name="Label_Scheduled" xml:space="preserve">
+    <value>Scheduled</value>
+  </data>
+  <data name="Label_Utilisation" xml:space="preserve">
+    <value>Utilisation</value>
+  </data>
+  <data name="Label_Day" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="Label_Week" xml:space="preserve">
+    <value>Week</value>
+  </data>
+  <data name="Label_TechsTime" xml:space="preserve">
+    <value>Techs / Time</value>
+  </data>
+  <data name="Label_UnscheduledLabour" xml:space="preserve">
+    <value>Unscheduled Labour</value>
+  </data>
+  <data name="Label_AvailableTechnicians" xml:space="preserve">
+    <value>Available Technicians</value>
+  </data>
+  <data name="Label_Assigned" xml:space="preserve">
+    <value>Assigned</value>
+  </data>
+  <data name="Label_Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="Label_ScheduleLabour" xml:space="preserve">
+    <value>Schedule Labour</value>
+  </data>
+  <data name="Label_Overdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="Label_SaveSchedule" xml:space="preserve">
+    <value>Save Schedule</value>
+  </data>
+  <data name="Label_Schedule" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="Label_DeleteSchedule" xml:space="preserve">
+    <value>Delete Schedule</value>
+  </data>
+  <data name="Label_DeleteScheduleConfirm" xml:space="preserve">
+    <value>Are you sure you want to delete this schedule?</value>
+  </data>
+  <data name="Label_YesDelete" xml:space="preserve">
+    <value>Yes, delete</value>
+  </data>
+  <data name="Label_Saved" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="Label_ScheduleSaved" xml:space="preserve">
+    <value>Schedule saved successfully.</value>
+  </data>
+  <data name="Label_Deleted" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+  <data name="Label_ScheduleDeleted" xml:space="preserve">
+    <value>Schedule deleted.</value>
+  </data>
+  <data name="Label_Invalid" xml:space="preserve">
+    <value>Invalid</value>
+  </data>
+  <data name="Label_FillAllFields" xml:space="preserve">
+    <value>Please fill all required fields.</value>
+  </data>
+  <data name="Label_StartEnd" xml:space="preserve">
+    <value>Start–End</value>
+  </data>
+  <data name="Label_Empty" xml:space="preserve">
+    <value>No unscheduled labour.</value>
+  </data>
+  <data name="Label_Reservations" xml:space="preserve">
+    <value>Reservations</value>
+  </data>
+  <data name="Label_ReservationsDiaryControls" xml:space="preserve">
+    <value>Reservations — Diary Controls</value>
+  </data>
+  <data name="Label_Slots30m" xml:space="preserve">
+    <value>Slots (30m)</value>
+  </data>
+  <data name="Label_DaySchedule" xml:space="preserve">
+    <value>Day Schedule</value>
+  </data>
+  <data name="Label_ReservationsSelectedDay" xml:space="preserve">
+    <value>Reservations (Selected Day)</value>
+  </data>
+  <data name="Label_DurationShort" xml:space="preserve">
+    <value>Dur</value>
+  </data>
+  <data name="Label_Bay" xml:space="preserve">
+    <value>Bay</value>
+  </data>
+  <data name="Label_NoReservations" xml:space="preserve">
+    <value>No reservations</value>
+  </data>
+  <data name="Label_Reserved" xml:space="preserve">
+    <value>Reserved</value>
+  </data>
+  <data name="Label_AliH" xml:space="preserve">
+    <value>Ali H.</value>
+  </data>
+  <data name="Label_SaraM" xml:space="preserve">
+    <value>Sara M.</value>
+  </data>
+  <data name="Label_FaisalK" xml:space="preserve">
+    <value>Faisal K.</value>
+  </data>
+  <data name="Label_NewTech" xml:space="preserve">
+    <value>New Tech</value>
+  </data>
+  <data name="Label_IsFixed" xml:space="preserve">
+    <value>Is Fixed?</value>
+  </data>
+  <data name="Label_WorkOrderType" xml:space="preserve">
+    <value>Work Order Type</value>
+  </data>
+  <data name="Label_VehicleType" xml:space="preserve">
+    <value>Vehicle Type</value>
+  </data>
+  <data name="Label_SubStatus" xml:space="preserve">
+    <value>Sub Status</value>
+  </data>
+  <data name="Label_DamageDate" xml:space="preserve">
+    <value>Received Date</value>
+  </data>
+  <data name="Label_DamageTime" xml:space="preserve">
+    <value>Damage Time</value>
+  </data>
+  <data name="Label_ReleatedTo" xml:space="preserve">
+    <value>Related To</value>
+  </data>
+  <data name="Label_Agreement" xml:space="preserve">
+    <value>Agreement</value>
+  </data>
+  <data name="Label_Movement" xml:space="preserve">
+    <value>Movement</value>
+  </data>
+  <data name="Label_AgreementId" xml:space="preserve">
+    <value>Agreement Id</value>
+  </data>
+  <data name="Label_VehicleMovement" xml:space="preserve">
+    <value>Vehicle Movement</value>
+  </data>
+  <data name="filepondDragDrop" xml:space="preserve">
+    <value>Drag &amp; Drop files here</value>
+  </data>
+  <data name="Label_RTS_Type" xml:space="preserve">
+    <value>RTS Type</value>
+  </data>
+  <data name="NewReservation" xml:space="preserve">
+    <value>New Reservation</value>
+  </data>
+  <data name="Label_DurationHour" xml:space="preserve">
+    <value>Duration (hour)</value>
+  </data>
+  <data name="Label_VehicleName" xml:space="preserve">
+    <value>Vehicle</value>
+  </data>
+  <data name="Label_MovementDate" xml:space="preserve">
+    <value>Movement Date</value>
+  </data>
+  <data name="Label_MovementList" xml:space="preserve">
+    <value>Movement List</value>
+  </data>
+  <data name="Label_ExitBranch" xml:space="preserve">
+    <value>Exit Branch</value>
+  </data>
+  <data name="Label_ReceivedBranch" xml:space="preserve">
+    <value>Received Branch</value>
+  </data>
+  <data name="Button_View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Label_MovementIn" xml:space="preserve">
+    <value>Movement In</value>
+  </data>
+  <data name="Label_VehiclesList" xml:space="preserve">
+    <value>Vehicles List</value>
+  </data>
+  <data name="Label_ReceivedMeter" xml:space="preserve">
+    <value>Received Meter</value>
+  </data>
+  <data name="Label_RegularMaintenance" xml:space="preserve">
+    <value>Regular Maintenance</value>
+  </data>
+  <data name="Label_CustomerName" xml:space="preserve">
+    <value>Customer Name</value>
+  </data>
+  <data name="Label_PhoneNo" xml:space="preserve">
+    <value>Phone No.</value>
+  </data>
+  <data name="Label_Dateformat" xml:space="preserve">
+    <value>Date format</value>
+  </data>
+  <data name="Label_ReceivedTime" xml:space="preserve">
+    <value>Received Time</value>
+  </data>
+  <data name="Label_Driver" xml:space="preserve">
+    <value>Driver</value>
+  </data>
+  <data name="Label_VehicleSubStatus" xml:space="preserve">
+    <value>Vehicle Sub Status</value>
+  </data>
+  <data name="Label_AddVehiclePhoto" xml:space="preserve">
+    <value>Add vehicle photo(s)</value>
+  </data>
+  <data name="Label_Upload" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="Label_AllowedExtensions" xml:space="preserve">
+    <value>Allowed extensions</value>
+  </data>
+  <data name="Label_MaintenanceTypes" xml:space="preserve">
+    <value>Maintenance Types</value>
+  </data>
+  <data name="Label_WorkOrder" xml:space="preserve">
+    <value>Work Order</value>
+  </data>
+  <data name="Label_AccidentNo" xml:space="preserve">
+    <value>Accident No.</value>
+  </data>
+  <data name="Label_IsMechanicCheck" xml:space="preserve">
+    <value>Mechanic Check</value>
+  </data>
+  <data name="Label_Undo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="Label_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Label_EmployeeSignature" xml:space="preserve">
+    <value>Employee Signature</value>
+  </data>
+  <data name="Label_DriverSignature" xml:space="preserve">
+    <value>Driver Signature</value>
+  </data>
+  <data name="Label_ResetSignature" xml:space="preserve">
+    <value>Reset Signature</value>
+  </data>
+  <data name="Label_Button_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Label_SuccessTitle" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Label_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Label_Morethan" xml:space="preserve">
+    <value>More than</value>
+  </data>
+  <data name="Label_selectVehicle" xml:space="preserve">
+    <value>Select Vehicle</value>
+  </data>
+  <data name="Label_ChooseVehicle" xml:space="preserve">
+    <value>Choose a vehicle</value>
+  </data>
+  <data name="Label_ChooseMovementType" xml:space="preserve">
+    <value>Choose movement type</value>
+  </data>
+  <data name="Label_AddFilesForVehicle" xml:space="preserve">
+    <value>Add files for the vehicle</value>
+  </data>
+  <data name="Label_OdometerMustMatchTheVreviousReadingOrExceedsIt" xml:space="preserve">
+    <value>Odometer must match the previous reading or exceed it</value>
+  </data>
+  <data name="Label_KiloMeter" xml:space="preserve">
+    <value>Kilometer</value>
+  </data>
+  <data name="Label_DoneSuccessfully" xml:space="preserve">
+    <value>Done successfully</value>
+  </data>
+  <data name="Label_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Label_WorkOrderMaintenance" xml:space="preserve">
+    <value>Work Order Maintenance</value>
+  </data>
+  <data name="Label_Hijri" xml:space="preserve">
+    <value>Hijri</value>
+  </data>
+  <data name="Label_Gregorian" xml:space="preserve">
+    <value>Gregorian</value>
+  </data>
+  <data name="SelectThisVehicle" xml:space="preserve">
+    <value>Select This Vehicle</value>
+  </data>
+  <data name="Label_DeepScratch" xml:space="preserve">
+    <value>Deep Scratch</value>
+  </data>
+  <data name="Label_SmallScratch" xml:space="preserve">
+    <value>Small Scratch</value>
+  </data>
+  <data name="Label_VeryDeepScratch" xml:space="preserve">
+    <value>Very Deep Scratch</value>
+  </data>
+  <data name="Label_BendInBody" xml:space="preserve">
+    <value>Bend in Body</value>
+  </data>
+  <data name="Label_DatePlaceholder" xml:space="preserve">
+    <value>YYYY-MM-DD</value>
+  </data>
+  <data name="N_A" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="Label_Branch" xml:space="preserve">
+    <value>Branch</value>
+  </data>
+  <data name="Label_LastMaintenance" xml:space="preserve">
+    <value>Last Maintenance</value>
+  </data>
+  <data name="Label_Insured" xml:space="preserve">
+    <value>Insured</value>
+  </data>
+  <data name="Title_BreakLogs" xml:space="preserve">
+    <value>Idle Logs</value>
+  </data>
+  <data name="Label_Started At" xml:space="preserve">
+    <value>Started At</value>
+  </data>
+  <data name="Label_NoHistory" xml:space="preserve">
+    <value>No history for today</value>
+  </data>
+  <data name="Label_Idle" xml:space="preserve">
+    <value>Idle</value>
+  </data>
+  <data name="Button_Logs" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <data name="Button_Idle" xml:space="preserve">
+    <value>Idle</value>
+  </data>
+  <data name="Text_Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="Text_NoLogsFound" xml:space="preserve">
+    <value>No logs found for this record.</value>
+  </data>
+  <data name="Text_LoadError" xml:space="preserve">
+    <value>Failed to load logs.</value>
+  </data>
+  <data name="Col_ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Col_Reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="Col_Note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="Col_Hint" xml:space="preserve">
+    <value>Hint</value>
+  </data>
+  <data name="Col_Period" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="Col_StartDate" xml:space="preserve">
+    <value>Start (Date)</value>
+  </data>
+  <data name="Col_EndDate" xml:space="preserve">
+    <value>End (Date)</value>
+  </data>
+  <data name="DT_Search" xml:space="preserve">
+    <value>Search:</value>
+  </data>
+  <data name="DT_SearchPlaceholder" xml:space="preserve">
+    <value>Search history...</value>
+  </data>
+  <data name="DT_EmptyTable" xml:space="preserve">
+    <value>No data available in table</value>
+  </data>
+  <data name="DT_Info" xml:space="preserve">
+    <value>Showing _START_ to _END_ of _TOTAL_ entries</value>
+  </data>
+  <data name="DT_InfoEmpty" xml:space="preserve">
+    <value>Showing 0 to 0 of 0 entries</value>
+  </data>
+  <data name="DT_InfoFiltered" xml:space="preserve">
+    <value>(filtered from _MAX_ total entries)</value>
+  </data>
+  <data name="DT_LengthMenu" xml:space="preserve">
+    <value>Show _MENU_ entries</value>
+  </data>
+  <data name="DT_LoadingRecords" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="DT_Processing" xml:space="preserve">
+    <value>Processing...</value>
+  </data>
+  <data name="DT_ZeroRecords" xml:space="preserve">
+    <value>No matching records found</value>
+  </data>
+  <data name="DT_Paginate_First" xml:space="preserve">
+    <value>First</value>
+  </data>
+  <data name="DT_Paginate_Last" xml:space="preserve">
+    <value>Last</value>
+  </data>
+  <data name="DT_Paginate_Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="DT_Paginate_Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Booked_Reservation" xml:space="preserve">
+    <value>Reservation has been successfully booked.</value>
+  </data>
+  <data name="Reservation_Cancelation" xml:space="preserve">
+    <value>Are you sure you want to cancel this reservation?</value>
+  </data>
+  <data name="Reservation_Cancelation_Header" xml:space="preserve">
+    <value>Cancel Reservation?</value>
+  </data>
+  <data name="Reservation_Canceled" xml:space="preserve">
+    <value>Reservation has been cancelled.</value>
+  </data>
+  <data name="Button_CreateWorkorder" xml:space="preserve">
+    <value>Create Workorder</value>
+  </data>
+  <data name="Button_Book" xml:space="preserve">
+    <value>Book</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="Week" xml:space="preserve">
+    <value>Week</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Month</value>
+  </data>
+  <data name="Hi" xml:space="preserve">
+    <value>Hi</value>
+  </data>
+  <data name="WelcomeMessage" xml:space="preserve">
+    <value>Welcome to Workshop System. On this page, you can go to any page in the system in an easy and very convenient way.</value>
+  </data>
+  <data name="ScreenShortcuts" xml:space="preserve">
+    <value>Screen Shortcuts</value>
+  </data>
+  <data name="AccountDefinition" xml:space="preserve">
+    <value>Account Definition</value>
+  </data>
+  <data name="ExternallyTransportedVehicle" xml:space="preserve">
+    <value>External Vehicle Transportation</value>
+  </data>
+  <data name="Label_Recall" xml:space="preserve">
+    <value>Recall</value>
+  </data>
+  <data name="Label_AddNew" xml:space="preserve">
+    <value>Add New</value>
+  </data>
+  <data name="Label_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Label_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Label_RecallDefinition" xml:space="preserve">
+    <value>Recall Definition</value>
+  </data>
+  <data name="Label_Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Label_StartDate" xml:space="preserve">
+    <value>Start Date</value>
+  </data>
+  <data name="Label_EndDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="Label_ImportExcel" xml:space="preserve">
+    <value>Import Excel</value>
+  </data>
+  <data name="Label_Chassis" xml:space="preserve">
+    <value>Chassis</value>
+  </data>
+  <data name="Label_NoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+  <data name="Label_Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Label_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Label_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Label_FilepondIdle" xml:space="preserve">
+    <value>Drag &amp; drop an Excel file here or &lt;span class='filepond--label-action'&gt;Browse&lt;/span&gt;</value>
+  </data>
+  <data name="Validation_FileTypeExcel" xml:space="preserve">
+    <value>Excel files only</value>
+  </data>
+  <data name="Validation_FileRequired" xml:space="preserve">
+    <value>Please select a file</value>
+  </data>
+  <data name="Validation_Required" xml:space="preserve">
+    <value>This field is required</value>
+  </data>
+  <data name="Validation_DateRange" xml:space="preserve">
+    <value>End date must be after start date</value>
+  </data>
+  <data name="Validation_GridRequired" xml:space="preserve">
+    <value>Please complete the required fields in the table</value>
+  </data>
+  <data name="Validation_GridEmpty" xml:space="preserve">
+    <value>The table has no data</value>
+  </data>
+  <data name="ServiceReminderStatus" xml:space="preserve">
+    <value>Service Reminder Status</value>
+  </data>
+  <data name="Scheduled" xml:space="preserve">
+    <value>Scheduled</value>
+  </data>
+  <data name="DueSoon" xml:space="preserve">
+    <value>Due Soon</value>
+  </data>
+  <data name="Overdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="ServiceReminder" xml:space="preserve">
+    <value>Service Reminders</value>
+  </data>
+  <data name="AddServiceReminderRule" xml:space="preserve">
+    <value>Add Service Reminder Rule</value>
+  </data>
+  <data name="Manufacturer" xml:space="preserve">
+    <value>Manufacturer</value>
+  </data>
+  <data name="Label_TimeDuo" xml:space="preserve">
+    <value>Time Due</value>
+  </data>
+  <data name="Label_PrimaryMeterInterval" xml:space="preserve">
+    <value>Primary Meter Interval</value>
+  </data>
+  <data name="Label_PrimaryMeterDue" xml:space="preserve">
+    <value>Primary Meter Due</value>
+  </data>
+  <data name="Manually" xml:space="preserve">
+    <value>Manually</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="SuccessTitle" xml:space="preserve">
+    <value>Done successfully</value>
+  </data>
+  <data name="ErrorHappened" xml:space="preserve">
+    <value>An error occurred</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="SwalDeleteCancel" xml:space="preserve">
+    <value>No, cancel</value>
+  </data>
+  <data name="FromNow" xml:space="preserve">
+    <value>from now</value>
+  </data>
+  <data name="Ago" xml:space="preserve">
+    <value>ago</value>
+  </data>
+  <data name="Every" xml:space="preserve">
+    <value>Every</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="NotificationsDescription" xml:space="preserve">
+    <value>If ON, and the user has Notification Settings enabled for Service Reminders, the user will receive a notification at 7:00 am once the reminder becomes Due Soon or Overdue, and then weekly until resolved.</value>
+  </data>
+  <data name="Unit_Kilometer" xml:space="preserve">
+    <value>km</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Placeholder_SelectManufacturer" xml:space="preserve">
+    <value>-- Select Manufacturer --</value>
+  </data>
+  <data name="Placeholder_SelectVehicle" xml:space="preserve">
+    <value>-- Select Vehicle --</value>
+  </data>
+  <data name="Placeholder_SelectModel" xml:space="preserve">
+    <value>-- Select Model --</value>
+  </data>
+  <data name="Placeholder_SelectService" xml:space="preserve">
+    <value>-- Select Service --</value>
+  </data>
+  <data name="Placeholder_Select" xml:space="preserve">
+    <value>-- Select --</value>
+  </data>
+  <data name="Placeholder_SelectTimeIntervalUnit" xml:space="preserve">
+    <value>-- Select Time Interval Unit --</value>
+  </data>
+  <data name="Placeholder_SelectVehicleClass" xml:space="preserve">
+    <value>-- Select Vehicle Class --</value>
+  </data>
+  <data name="RequiredField" xml:space="preserve">
+    <value>This field is required</value>
+  </data>
+  <data name="TransferDate" xml:space="preserve">
+    <value>Transfer Date</value>
+  </data>
+  <data name="ExpectedReturnDate" xml:space="preserve">
+    <value>Expected Return Date</value>
+  </data>
+  <data name="Label_Groups" xml:space="preserve">
+    <value>Groups</value>
+  </data>
+  <data name="Label_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Label_CreateJobCard" xml:space="preserve">
+    <value>Create Job Card</value>
+  </data>
+  <data name="Label_MovementOut" xml:space="preserve">
+    <value>Movement Out</value>
+  </data>
+  <data name="Label_TimeRange" xml:space="preserve">
+    <value>Time Range</value>
+  </data>
+  <data name="Label_BreakTimeRange" xml:space="preserve">
+    <value>Break Time Range</value>
+  </data>
+  <data name="Label_PrimaryDescription" xml:space="preserve">
+    <value>Description (EN)</value>
+  </data>
+  <data name="Label_SecondaryDescription" xml:space="preserve">
+    <value>Description (AR)</value>
+  </data>
+  <data name="Hint_desc" xml:space="preserve">
+    <value>Break time is excluded from job time.</value>
+  </data>
+  <data name="Label_Confirmed" xml:space="preserve">
+    <value>Confirmed</value>
+  </data>
+  <data name="Label_Under_Repair" xml:space="preserve">
+    <value>Under Repair</value>
+  </data>
+  <data name="Label_Tax" xml:space="preserve">
+    <value>Tax</value>
+  </data>
+  <data name="SalesType" xml:space="preserve">
+    <value>Sales Type</value>
+  </data>
+  <data name="DiscountLabor" xml:space="preserve">
+    <value>Discount Labor</value>
+  </data>
+  <data name="DiscountParts" xml:space="preserve">
+    <value>Discount Parts</value>
+  </data>
+  <data name="GeneralRequest" xml:space="preserve">
+    <value>General Request</value>
+  </data>
+  <data name="TransferVehicle" xml:space="preserve">
+    <value>Transfer Vehicle</value>
+  </data>
+  <data name="Title_Labours" xml:space="preserve">
+    <value>Labours</value>
+  </data>
+  <data name="NoPartsHistoryFound" xml:space="preserve">
+    <value>No Parts History Found</value>
+  </data>
+  <data name="NoLabourHistoryFound" xml:space="preserve">
+    <value>No Labours History Found</value>
+  </data>
+  <data name="Label_ShortDescription" xml:space="preserve">
+    <value>Short Description</value>
+  </data>
+  <data name="Label_Locator" xml:space="preserve">
+    <value>Locator</value>
+  </data>
+  <data name="Label_Unit" xml:space="preserve">
+    <value>Unit</value>
+  </data>
+  <data name="Label_RequestQuantity" xml:space="preserve">
+    <value>Request Qty</value>
+  </data>
+  <data name="Label_UsedQuantity" xml:space="preserve">
+    <value>Used Qty</value>
+  </data>
+  <data name="Label_Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="ManualDate" xml:space="preserve">
+    <value>Manual Date</value>
+  </data>
+  <data name="Label_ ManualMeterInterval" xml:space="preserve">
+    <value>Manual Meter Interval</value>
+  </data>
+  <data name="Label_Maintenance" xml:space="preserve">
+    <value>Maintenance</value>
+  </data>
+  <data name="Label_Rented" xml:space="preserve">
+    <value>Rented</value>
+  </data>
+  <data name="Label_StaffService" xml:space="preserve">
+    <value>Staff Service</value>
+  </data>
+  <data name="Label_Complementry" xml:space="preserve">
+    <value>Complimentary</value>
+  </data>
+  <data name="Label_ExitTime" xml:space="preserve">
+    <value>Exit Time</value>
+  </data>
+  <data name="Label_FuelLevel" xml:space="preserve">
+    <value>Fuel Level</value>
+  </data>
+  <data name="Label_ExpectedReturnDate" xml:space="preserve">
+    <value>Expected Return Date</value>
+  </data>
+  <data name="Label_ExpectedReturnTime" xml:space="preserve">
+    <value>Expected Return Time</value>
+  </data>
+  <data name="Label_ExitMeter" xml:space="preserve">
+    <value>Exit Meter</value>
+  </data>
+  <data name="Label_PartSublet" xml:space="preserve">
+    <value>Part Sublet</value>
+  </data>
+  <data name="Label_ApproveAll" xml:space="preserve">
+    <value>Approve All</value>
+  </data>
+  <data name="Label_Reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="Label_PartApproved" xml:space="preserve">
+    <value>Part Approved Successfully!</value>
+  </data>
+  <data name="Label_PartReject" xml:space="preserve">
+    <value>Part Rejected Successfully!</value>
+  </data>
+  <data name="Label_PartReceived" xml:space="preserve">
+    <value>Part Received Successfully!</value>
+  </data>
+  <data name="ActiveReservationExists" xml:space="preserve">
+    <value>This vehicle already has an active reservation.</value>
+  </data>
+  <data name="Label_Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Label_PartTransferReq" xml:space="preserve">
+    <value>Transfer Request has been Sent</value>
+  </data>
+  <data name="Discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+	<data name="Label_Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+	<data name="Label_Class" xml:space="preserve">
+    <value>Class</value>
+  </data>
+</root>

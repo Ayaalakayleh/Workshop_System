@@ -1,0 +1,195 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.ReservationListItemDTO>
+@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+@using Workshop.Domain.Enum
+@inject IStringLocalizer<Common> Common
+
+@{
+    var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+
+<table class="table main-table table-borderless">
+    <thead>
+        <tr class="text-muted">
+            <th>@Common["Label_Date"]</th>
+            <th>@Common["Label_Vehicle"]</th>
+            <th>@Common["Label_Time"]</th>
+            <th>@Common["Label_DurationHour"]</th>
+            <th>@Common["Label_Status"]</th>
+            <th>@Common["Label_CreatedBy"]</th>
+            <th>@Common["Label_Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Date.ToString("MM/dd/yyyy")</td>
+                    <td>@item.Plate_Number</td>
+                    <td>@item.Start_Time.ToString(@"hh\:mm") - @item.End_Time.ToString(@"hh\:mm")</td>
+                    <td>@item.Duration</td>
+                    <td>@(lang == "ar" ? item.StatusSecondaryName : item.StatusPrimaryName)</td>
+                    <td>@item.CreatedBy</td>
+                    <td class="actions-cell">
+                        @{
+                            var hasAction = false;
+                        }
+
+                        @* Book *@
+                        @if (item.Status == (int)ReservationStatus.New)
+                        {
+                            hasAction = true;
+                            <button class="btn btn-sm btn-primary btn-book reservations-button"
+                                    title="@Common["Button_Book"]"
+                                    data-reservationid="@item.Id"
+                                    data-statusid="@((int)ReservationStatus.Booked)">
+                                <i class="fad fa-check-circle"></i>&nbsp;@Common["Label_Confirm"]
+                            </button>
+                        }
+                        @* Create Workorder *@
+                        else if (item.Status == (int)ReservationStatus.Booked)
+                        {
+                            hasAction = true;
+                            <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId })"
+                               class="btn btn-sm btn-success reservations-button"
+                               title="@Common["Label_MovementIn"]">
+                                <i class="fad fa-clipboard-list"></i>&nbsp;@Common["Label_MovementIn"]
+                            </a>
+                        }
+
+                        @* Cancel (hide for Completed/Canceled) *@
+                        @if (item.Status != (int)ReservationStatus.Completed && item.Status != (int)ReservationStatus.Canceled)
+                        {
+                            hasAction = true;
+                            <button class="btn btn-sm btn-danger btn-cancel reservations-button"
+                                    title="@Common["Button_Cancel"]"
+                                    data-reservationid="@item.Id"
+                                    data-statusid="@((int)ReservationStatus.Canceled)">
+                                <i class="fad fa-times-circle"></i>&nbsp;@Common["Button_Cancel"]
+                            </button>
+                        }
+
+                        @* If no actions were rendered, drop a placeholder to equalize row height *@
+                        @if (!hasAction)
+                        {
+                            <span class="action-placeholder"></span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-end">
+    <div id="contentPager" class="mt-3"></div>
+    <input type="hidden" id="total_pages" value="@(ViewBag.TotalPages ?? 1)" />
+    <input type="hidden" id="current_page" value="@(ViewBag.CurrentPage ?? 1)" />
+</div>
+<script>
+    let currentPage = Number($('#current_page').val() || 1);
+
+    function initPager(page = 1) {
+        currentPage = page;
+
+        // Your plugin init — keep as-is; classes differ by plugin,
+        // CSS above covers both `.simple-pagination` and `.pagination`.
+        $('#contentPager').pagination({
+            items: Number($("#total_pages").val() || 1),
+            itemOnPage: 25,
+            currentPage: page,
+            prevText: '&laquo;',
+            nextText: '&raquo;',
+            onPageClick: function (pageClicked) {
+                currentPage = pageClicked;
+                getData(pageClicked);
+            }
+        });
+    }
+
+    $(function () {
+        initPager(currentPage);
+    });
+
+    // BOOK
+    $(document).off('click', '.btn-book').on('click', '.btn-book', function () {
+        const reservationId = $(this).data('reservationid');
+        const statusId = $(this).data('statusid');
+
+        $.ajax({
+            url: '@Url.Action("UpdatedReservationStatus", "Reservations")',
+            type: 'POST',
+            data: {
+                ReservationId: reservationId,
+                StatusId: statusId,
+                UpdatedBy: 1
+            },
+            success: function (res) {
+                if (res.success) {
+
+
+                    Swal.fire({
+                                    title: '@Common["Booked_Reservation"]',
+            icon: 'success',
+            confirmButtonText: '@Common["Ok"]',
+                    });
+
+                     $('#btnSearch').click();
+                } else {
+                    Swal.fire('Error', res.message || 'Failed to update reservation.', 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Server error occurred.', 'error');
+            }
+        });
+    });
+
+    // CANCEL
+    $(document).off('click', '.btn-cancel').on('click', '.btn-cancel', function () {
+        const reservationId = $(this).data('reservationid');
+
+        Swal.fire({
+            title: '@Html.Raw(@Common["Reservation_Cancelation_Header"])',
+            text: '@Html.Raw(@Common["Reservation_Cancelation"])',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '@Common["SwalDeleteConfirm"]',
+            cancelButtonText: '@Common["swalDeleteNo"]'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("UpdatedReservationStatus", "Reservations")',
+                    type: 'POST',
+                    data: {
+                        ReservationId: reservationId,
+                        StatusId: @((int)ReservationStatus.Canceled),
+                        UpdatedBy: 1
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                                                Swal.fire({
+                                    title: '@Common["Cancelled"]',
+            icon: 'success',
+            confirmButtonText: '@Common["Ok"]',
+                    });
+                            //getData(currentPage);
+                            $('#btnSearch').click();
+
+                        } else {
+                            Swal.fire('Error', res.message || 'Failed to cancel reservation.', 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Server error occurred.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    // If getData(page) returns new HTML that includes the pager fields,
+    // be sure to call initPager(page) after injecting the HTML.
+</script>

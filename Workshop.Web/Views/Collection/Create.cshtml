@@ -1,0 +1,522 @@
+﻿@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.ExternalWorkshopExp.MExternalWorkshopExpDTO
+
+@using Microsoft.Extensions.Localization
+@using Newtonsoft.Json
+@using Workshop.Resources
+@{
+    ViewBag.Title = Common["External_Workshop_Exp"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lang = "en";
+
+}
+@using (Html.BeginForm("Create", "Collection", FormMethod.Post, new { enctype = "multipart/form-data", @id = "form" }))
+{
+    @Html.HiddenFor(model => model.External_Workshop_ExpjsonList);
+    @Html.AntiForgeryToken();
+
+    <style>
+        #Clear {
+            display: none
+        }
+
+        .the-loader {
+            display: none;
+            border: 6px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 6px solid #3498db;
+            width: 40px;
+            height: 40px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        /* Safari */
+        @@-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <div class="row">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2>@Common["ExternalWorkshopMaintenanceInvoice"]</h2>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">@Common["ExternalWorkshop"]<span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.ExternalWorkshopId, (IEnumerable<SelectListItem>)ViewBag.ExternalWorkshopList, Common["Select"], new { @class = "form-control select2 " })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">@Common["Label_InvoiceType"]<span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.InvoiceTypeId, new SelectList(Model.InvoiceType, "Id", lang == "en" ? "PrimaryName" : "SecondaryName"), Common["Select"], new { @class = "form-control select2" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">@Common["Label_ExcelDate"]</label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(model => model.Excel_Date, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">@Common["Label_UploadFile"]</label>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="fileInput" accept=".xlsx, .xls">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" id="BrowseFile" type="button"> @Common["Browse"]</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">@Common["Label_DownloadTemplate"]</label>
+                                    <div class="input-group">
+                                        <button class="btn btn-primary btn-w-m" type="button" id="Download"><i class="fa fa-save"></i>&nbsp;@Common["Button_Download"]</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <hr />
+                        <div class="table-scroll-horizontal">
+                            <table id="price-list-table" class="table table-bordered table-hover w-100 text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            @Common["Label_Id"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_InvoiceNo"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Location"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Date"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_PlateNumber"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_BusinessLine"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Milage"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Maker"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Model"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Year"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_ServiceType"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Quantity"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Price"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_SubTotalBeforVat"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Vat"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Total"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Description"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_ErrorReason"]
+                                        </th>
+                                        <th>
+                                            @Common["Label_Actions"]
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-primary btn-w-m" id="Save" hidden><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+                            <button class="btn btn-primary btn-w-m" id="Check" type="button"><i class="fa fa-check"></i>&nbsp;@Common["Button_Check"]</button>
+                            <button class="btn btn-primary btn-w-m" id="Clear"><i class="fa fa-history"></i>&nbsp;@Common["Button_ClearFields"]</button>
+                            <a href="@Url.Action("Index", "Collection")" class="btn btn-secondary btn-w-m"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Button_BackToList"]</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+
+          var jsonData = @Html.Raw(JsonConvert.SerializeObject(Model.DExternalWorkshopExp));
+
+    $(document).ready(function () {
+
+        $("#Download").click(function () {
+
+            var _Prvider_Name = $("#ExternalWorkshopId option:selected").val();
+            if (_Prvider_Name != '' || _Prvider_Name != 0) {
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("DownloadTemplate", "Collection")' + '?WorkShopId=' + _Prvider_Name,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: {}
+                }).done(function (result) {
+                    var link = document.createElement('a');
+                    link.href = result ;
+                    link.download = $("#ExternalWorkshopId option:selected").text();
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+
+
+            } else {
+                    Swal.fire("@Common["Error"]", "@Common["Please Select WS"]");
+                    return false;
+                }
+            });
+            $("#BrowseFile").click(function () {
+
+                //if ($("#form").valid()) {
+
+                    var formData = new FormData();
+                    var file = $('#fileInput')[0].files[0];
+                    if(!file)
+                        return;
+
+                    formData.append('file', file);
+
+                    var _Prvider_Name = $("#ExternalWorkshopId option:selected").val();
+                    formData.append('WorkshopId', _Prvider_Name);
+                    formData.append('InvoiceTypeId', $("#InvoiceTypeId").val());
+
+                    $.ajax({
+                        url: '@Url.Action("ImportExcel", "Collection")',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data.success == true) {
+
+                                jsonData = data.data;
+                                apppendTable();
+                            } else {
+                                Swal.fire("@Common["Error"]", data.message);
+                            }
+                            $("#Save").attr("hidden", true);
+
+                        },
+
+                        error: function (xhr, textStatus, errorThrown) {
+                        }
+                    });
+
+
+                // } else {
+                //     swal("@Common["PleaseEnterData"]", "", "error");
+                //     return false;
+                // }
+            });
+
+
+        });
+
+    // $('#form').validate({
+    //     rules: {
+    //         ExternalWorkshopId: 'required',
+    //         Excel_Date: 'required',
+    //         InvoiceTypeId:'required',
+    //     },
+    //     messages: {
+    //         ExternalWorkshopId: '@Common["RequiredField"]',
+    //         Excel_Date: '@Common["RequiredField"]',
+    //         InvoiceTypeId: '@Common["RequiredField"]',
+
+    //     },
+    // });
+    $("#Save").click(function (e) {
+
+        $(".errorReason").html("");
+        if ($("#form").valid()) {
+            const table = document.getElementById('price-list-table');
+            const rows = table.querySelectorAll('tr');
+            if (rows.length > 1) {
+                $('#Save').prop('disabled', true);
+                e.preventDefault();
+                e.stopPropagation();
+                GetTableData();
+                //turn off the loader
+
+                $('#form').submit();
+                $(".the-car-loader").hide();
+                $(".the-loader").show();
+
+            } else {
+                Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+                return false;
+            }
+
+        }
+        else {
+            Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+            return false;
+        }
+
+    });
+
+    $("#form").submit(function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var data = new FormData(this);
+
+        $.ajax({
+            url: '@Url.Action("Create", "Collection")',
+            type: 'POST',
+            data: data,
+            dataType: 'JSON',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+
+                if (data.isSuccess == true) {
+                        Swal.fire({
+                        icon: 'success',
+                        title: "@Common["Success"]",
+                        confirmButtonText: "@Common["Ok"]",
+                        confirmButtonColor: 'var(--primary-600)',
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        window.location.href = "@Url.Action("Index", "Collection")";
+                    });
+                } else {
+                    Swal.fire("@Common["Error"]", data.message);
+                }
+
+            },
+
+            error: function () {
+                Swal.fire("@Common["Error"]", "@Common["Error Happend"]");
+            }
+        });
+    });
+
+
+    function CreateOrEditSuccess(data) {
+        jsonData = data.Data;//fault data list
+        var resultsuccess = data.DataList[0];
+        var resultfault = data.DataList[1];
+        var IsSuccess = data.IsSuccess;
+
+        $.each(JSON.parse(resultsuccess), function (index, item) {
+            $("#ck_"+item).html("<i class='fas fa-check text-success'></i>");
+        })
+
+        $.each(JSON.parse(resultfault), function (index, item) {
+            $("#ck_" + item).html("<i class='fas fa-times text-danger'></i>");
+        })
+
+        if (IsSuccess) {
+            Swal.fire("@Common["Success"]", "@Common["DoneSuccessfully"]");
+           // $(".check-or-uncheck").html("<i class='fas fa-check text-success'></i>");
+            $(".btn.btn-danger").attr("disabled", "disabled");
+            $("#Save").attr("hidden", true);
+            $("#Clear").show();
+
+        } else {
+            Swal.fire("@Common["Error"]", data.message);
+        }
+    }
+    $("#Clear").click(function () {
+        window.location.reload();
+    });
+    function apppendTable() {
+        var table = $('#price-list-table tbody');
+
+        $('#price-list-table tbody').empty();
+        $.each(jsonData, function (index, item) {
+            var row = $('<tr>');
+            row.append('<td contenteditable="false" hidden>' +index+ '</td>');
+            row.append('<td id="ck_'+index+ '"class="check-or-uncheck" contenteditable="false"><div class="the-loader"></div></td>');
+            row.append('<td contenteditable="true">' + item.Invoice_No + '</td>');
+            row.append('<td contenteditable="true">' + item.City + '</td>');
+            row.append('<td contenteditable="true">' + (item.Invoice_Date ? item.Invoice_Date : '') + '</td>');
+            row.append('<td contenteditable="true">' + item.License_Plate_No + '</td>');
+            row.append('<td contenteditable="true">' + item.Business_Line + '</td>');
+            row.append('<td contenteditable="true">' + item.MILAGE + '</td>');
+            row.append('<td contenteditable="true">' + item.Maker + '</td>');
+            row.append('<td contenteditable="true">' + item.Model + '</td>');
+            row.append('<td contenteditable="true">' + item.Year + '</td>');
+            row.append('<td contenteditable="true">' + item.Service_Type + '</td>');
+            row.append('<td contenteditable="true">' + item.Quantity + '</td>');
+            row.append('<td contenteditable="true">' + (item.Price ? item.Price.toFixed(2) : '') + '</td>');
+            row.append('<td contenteditable="true">' + (item.SubTotal_BeforVat ? item.SubTotal_BeforVat.toFixed(2) : '') + '</td>');
+            row.append('<td contenteditable="true">' + (item.Vat ? item.Vat.toFixed(2) : '') + '</td>');
+            row.append('<td contenteditable="true">' + (item.Total ? item.Total.toFixed(2) : '' )+ '</td>');
+            row.append('<td contenteditable="true">' + item.Description + '</td>');
+            row.append('<td class="errorReason" id="cr_' + index + '" contenteditable="true"></td>');
+            row.append('<td><button type="button" class="btn btn-danger btn-w-m btn-sm delete"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button></td>');
+            table.append(row);
+        });
+        $("#price-list-table tbody").on("click", ".delete", function () {
+            $(this).closest("tr").remove();
+        });
+    }
+    function GetTableData() {
+        const table = document.getElementById('price-list-table');
+        //   table.remove();
+        const rows = table.querySelectorAll('tr');
+        const jsonData = [];
+        rows.forEach((row, rowIndex) => {
+            if (rowIndex === 0) return;
+            const cells = row.querySelectorAll('td');
+            const rowData = {};
+            rowData['ID'] = cells[0].textContent;
+            rowData['Invoice_No'] = cells[2].textContent;
+            rowData['City'] = cells[3].textContent;
+            var date = cells[4].textContent;
+            var dateString = date.replaceAll('-', '/');
+            //var parts = dateString.split('/');
+            rowData['Invoice_Date'] = date;//parts[2] + '-' + parts[1] + '-' + parts[0];
+            rowData['License_Plate_No'] = cells[5].textContent;
+            rowData['Business_Line'] = cells[6].textContent;
+            rowData['MILAGE'] = parseInt(cells[7].textContent);
+            rowData['Maker'] = cells[8].textContent;
+            rowData['Model'] = cells[9].textContent;
+            rowData['Year'] = cells[10].textContent;
+            rowData['Service_Type'] = cells[11].textContent;
+            rowData['Quantity'] = parseInt(cells[12].textContent);
+            rowData['Price'] = parseFloat(cells[13].textContent);
+            rowData['SubTotal_BeforVat'] = parseFloat(cells[14].textContent);
+            rowData['Vat'] = parseFloat(cells[15].textContent);
+            rowData['Total'] = parseFloat(cells[16].textContent);
+            rowData['Description'] = cells[17].textContent;
+            rowData['WorkOrderId'] = 0;
+
+            jsonData.push(rowData);
+        });
+        $('#External_Workshop_ExpjsonList').val(JSON.stringify(jsonData));
+        //return ;
+
+        //console.log(jsonString);
+    }
+
+</script>
+
+
+<script>
+
+    $("#Check").click(function () {
+        $(".errorReason").html("");
+        if ($("#form").valid()) {
+
+            const table = document.getElementById('price-list-table');
+            const rows = table.querySelectorAll('tr');
+            if (rows.length > 1) {
+
+
+
+
+                GetTableData();
+
+                var formData = new FormData($('#form')[0]);
+
+                    $.ajax({
+                        url: '@Url.Action("CheckExcel", "Collection")',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+
+                            let errorsList = [];
+                            if (data.length > 0) { // has errors
+                                $.each(data, function (index, item) {
+                                    if (item.Errors.length == 0) { // no errors
+                                        $("#ck_" + item.Id).html("<i class='fas fa-check text-success'></i>");
+                                    } else { // has errors
+                                        $("#ck_" + item.Id).html("<i class='fas fa-times text-danger'></i>");
+                                        var list = $('<ul class="text-danger"/>').appendTo("#cr_" + item.Id);
+                                        $.each(item.Errors, function (index, items) {
+                                            list.append("<li>"+items+"</li>");
+                                        })
+                                        errorsList.push(item);
+                                    }
+                                })
+                                if (errorsList.length == 0) {
+                                    $("#Save").attr("hidden", false);
+
+                                }
+
+                            } else { // no errors
+                                $("#Save").attr("hidden", false);
+
+                            }
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            Swal.fire("@Common["Error"]", "@Common["Error Happend"]");
+                            $("#Save").attr("hidden", false);
+
+                        }
+                    });
+
+                $(".the-car-loader").hide();
+                $(".the-loader").show();
+
+            } else {
+                Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+            }
+        }
+        else {
+            Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+        }
+    })
+
+</script>
+<script src="~/js/site.js"></script>

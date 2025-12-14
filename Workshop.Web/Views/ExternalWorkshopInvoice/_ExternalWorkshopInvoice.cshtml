@@ -1,0 +1,120 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model Workshop.Core.DTOs.ExternalWorkshopInvoiceDTO
+
+@Html.HiddenFor(a => a.VatRate)
+@if (Model.ExternalWorkshopInvoiceDetails != null)
+{
+
+	<table id="payment-method-table" class="table table-bordered table-hover w-100 text-center">
+		<thead>
+			<tr>
+				<th>
+					<input type="checkbox" class="checkbox checkAll" />
+				</th>
+				<th>
+					@Common["Label_Branch"]
+				</th>
+				<th>
+					@Common["Label_WIP"]
+				</th>
+				<th>
+					@Common["Label_InvoiceNo"]
+				</th>
+				<th>
+					@Common["Label_LaborCost"]
+				</th>
+				<th>
+					@Common["Label_PartsCost"]
+				</th>
+				<th>
+					@Common["Label_Vat"]
+				</th>
+				<th>
+					@Common["Label_TotalInvoice"]
+				</th>
+				<th>
+					@Common["Label_UploadFile"]
+				</th>
+			</tr>
+		</thead>
+
+		<tbody id="payment-method-table_body">
+
+			@foreach (var item in Model.ExternalWorkshopInvoiceDetails)
+			{
+				<tr>
+
+					<td class="checkboxCell">
+						<input type="checkbox" class="checkbox Selected"
+							   data-MovementId="@item.MovementId"
+							   data-damegeId="@item.WorkOrderId" />
+					</td>
+					<td>
+					@* 	<input id="BranchID_@item.MovementId" class="form-control" type="number" readonly />
+					 *@
+						@* @Html.TextBox($"BranchID_{item.MovementId}", item.BranchName, new { @class = "form-control", @id = $"BranchID_{item.MovementId}", @readonly = "readonly" }) *@
+
+						@item.BranchName
+					</td>
+					<td>
+						@item.WIP
+						<input type="hidden" id="VehicleId_@item.MovementId" value="@item.VehicleId" class="form-control" />
+
+					</td>
+					<td>
+						<input id="InvoiceNo_@item.MovementId" class="form-control" />
+					</td>
+					<td>
+						<input id="LaborCost_@item.MovementId" class="form-control" type="number" onchange="ChangeVat(@item.MovementId)" />
+					</td>
+					<td>
+						<input id="PartsCost_@item.MovementId" class="form-control" type="number" onchange="ChangeVat(@item.MovementId)" />
+					</td>
+					<td>
+						<input id="Vat_@item.MovementId" class="form-control" type="number" readonly />
+					</td>
+					<td>
+						<input id="TotalInvoice_@item.MovementId" class="form-control" type="number" readonly />
+					</td>
+					<td>
+						<input type="file" class="Uploadfile" id="@item.MovementId" />
+					</td>
+
+				</tr>
+			}
+
+		</tbody>
+	</table>
+
+	<div class="text-center text-white my-3">
+
+		<button type="button" id="btnSave" onclick="Save()" class="btn btn-primary btn-w-m"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+	</div>
+}
+
+
+
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+
+        saveUrl: '@Url.Action("Save", "ExternalWorkshopInvoice")',
+        indexUrl: '@Url.Action("Index", "ExternalWorkshopInvoice")',
+		getBranchsURL: '@Url.Action("GetBranchs", "ExternalWorkshopInvoice")',
+        getAgreementUrl: '@Url.Action("M_Agreement_GetAgreementId", "WorkOrder")',
+        getMovementUrl: '@Url.Action("M_Agreement_GetMovementId", "WorkOrder")',
+        commonError: '@Html.Raw(Common["Error"])',
+        ErrorHappended :'@Html.Raw(Common["ErrorHappend"])',
+		doneMessage: '@Html.Raw(Common["Done Successfully"])',
+		errorMessage: '@Html.Raw(@Common["Error"])',
+		chooseInvoiceMessage: '@Html.Raw(@Common["PleaseChooseInvoice"])',
+		enterAllDataMessage : '@Html.Raw(@Common["PleaseEnterAllData"])',
+		searchButtonMessage: '@Html.Raw(@Common["Button_Search"])',
+		emptyTableMessage: '@Html.Raw(@Common["emptyTable"])',
+		displayMessage: '@Html.Raw(@Common["Display"])' + '_MENU_' + '@Html.Raw(@Common["RowPerPage"])',
+		modelCount: '@Html.Raw(@Model?.ExternalWorkshopInvoiceDetails?.Count)'
+    });
+</script>
+<script src="~/js/Definitions/ExternalWorkshopInvoice_ParialView.js"></script>

@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.TechnicianWorkScheduleDTO>;
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["TechnicianWorkSchedule"]</h2>
+                <div class="panel-toolbar">
+
+                    <a href="@Url.Action("Edit", "WorkScheduleDefinition")" class="btn btn-sm btn-outline-primary add-record"><i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]</a>
+
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_Name"]</label>
+                                <input type="text" name="Name" class="form-control" id="_Name">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_Date"]</label>
+                                <input type="date" name="Date" class="form-control flat-picker" id="selectedDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" id="btnSearch">
+                            <i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+                            <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+                        </button>
+                    </div>
+                    <hr />
+@*                     <div class="col-xl-12">
+                        <div class="panel panel-icon" id="panel-9">
+                            <div class="panel-hdr">
+                                <h2>Development <span class="fw-light"><i>Phases</i></span></h2>
+                            </div>
+                            <div class="panel-container">
+                                <div class="panel-content">
+                                    <div id="development-phases-chart" style="height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> *@
+                    <!-- datatable start -->
+                    <div id="contentList" class="row">
+                        @Html.Partial("_TechnicianWorkScheduleList", Model)
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                        <div class="mb-5 row" id="contentPager" hidden></div>
+                    </div>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+<script src="~/smartadmin-5-styles/scripts/pages/projectmanagementdashboard.js" type="module"></script>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        getWorkScheduleIndexUrl: '@Url.Action("Index", "WorkScheduleDefinition")'
+    });
+</script>
+<script src="~/js/definitions/WorkSchedule.js"></script>
+}

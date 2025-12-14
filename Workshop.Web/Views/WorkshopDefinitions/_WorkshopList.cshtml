@@ -1,0 +1,75 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+
+@model List<Workshop.Core.DTOs.WorkshopDTOs.WorkshopListDTO>
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+
+@if (Model != null && Model.ToList().Count > 0)
+{
+
+	<table id="workshops-table" class="table table-bordered table-hover table-striped w-100 text-center main-table">
+		<thead class="bg-primary-500 bg-primary-gradient">
+			<tr>
+				<th>@Common["Label_Id"]</th>
+				<th>@Common["Label_NameEN"]</th>
+				<th>@Common["Label_NameAR"]</th>
+				<th>@Common["Label_Email"]</th>
+				<th>@Common["Label_PhoneNumber"]</th>
+				<th>@Common["Label_ParentId"]</th>
+				<th>@Common["Label_CreatedDate"]</th>
+				<th>@Common["Label_Actions"]</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@Html.DisplayFor(modelItem => item.Id)</td>
+					<td>@Html.DisplayFor(modelItem => item.PrimaryName)</td>
+					<td>@Html.DisplayFor(modelItem => item.SecondaryName)</td>
+					<td>@Html.DisplayFor(modelItem => item.Email)</td>
+					<td>@Html.DisplayFor(modelItem => item.Phone)</td>
+					<td>
+						@if (!string.IsNullOrEmpty(item.ParentName))
+						{
+							@Html.DisplayFor(modelItem => item.ParentName)
+						}
+						else
+						{
+							@Html.Label("---")
+						}
+					</td>
+					<td>
+						@Convert.ToDateTime(item.CreatedDate).ToString("dd/MM/yyyy")
+					</td>
+					<td>
+						@* ToDo: Permission *@
+						@* @if (BaseHttpContext.UserHasPermission(Permissions.WorkshopDefinitionsEdit)) *@
+						@if (true)
+						{
+							<a href="@Url.Action("Edit", "WorkshopDefinitions", new { id = item.Id })" class="btn btn-info btn-w-m"><i class="fas fa-pencil"></i>&nbsp;@Common["Edit"]</a>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+    
+	@* ToDo: Pagination *@
+	@* <input id="total_pages" value="@Math.Ceiling((decimal)Model.ToList()[0].NumberOfPages / 25)" hidden /> *@
+}
+else
+{
+	<div class="alert alert-info text-center">
+		@Common["NoDataFound"]
+	</div>
+}
+
+@if (Model.Count() > 0)
+{
+	<input id="total_pages" value="@(Model.Count() > 0 ? Math.Ceiling((decimal)Model.ToList()[0].Pages / 25) : 0)" hidden />
+}
+<script src="~/js/site.js"></script>

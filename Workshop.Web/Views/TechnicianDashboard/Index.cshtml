@@ -1,0 +1,136 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model Workshop.Web.Models.ClockingModel
+
+
+@{
+    ViewBag.Title = Common["VehicleWorkshopSystem"];
+}
+
+<div id="techDashboardRoot"
+     data-clocking-url="@Url.Action("Clocking", "TechnicianDashboard")">
+    <div id="i18n"
+         class="d-none"
+         data-vehicleworkshopsystem="@Common["VehicleWorkshopSystem"]"
+         data-choosepintype="@Common["ChoosePINType"]"
+         data-pattern="@Common["Pattern"]"
+         data-numericpin="@Common["NumericPIN"]"
+         data-drawpatterntounlock="@Common["DrawYourPatternToUnlock"]"
+         data-tryagain="@Common["TryAgain"]"
+         data-enter6digitpin="@Common["Enter6DigitPIN"]"
+         data-clear="@Common["Clear"]"
+         data-delete="@Common["Delete"]"
+         data-close="@Common["Close"]"
+         data-numerickeyboard="@Common["NumericKeyboard"]"
+         data-pin="@Common["PIN"]"
+         data-nowor="@Common["NOWOR"]"
+         data-timeunknown="@Common["TimeUnknown"]"
+         data-pincorrectredirecting="@Common["PINCorrectRedirecting"]"
+         data-incorrectpintryagain="@Common["IncorrectPINTryAgain"]"
+         data-patterntooshortconnectatleast4="@Common["PatternTooShortConnectAtLeast4"]"
+         data-patterncorrectredirecting="@Common["PatternCorrectRedirecting"]"
+         data-incorrectpatterntryagain="@Common["IncorrectPatternTryAgain"]">
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-weight-bold">@Common["VehicleWorkshopSystem"]</h2>
+                    <div class="panel-toolbar">
+                        <div class="current-time" id="currentTime"></div>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="technicians-grid" id="techniciansGrid"></div>
+
+                        <!-- PIN type modal -->
+                        <div class="pin-type-modal" id="pinTypeModal" aria-hidden="true">
+                            <div class="pin-type-modal-content">
+                                <button class="pattern-close" id="closePinType" aria-label="@Common["Close"]">&times;</button>
+                                <div class="pin-type-header">
+                                    <div class="technician-modal-photo" id="pinTypePhoto"></div>
+                                    <h3 class="technician-modal-name" id="pinTypeName"></h3>
+                                    <p class="pattern-instruction" id="pinTypeInstruction">@Common["ChoosePINType"]</p>
+                                </div>
+                                <div class="pin-type-buttons">
+                                    @* <button class="pin-type-btn" id="choosePattern" type="button">
+                                        <div class="pin-type-icon" aria-hidden="true">🔒</div>
+                                        <div class="pin-type-label">@Common["Pattern"]</div>
+                                    </button> *@
+                                    <button class="pin-type-btn" id="chooseNumeric" type="button">
+                                        <div class="pin-type-icon" aria-hidden="true">🔢</div>
+                                        <div class="pin-type-label">@Common["NumericPIN"]</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pattern modal -->
+                      @*   <div class="pattern-modal" id="patternModal" aria-hidden="true">
+                            <div class="pattern-modal-content">
+                                <button class="pattern-close" id="closePattern" aria-label="@Common["Close"]">&times;</button>
+                                <div class="pattern-header">
+                                    <div class="technician-modal-photo" id="modalPhoto"></div>
+                                    <h3 class="technician-modal-name" id="modalName"></h3>
+                                    <p class="pattern-instruction" id="patternInstruction">@Common["DrawYourPatternToUnlock"]</p>
+                                </div>
+                                <canvas id="patternCanvas" class="pattern-canvas"></canvas>
+                                <div class="pattern-error" id="patternError" role="alert"></div>
+                                <button class="pattern-reset" id="resetPattern" type="button">@Common["TryAgain"]</button>
+                            </div>
+                        </div> *@
+
+                        <!-- Numeric modal -->
+                        <div class="numeric-modal" id="numericModal" aria-hidden="true">
+                            <div class="numeric-modal-content">
+                                <button class="pattern-close" id="closeNumeric" aria-label="@Common["Close"]">&times;</button>
+                                <div class="pattern-header">
+                                    <div class="technician-modal-photo" id="numericPhoto"></div>
+                                    <h3 class="technician-modal-name" id="numericName"></h3>
+                                    <p class="pattern-instruction" id="numericInstruction">@Common["Enter6DigitPIN"]</p>
+                                </div>
+                                <div class="pin-display" id="pinDisplay" aria-label="@Common["PIN"]">
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                </div>
+                                <div class="numeric-keyboard" aria-label="@Common["NumericKeyboard"]">
+                                    <button class="num-btn" data-num="1" type="button">1</button>
+                                    <button class="num-btn" data-num="2" type="button">2</button>
+                                    <button class="num-btn" data-num="3" type="button">3</button>
+                                    <button class="num-btn" data-num="4" type="button">4</button>
+                                    <button class="num-btn" data-num="5" type="button">5</button>
+                                    <button class="num-btn" data-num="6" type="button">6</button>
+                                    <button class="num-btn" data-num="7" type="button">7</button>
+                                    <button class="num-btn" data-num="8" type="button">8</button>
+                                    <button class="num-btn" data-num="9" type="button">9</button>
+                                    <button class="num-btn clear-btn" id="clearPin" type="button">@Common["Clear"]</button>
+                                    <button class="num-btn" data-num="0" type="button">0</button>
+                                    <button class="num-btn delete-btn" id="deletePin" type="button">@Common["Delete"]</button>
+                                </div>
+                                <div class="pattern-error" id="numericError" role="alert"></div>
+                            </div>
+                        </div>
+
+                    </div> <!-- /panel-content -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        getTechniciansPINUrl: '@Url.Action("GetTechniciansPIN", "TechnicianDashboard")',
+        checkNumericPINUrl: '@Url.Action("CheckNumericPIN", "TechnicianDashboard")',
+        clockingUrl: '@Url.Action("Clocking", "TechnicianDashboard")'
+    });
+</script>
+<script src="~/js/Definitions/TechnicianDashboard.js"></script>

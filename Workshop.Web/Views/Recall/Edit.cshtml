@@ -1,0 +1,152 @@
+﻿@model Workshop.Core.DTOs.RecallDTO
+@using Newtonsoft.Json
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = Common["Label_Recall"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("Edit", "Recall", FormMethod.Post, new { enctype = "multipart/form-data", id = "recallForm" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-weight-bold">@Common["Label_RecallDefinition"]</h2>
+                </div>
+
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row" id="RecallForm">
+                            <div class="row">
+                                @Html.HiddenFor(model => model.Id)
+                                @Html.Hidden("recallJson", new { @id = "recallJson", @name = "recallJson" })
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Code, @Common["Label_Code"]) <span class="text-danger">*</span>
+                                        @Html.TextBoxFor(model => model.Code, new { @class = "form-control", @id = "Code" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Title, @Common["Label_Title"]) <span class="text-danger">*</span>
+                                        @Html.TextBoxFor(model => model.Title, new { @class = "form-control", @id = "Title" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Description, @Common["Label_Description"]) <span class="text-danger">*</span>
+                                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @id = "Description", rows = "3" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.StartDate, @Common["Label_StartDate"]) <span class="text-danger">*</span>
+                                        @Html.TextBoxFor(model => model.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text", @id = "StartDate" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.EndDate, @Common["Label_EndDate"]) <span class="text-danger">*</span>
+                                        @Html.TextBoxFor(model => model.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text", @id = "EndDate" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+<div class="form-check form-switch mt-5">
+    @Html.CheckBox("IsActive", true, new { @class = "form-check-input", id = "customSwitch1" })
+    @Html.LabelFor(m => m.IsActive, (string)Common["Label_IsActive"], new { @class = "form-check-label", @for = "customSwitch1" })
+</div>
+
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                @using (Html.BeginForm("ImportTemplate", "Recall", FormMethod.Post, new { enctype = "multipart/form-data", id = "excelFileForm" }))
+                                {
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <input type="file" id="ExcelVehicle" name="ExcelVehicle" class="filepond" />
+                                            <button type="button" id="RecallUpload" class="btn btn-primary btn-w-m">
+                                                <i class="fa fa-save"></i>&nbsp;@Common["Label_ImportExcel"]
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                                        <div class="col-12 mt-2">
+                            <div class="position-relative">
+                                <div id="gridContainer"></div>
+                            </div>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-white my-3">
+                    <button type="submit" id="btnCreate" class="btn btn-primary btn-w-m">
+                        <i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-w-m">
+                        <i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    window.LABELS = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(new {
+        Id = Common["Label_ID"].Value,
+        Make = Common["Label_Make"].Value,
+        Model = Common["Label_Model"].Value,
+        Chassis = Common["Label_Chassis"].Value,
+        Action = Common["Label_Action"].Value,
+        NoData = Common["Label_NoData"].Value,
+        DeleteConfirmTitle = Common["Label_Confirm"].Value,
+        // If you keep the message in Messages.resx, it’s fine—pull it here:
+        DeleteConfirmText = Message["Message_DeleteConfirm"].Value,
+        Yes = Common["Label_Yes"].Value,
+        No = Common["Label_No"].Value,
+
+        // FilePond (contains HTML; JSON keeps it intact, no &lt;...&gt;)
+        FilepondIdle = Common["Label_FilepondIdle"].Value,
+        FileTypeExcelOnly = Common["Validation_FileTypeExcel"].Value,
+        FileRequired = Common["Validation_FileRequired"].Value
+    } ));
+
+    window.VALIDATION = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(new {
+        Required   = Common["Validation_Required"].Value,
+        DateRange  = Common["Validation_DateRange"].Value,
+        GridRequired = Common["Validation_GridRequired"].Value,
+        GridEmpty  = Common["Validation_GridEmpty"].Value
+    } ));
+
+    var MakeID        = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Makes ?? new List<object>()));
+    var Vehicle       = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Vehicles ?? new List<object>()));
+    var Chasses       = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChassisNo ?? new List<object>()));
+    var VehcilesRecall= @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.VehcilesRecall ?? new List<object>()));
+</script>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        indexUrl: '@Url.Action("Index", "Recall")',
+        importTemplateUrl: '@Url.Action("ImportTemplate", "Recall")',
+        downloadTemplateUrl: '@Url.Action("DownloadTemplate", "Recall")',
+        deleteRecallUrl: '@Url.Action("DeleteRecall", "Recall")'
+    });
+</script>
+<script src="~/js/definitions/recall.js"></script>
+<script src="~/js/site.js"></script>
+

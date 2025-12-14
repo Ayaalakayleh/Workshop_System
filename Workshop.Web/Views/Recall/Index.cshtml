@@ -1,0 +1,81 @@
+﻿@using Workshop.Core.DTOs
+@using Workshop.Resources
+@model RecallModel
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Label_Recall"]</h2>
+                <div class="panel-toolbar">
+                    <a href="@Url.Action("Edit", "Recall")" class="btn btn-outline-primary add-record btn-sm">
+                        <i class="fa fa-plus"></i>&nbsp;@Common["Label_AddNew"]
+                    </a>
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    @using (Html.BeginForm("Index", "Recall", FormMethod.Post, new { enctype = "multipart/form-data", id = "searchForm" }))
+                    {
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RecallFilter.Tittle, @Common["Label_Name"])
+                                    @Html.TextBoxFor(model => model.RecallFilter.Tittle, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RecallFilter.Code, @Common["Label_Code"])
+                                    @Html.TextBoxFor(model => model.RecallFilter.Code, new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-3 col-12">
+                                <button type="submit" class="btn btn-primary" id="btnSearch">
+                                    <i class="fad fa-search"></i>&nbsp;@Common["Label_Search"]
+                                </button>
+                                <button id="ResetBTN" type="button" class="btn btn-secondary">
+                                    <i class="fad fa-times"></i>&nbsp;@Common["Label_Reset"]
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+                    <div id="contentList">
+                        @Html.Partial("_RecallsList", Model)
+                    </div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <div class="mb-5 row" id="contentPager" hidden></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 1) Flip chevrons: left→right and right→left (scoped to pagination) */
+    .pagination .sa.sa-chevron-left,
+    .pagination .sa.sa-chevron-right {
+        transform: scaleX(-1);
+        display: inline-block;
+    }
+</style>
+
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        indexUrl: '@Url.Action("Index", "Recall")',
+        importTemplateUrl: '@Url.Action("ImportTemplate", "Recall")',
+        downloadTemplateUrl: '@Url.Action("DownloadTemplate", "Recall")',
+        deleteRecallUrl: '@Url.Action("DeleteRecall", "Recall")'
+    });
+</script>
+
+<script src="~/js/definitions/recall.js"></script>

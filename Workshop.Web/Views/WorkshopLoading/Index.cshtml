@@ -1,0 +1,209 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@using System.Text.Json
+@inject IStringLocalizer<Common> Common
+
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Label_WorkshopLoading"]</h2>
+            </div>
+
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    <!-- Top toolbar -->
+                    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <button class="btn btn-sm btn-primary" id="btnToday">@Common["Label_Today"]</button>
+                            <button class="btn btn-sm btn-outline-secondary" id="btnPrev"><i class="fas fa-chevron-left"></i></button>
+                            <div id="rangeLabel" class="fw-bold mx-2"></div>
+                            <button class="btn btn-sm btn-outline-secondary" id="btnNext"><i class="fas fa-chevron-right"></i></button>
+
+                            <div class="ms-3 d-flex align-items-center gap-2">
+                                <span class="wl-badge">
+                                    <span class="me-1">@Common["Label_Techs"]:</span><span id="statTechs">0</span>
+                                </span>
+                                <span class="wl-badge">
+                                    <span class="me-1">@Common["Label_Capacity"]:</span><span id="statCapacity">0m</span>
+                                </span>
+                                <span class="wl-badge">
+                                    <span class="me-1">@Common["Label_Scheduled"]:</span><span id="statScheduled">0m</span>
+                                </span>
+                                <span class="wl-badge">
+                                    <span class="me-1">@Common["Label_Utilisation"]:</span><span id="statUtil">0%</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" class="form-control form-control-sm flat-picker" id="datePicker" />
+                            <!-- View buttons -->
+                            <div class="btn-group ms-1" role="group" aria-label="view">
+                                <button class="btn btn-sm btn-outline-primary active" data-view="day" id="btnViewDay">@Common["Label_Day"]</button>
+                                <button class="btn btn-sm btn-outline-primary" data-view="week" id="btnViewWeek">@Common["Label_Week"]</button>
+                                <button class="btn btn-sm btn-outline-primary" data-view="month" id="btnViewMonth">@Common["Label_Month"]</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3">
+                        <partial name="_TechsTime" />
+                        <partial name="_Unscheduled" />
+                    </div>
+
+                    <!-- Available Technicians -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">@Common["Label_AvailableTechnicians"]</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table mb-0 align-middle">
+                                    <thead>
+                                        <tr class="text-muted">
+                                            <th>@Common["Label_Technician"]</th>
+                                            <th>@Common["Label_Shift"]</th>
+                                            <th>@Common["Label_Hours"]</th>
+                                            <th>@Common["Label_Assigned"]</th>
+                                            <th>@Common["Label_Available"]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="availTbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!--/panel-content-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Common["Label_ScheduleLabour"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm" class="row g-3">
+                    <input type="hidden" id="jobIndex" />
+                    <div class="col-lg-4">
+                        <label class="form-label">@Common["Label_Date"]</label>
+                        <input type="date" id="schedDate" class="form-control flat-picker" />
+                    </div>
+                    <div class="col-lg-4">
+                        <label class="form-label">@Common["Label_Technician"]</label>
+                        <select id="schedTech" class="form-control"></select>
+                    </div>
+                    <div class="col-lg-4">
+                        <label class="form-label">@Common["Label_Start"]</label>
+                        <input type="time" id="schedStart" class="form-control" step="60" />
+                    </div>
+
+                    <div class="col-lg-4">
+                        <label class="form-label">@Common["Label_DurationMins"]</label>
+                        <input type="number" id="schedDuration" class="form-control" min="1" readonly />
+                    </div>
+                    <div class="col-lg-8">
+                        <label class="form-label">@Common["Label_Ends"]</label>
+                        <input type="text" id="schedEnds" class="form-control" readonly />
+                    </div>
+
+                    <div class="col-12 d-flex align-items-center gap-2">
+                        <span class="badge bg-dark" id="schedJobTag"></span>
+                        <span class="badge bg-secondary" id="schedAllowedTag"></span>
+                        <span class="badge bg-danger d-none" id="schedStatusOverdue">@Common["Label_Overdue"]</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+                <button type="button" class="btn btn-primary" id="btnSaveSchedule"><i class="fad fa-save"></i>&nbsp;@Common["Label_SaveSchedule"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Groups Modal -->
+<div class="modal fade" id="groupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Common["Label_Groups"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Group list -->
+                <div class="mb-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="fw-semibold">@Common["Label_Groups"]</div>
+                        <div class="small text-muted" id="groupCount"></div>
+                    </div>
+                    <div id="groupList" class="list-group mt-2"></div>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- Selected group results -->
+                <div id="groupItemsSection" class="d-none">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="fw-semibold" id="groupItemsHeader">@Common["Label_Items"]</div>
+                        <div class="small text-muted" id="groupItemsMeta"></div>
+                    </div>
+                    <div id="groupItems" class="mt-2"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Common["Button_Close"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/site.js"></script>
+<script>
+    window.i18n = @Html.Raw(JsonSerializer.Serialize(new
+        {
+                    label_schedule = Common["Label_Schedule"].Value,
+                    label_job = Common["Label_Job"].Value,
+                    label_allowed = Common["Label_Allowed"].Value,
+                    label_overdue = Common["Label_Overdue"].Value,
+                    label_deleteTitle = Common["Label_DeleteSchedule"].Value,
+                    label_deleteText = Common["Label_DeleteScheduleConfirm"].Value,
+                    label_yesDelete = Common["Label_YesDelete"].Value,
+                    label_cancel = Common["Button_Cancel"].Value,
+                    label_saved = Common["Label_Saved"].Value,
+                    label_savedMsg = Common["Label_ScheduleSaved"].Value,
+                    label_deleted = Common["Label_Deleted"].Value,
+                    label_deletedMsg = Common["Label_ScheduleDeleted"].Value,
+                    label_invalid = Common["Label_Invalid"].Value,
+                    label_fillAll = Common["Label_FillAllFields"].Value,
+
+                    /* NEW labels used in Groups modal */
+                    label_groups = Common["Label_Groups"].Value,
+                    label_open = Common["Label_Open"].Value,
+                    label_items = Common["Label_Items"].Value,
+                    label_none = Common["Label_None"].Value
+        }))
+</script>
+
+<script>
+    window.RazorVars=Object.assign({}, window.RazorVars || {}, {
+        getAvailableTechniciansUrl: '@Url.Action("GetAvailableTechnicians", "WorkshopLoading")',
+        getTechniciansScheduleUrl: '@Url.Action("GetTechniciansSchedule", "WorkshopLoading")',
+        getServicesByIdUrl: '@Url.Action("GetServicesById", "WorkshopLoading")',
+        wipScheduleUrl: '@Url.Action("WIPSChedule", "WorkshopLoading")',
+        getTechnicianAvailabilityUrl: '@Url.Action("Get_TechnicianAvailabilty", "WorkshopLoading")',
+        getGroupedServicesUrl: '@Url.Action("GetGroupedServices", "WorkshopLoading")'
+    });
+</script>
+<script src="~/js/definitions/workshoploading.js"></script>

@@ -1,0 +1,34 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.LabourRateDTO>;
+
+@if (Model != null)
+{
+    @foreach (var item in Model)
+    {
+        <tr id="@item.Id">
+            <td>
+                @item.LabourCode
+            </td>
+            <td>
+                @item.DescriptionEn
+            </td>
+            <td>
+                @item.DescriptionAr
+            </td>
+            <td>
+                <button type="button" class="btn btn-info btn-w-m btn-sm editLKP" onclick="Editlookup(@item.Id)"><i class="fa fa-pencil"></i>&nbsp;Edit</button>
+                <button type="button" class="btn btn-danger btn-w-m btn-sm" onclick="DeleteLookup(@item.Id)"><i class="fa fa-trash"></i>&nbsp;Delete</button>
+            </td>
+        </tr>
+    }
+    <input type="hidden" id="hidNoResultFound" value="0" />
+
+}
+else
+{
+    <input type="hidden" id="hidNoResultFound" value="1" />
+}
+
+@if (Model.Count() > 0)
+{
+    <input id="total_pages" value="@(Model.Count() > 0 ? Math.Ceiling((decimal)Model.ToList()[0].TotalPages / 25) : 0)" hidden />
+}

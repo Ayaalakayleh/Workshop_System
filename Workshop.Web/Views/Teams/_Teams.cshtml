@@ -1,0 +1,92 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@using Workshop.Core.DTOs
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@inject IConfiguration Configuration
+@model TeamModel
+
+@{
+	string BASEURL = Configuration["ApiSettings:BaseApiUrl"] ?? "";
+	var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+}
+@functions {
+	public static string IntToHexString(int colorInt)
+	{
+		return "#" + (colorInt & 0xFFFFFF).ToString("X6");
+	}
+}
+
+@{
+	var paginationInfo = ViewBag.PaginationInfo as PagedTeamResultDTO;
+}
+
+<table id="data" class="table table-bordered table-hover text-center w-100 main-table">
+	<thead>
+		<tr>
+			<th>@Common["Code"]</th>
+			<th>@Common["ShortName"]</th>
+			<th>@Common["Description"]</th>
+			<th>@Common["Color"]</th>
+			<th>@Common["Label_Actions"]</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null)
+			@foreach (var team in Model.TeamsList)
+			{
+				var colorHex = IntToHexString(team.Color);
+
+				<tr data-id="@team.Id">
+					<td>@team.Code</td>
+					<td>@team.Short</td>
+					<td>
+						@(lang == "en" ? team.PrimaryName : team.SecondaryName)
+					</td>
+					<td>
+						<span class="width-1 height-1 rounded-circle d-block m-auto" style="background-color:@colorHex;"></span>
+					</td>
+					<td>
+						<button id="editBtn"
+								class="btn btn-info btn-sm"
+								data-bs-toggle="modal"
+								data-bs-target="#teamModal"
+								asp-controller="TeamsController"
+								asp-action="EditTeam">
+							<i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
+						</button>
+
+						<button id="deleteBtn"
+								data-user-id="@team.Id"
+								class="btn btn-danger btn-sm"
+								asp-controller="TeamsController"
+								asp-action="DeleteTeam">
+							<i class="fad fa-trash"></i>&nbsp;@Common["Delete"]
+						</button>
+					</td>
+				</tr>
+			}
+		@if (Model == null || !Model.TeamsList.Any())
+		{
+@* 			<tr>
+				<td colspan="5" class="text-center">@Common["NoRecordsFound"]</td>
+			</tr> *@
+		}
+	</tbody>
+</table>
+@if (Model?.TotalPages > 0)
+{
+	<input id="total_pages" value="@Model.TotalPages" hidden />
+}
+
+@if (paginationInfo != null)
+{
+	<div id="paginationData"
+		 data-total-pages= "@Model?.TotalPages"
+		 data-total-records="@Model?.TotalPages"
+		 data-current-page="@paginationInfo.CurrentPage"
+		 data-page-size=  "@Model?.PageSize"
+		 hidden>
+	</div>
+}
+

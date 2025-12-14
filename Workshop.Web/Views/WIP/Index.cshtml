@@ -1,0 +1,61 @@
+﻿@model Workshop.Core.DTOs.WIPDTO
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Title_RepairOrdersWIP"]</h2>
+                <div class="panel-toolbar">
+                    @* Add New button (optional) *@
+                    @* <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#wipModal">
+                        <i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+                    </button> *@
+                </div>
+            </div>
+
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    <!-- Search Filters -->
+                    @await Html.PartialAsync("_Filter")
+
+                    <!-- List -->
+                    <hr />
+                    <div id="WIPListContainer">
+                        @* Initial render of first page *@
+                        @await Html.PartialAsync("_WIPList", Model.List)
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-end">
+                        <div class="mb-5 row" id="contentPager" hidden></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_WIPModal", Model)
+
+<script src="~/js/Definitions/wip.js"></script>
+<script>
+    // Expose server-generated URLs to wip.js — use window.URLs consistently
+    window.URLs = {
+        indexUrl: '@Url.Action("Index", "WIP")',
+        vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',
+        branchesUrl: '@Url.Action("Branches", "ERPAPI")',
+        createIssueVoucher: '@Url.Action("CreateIssueVoucher", "WIP")',
+        editPostUrl: '@Url.Action("Edit_Post", "WIP")',
+        editGetUrl: '@Url.Action("Edit", "WIP")',
+        closeWipUrl: '@Url.Action("CloseWIP", "WIP")',
+        getVehicleDetailsByIdUrl: '@Url.Action("GetVehicleDetailsById", "WIP")',
+        getWIPOptionsByIdUrl: '@Url.Action("GetWIPOptionsById", "WIP")',
+        transferMoveInUrl: '@Url.Action("TransferMoveIn", "WIP")',
+        addUrl: '@Url.Action("Add", "WIP")'
+    };
+</script>

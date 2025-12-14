@@ -1,0 +1,325 @@
+﻿@model Workshop.Core.DTOs.Vehicle.VehicleDefinitions;
+@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="row">
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        <div class="form-group">
+            <label>@Common["Manufacturer"]</label>
+            @Html.DropDownListFor(model => model.ManufacturerId, (IEnumerable<SelectListItem>)ViewBag.Makes, Common["Select"], new { @class = "form-control" })
+
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        <div class="form-group">
+            <label calss=" text-white">@Common["Model"]</label>
+            <select class="form-control" id="vehicleModelId">
+                <option value="">@Common["Select"]</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        <div class="form-group">
+            <label calss=" text-white">@Common["Status"]</label>
+            <select class="form-control" id="VehicleStatusId">
+                <option value="" selected>@Common["Select"]</option>
+                <option value="2">@Common["Maintenance"]</option>
+                <option value="3">@Common["Rented"]</option>
+                <option value="12">@Common["StaffService"]</option>
+                <option value="13">@Common["Complementry"]</option>
+
+            </select>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        @* @if ((((POCO.CompanyBranch)Session["BranchInfo"]).CountryCode) == "JOR") *@
+        @if (false)
+        {
+            <div class="form-group">
+                <label calss=" text-white">@Common["PlateNumber"]</label>
+                @if (!string.IsNullOrEmpty(Model.PlateNumber))
+                {
+                    <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="11" name="PlateNumber" value="@Model.PlateNumber" placeholder="@Common["PlateNumber"]">
+
+                }
+                else
+                {
+                    <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="11" name="PlateNumber" value="@Model.PlateNumber" placeholder="@Common["PlateNumber"]">
+
+                }
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label calss=" text-white">@Common["PlateNumber"]</label>
+                <div class="input-group">
+                    @if (!string.IsNullOrEmpty(Model.PlateNumber))
+                    {
+                        <input type="text" class="form-control plate-mask" value="@Model.PlateNumber" id="PlateNumber" maxlength="12" name="PlateNumber" placeholder="@Common["PlateNumber"]">
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="12" name="PlateNumber" placeholder="@Common["PlateNumber"]">
+
+                    }
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" onclick="convertPlateNumber()"><i class="fas fa-language"></i></button>
+                    </div>
+                </div>
+                <p class="mt-1" id="plateText"><p>
+            </div>
+        }
+    </div>
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12 ">
+        <div class="form-group">
+            <label calss=" text-white">@Common["Branch"]</label>
+            <select id="BranchId" name="BranchId" class="form-control select2">
+                <option value="" selected>@Common["Select"]</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        <div class="form-group">
+            <label calss=" text-white">@Common["VehicleType"]</label>
+            <select id="VehicleTypeId" class="form-control">
+                <option value="1" selected>@Common["Internal"]</option>
+                <option value="2">@Common["External"]</option>
+            </select>
+        </div>
+    </div>
+
+</div>
+<div class="text-center mt-2">
+    <button type="button" class="btn btn-primary btn-w-m" id="searchVehicleDefinitions"><i class="fa fa-search"></i>&nbsp;@Common["Search"]</button>
+    <button class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Reset"]</button>
+</div>
+<script>
+    var currentVehiclePageNumber = 0;
+        var branchclassIdF = 0;
+    $(document).ready(function () {
+        loadVehicles();
+        branchclassIdF = $("#BranchPriceClassId").val();
+
+        
+        if (false) {
+            $('.plate-mask').inputmask({
+                regex: '(?[0-9]{2})( - [0-9]{5})',
+            });
+        }
+        else if(false)
+        {
+            $('.plate-mask').inputmask({
+
+                regex: '(?[ 0-9 ]{4})(( - [\u0600-\u06FF]{1})( [\u0600-\u06FF]{1})( [\u0600-\u06FF]{1}))|(( - [A-Z]{1})( [A-Z]{1})( [A-Z]{1}))*',
+            });
+        }
+        function convertPlateNumber() {
+            let str = document.getElementById("PlateNumber").value;
+
+            var ArrayOfPlate = str.split("-");
+            const mapObj = {
+                65: "أ",// A
+                66: "ب",// B
+                74: "ح",// J
+                68: "د",// D
+                82: "ر",// R
+                83: "س",// S
+                88: "ص",// X
+                84: "ط",// T
+                69: "ع",// E
+                71: "ق",// G
+                75: "ك",// K
+                77: "ل",// L
+                90: "م",// Z
+                78: "ن",// N
+                72: "هـ",// H
+                85: "و",// U
+                86: "ي",// V
+                1571: "A",// أ
+                1576: "B",// ب
+                1581: "J",// ح
+                1583: "D",// د
+                1585: "R",// ر
+                1587: "S",// س
+                1589: "X",// ص
+                1591: "T",// ط
+                1593: "E",// ع
+                1602: "G",// ق
+                1603: "K",// ك
+                1604: "L",// ل
+                1605: "Z",// م
+                1606: "N",// ن
+                1607: "H",// ه
+                1610: "V"// ي
+            };
+
+            var letters = ArrayOfPlate[1].split("");
+            var NewPlate = ArrayOfPlate[0] + "-";
+
+            for (var i = 0; i < letters.length; i++) {
+                var asciiLetter = letters[i].charCodeAt(0);
+                if (asciiLetter != 32) {
+                    NewPlate = NewPlate + mapObj[asciiLetter];
+
+                }
+
+                else {
+                    NewPlate = NewPlate + " ";
+                }
+
+            }
+        }
+        });
+    $(document).ready(function () {
+        GetBranches()
+        //$(window).scroll(function () {
+        //    if ($('#hidSearchVehicleDefinitions').val() == 1) {
+        //        if ($('#hidNoResultFound').val() != 1) {
+        //            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+        //                currentVehiclePageNumber += 1;
+        //                loadVehicles(currentVehiclePageNumber);
+        //                if ($(".cards-length").length >= 1) {
+        //                    $("#noResultDiv #kk").hide();
+        //                }
+        //            }
+        //        }
+        //    }
+        //});
+
+        $('#ManufacturerId').change(function () {
+
+            var manufacturerId = $('#ManufacturerId').val();
+            x = $('#ManufacturerId').val();
+            ManufacturerName = $("#ManufacturerId option:selected").html();
+            if (manufacturerId == "Modal") {
+                $("#CompanyModal").addClass("bd-example-modal-xl");
+                $("#CompanyModal").modal('show');
+            } else {
+                var x = 0;
+                var isNew = true;
+                $("#vehicleModelId option").remove();
+                $('#vehicleModelId').append('<option value="">@Common["Select"]</option>');
+                if (manufacturerId == "") {
+                    $('#vehicleModelId').prop('disabled', true);
+                } else {
+                    $('#vehicleModelId').prop('disabled', false);
+                    var url = "/VehicleDefinition/FillVehicleModel/id".replace("id", manufacturerId)
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: {},
+                        success: function (data) {
+
+                            $.each(data, function (key, value) {
+
+                                $('#vehicleModelId').append('<option value=' + value.id + '>' + value.name + '</option>')
+                            });
+
+                            $('#vehicleModelId').val(@Model.VehicleModelId);
+                        },
+                        error: function () {
+                            alert('error FillVehicleModel');
+                        }
+                    });
+                }
+            }
+        });
+    });
+    $(".modal .btn-secondary").click(function () {
+        $(".modal .select2").val("").trigger("change.select2");
+        $(".modal .plate-mask").val('');
+    });
+
+    function loadVehicles(currentVehiclePageNumber) {
+       
+        $('#hidSearchVehicleDefinitions').val(1);
+        var ManufacturerId = $('#ManufacturerId').val() != "" ? $('#ManufacturerId').val() : null;
+        var vehicleModelId = $('#vehicleModelId').val() != "" ? $('#vehicleModelId').val() : null;
+
+        var PlateNumber = $('#PlateNumber').val() != "" ? $('#PlateNumber').val() : null;
+        var BranchId = $("#BranchId").val();
+        var VehicleStatusId = $("#VehicleStatusId").val() != "" ? $("#VehicleStatusId").val() : null;
+
+        var pageNumber = currentVehiclePageNumber || 1;
+        var pagesize = 50;
+        var type = $("#VehicleTypeId").val() != '' ? $("#VehicleTypeId").val() : null;
+        var vehicleDefinitions = {
+            'ManufacturerId': ManufacturerId, 'VehicleModelId': vehicleModelId, 'PlateNumber': PlateNumber,  'VehicleStatusId': VehicleStatusId,
+            'PageNumber': pageNumber, 'PageSize': pagesize, 'VehicleTypeId': type
+        };
+
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("VehicleList", "WIP")',
+            contentType: 'application/json',
+            dataType: 'html',
+            data: JSON.stringify(vehicleDefinitions),
+            error: function (err) {
+            }
+        }).done(function (result) {
+
+            $("#vehicleList").html(result);
+
+            var activestyleid = $(".nav-link.VehicleGridType.active").attr("id");
+
+            if (activestyleid == "ShosTableVehicles") {
+                $(".tab-pane.ShosTableVehicles.VehicleGrid").addClass("active show");
+                $(".tab-pane.ShowcardsVehicles.VehicleGrid").removeClass("active show");
+
+            } else {
+                $("#ShowcardsVehicles").addClass("active");
+                $(".tab-pane.ShosTableVehicles.VehicleGrid").removeClass("active show");
+                $(".tab-pane.ShowcardsVehicles.VehicleGrid").addClass("active show");
+            }
+
+            $("." + $("#panel_999 .nav-link.active").attr("id") + "").addClass("show");
+            $("." + $("#panel_999 .nav-link.active").attr("id") + "").addClass("active");
+
+
+
+
+        });
+        //event.preventDefault();
+
+    }
+
+    $("#searchVehicleDefinitions").click(function () {
+        $("#vehicleList").html('');
+        loadVehicles();
+    });
+
+    $(document).keypress("#searchVehicleDefinitions", function (event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            $("#vehicleList").html('');
+            loadVehicles();
+        }
+    });
+
+    function GetBranches() {
+
+        $.ajax({
+
+            type: 'GET',
+             url: '@Url.Action("Branches", "ERPAPI")',
+             dataType: 'json',
+        }).done(function (result) {
+            $("#BranchId option").remove();
+            $('#BranchId').append('<option value="" selected>@Common["Select"]</option>');
+
+             for (var i = 0; i < result.length; i++) {
+                 $('#BranchId').append('<option value="' + result[i].branchID + '">' + result[i].name + '</option>');
+             }
+
+        });
+    }
+</script>

@@ -1,0 +1,564 @@
+﻿@model Workshop.Core.DTOs.PrintInternalDTO;
+
+@{
+    Layout = null;
+    var CompanyInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.General.CompanyInfo>(Context.Session.GetString("CompanyInfo"));
+
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Internal Invoice</title>
+    <style>
+        /* ---------- PAGE / GLOBAL ---------- */
+
+        @@page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "Tahoma","Arial","Noto Naskh Arabic",sans-serif;
+            background: #eaf2f8;
+            color: #222;
+        }
+
+        body {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .wrap {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 8mm auto;
+            box-sizing: border-box;
+            padding: 10mm 12mm;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        /* ---------- HEADER (LOGO + TITLE + QR) ---------- */
+
+        .head {
+            position: relative;
+            text-align: center;
+            margin-bottom: 8mm;
+        }
+
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32mm;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .qr {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 32mm;
+            height: 32mm;
+            object-fit: contain;
+        }
+
+        .head h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        .head p {
+            margin: 3px 0 0;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .head .rule {
+            margin: 6px auto 0;
+            width: 52%;
+            height: 1px;
+            background: #cfcfcf;
+        }
+
+        /* ---------- INVOICE META (MERGED TABLE) ---------- */
+
+        .inv-meta {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8mm;
+            font-size: 11px;
+        }
+
+            .inv-meta th {
+                background: #f7941d;
+                color: #fff;
+                padding: 4px 6px;
+                border: 1px solid #d8d8d8;
+            }
+
+            .inv-meta td {
+                border: 1px solid #e3e3e3;
+                padding: 3px 6px;
+                vertical-align: middle;
+            }
+
+            .inv-meta .meta-title-en {
+                text-align: left;
+            }
+
+            .inv-meta .meta-title-ar {
+                text-align: right;
+                direction: rtl;
+            }
+
+            .inv-meta .label-en {
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            .inv-meta .label-ar {
+                text-align: right;
+                direction: rtl;
+                white-space: nowrap;
+            }
+
+            .inv-meta .value {
+                text-align: center;
+            }
+
+        /* ---------- SUPPLIER/CUSTOMER PANELS ---------- */
+
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8mm;
+            margin-bottom: 6mm;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            box-shadow: 0 4px 10px rgba(26,26,26,0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+            .panel .title {
+                background: linear-gradient(180deg,#f7941d,#e87a02);
+                color: #fff;
+                padding: 4px 6px;
+                font-weight: 700;
+                font-size: 12px;
+            }
+
+            .panel .body {
+                padding: 6px 8px 5px;
+                font-size: 11px;
+                color: #333;
+            }
+
+            .panel .row {
+                display: flex;
+                gap: 6px;
+                margin: 3px 0;
+                align-items: flex-start;
+            }
+
+            .panel .k {
+                width: 120px;
+                color: #666;
+                font-size: 11px;
+            }
+
+            .panel .v {
+                flex: 1;
+                font-size: 11px;
+            }
+
+        .right-align {
+            text-align: right;
+            direction: rtl;
+        }
+
+            .right-align .v {
+                text-align: right;
+                direction: rtl;
+            }
+
+        /*                .right-align .v.ltr {
+                            direction: ltr;
+                            text-align: left;
+                        }*/
+
+        /* ---------- OTHER INFO ---------- */
+
+        .half {
+            display: flex;
+            gap: 6mm;
+            margin-bottom: 6mm;
+        }
+
+            .half .panel {
+                flex: 1;
+            }
+
+        /* ---------- ITEMS TABLE ---------- */
+
+        .items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4mm;
+            font-size: 11px;
+        }
+
+            .items thead th {
+                background: #f7941d;
+                color: #fff;
+                padding: 4px 4px;
+                font-weight: 700;
+                border: 1px solid #d9d9d9;
+                text-align: center;
+            }
+
+            .items td, .items th {
+                border: 1px solid #e1e1e1;
+                padding: 4px 4px;
+                vertical-align: middle;
+            }
+
+            .items tbody td {
+                background: #fff;
+            }
+
+            .items tfoot td {
+                background: #fafafa;
+                font-weight: 700;
+            }
+
+            .items .desc-cell {
+                text-align: left;
+                direction: rtl;
+            }
+
+                .items .desc-cell small {
+                    display: block;
+                    font-size: 10px;
+                    color: #555;
+                }
+
+            .items .num {
+                text-align: right;
+            }
+
+            .items tfoot .label-cell {
+                text-align: left;
+                padding-left: 6px;
+            }
+
+            .items tfoot .currency-cell {
+                width: 60px;
+                text-align: center;
+            }
+
+            .items tfoot .amt {
+                width: 80px;
+                text-align: right;
+            }
+
+        .currency-text {
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
+        /* ---------- FOOTER ---------- */
+
+        .footer {
+            margin-top: 10mm;
+            text-align: center;
+            color: #777;
+            font-size: 9px;
+        }
+
+        /* ---------- PRINT ---------- */
+
+        @@media print {
+            body {
+                background: #fff;
+            }
+
+            .wrap {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                width: 210mm;
+                min-height: 297mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap" role="document">
+
+        <!-- LOGO & QR -->
+        <div class="head">
+            @if (CompanyInfo == null)
+            {
+
+                <img src="~/Content/img/fleetexpresslogo.png" aria-roledescription="logo">
+            }
+            else
+            {
+                {
+                    if (CompanyInfo.Img != null && CompanyInfo.Image != null)
+                    {
+                        <img class="logo" src="@CompanyInfo.Image" alt="@CompanyInfo.CompanyPrimaryName">
+
+                    }
+                    else
+                    {
+                        <img class="logo" src="~/Content/img/fleetexpresslogo.png" />
+                    }
+                }
+            }
+            <h1>INTERNAL INVOICE</h1>
+            <p>فاتورة داخلية</p>
+            <div class="rule"></div>
+        </div>
+
+        <!-- INVOICE META: MERGED TABLE (EN + AR) -->
+        <table class="inv-meta">
+            <tr>
+                <th colspan="2" class="meta-title-en">Invoice Details</th>
+                <th colspan="2" class="meta-title-ar">بيانات الفاتورة</th>
+            </tr>
+            <tr>
+                <td class="label-en">Invoice No</td>
+                <td class="value">@Model.InvoiceDetails.InvoiceNo</td>
+                <td class="value">@Model.InvoiceDetails.InvoiceNo</td>
+                <td class="label-ar" >رقم الفاتورة</td>
+
+            </tr>
+            <tr>
+                <td class="label-en">Invoice Date</td>
+                <td class="value">@Model.InvoiceDetails.InvoiceDate.Value.ToString("dd/MM/yyyy")</td>
+                <td class="value">@Model.InvoiceDetails.InvoiceDate.Value.ToString("dd/MM/yyyy")</td>
+                <td class="label-ar">تاريخ الفاتورة </td>
+
+            </tr>
+        </table>
+
+        <!-- SUPPLIER / CUSTOMER -->
+        <div class="panels">
+            <!-- Left: English -->
+            <div>
+                <div class="panel">
+                    <div class="title">Supplier</div>
+                    <div class="body">
+                        <div class="row"><div class="k">Company</div><div class="v">@CompanyInfo.CompanyPrimaryName</div></div>
+                        <div class="row"><div class="k">Address</div><div class="v">@CompanyInfo.Address</div></div>
+                        <div class="row"><div class="k">Short Address</div><div class="v">@CompanyInfo.ShortAddress</div></div>
+                        <div class="row"><div class="k">Email</div><div class="v">@CompanyInfo.Email</div></div>
+                        <div class="row"><div class="k">Phone</div><div class="v">@CompanyInfo.Phone</div></div>
+                        <div class="row"><div class="k">Tax ID</div><div class="v">@CompanyInfo.TaxNumber</div></div>
+                        <div class="row"><div class="k">CR No</div><div class="v">@(!string.IsNullOrEmpty(CompanyInfo.CRNumber) ? CompanyInfo.CRNumber : (!string.IsNullOrEmpty(CompanyInfo.RegistrationNo) ? CompanyInfo.RegistrationNo : ""))</div></div>
+                        <div class="row"><div class="k">Postal Code</div><div class="v">@CompanyInfo.PostalCode</div></div>
+                    </div>
+                </div>
+
+                <div style="height:4mm"></div>
+
+                <div class="panel">
+                    <div class="title">Customer</div>
+                    <div class="body">
+                        <div class="row"><div class="k">Customer Name</div><div class="v">-</div></div>
+                        <div class="row"><div class="k">Address</div><div class="v">—</div></div>
+                        <div class="row"><div class="k">VAT No</div><div class="v">0</div></div>
+                        <div class="row"><div class="k">Phone</div><div class="v">-</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Arabic -->
+            <div>
+                <div class="panel">
+                    <div class="title" style="text-align:right">المورد</div>
+                    <div class="body right-align">
+                        <div class="row"><div class="k">اسم المورد :</div><div class="v ltr">@CompanyInfo.CompanySecondaryName</div></div>
+                        <div class="row"><div class="k">العنوان :</div><div class="v ltr">@CompanyInfo.AddressAr</div></div>
+                        <div class="row"><div class="k">العنوان الوطني :</div><div class="v ltr">@CompanyInfo.ShortAddress</div></div>
+                        <div class="row"><div class="k">البريد الالكتروني :</div><div class="v ltr">@CompanyInfo.Email</div></div>
+                        <div class="row"><div class="k">هاتف :</div><div class="v ltr">@CompanyInfo.Phone</div></div>
+                        <div class="row"><div class="k">الرقم الضريبي :</div><div class="v ltr">@CompanyInfo.TaxNumber</div></div>
+                        <div class="row"><div class="k">سجل تجاري :</div><div class="v ltr">@(!string.IsNullOrEmpty(CompanyInfo.CRNumber) ? CompanyInfo.CRNumber : (!string.IsNullOrEmpty(CompanyInfo.RegistrationNo) ? CompanyInfo.RegistrationNo : ""))</div></div>
+                        <div class="row"><div class="k">الرمز البريدي :</div><div class="v ltr">@CompanyInfo.PostalCode</div></div>
+                    </div>
+                </div>
+
+                <div style="height:4mm"></div>
+
+                <div class="panel">
+                    <div class="title" style="text-align:right">العميل</div>
+                    <div class="body right-align">
+                        <div class="row"><div class="k">اسم العميل :</div><div class="v ltr">-</div></div>
+                        <div class="row"><div class="k">العنوان :</div><div class="v ltr">—</div></div>
+                        <div class="row"><div class="k">الرقم الضريبي :</div><div class="v ltr">0</div></div>
+                        <div class="row"><div class="k">الهاتف :</div><div class="v ltr">-</div>-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OTHER INFO -->
+
+        <!-- ITEMS -->
+        <table class="items" role="table" aria-label="Items">
+            <thead>
+                <tr>
+                    <th>
+                        NATURE OF GOODS OR
+
+                        SERVICES GOODS OR SERVICES
+
+                        تفاصيل السلع او الخدمات
+                    </th>
+                    <th>
+                        Price
+
+                        السعر
+                    </th>
+                    <th>
+                        Qty / Days
+
+                        أيام / كمية
+                    </th>
+                    <th>
+                        Discount
+
+                        الخصم
+                    </th>
+                    <th>
+                        Taxable amount
+
+                        المبلغ الخاضع للضريبة
+                    </th>
+                    <th>
+                        Tax %
+
+                        نسبة الضريبة
+                    </th>
+                    <th>
+                        Tax Value
+
+                        قيمة الضريبة
+                    </th>
+                    <th>
+                        Total
+
+                        المجموع
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.WipInvoiceDetail)
+                {
+                    <tr>
+                        <td class="desc-cell">
+                            @item.FullDescription
+                        </td>
+                        <td class="num">@item.Price.ToString("#,##0.00")</td>
+                        <td class="num">@item.Quantity.ToString("#,##0.00")</td>
+                        <td class="num">0.00</td>
+                        <td class="num">@item.Total.ToString("#,##0.00")</td>
+                        <td class="num">0%</td>
+                        <td class="num">0.00</td>
+                        <td class="num">@item.Total.ToString("#,##0.00")</td>
+                    </tr>
+                }
+
+              
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="label-cell">
+                        TOTAL (EXCLUDING VAT)
+
+                        اجمالي (باستثناء ضريبة القيمة المضافة)
+                    </td>
+                    <td class="currency-cell">
+                        <span class="currency-text">
+                            SAR
+                            ريال سعودي
+                        </span>
+                    </td>
+                    <td class="amt">
+                        @(Model.WipInvoiceDetail?.Sum(x => x.Total).ToString("#,##0.00"))
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="label-cell">
+                        TOTAL VAT
+
+                        مجموع ضريبة القيمة المضافة
+                    </td>
+                    <td class="currency-cell">
+                        <span class="currency-text">
+                            SAR
+                            ريال سعودي
+                        </span>
+                    </td>
+                    <td class="amt">0.00</td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" class="label-cell">
+                        TOTAL AMOUNT DUE
+
+                        اجمالي المبلغ المستحق
+                    </td>
+                    <td class="currency-cell">
+                        <span class="currency-text">
+                            SAR
+                           ريال سعودي
+                        </span>
+                    </td>
+                    <td class="amt">
+                        @(Model.WipInvoiceDetail?.Sum(x => x.Total).ToString("#,##0.00"))
+
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+@*         <div class="footer">
+            Page 1 of 1
+        </div> *@
+    </div>
+
+    <script>
+        // Optional auto-download – keep or remove as needed
+        // window.onload = function () {
+        //     const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+        //     const url = URL.createObjectURL(blob);
+        //     const a = document.createElement('a');
+        //     a.href = url;
+        //     a.download = 'invoice.html';
+        //     document.body.appendChild(a);
+        //     a.click();
+        //     a.remove();
+        //     URL.revokeObjectURL(url);
+        // }
+    </script>
+</body>
+</html>

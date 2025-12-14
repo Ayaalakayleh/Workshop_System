@@ -1,0 +1,52 @@
+﻿@model Workshop.Core.DTOs.WIPOptionsDTO;
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="tab-pane fade" id="tabOptions" role="tabpanel">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-check form-switch">
+                        @* <input type="checkbox" class="form-check-input" id="optPartialInv">  *@
+                        @Html.CheckBoxFor(m => m.PartialInvoicing, new { @class = "form-check-input", id = "optPartialInv" })
+                        <label class="form-check-label" for="optPartialInv">@Common["Label_PartialInvoicing"]</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-check form-switch">
+                        @* <input type="checkbox" class="form-check-input" id="optReturnParts" disabled> *@
+                        @Html.CheckBoxFor(m => m.ReturnParts, new { @class = "form-check-input", id = "optReturnParts", disabled = "disabled" })
+                        <label class="form-check-label" for="optReturnParts">@Common["Label_ReturnParts"]</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-check form-switch">
+                        @* <input type="checkbox" class="form-check-input" id="optRepeatRepair"> *@
+                        @Html.CheckBoxFor(m => m.RepeatRepair, new { @class = "form-check-input", id = "optRepeatRepair" })
+                        <label class="form-check-label" for="optRepeatRepair">@Common["Label_RepeatRepair"]</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-check form-switch">
+                        @* <input type="checkbox" class="form-check-input" id="optUpdateDemand"> *@
+                        @Html.CheckBoxFor(m => m.UpdateDemand, new { @class = "form-check-input", id = "optUpdateDemand" })
+                        <label class="form-check-label" for="optUpdateDemand">@Common["Label_UpdateDemand"]</label>
+
+                    </div>
+                </div>
+
+                @* <div class="col-12">
+                    <label class="form-label">@Common["Label_DecardingOption"]</label>
+                    <select class="form-control" id="DecardingOption">
+                        <option value="Requisition">@Common["Label_Requisition"]</option>
+                        <option value="Issue">@Common["Label_Issue"]</option>
+                        <option value="None">@Common["Label_None"]</option>
+                    </select>
+                </div> *@
+            </div>
+        </div>
+    </div>
+</div>

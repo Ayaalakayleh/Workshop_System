@@ -1,0 +1,34 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>@Common["Label_WIPNo"]</label>
+            <input type="text" id="WipNo" name="WipNo" class="form-control" placeholder="e.g. 000123">
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>@Common["Label_Status"]</label>
+            @Html.DropDownList("Status", new SelectList(ViewBag.Status, "Value", "Text"), Common["Select"], new { @class = "form-control", id = "Status" })
+        </div>
+    </div>
+   
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>@Common["Label_Customer"]</label>
+            @* <input type="text" id="Customer" name="Customer" class="form-control" placeholder="Name / Phone"> *@
+            @Html.DropDownList("CustomerId", new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CustomerId" })
+
+        </div>
+    </div>
+</div>
+<div class="text-center mt-3">
+    <button class="btn btn-primary" id="btnWIPSearch"><i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+    <button type="button" class="btn btn-secondary" id="btnResetSearch">
+        <i class="fad fa-times"></i>&nbsp;@Common["Button_Reset"]
+    </button>
+</div>

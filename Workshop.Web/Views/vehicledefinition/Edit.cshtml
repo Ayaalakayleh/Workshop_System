@@ -1,0 +1,185 @@
+﻿@model Workshop.Core.DTOs.Vehicle.CreateVehicleDefinitionsModel
+@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@{
+    ViewBag.Title = Common["CreateVehicle"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr px-2">
+                <h2 class="font-weight-bold">@Common["VehicleDefinition"]</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    @using (Html.BeginForm("Edit", "VehicleDefinition", FormMethod.Post, new { enctype = "multipart/form-data", id = "vehicleDefinitionForm" }))
+                    {
+                        @Html.HiddenFor(a => a.Id)
+                        @Html.HiddenFor(a => a.path)
+                        @Html.HiddenFor(m => m.VehicleModelId, new { id = "VehicleModelId_Hidden" })
+
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label>@Common["Label_Manufacturer"] <span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(
+                                    model => model.ManufacturerId,
+                                                                new SelectList(Model.ColManufacturers, "Id", lang == "en" ? "ManufacturerPrimaryName" : "ManufacturerSecondaryName"),
+                                                                Common["Select"],
+                                                                new { @class = "form-control select2", @id = "ManufacturerId" }
+                                                                )
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_Model"] <span class="text-danger">*</span></label>
+                                <select class="form-control select2" id="VehicleModelId" name="VehicleModelId">
+                                    <option value="">@Common["Select"]</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_ManufacturerYear"] <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(a => a.ManufacturingYear,
+                                                                new
+                                                                {
+                                                                    @class = "form-control",
+                                                                    type = "number",
+                                                                    min = "1900",
+                                                                    max = "2100",
+                                                                    value = Model.ManufacturingYear == 0 ? DateTime.Now.Year : Model.ManufacturingYear
+                                                                })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            @if ("(((POCO.CompanyBranch)Session[\"BranchInfo\"]).CountryCode)" == "JOR")
+                                {
+                                    <div class="form-group">
+                                        <label>@Common["Label_PlateNumber"] <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="11" name="PlateNumber" value="@Model.PlateNumber">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="form-group">
+                                        <label>@Common["Label_PlateNumber"] <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="12" name="PlateNumber" value="@Model.PlateNumber">
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label>@Common["Color"] <span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(
+                                    model => model.Color,
+                                                                new SelectList(Model.ColVehicleColors, "Id", lang == "en" ? "VehiclePrimaryName" : "VehicleSecondaryName"),
+                                                                Common["Select"],
+                                                                new { @class = "form-control select2", @id = "newColorId", name = "newColorId" }
+                                                                )
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12" hidden>
+                            <div class="form-group">
+                                <label>@Common["Label_Status"] <span class="text-danger">*</span></label>
+                                <select class="select2 form-control" id="VehicleStatusId" name="VehicleStatusId">
+                                    <option value="2" selected>@Common["Maintenance"]</option>
+                                    <option value="3">@Common["Rented"]</option>
+                                    <option value="12">@Common["StaffService"]</option>
+                                    <option value="13">@Common["Complementry"]</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_Kilometres"] <span class="text-danger">*</span></label>
+                                @Html.EditorFor(a => a.CurrentMeter, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_ChassisNumber"] <span class="text-danger">*</span></label>
+                                @Html.EditorFor(a => a.ChassisNo, new { htmlAttributes = new { @class = "form-control" } })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>Company</label> @* Company now NOT required *@
+                                @Html.DropDownListFor(
+                                                                m => m.CompanyId,
+                                                                new SelectList((IEnumerable<dynamic>)ViewBag.Customers,
+                                                                "Id", lang == "en" ? "CustomerName" : "CustomerName", Model.CompanyId),
+                                                                "Select",
+                                                                new { @class = "form-control select2", id = "CompanyId" }
+                                                                )
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12" hidden>
+                            <div class="form-group">
+                                <label>@Common["Label_Upload"]<span class="text-warning font-normal"> @Common["AllowedExtensions"]: pdf, png , jpeg</span></label>
+                                <input type="file" id="Uploadfile" name="Uploadfile" />
+                                <label id="Uploadfile-error" class="error" for="Uploadfile"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-white my-3">
+                        @if (true)
+                            {
+                                <button type="submit" id="btnCreate" class="btn btn-primary btn-w-m">
+                                    <i class="fa fa-save"></i>&nbsp;@Common["Save"]
+                                </button>
+                            }
+                            <a href="@Url.Action("Index")" class="btn btn-secondary btn-w-m">
+                                <i class="fa @("Workshop.Controllers.LanguageController.IsRighToLeft()" == "true" ? "fa-arrow-right" : "fa-arrow-left")"></i>&nbsp;@Common["Button_BackToList"]
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var RazorVars = {
+        indexUrl: '@Url.Action("Index", "VehicleDefinition")',
+        editUrl: '@Url.Action("Edit", "VehicleDefinition")',
+        listUrl: '@Url.Action("GetDataList", "VehicleDefinition")',
+        fillVehicleModel: '@Url.Action("FillVehicleModel", "VehicleDefinition")',
+
+        // Swal texts
+        msgSuccessTitle: '@Html.Raw(Common["SuccessTitle"])',
+        btnOk: '@Html.Raw(Common["Ok"])',
+        swalDeleteTitle: '@Message["SwalDeleteTitle"]',
+        swalDeleteConfirm: '@Message["SwalDeleteConfirm"]',
+        swalDeleteCancel: '@Message["SwalDeleteCancel"]',
+        swalErrorHappened: '@Message["ErrorHappend"]',
+        swalDeleted: '@Message["Deleted"]',
+        swalCancelled: '@Message["Cancelled"]',
+
+        // Vars
+        vehicleModelId: '@Model.VehicleModelId'
+    };
+    var lang = '@lang';
+</script>
+
+<script src="~/js/definitions/Vehicle.js"></script>

@@ -1,0 +1,249 @@
+﻿@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.WorkshopMovement.WorkshopMovementFilter;
+@{
+    ViewBag.Title = Common["Movements"];
+}
+
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Movements"]</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content text-start">
+
+                    <div class="row">
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_VehicleName"]</label>
+                                @Html.DropDownListFor(model => model.VehicleID, (SelectList)ViewBag.VehicleNams, Common["Select"], htmlAttributes: new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label>@Common["Label_Chassis"]</label>
+                                @Html.DropDownList("ChassisId", (SelectList)ViewBag.Chassis, Common["Select"], new { @class = "form-control", id = "chassisDropdown" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group" id="mYear">
+                                <label>@Common["Label_MovementDate"]</label>
+                                <div class="input-group">
+                                    <input type="date" class="form-control flat-picker" id="dateSearch" />
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="text-center mt-3">
+                        <button id="searchVehicleMovment" type="button" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                        <button id="reset-fields" type="reset" class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
+                        <input type="hidden" id="hidSearchVehicleDefinitions" value="0" />
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+<div id="MovementList"></div>
+<div id="contentPager" hidden></div>
+
+
+<script>
+
+
+    $("#searchVehicleMovment").click(function () {
+        getData(1);
+    });
+    var GregorianDate;
+    $(document).ready(function () {
+        $("#GregorianDate").on('dp.change', function (arg) {
+            let date = arg.date;
+            GregorianDate = date.format("DD-MM-YYYY");
+        });
+        getData(1);
+    });
+
+    function getData(page) {
+
+        debugger
+        var Recieved = $('#Recieved').is(":checked");
+        var NotRecieved = $('#NotRecieved').is(":checked");
+        var VehicleID = $('#VehicleID').val();
+        VehicleID = (VehicleID === "" || VehicleID === "0") ? null : parseInt(VehicleID);
+        var dateSearch = $('#dateSearch').val();
+        dateSearch = (dateSearch === "" || dateSearch === null) ? null : dateSearch;
+         vehicleMovementFilter = {
+              'VehicleID': VehicleID,  'page': page, 'GregorianDate': dateSearch
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("MovementList", "Movements")',
+            contentType: 'application/json',
+            dataType: 'html',
+            data: JSON.stringify(vehicleMovementFilter)
+
+        }).done(function (result) {
+
+            $("#MovementList").html(result);
+    // after: $("#MovementList").html(result);
+    if ($("#total_pages").val() != undefined) {
+        $("#contentPager").attr("hidden", false);
+
+        // kill any previous instance before re-init (important)
+        if ($('#contentPager').data('pagination')) {
+            $('#contentPager').pagination('destroy');
+        }
+
+        $('#contentPager').pagination({
+            items: $("#total_pages").val(),
+            itemOnPage: 25,
+            currentPage: page,
+            prevText: '&laquo;',   // «
+            nextText: '&raquo;',   // »
+            onPageClick: function (p) { getData(p); }
+        });
+
+        // Bootstrap-like look, same as your Technicians code
+        $('#contentPager ul').addClass('pagination');
+        $('#contentPager li').addClass('page-item');
+        $('#contentPager a, #contentPager span').addClass('page-link');
+    } else {
+        $("#contentPager").attr("hidden", true);
+    }
+
+        });
+    }
+        $(document).ready(function () {
+
+        getData(1);
+                $('select').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: function () {
+            return $(this).data('placeholder') || 'Select an option';
+        }
+    });
+        flatpickr(".flat-picker", {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        minDate: "1950-01-01",
+        maxDate: "2100-31-12",
+        disableMobile: true
+    });
+    });
+
+        $(document).on('click', 'button[type=reset]', function () {
+        const $form = $(this).closest('form');
+
+        // Let the browser reset everything to its original "selected" state
+        if ($form.length) $form[0].reset();
+
+        // Then normalize selects (especially Select2) to a default value
+        setTimeout(function () {
+            const $scope = $form.length ? $form : $(document);
+
+            $scope.find('select').each(function () {
+                const $sel = $(this);
+                const isMultiple = $sel.prop('multiple');
+
+                // 1) If provided, honor an explicit default
+                //    e.g. <select data-reset-value="0"> or data-reset-value="1,3" (for multiple)
+                const explicit = $sel.data('resetValue');
+
+                let value;
+                if (explicit !== undefined) {
+                    value = isMultiple ? String(explicit).split(',') : String(explicit);
+                } else {
+                    // 2) Otherwise use whatever the HTML had as the original default
+                    const defaults = $sel.find('option').filter(function () { return this.defaultSelected; });
+
+                    if (isMultiple) {
+                        value = defaults.map(function () { return this.value; }).get();
+                    } else if (defaults.length) {
+                        value = defaults.first().val();
+                    } else if ($sel.find('option[value="0"]').length) {
+                        // 3) Fallback: common pattern where "0" = "Select..."
+                        value = "0";
+                    } else {
+                        // 4) Last resort: first option
+                        value = $sel.find('option').first().val();
+                    }
+                }
+
+                if ($sel.hasClass('select2-hidden-accessible')) {
+                    $sel.val(value).trigger('change');   // refresh Select2 UI
+                } else {
+                    $sel.val(value).trigger('change');   // keep everything in sync
+                }
+            });
+        }, 0);
+    });
+</script>
+<script>
+    let isSyncing = false;
+    const vehicleByIdUrl = '@Url.Action("GetVehicleDefentionById", "Movements")';
+
+    $('#VehicleID').on('change', function () {
+        debugger;
+        if (isSyncing) return;
+
+        const vehicleId = $(this).val();
+        if (!vehicleId) return;
+
+        $.ajax({
+            url: vehicleByIdUrl + '?id=' + vehicleId + '&lang=en',
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res?.success && res.data?.vehicle) {
+                    isSyncing = true;
+                    $('#chassisDropdown')
+                        .val(res.data.vehicle.id)
+                        .trigger('change.select2');
+                    isSyncing = false;
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Failed to load vehicle details.', 'error');
+            }
+        });
+    });
+
+    $('#chassisDropdown').on('change', function () {
+        debugger;
+
+        if (isSyncing) return;
+
+        const chassisId = $(this).val();
+        if (!chassisId) return;
+
+        $.ajax({
+            url: vehicleByIdUrl + '?id=' + chassisId + '&lang=en',
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res?.success && res.data?.vehicle) {
+                    isSyncing = true;
+                    $('#VehicleID')
+                        .val(res.data.vehicle.id)
+                        .trigger('change.select2');
+                    isSyncing = false;
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Failed to load chassis vehicle.', 'error');
+            }
+        });
+    });
+</script>

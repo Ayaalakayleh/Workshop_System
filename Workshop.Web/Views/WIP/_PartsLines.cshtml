@@ -1,0 +1,172 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@using Workshop.Domain.Enum;
+@{
+    var GeneralRequest = ViewBag.GeneralRequest;
+    var WIPstatus = Convert.ToInt32(ViewData["WIPstatus"]);
+    var WIPId = Convert.ToInt32(ViewData["WIPId"]);
+    var permission = true;
+}
+<style>
+    #WarehouseDiv{
+        width: 200px !important;
+    }
+</style>
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+       <div class="d-flex Justify-contet-ceter align-items-center gap-3">
+            <h5 class="mb-0">@Common["Title_PartsLines"]</h5>
+            @* <div id="WarehouseDiv">
+                @Html.DropDownList("FK_WarehouseId", new SelectList(ViewBag.Warehouses ?? new List<SelectListItem>(), "Value", "Text"), "Select Warehouse", new { @class = "form-control form-control-sm", id = "FK_WarehouseId" })
+            </div> *@
+        </div>
+        <div class="d-flex gap-2">
+            @if (WIPId != null || WIPId > 0)
+            {
+                @if (WIPstatus != (int)WIPStatusEnum.G && WIPstatus != (int)WIPStatusEnum.Invoiced)
+                {
+                    @* @if (PermissionHelper.UserHasPermission(Permissions.WIP.Approve))
+                    {
+                        <button type="button" id="ApproveRequestPartsBTN" class="btn btn-success btn-sm"> &nbsp;@Common["Label_ApproveAll"]</button>
+                    } *@
+
+                    @if (PermissionHelper.UserHasPermission(Permissions.WIP.AddParts))
+                    {
+                    }
+                        @if (GeneralRequest)
+                        {
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#addPartGeneralModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp; @Common["GeneralRequest"]</button>
+                        }
+                        else
+                        {
+                            <button type="button" id="btnAddPart" data-bs-toggle="modal" data-bs-target="#addPartModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddParts"]</button>     
+                        }
+
+                }
+            }
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div id="mainItemsGrid" class="gridContainer"></div>
+    </div>
+</div>
+
+
+
+<!-- add part modal -->
+<div class="modal fade" id="addPartModal" tabindex="-1" aria-labelledby="addPartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPartModalLabel">@Common["Title_AddPart"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-primary btn-sm active" id="ours-tab">Our warehouses</button>
+                    <button type="button" id="others-tab" class="btn btn-outline-primary btn-sm">Other warehouses</button>
+                </div>
+                <div id="gridContainer"></div>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Common["Button_Close"]</button>
+                <button type="button" class="btn btn-primary" id="selectItemsBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addPartGeneralModal" tabindex="-1" aria-labelledby="addPartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPartModalLabel">@Common["Title_AddPart"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <textarea class="form-control" rows="4" cols="50" id="RequestDescription" name="RequestDescription"></textarea>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Common["Button_Close"]</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnAddPartGeneral">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transfer Request From/To Warehouses -->
+<div class="modal fade" id="transferPartModal" tabindex="-1" aria-labelledby="transferPartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="transferPartModalLabel">Transfer Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">From Warehouse</label>
+                    <select id="transferFromWarehouse" class="form-select select2"></select>
+                </div>
+                @* <div class="mb-3">
+                    <label class="form-label fw-bold">Locator</label>
+                    <select id="transferFromLocator" class="form-select select2"></select>
+                </div> *@
+                <div class="mb-3">
+                    <label class="form-label fw-bold">To Warehouse</label>
+                    <select id="transferToWarehouse" class="form-select select2"></select>
+                </div>
+
+            </div>
+
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmTransfer">Continue</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+</script>
+<script>
+    const wipStatus = @WIPstatus;
+    const Gone = @((int)WIPStatusEnum.G);
+    const Invoiced = @((int)WIPStatusEnum.Invoiced);
+
+
+        function sendToTransferVoucher() {
+
+        const transferData = {
+            fromWarehouse: 3,
+            toWarehouse: 7,
+            items: [
+                { itemId: 101, qty: 5, unit: "pcs" },
+                { itemId: 202, qty: 12, unit: "box" }
+            ]
+        };
+
+        window.parent.postMessage(
+            {
+                action: "openTransferVoucher",
+                payload: transferData
+            },
+            "*"
+        );
+
+    var Permission_Approve = true;
+    var Permission_Reject = true;
+    var Permission_Issue = true;
+    var Permission_Undo = true;
+
+    }
+
+</script>
+<script src="~/js/definitions/wipmaingriditems.js"></script>
+<script src="~/js/definitions/wipselectiongriditem.js"></script>

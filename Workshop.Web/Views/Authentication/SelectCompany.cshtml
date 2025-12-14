@@ -1,0 +1,215 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.General.CompanyInfo>
+
+@{
+    ViewBag.Title = "SelectCompany";
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>
+        Workshop System
+    </title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+    @*   @if (Vehicle.Controllers.LanguageController.IsRighToLeft())
+    {
+        <link href="~/Content/css/plugins/bootstrap-rtl/bootstrap-rtl.css" rel="stylesheet" />
+    } *@
+
+    <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/vendors.bundle.css">
+    <link id="appbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/app.bundle.css">
+    <link id="mytheme" rel="stylesheet" media="screen, print">
+    <link id="myskin" rel="stylesheet" media="screen, print" href="~/auth-assets/css/skins/skin-master.css">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png">
+    <link rel="mask-icon" href="img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="stylesheet" media="screen, print" href="~/auth-assets/css/page-login-alt.css">
+    <link href="~/auth-assets/css/themes/cust-theme-3.css" rel="stylesheet" />
+    <style>
+        @@font-face {
+            font-family: 'Tajawal-Bold';
+            src: url('../../smartadmin-5-styles/tajwal-arabic-font/Tajawal-Bold.ttf') format('truetype');
+        }
+
+        body {
+            overflow-y: scroll;
+        }
+
+        .blankpage-form-field {
+            margin: auto;
+        }
+
+        .select2-container {
+            z-index: 9999999 !important
+        }
+
+        #hidden-word {
+            width: 200px;
+            height: 50px;
+            white-space: nowrap;
+            padding-right: 40px
+        }
+
+        .page-logo-text {
+            text-align: start;
+            color: var(--theme-dark) !important
+        }
+
+        .blankpage-form-field .page-logo, .blankpage-form-field .card {
+            background-image: unset !important;
+            background-color: unset !important;
+            background: rgba(255, 255, 255, 0.25) !important;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        }
+
+        .btn.btn-outline-danger {
+            color: #dc3545 !important;
+            border: 1px solid #dc3545 !important
+        }
+
+            .btn.btn-outline-danger:hover {
+                background-color: #dc3545 !important;
+                border: 1px solid #dc3545 !important;
+                color: #fff !important
+            }
+
+        address label {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Tajawal-Bold';
+        }
+
+        .btn.btn-glass {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
+</head>
+<body style="display:-webkit-box;padding:10px 0">
+    <!-- DOC: script to save and load page settings -->
+    <script>
+        /**
+         *	This script should be placed right after the body tag for fast execution
+         *	Note: the script is written in pure javascript and does not depend on thirdparty library
+         **/
+        'use strict';
+
+        var classHolder = document.getElementsByTagName("BODY")[0],
+            /**
+             * Load from localstorage
+             **/
+            themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
+                {},
+            themeURL = themeSettings.themeURL || '',
+            themeOptions = themeSettings.themeOptions || '';
+        /**
+         * Load theme options
+         **/
+        if (themeSettings.themeOptions) {
+            classHolder.className = themeSettings.themeOptions;
+            console.log("%c✔ Theme settings loaded", "color: #148f32");
+        }
+        else {
+            console.log("%c✔ Heads up! Theme settings is empty or does not exist, loading default settings...", "color: #ed1c24");
+        }
+        if (themeSettings.themeURL && !document.getElementById('mytheme')) {
+            var cssfile = document.createElement('link');
+            cssfile.id = 'mytheme';
+            cssfile.rel = 'stylesheet';
+            cssfile.href = themeURL;
+            document.getElementsByTagName('head')[0].appendChild(cssfile);
+
+        }
+        else if (themeSettings.themeURL && document.getElementById('mytheme')) {
+            document.getElementById('mytheme').href = themeSettings.themeURL;
+        }
+        /**
+         * Save to localstorage
+         **/
+        var saveSettings = function () {
+            themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
+                return /^(nav|header|footer|mod|display)-/i.test(item);
+            }).join(' ');
+            if (document.getElementById('mytheme')) {
+                themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
+            };
+            localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+        }
+        /**
+         * Reset settings
+         **/
+        var resetSettings = function () {
+            localStorage.setItem("themeSettings", "");
+        }
+
+    </script>
+    <a href="@Url.Action("Logout", "Authentication")" class="btn btn-glass text-dark font-weight-bold">Logout</a>
+    <div class="row w-75 justify-content-center">
+
+        @foreach (var item in Model)
+        {
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12 my-3 change_if_2">
+                <div class="blankpage-form-field w-100">
+                    <div class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+                        <a class="page-logo-link d-flex align-items-center">
+                            @if (string.IsNullOrEmpty(item.Image))
+                            {
+                                <img src="~/Content/img/Company.png" class="rounded-circle" aria-roledescription="logo" />
+                            }
+                            else
+                            {
+                                <img src="@item.Image" class="rounded-circle" alt="@item.CompanyPrimaryName" aria-roledescription="logo">
+                            }
+
+                            <span class="page-logo-text mr-1 text-center font-weight-bold" id="hidden-word">
+                                @Html.DisplayFor(modelItem => item.CompanyPrimaryName)
+                                <br />
+                                <span style="font-family: 'Tajawal-Bold'; white-space: break-spaces">
+                                    @Html.DisplayFor(modelItem => item.CompanySecondaryName)
+                                </span>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0 text-center">
+                        <a href="@Url.Action("SelectCompanyLink", "Authentication", new { Company = item.Id })">
+                            @* address can go here if needed *@
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <h1 class="text-black my-5">Select Company</h1>
+    <span class="mb-3">
+        @*<img src="~/Content/img/logo-small.png" width="150" />*@
+        <img src="~/smartadmin-5-styles/img/fleetexpresslogo.png" width="400" />
+    </span>
+
+    <video poster="~/smartadmin-5-styles/img/clouds.png" id="bgvid" playsinline autoplay muted loop>
+        <source src="~/auth-assets/media/video/cc.webm" type="video/mp4">
+    </video>
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>*@
+    <!-- Page related scripts -->
+</body>
+</html>

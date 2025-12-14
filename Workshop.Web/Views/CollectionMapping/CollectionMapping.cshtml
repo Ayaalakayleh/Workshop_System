@@ -1,0 +1,654 @@
+﻿@using Microsoft.Extensions.Localization
+@using Newtonsoft.Json
+@using Workshop.Resources
+@using Workshop.Web.Interfaces.Services
+
+@model Workshop.Core.DTOs.ExternalWorkshopExp.MExcelMappingDTO
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@inject IFileService fileService
+
+@{
+    ViewBag.Title = "en";
+}
+
+@using (Html.BeginForm("CollectionMapping", "CollectionMapping", FormMethod.Post,
+                new
+                {
+                    enctype = "multipart/form-data",
+                    id = "form"
+                }))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.jsonList)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.FilePath)
+    @Html.HiddenFor(model => model.FileName)
+    <style>
+        .required-field {
+            display: none
+        }
+    </style>
+    <div class="row">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-weight-bold">@Common["Title_CollectionMapping"]</h2>
+                </div>
+                <div class="panel-container">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="validationCustom05">@Common["ExternalWorkshop"]<span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.WorkshopId, (IEnumerable<SelectListItem>)ViewBag.WorkshopList, @Common["ExternalWorkshop"], new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.WorkshopId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="validationCustom02">@Common["Label_StartedRow"]<span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(a => a.Started_Row, htmlAttributes: new { @class = "form-control" })
+                                    <span class="text-danger required-field">@Common["RequiredField"]</span>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="validationCustom03">@Common["Label_StartedColumn"]<span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(a => a.Started_Column, htmlAttributes: new { @class = "form-control" })
+                                    <span class="text-danger required-field">@Common["RequiredField"]</span>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                <div class="form-group">
+                                    <label>@Common["Label_UploadTemplateFile"]<span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" Id="fileInput" accept=".xlsx, .xls">
+                                </div>
+                                <div class="form-group ShowById">
+                                    <label>@Common["Label_DownloadTemplate"]</label>
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-primary btn-w-m" id="Download"><i class="fad fa-file-download"></i>&nbsp;@Common["Download"]</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table id="collection-mapping-table" class="table table-bordered table-hover w-100 text-center mt-3">
+                                <thead>
+                                    <tr>
+                                        <th>@Common["Label_ColumnName"]</th>
+                                        <th>@Common["Label_AdditionColumnName"]</th>
+                                        <th>@Common["Label_MappingColumnDB"]</th>
+                                        <th>@Common["Label_MappingColumnIndex"]</th>
+                                        <th>@Common["Label_IsVatIncluded"]</th>
+                                        <th>@Common["Label_AdditionData"]</th>
+                                        <th id="action">@Html.DisplayName(@Common["Label_Actions"])</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="collection-mapping-table-body">
+                                    <tr>
+                                        <td><input type="text" class="form-control Column_Name text-input"></td>
+                                        <td><input type="text" class="form-control Addition_Cullman_Name text-input"></td>
+                                        <td>
+                                            <select class="form-control dropdown" onchange="Dropdownchange(this)"></select>
+                                        </td>
+                                        <td><input type="number" class="form-control text-input Mapping_Column_Index"></td>
+                                        <td>
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input checkbox" id="customSwitch">
+                                                <label class="custom-control-label" for="customSwitch"></label>
+                                            </div>
+                                        </td>
+                                        <td><input type="text" class="form-control text-input"></td>
+                                        <td>
+                                            <button type="button" class="btn btn-success btn-sm add-row my-1"><i class="fa fa-plus"></i>&nbsp;@Common["Button_Add"]</button>
+                                            <button type="button" class="btn btn-danger btn-sm delete-row my-1"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div class="text-center mt-3">
+
+                            <button class="btn btn-primary btn-w-m" id="Save"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+                            <a href="@Url.Action("CollectionMappingIndex", "CollectionMapping")" class="btn btn-secondary btn-w-m"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Button_BackToList"]</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/js/site.js"></script>
+<script>
+
+    var Excel_MappingColumnsList = @Html.Raw(JsonConvert.SerializeObject(Model.ExcelMappingColumnsList));
+    var ColIndex = [];
+    var ColMappingColumnDB = [];
+
+    var jsonData = @Html.Raw(JsonConvert.SerializeObject(Model.DExcelMappingList));
+
+    $(document).ready(function () {
+
+        $.each(jsonData, function (index, item) {
+            var x = item.Mapping_ColumnDB;
+            ColMappingColumnDB.push(item.Mapping_ColumnDB);
+        });
+
+        $('.ShowById').hide();
+
+        if ($('#Id').val() > 0) {
+            $('.ShowById').show();
+        }
+
+        if (jsonData && jsonData.length > 0) {
+            apppendTable();
+            if (jsonData.length < 17)
+                addRow();
+        }
+
+        $("#Download").click(function () {
+
+            var FinalPath = "@fileService.GetFileFullPath(Model.FilePath)";
+
+            var link = document.createElement('a');
+            link.href = FinalPath;
+            link.target = '_blank';
+            link.download = '@Model.FileName';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        $(".btn-success.btn-sm.add-row").removeClass("waves-effect");
+
+        // INITIAL POPULATE DROPDOWN OPTIONS FOR FIRST ROW
+        $.each(Excel_MappingColumnsList, function (index, item) {
+
+            var matchingItem = 0;
+            if (jsonData != null) {
+                jsonData.find(function (mappingItem) {
+                    if (mappingItem.Mapping_ColumnDB === item.COLUMN_NAME) {
+                        return matchingItem = 1;
+                    } else {
+                        return matchingItem = 0;
+                    }
+                });
+                if (matchingItem == 0) {
+                    $(".dropdown").append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+                }
+            } else {
+                $(".dropdown").append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+            }
+
+        });
+
+        if ($.fn.select2) {
+            $('.dropdown').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                dropdownAutoWidth: true
+            });
+        }
+
+        $('#collection-mapping-table').on('click', '.add-row', function () {
+            var $currentRow = $(this).closest('tr');
+            var $Column_Name = $currentRow.find('.Column_Name');
+            var $Addition_Cullman_Name = $currentRow.find('.Addition_Cullman_Name');
+            var $Mapping_Column_Index = $currentRow.find('.Mapping_Column_Index');
+
+            if (($Column_Name.val() !== '' || $Addition_Cullman_Name.val() !== '') &&
+                ($Mapping_Column_Index.val() !== '')) {
+
+                // disable current add button
+                $(this).prop('disabled', true);
+
+                // add a brand new clean row
+                addRow();
+
+            } else {
+                Swal.fire("@Common["Please Enter Data"]", '', 'error');
+            }
+        });
+
+        // =========================
+        //  DELETE ROW WITH CONFIRM
+        // =========================
+        $('#collection-mapping-table').on('click', '.delete-row', function () {
+            const $button = $(this);
+
+            Swal.fire({
+                title: '@Message["SwalDeleteTitle"]',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor:"var(--danger-800)",
+                cancelButtonColor:"var(--secondary-700)",
+                confirmButtonText: '@Message["Yes"]',
+                cancelButtonText: '@Message["No"]'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                const $row = $button.closest('tr');
+
+                // 1) Remove the row unconditionally (even if it's empty)
+                $row.remove();
+
+                // 2) Rebuild ColMappingColumnDB from the remaining rows
+                ColMappingColumnDB = [];
+                $('#collection-mapping-table tbody tr').each(function () {
+                    const $r = $(this);
+                    let mappingText = '';
+
+                    const $ddl = $r.find('select.dropdown');
+                    if ($ddl.length) {
+                        // rows with a <select>
+                        mappingText = $ddl.find('option:selected').text();
+                    } else {
+                        // rows rendered as plain text (from jsonData)
+                        mappingText = $r.find('td:eq(2)').text();
+                    }
+
+                    mappingText = $.trim(mappingText.replace(/ - Data Type : .+$/, ''));
+
+                    if (mappingText) {
+                        ColMappingColumnDB.push(mappingText);
+                    }
+                });
+
+                // 3) If no rows left, always add exactly one empty row
+                if ($('#collection-mapping-table tbody tr').length === 0) {
+                    addRow();
+                    return; // dropdowns will be built inside addRow
+                }
+
+                // 4) Rebuild all dropdowns based on updated ColMappingColumnDB
+                $('#collection-mapping-table tbody tr').each(function () {
+                    const $r = $(this);
+                    const $ddl = $r.find('select.dropdown');
+
+                    if ($ddl.length === 0) return;
+
+                    const currentValue = $ddl.val(); // save current selection if possible
+
+                    $ddl.empty();
+                    $ddl.append('<option value="">Select an option</option>');
+
+                    $.each(Excel_MappingColumnsList, function (index, item) {
+                        const optionText = item.COLUMN_NAME + ' - Data Type : ' + item.DATA_TYPE;
+                        const $opt = $('<option/>').val(index).text(optionText);
+
+                        // Disable columns that are already mapped, except Service_Type
+                        if (ColMappingColumnDB.includes(item.COLUMN_NAME) && item.COLUMN_NAME !== 'Service_Type') {
+                            $opt.prop('disabled', true).css('color', '#ccc');
+                        }
+
+                        $ddl.append($opt);
+                    });
+
+                    // Try to keep the previous selection if it still exists
+                    if (currentValue) {
+                        $ddl.val(currentValue);
+                    }
+
+                    // Tell Select2 to refresh using NORMAL change (not change.select2)
+                    if ($.fn.select2 && $ddl.data('select2')) {
+                        $ddl.trigger('change');
+                    }
+                });
+            });
+        });
+
+        $('#form').validate({
+            rules: {
+                ExternalWorkshopId: 'required',
+                Started_Row: 'required',
+                Started_Column: 'required',
+                fileInput: 'required',
+            },
+            messages: {
+                ExternalWorkshopId: '@Common["RequiredField"]',
+                Started_Row: '@Common["RequiredField"]',
+                Started_Column: '@Common["RequiredField"]',
+                fileInput: '@Common["RequiredField"]',
+            },
+        });
+
+        $("#form").submit(function (e) {
+            debugger
+            e.preventDefault();
+            e.stopPropagation();
+            var tableData = GetTableData();
+
+            if (tableData.length >= 1) {
+                $('#jsonList').val(JSON.stringify(tableData));
+
+                if ($("#form").valid()) {
+
+                    $('#sup').prop('disabled', true);
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var fd = new FormData(this);
+                    var file = $('#fileInput')[0].files[0];
+                    fd.append('File', file);
+
+                    $.ajax({
+
+                        url: '@Url.Action("CollectionMapping", "CollectionMapping")',
+                        type: 'POST',
+                        data: fd,
+                        dataType: 'json',
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        success: function (data) {
+
+                            if (data.isSuccess) {
+
+                                CreateOrEditSuccess(data)
+                            }
+                            else {
+                                Swal.fire("@Common["Error"]", '', 'error');
+                            }
+                        },
+                        error: function (data) {
+                            Swal.fire("@Common["Error"]", '', 'error');
+                        }
+                    });
+
+                }
+            } else {
+                Swal.fire("@Common["Error"]", 'At least one row must be filled with data', 'error');
+                return false;
+            }
+
+        });
+
+    });
+
+    function addRow() {
+
+        var table = $('#collection-mapping-table-body');
+        var row = $('<tr>');
+
+        row.append('<td><input type="text" class="form-control Column_Name text-input"></td>');
+        row.append('<td><input type="text" class="form-control Addition_Cullman_Name text-input"></td>');
+        row.append('<td><select class="form-control dropdown" onchange="Dropdownchange(this)"><option value="">Select an option</option></select></td>');
+        row.append('<td><input type="number" class="form-control text-input Mapping_Column_Index"></td>');
+        row.append('<td><div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input checkbox" id="customSwitch"><label class="custom-control-label" for="customSwitch"></label></div></td>');
+        row.append('<td><input type="text" class="form-control text-input"></td>');
+        row.append('<td><button type="button" class="btn btn-success btn-sm add-row my-1"><i class="fa fa-plus"></i>&nbsp;@Common["Add"]</button> <button type="button" class="btn btn-danger btn-sm delete-row my-1"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button></td>');
+
+        table.append(row);
+
+        var dropdown = row.find('.dropdown');
+
+        $.each(Excel_MappingColumnsList, function (index, item) {
+            var matchingItem = 0;
+            ColMappingColumnDB.find(function (mappingItem) {
+                if (mappingItem === item.COLUMN_NAME) {
+                    return matchingItem = 1;
+                } else {
+                    return matchingItem = 0;
+                }
+            });
+
+            if (matchingItem == 1) {
+                if (item.COLUMN_NAME == "Service_Type") {
+                    dropdown.append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+                } else {
+                    dropdown.append('<option disabled="disabled" style="color: rgb(204, 204, 204);" value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+                }
+            } else {
+                dropdown.append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+            }
+        });
+
+        if ($.fn.select2) {
+            dropdown.select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                dropdownAutoWidth: true
+            });
+        }
+    }
+
+    function apppendTable() {
+        var table = $('#collection-mapping-table-body');
+        $('#collection-mapping-table-body').empty();
+        $.each(jsonData, function (index, item) {
+            var row = $('<tr>');
+            var isChecked = item.Is_Vat_Included ? 'checked' : '';
+            if (item.Column_Name === null || item.Column_Name === undefined) {
+                row.append('<td contenteditable="true"><input type="text" class="form-control Column_Name text-input" value=""></td></td>');
+            } else {
+                row.append('<td contenteditable="true"><input type="text" class="form-control Column_Name text-input" value="' + item.Column_Name + '"></td></td>');
+            }
+
+            if (item.Addition_Cullman_Name === null || item.Addition_Cullman_Name === undefined) {
+                row.append('<td contenteditable="true"><input type="text" class="form-control Addition_Cullman_Name text-input" value=""></td>');
+
+            } else {
+                row.append('<td contenteditable="true"><input type="text" class="form-control Addition_Cullman_Name text-input" value="' + item.Addition_Cullman_Name + '"></td>');
+            }
+
+            if (item.Mapping_ColumnDB === null || item.Mapping_ColumnDB === undefined) {
+                row.append('<td contenteditable="false">' + item.Mapping_ColumnDB + '</td>');
+            } else {
+                row.append('<td contenteditable="false">' + item.Mapping_ColumnDB + '</td>');
+            }
+
+            if (item.Mapping_Column_Index === null || item.Mapping_Column_Index === undefined) {
+                row.append('<td contenteditable="true"><input type="number" class="form-control text-input" value=""></td>');
+            } else {
+                row.append('<td contenteditable="true"><input type="number" class="form-control text-input" value="' + item.Mapping_Column_Index + '"></td>');
+            }
+            row.append('<td contenteditable="true"><div class="custom-control custom-switch"><input type = "checkbox" ' + isChecked + ' class= "custom-control-input checkbox" id = "ckt' + index + '" > <label class= "custom-control-label" for= "ckt' + index + '"></label></div></td>');
+
+            if (item.Addition_Data === null || item.Addition_Data === undefined) {
+                row.append('<td contenteditable="true"><input type="text" class="form-control text-input" value=""></td>');
+            } else {
+                row.append('<td contenteditable="true"><input type="text" class="form-control text-input" value="' + item.Addition_Data + '"></td>');
+            }
+            row.append('<td><button type="button" class="btn btn-danger btn-sm delete-row " ><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button></td>');
+            table.append(row);
+        });
+    }
+
+    function Dropdownchange(selectElement) {
+        var selectedOption = $(selectElement).val();
+
+        ColMappingColumnDB = [];
+        const tableRows = $('#collection-mapping-table tbody tr');
+        tableRows.each(function () {
+            var Mapping_ColumnDB = $(this).find('td:eq(2) select option:selected').text();
+            if (Mapping_ColumnDB == '') {
+                ColMappingColumnDB.push($(this).find('td:eq(2)').text());
+            } else {
+                ColMappingColumnDB.push(Mapping_ColumnDB.replace(/ - Data Type : \w+/, ''));
+            }
+        });
+        var currentRowDropdown = $(selectElement).closest('tr').find('.dropdown');
+        currentRowDropdown.empty();
+        currentRowDropdown.append('<option value="">Select an option</option>');
+        $.each(Excel_MappingColumnsList, function (index, item) {
+            currentRowDropdown.append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+        });
+
+        $.each(ColMappingColumnDB, function (index, item) {
+            var dropdownOption = currentRowDropdown.find('option').filter(function () {
+                return $(this).text().replace(/ - Data Type : \w+/, '') === item;
+            });
+
+            if (dropdownOption) {
+                dropdownOption.prop('selected', true);
+                if (dropdownOption.text().replace(/ - Data Type : \w+/, '') != "Service_Type") {
+                    dropdownOption.attr("disabled", true);
+                    dropdownOption.css("color", "#ccc");
+                }
+
+            } else {
+                dropdownOption.prop('selected', false);
+                dropdownOption.attr("disabled", false);
+                dropdownOption.css("color", "");
+            }
+        });
+
+        updateDropdownOptions(selectElement);
+
+        // Ensure Select2 UI stays in sync
+        if ($.fn.select2) {
+            currentRowDropdown.trigger('change'); // normal change event
+        }
+    }
+
+    function validateTableRows() {
+        let isValid = true;
+        let errorMessages = [];
+        let hasAtLeastOneValidRow = false;
+
+        $('#collection-mapping-table tbody tr').each(function (index) {
+            const $row = $(this);
+            const columnName = $row.find('td:eq(0) input').val().trim();
+            const additionColumnName = $row.find('td:eq(1) input').val().trim();
+            const mappingColumnDB = $row.find('td:eq(2) select').val();
+            const mappingColumnIndex = $row.find('td:eq(3) input').val().trim();
+
+            $row.find('td:eq(0) input').removeClass('is-invalid');
+            $row.find('td:eq(1) input').removeClass('is-invalid');
+            $row.find('td:eq(2) select').removeClass('is-invalid');
+            $row.find('td:eq(3) input').removeClass('is-invalid');
+
+            const hasData = columnName || additionColumnName || mappingColumnDB || mappingColumnIndex ||
+                $row.find('td:eq(5) input').val().trim();
+
+            if (hasData) {
+                hasAtLeastOneValidRow = true;
+                let rowHasErrors = false;
+
+                if (!columnName) {
+                    $row.find('td:eq(0) input').addClass('is-invalid');
+                    isValid = false;
+                    rowHasErrors = true;
+                }
+
+                if (!additionColumnName) {
+                    $row.find('td:eq(1) input').addClass('is-invalid');
+                    isValid = false;
+                    rowHasErrors = true;
+                }
+
+                if (!mappingColumnDB) {
+                    $row.find('td:eq(2) select').addClass('is-invalid');
+                    isValid = false;
+                    rowHasErrors = true;
+                }
+
+                if (!mappingColumnIndex) {
+                    $row.find('td:eq(3) input').addClass('is-invalid');
+                    isValid = false;
+                    rowHasErrors = true;
+                }
+
+                if (rowHasErrors && !errorMessages.includes('All four columns are required for rows with data')) {
+                    errorMessages.push('All four columns are required for rows with data');
+                }
+            }
+        });
+
+        if (!hasAtLeastOneValidRow) {
+            isValid = false;
+            errorMessages.push('At least one row must be filled with data');
+        }
+
+        return {
+            isValid: isValid,
+            messages: errorMessages
+        };
+    }
+
+    function updateDropdownOptions(selectElement) {
+
+        const tableRows = $('#collection-mapping-table tbody tr');
+
+        tableRows.each(function (index) {
+            if (index < $(selectElement).closest('tr').index()) {
+                var dropdownToUpdate = $(this).find('.dropdown');
+
+                var lastDDLValue = $(this).find('td:eq(2) select option:selected').val();
+                dropdownToUpdate.empty();
+                dropdownToUpdate.append('<option value="">Select an option</option>');
+
+                $.each(Excel_MappingColumnsList, function (index, item) {
+                    dropdownToUpdate.append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
+                });
+
+                $.each(ColMappingColumnDB, function (index, item) {
+                    var dropdownOption = dropdownToUpdate.find('option').filter(function () {
+                        return $(this).text().replace(/ - Data Type : \w+/, '') === item;
+                    });
+
+                    if (dropdownOption) {
+                        if (dropdownOption.text().replace(/ - Data Type : \w+/, '') != "Service_Type") {
+                            dropdownOption.attr("disabled", true);
+                            dropdownOption.css("color", "#ccc");
+                        }
+                    } else {
+                        dropdownOption.prop('selected', false);
+                        dropdownOption.attr("disabled", false);
+                        dropdownOption.css("color", "");
+                    }
+                });
+                dropdownToUpdate.val(lastDDLValue);
+
+                // Keep select2 UI synced
+                if ($.fn.select2) {
+                    dropdownToUpdate.trigger('change'); // normal change event
+                }
+            }
+        });
+
+    }
+
+    function GetTableData() {
+        const tableRows = $('#collection-mapping-table tbody tr');
+        const jsonData = [];
+
+        tableRows.each(function () {
+            var Column_Name = $(this).find('td:eq(0) input').val();
+            var Mapping_Column_Index = $(this).find('td:eq(3) input').val();
+            if ((Column_Name === "" || Column_Name === undefined) && (Mapping_Column_Index === "" || Mapping_Column_Index === undefined)) { } else {
+                const rowData = {};
+                rowData['Column_Name'] = $(this).find('td:eq(0) input').val();
+                rowData['Addition_Cullman_Name'] = $(this).find('td:eq(1) input').val();
+                var Mapping_ColumnDB = $(this).find('td:eq(2) select option:selected').text();
+                if (Mapping_ColumnDB == '') {
+                    rowData['Mapping_ColumnDB'] = $(this).find('td:eq(2)').text();
+                } else {
+                    rowData['Mapping_ColumnDB'] = Mapping_ColumnDB;
+                }
+                rowData['Mapping_Column_Index'] = $(this).find('td:eq(3) input').val();
+                rowData['Is_Vat_Included'] = $(this).find('td:eq(4) input[type="checkbox"]').is(':checked');
+                rowData['Addition_Data'] = $(this).find('td:eq(5) input').val();
+
+                jsonData.push(rowData);
+            }
+
+        });
+
+        return jsonData;
+    }
+
+    function CreateOrEditSuccess(data) {
+        window.location.href = "@Url.Action("CollectionMappingIndex", "CollectionMapping")";
+    }
+</script>
+

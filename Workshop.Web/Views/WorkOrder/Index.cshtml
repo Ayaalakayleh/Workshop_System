@@ -1,0 +1,136 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+@inject IStringLocalizer<Common> Common
+@model WorkOrderModel
+
+@{
+	ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["WorkOrder"]</h2>
+				<div class="panel-toolbar">
+					<a href="@Url.Action("Edit", "WorkOrder")"
+					   class="btn btn-outline-primary"
+					   data-bs-toggle="modal"
+					   data-bs-target="#workOrderModal"
+					   id="BtnAddNew">
+						<i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
+					</a>
+
+
+				</div>
+			</div>
+
+			<div class="panel-container show">
+				<div class="panel-content text-start">
+					@using (Html.BeginForm("Index", "WorkOrder", FormMethod.Post, new { id = "WorkOrderFilter" }))
+					{
+						<div class="row">
+							<div class="col-md-3 col-sm-12">
+								<div class="form-group">
+									<label>@Common["Label_Vehicle"]</label>
+									@Html.DropDownListFor(model => model.WorkOrderFilter.VehicleID, ViewBag.Vehicles as List<SelectListItem>, Common["Select"].Value, new { @class = "form-control select2" })
+								</div>
+							</div>
+							<div class="col-md-3 col-sm-12">
+								<div class="form-group">
+									<label>@Common["WorkOrderType"]</label>
+									@Html.DropDownListFor(model => model.WorkOrderFilter.WorkOrderTypeId, new List<SelectListItem>(){ new SelectListItem( @Common["Accident"] , "1"),
+									new SelectListItem(@Common["Maintenance"], "2")}
+																, Common["Select"].Value, new { @class = "form-control" })
+
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-12">
+							<div class="form-group" id="mYear">
+								<label>@Common["Label_FromDate"]</label>
+								<div class="input-group">
+									@Html.EditorFor(model => model.WorkOrderFilter.FromDate, new { htmlAttributes = new { @class = "form-control flat-picker", @type = "date" } })
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-12">
+							<div class="form-group" id="mYear">
+								<label>@Common["Label_ToDate"]</label>
+								<div class="input-group">
+									@Html.EditorFor(model => model.WorkOrderFilter.ToDate, new { htmlAttributes = new { @class = "form-control flat-picker", @type = "date" } })
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-12">
+							<div class="form-group">
+								<label>@Common["Label_CreatedBy"]</label>
+								@Html.EditorFor(model => model.WorkOrderFilter.CreatedBy, new { htmlAttributes = new { @class = "form-control"} })
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-12">
+							<div class="form-group">
+								<label>@Common["Label_WorkOrder_Status"]</label>
+								@Html.DropDownListFor(model => model.WorkOrderFilter.WorkOrderStatus, new List<SelectListItem>(){ new SelectListItem( @Common["Open"] , "1"),
+																new SelectListItem(@Common["Pending"], "2"),
+																new SelectListItem(@Common["UnderRepair"], "3"),
+																new SelectListItem(@Common["Closed"], "4"),
+																new SelectListItem(@Common["Cancelled"], "5")
+																}
+																, Common["Select"].Value, new { @class = "form-control" })
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-12">
+							<div class="form-group">
+								<label>@Common["Label_InvoiceType"]</label>
+
+								@Html.DropDownListFor(model => model.WorkOrderFilter.InvoicingStatus, new List<SelectListItem>(){ new SelectListItem( @Common["HasNoInvoice"] , "0"),
+																new SelectListItem(@Common["HasInvoice"], "2"),
+																}
+																, Common["Select"].Value, new { @class = "form-control" })
+
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-12">
+							<div class="form-group">
+								<label>@Common["Label_WorkOrderNumber"]</label>
+								@Html.EditorFor(model => model.WorkOrderFilter.WorkOrderNo, new { htmlAttributes = new { @class = "form-control",@type="number" } })
+
+							</div>
+						</div>
+					</div>
+
+					<div class="text-center mt-3">
+						<button id="searchVehicle" type="submit" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+						<button type="submit" id="ResetBtn" class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
+						<input type="hidden" id="hidSearchVehicleDefinitions" value="0" />
+					</div>
+					}
+					<hr />
+					<div id="contentEdit">
+						@await Html.PartialAsync("Edit", Model)
+					</div>
+					<div id="contentList">
+						@await Html.PartialAsync("_WorkOrderList", Model)
+					</div>
+					<div class="d-flex align-items-center justify-content-end mt-2">
+						<div id="contentPager" class="mb-3" hidden></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<div id="DamageList"></div>
+<script src="~/js/site.js"></script>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        loadWorkOrderDataUrl: '@Url.Action("loadWorkOrderData", "WorkOrder")',
+        vehicleListUrl: '@Url.Action("VehicleList", "WorkOrder")',
+        getAgreementUrl: '@Url.Action("M_Agreement_GetAgreementId", "WorkOrder")',
+        getMovementUrl: '@Url.Action("M_Agreement_GetMovementId", "WorkOrder")',
+        workOrderListUrl: '@Url.Action("WorkOrderList", "WorkOrder")'
+    });
+</script>
+<script src="~/js/Definitions/WorkOrder.js"></script>

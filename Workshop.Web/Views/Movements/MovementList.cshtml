@@ -1,0 +1,90 @@
+﻿@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.Vehicle.VehicleMovement;
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr px-2">
+                <h2 class="font-weight-bold">@Common["Label_MovementList"]</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <table class="table table-bordered table-hover w-100 text-center main-table" id="tblData">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Common["Label_Vehicle"]
+                                </th>
+                                <th>
+                                    @Html.DisplayName(Common["Label_MovementDate"])
+                                </th>
+                                <th>
+                                    @Html.DisplayName(Common["Label_ExitBranch"])
+                                </th>
+                                <th>
+                                    @Html.DisplayName(Common["Label_ReceivedBranch"])
+                                </th>
+                                <th>
+                                    @Common["Label_Action"]
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblData">
+                            @if (Model != null && Model.ColMovements != null && Model.ColMovements.Count > 0) { 
+                                foreach (var item in Model.ColMovements)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.VehicleName)
+                                        </td>
+                                        <td>
+                                            @(item.GregorianMovementDate?.ToString("dd/MM/yyyy"))
+                                        </td>
+                                        <td>
+                                            @((Model.ColBranches).Where(x => x.BranchID == item.ExitBranchId).FirstOrDefault() != null ?
+                                                        (Model.ColBranches).Where(x => x.BranchID == item.ExitBranchId).FirstOrDefault().BranchPrimaryName : "")
+                                        </td>
+                                        <td>
+                                            @((Model.ColBranches).Where(x => x.BranchID == item.ReceivedBranchId).FirstOrDefault() != null ?
+                                                        (Model.ColBranches).Where(x => x.BranchID == item.ReceivedBranchId).FirstOrDefault().BranchPrimaryName : "")
+
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("VehicleMovementFind","Movements", new {MovementId = item.MovementId })" class="btn btn-info">
+                                                <i class="fad fa-eye"></i>
+                                                &nbsp;
+                                                @Common["Button_View"]
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                    @if (Model != null && Model.ColMovements != null && Model.ColMovements.Count > 0)
+                    {
+                    <input id="total_pages" value="@Math.Ceiling((decimal)Model.ColMovements.ToList()[0].TotalPages / 25)" hidden />
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+        $('.main-table').DataTable({
+        responsive: true,
+        pageLength: 10,
+        info: false,
+        paging: false,
+        dom: 'tp',
+        language: {
+            emptyTable: resources.EmptyData
+        }
+    });
+</script>

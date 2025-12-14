@@ -1,0 +1,90 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.ExternalWorkshopInvoiceDTO
+@{
+    ViewBag.Title = @Common["MonthlyExternalWorkshopInvoicies"];
+   // var lang = "en";//Workshop.Controllers.LanguageController.GetCurrentLanguage();
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">
+                    @Common["ExternalWorkshopInvoice"]
+                </h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    @using (Html.BeginForm("Edit", "ExternalWorkshopInvoice", FormMethod.Post, new { @id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        @Html.Label(@Common["Label_Month"])
+                                        @* @Html.EditorFor(a => a.Month, new { htmlAttributes = new { @class = "form-control ", @min = "1", @max = "12", oninput = "ChangeMonth()" } }) *@
+                                        @Html.EditorFor(a => a.Month, new { htmlAttributes = new { @class = "form-control ", @min = "1", @max = "12", oninput = "ChangeMonth()" } })
+
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        @Html.Label(@Common["Label_FromDate"])
+                                        <div class="input-group">
+                                             @Html.TextBoxFor(model => model.GregorianFromDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", @type = "text" }) 
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        @Html.Label(@Common["Label_ToDate"])
+                                         @Html.TextBoxFor(model => model.GregorianToDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", @type = "text" }) 
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="CustomerList">
+                                    <div class="form-group">
+                                        @Html.Label(@Common["ExternalWorkshop"])
+                                        @Html.DropDownListFor(model => model.ExternalWorkshopId, (IEnumerable<SelectListItem>)ViewBag.WorkshopDefinitions, @Common["Select"], new { @class = "form-control select2" })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        @Html.Label(@Common["Label_InvoiceType"])
+                                        @Html.DropDownListFor(model => model.InvoiceTypeId, (IEnumerable<SelectListItem>)ViewBag.InvoiceTypes, @Common["Select"], new { @class = "form-control select2" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center text-white my-3">
+                                <button type="submit" id="btnCalculation" class="btn btn-default btn-w-m"><i class="fa fa-exchange"></i>&nbsp;@Common["Button_GetWorkOrders"]</button>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 my-3" id="contentList">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.RazorVars = Object.assign({}, window.RazorVars || {}, {
+        GetDateUrl: '@Url.Action("GetDate", "ExternalWorkshopInvoice")',
+        EditUrl: '@Url.Action("Edit", "ExternalWorkshopInvoice")',
+        getBranchsURL: '@Url.Action("GetBranchs", "ExternalWorkshopInvoice")',
+        getAgreementUrl: '@Url.Action("M_Agreement_GetAgreementId", "WorkOrder")',
+        getMovementUrl: '@Url.Action("M_Agreement_GetMovementId", "WorkOrder")',
+        commonError: '@Html.Raw(Common["Error"])',
+        ErrorHappended :'@Html.Raw(Common["ErrorHappend"])',
+    });
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/Definitions/ExternalWorkshopInvoice.js"></script>
+
+
+

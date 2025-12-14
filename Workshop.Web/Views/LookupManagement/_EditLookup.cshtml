@@ -1,0 +1,123 @@
+﻿@model Workshop.Core.DTOs.LookupDetailsDTO;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+<td class="d-none">
+    @Html.HiddenFor(a => a.Id)
+    @Html.HiddenFor(a => a.HeaderId, new { @class = "EditLookup" })
+</td>
+<td>
+    @Html.TextBoxFor(a => a.Code, new { @class = "form-control EditLookup", type = "form-control", @maxlength = "4" })
+    <span></span>
+</td>
+<td>
+    @Html.TextBoxFor(a => a.PrimaryName, new { @class = "form-control EditLookups", type = "form-control", @maxlength = "250" })
+    <span></span>
+<td>
+    @Html.TextBoxFor(a => a.SecondaryName, new { @class = "form-control EditLookups", type = "form-control", @maxlength = "250" })
+    <span></span>
+</td>
+
+<td>
+    <button type="button" class="btn btn-primary btn-sm" id="SubmitEditLookup">
+        <i class="fa fa-save"></i>&nbsp;@Common["Button_Save"]
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm" id="cancelEditing"><i class="fa fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
+</td>
+
+<script>
+    $(document).on("click", "#cancelEditing", function (e) {
+        search();
+    });
+
+
+        // Required-only validation with inline labels (no SweetAlert)
+    $(document).on('click', '#SubmitEditLookup', function (e) {
+        e.preventDefault();
+
+        var $btn = $(this);
+
+        // Resolve the row to validate
+        var idVal = $('#Id').val();
+        var $row = idVal ? $('#' + idVal) : $btn.closest('tr');
+        if (!$row.length) { $row = $(document); }
+
+        // Helper to get field from row; fall back to top-level input by id
+        function pick(selectorInRow, fallbackSelector) {
+            var $el = $row.find(selectorInRow);
+            if (!$el.length && fallbackSelector) $el = $(fallbackSelector);
+            return $el;
+        }
+
+        var $primary   = pick('input[name="PrimaryName"]',   '#PrimaryName');
+        var $secondary = pick('input[name="SecondaryName"]', '#SecondaryName');
+        var $code      = pick('input[name="Code"]',          '#Code');
+
+        // Clear previous indicators
+        $row.find('input.invalid').removeClass('invalid');
+        $row.find('td > span').removeClass('invalid').html('');
+
+        var isValid = true;
+
+        function requireFilled($input, tdIndex, label) {
+            var value = $.trim($input.val());
+            var $td = $input.closest('td');
+            var $span = $td.find('span');
+            // If tdIndex provided & row is a <tr>, use that specific cell’s <span>
+            if (tdIndex != null && $row.is('tr')) {
+                var $specific = $row.find('td:eq(' + tdIndex + ') > span');
+                if ($specific.length) $span = $specific;
+            }
+
+            if (!value) {
+                $input.addClass('invalid');
+                if ($span.length) $span.addClass('invalid').html(resources.required_field);
+                isValid = false;
+            } else {
+                $input.removeClass('invalid');
+                if ($span.length) $span.removeClass('invalid').html('');
+            }
+        }
+
+        // Only "required" checks
+        requireFilled($primary,   2, 'Primary Name');
+        requireFilled($secondary, 3, 'Secondary Name');
+        requireFilled($code,      1, 'Code');
+
+        if (!isValid) return; // show inline labels only; no popups
+
+        // Submit when valid
+        var model = {
+            'Id': idVal,
+            'PrimaryName': $primary.val(),
+            'SecondaryName': $secondary.val(),
+            'Code': $code.val(),
+            'HeaderId': $("#HeaderId").val()
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("LookupUpdate", "LookupManagement")',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(model),
+            success: function (result) {
+                search();
+            }
+        });
+    });
+
+    // Optional: live clear the label as the user types
+    $(document).on('input change', 'input[name="PrimaryName"], input[name="SecondaryName"], input[name="Code"]', function () {
+        var $input = $(this);
+        var $td = $input.closest('td');
+        var $span = $td.find('span');
+        if ($.trim($input.val())) {
+            $input.removeClass('invalid');
+            if ($span.length) $span.removeClass('invalid').html('');
+        }
+    });
+
+
+</script>

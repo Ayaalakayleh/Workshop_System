@@ -1,0 +1,481 @@
+﻿@using Workshop.Core.DTOs.AccountingDTOs
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.Vehicle.VehicleMovement;
+@{
+    var lang = "en";
+}
+@using (Html.BeginForm("TransferMoveIn", "WorkshopMovement", FormMethod.Post, new { enctype = "multipart/form-data", id = "TransferMovementIn" }))
+{
+    @Html.HiddenFor(a => a.MovementId)
+    @Html.HiddenFor(a => a.VehicleID)
+    @Html.HiddenFor(a => a.MoveInWorkshopId)
+    @Html.HiddenFor(a => a.MoveOutWorkshopId)
+    @Html.HiddenFor(a => a.WorkshopId)
+    @Html.HiddenFor(a => a.ExitMeter)
+    @Html.HiddenFor(a => a.MasterId)
+    @Html.HiddenFor(a => a.ExitDriverId)
+    @Html.HiddenFor(a => a.LastVehicleStatus)
+    @Html.HiddenFor(a => a.VatRate)
+    @Html.HiddenFor(a => a.WorkOrderId)
+    @Html.Hidden("FixedServiceIds", "", new { id = "FixedServiceIds" })
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label class="">@Common["Movement Date"]</label>
+                <div class=" input-group" id="">
+                    @Html.EditorFor(model => model.GregorianMovementDate, new { htmlAttributes = new { @class = "form-control flat-picker" } })
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class="">@Common["Received Time"]</label>
+                @Html.EditorFor(model => model.ReceivedTime, new { htmlAttributes = new { @type = "time", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="col-6">
+
+            <div class="form-group">
+                <label class=" ">@Common["Received Meter"]</label>
+                <input type="number"
+                       class="form-control"
+                       id="ReceivedMeter"
+                       name="ReceivedMeter"
+                       @(Model.isPart ? "disabled='disabled'" : "") />
+            </div>
+        </div>
+        <div class="col-lg-6">
+
+            <div class="form-group">
+                <label class="">@Common["Fuel Level"]</label>
+                @Html.DropDownListFor(model => model.FuelLevelId,
+                new SelectList(Model.fuelLevels, "Id", "FuleLevelPrimaryName"),
+                        @Common["Select"],
+                        Model.isPart
+                        ? new { @class = "form-control select2", @id = "OutfuelLevelId", disabled = "disabled" }
+                        : new { @class = "form-control select2", @id = "OutfuelLevelId" })
+        </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="font-normal ">@Common["Driver"]</label>
+                <input type="text" id="ExitDriverName" name="ResivedDriver" class="form-control" @(Model.isPart ? "disabled='disabled'" : "")>
+            </div>
+        </div>
+        @* @{var claim = Model.Dameges.Find(p => p.Id == Model.ColMaintenanceCard[0].DamageId); *@
+        @*     var claimType = claim != null ? claim.ClaimType : 0; *@
+        @*     var insurance = claim != null ? claim.FullInsuranceStatus : 0; *@
+        @* } *@
+        @* <input type="hidden" id="claimType" value="@(claimType)" /> *@
+        @* @if (claimType == 2 || (claimType == 1 && insurance == 2)) *@
+        @* { *@
+        @*     <div class="col-6"> *@
+
+        @*         <div class="form-group"> *@
+        @*             <label class=" ">@Common["DeductibleAmount"]</label> *@
+        @*             @Html.TextBoxFor(a => a.DeductibleAmount, htmlAttributes: new { @class = "form-control " }) *@
+        @*         </div> *@
+        @*     </div> *@
+        @*     <div class="col-6"> *@
+
+        @*         <div class="form-group"> *@
+        @*             <label class=" ">@Common["ConsumptionValueOfSpareParts"]</label> *@
+        @*             @Html.TextBoxFor(a => a.ConsumptionValueOfSpareParts, htmlAttributes: new { @class = "form-control " }) *@
+        @*         </div> *@
+        @*     </div> *@
+        @* } *@
+
+        <div class="col-6">
+            <div class="form-group">
+                <label class=" ">@Common["Parts Cost"]</label>
+                @Html.TextBoxFor(a => a.PartsCost, htmlAttributes: new { @class = "form-control ", @type = "number", @onchange = "ChangeVat()" })
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                <label class=" ">@Common["Labor Cost"]</label>
+                @Html.TextBoxFor(a => a.LaborCost, htmlAttributes: new { @class = "form-control ", @type = "number", @onchange = "ChangeVat()" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class=" ">@Common["Vat"]</label>
+                @Html.TextBoxFor(a => a.Vat, htmlAttributes: new { @class = "form-control ", @type = "number", @readonly = "readonly" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class=" ">@Common["Total Invoice"]</label>
+                @Html.TextBoxFor(a => a.TotalWorkOrder, htmlAttributes: new { @class = "form-control ", @type = "number", @readonly = "readonly" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class=" ">@Common["Invoice Type"]</label>
+
+                @Html.DropDownListFor(model => model.InvoiceTypeId, new SelectList(Model.InvoiceType ?? new List<TypeSalesPurchases>(), "Id", lang == "en" ? "PrimaryName" : "SecondaryName"), Common["Select"], new { @class = "form-control select2" })
+
+                @Html.ValidationMessageFor(m => m.InvoiceTypeId, "", new { @class = "text-danger " })
+            </div>
+        </div>
+        <div class="col-6">
+
+            <div class="form-group">
+                <label class=" ">@Common["Invoice No"]</label>
+                @Html.TextBoxFor(a => a.InvoceNo, htmlAttributes: new { @class = "form-control " })
+            </div>
+        </div>
+        <div class="col-6 my-5">
+            <div class="form-group">
+                <div class="form-check form-switch">
+                    @Html.CheckBoxFor(model => model.NotTaxable, new { @class = "form-check-input", id = "NotTaxable" })
+                    <label class="form-check-label" for="NotTaxable">Not Taxable</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group form-check mt-3">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="IsPart"
+                       @(Model.isPart ? "checked" : "")
+                       disabled />
+
+                <label class="form-check-label" for="IsPart">
+                    @Common["Is Part"]
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div id="MaintenanceCard" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table class="table table-bordered table-hover w-100 text-center" id="tblMainteneance">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                @Common["Service"]
+                                            </th>
+
+                                            <th>
+                                                @Common["Description"]
+                                            </th>
+
+                                            <th>
+                                                @Common["Status"]
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblData">
+                                        @foreach (var item in Model.WIPServices)
+                                        {
+                                            if (item.Id > 0)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <input type="hidden" class="service-id" value="@item.Id" />
+                                                        <label class="text-info mt-0">@item.Code</label>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" readonly class="form-control" value="@item.Description">
+                                                    </td>
+                                                    <td>
+                                                        <div class="custom-control custom-switch custom-control-inline my-1">
+                                                            <input type="checkbox" class="custom-control-input service-checkbox"
+                                                                   data-service-id="@item.Id" />
+                                                            <label class="custom-control-label align-middle">@Common["IsFix"]</label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* <div class="row"> *@
+    @*     <div class="col-12"> *@
+    @*         <form role="form"> *@
+    @*             <div class="form-group"> *@
+    @*                 <label class=" ">@Common["Upload"]</label> *@
+    @*                 <input type="file" name="Invoice" id="Invoicefile" /> *@
+    @*             </div> *@
+    @*         </form> *@
+    @*     </div> *@
+    @* </div> *@
+
+    <div class="text-center mt-4">
+        <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+    </div>
+}
+
+<script src="~/js/site.js"></script>
+<script>
+    var cuspond;
+    var validPhoto = true;
+    $(document).ready(function () {
+
+        var inputElement = document.querySelector('#Invoicefile');
+        // Create the FilePond instance
+        cuspond = FilePond.create(inputElement, {
+            imageCropAspectRatio: '1:1',
+            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/PNG', 'application/pdf'],
+            maxFileSize: fileSizeAllowed + fileSizeUnit,
+            fileMetadataObject: {
+                'markup': [
+                    [
+                        'rect', {
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: '60px',
+                            backgroundColor: 'rgba(0,0,0,.5)',
+                        },
+                    ]
+                ]
+            },
+            allowMultiple: true,
+            maxFiles: 5,
+            onprocessfile: (files) => { isLoadingCheck(); },
+            onaddfile: (file) => { isLoadingCheck(); },
+            onremovefile: (file) => { isLoadingCheck(); }
+        });
+
+    });
+
+    function ChangeVat() {
+
+        var LaborCost = $('#LaborCost').val();
+        var PartsCost = $('#PartsCost').val();
+
+        /*var VatRate = $('#VatRate').val();*/
+        var isNotTaxable = $('#NotTaxable').is(':checked');
+        var VatRate = isNotTaxable ? 0 : parseFloat($('#VatRate').val()) || 0;
+
+        var VatValue = (parseFloat(LaborCost) + parseFloat(PartsCost)) * (parseFloat(VatRate) / 100);
+       // var VatValue = ( parseFloat(PartsCost)) * (parseFloat(VatRate) / 100);
+        $('#Vat').val(VatValue);
+         $('#TotalWorkOrder').val( parseFloat(VatValue)+parseFloat(PartsCost)+parseFloat(LaborCost)) ;
+    }
+
+    function ValidOut() {
+
+        isValid = true;
+        var isPart = $("#IsPart").is(":checked");
+        if(!isPart){
+        if ($("#OutfuelLevelId").val() == "") {
+            $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            isValid = false;
+        } else {
+            $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+        }
+        }
+        
+        if ($("#GregorianMovementDate").val() == "") {
+            $("#GregorianMovementDate").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            isValid = false;
+        } else {
+            $("#GregorianMovementDate").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+        }
+        if ($("#ReceivedTime").val() == "") {
+            $("#ReceivedTime").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            isValid = false;
+        } else {
+            $("#ReceivedTime").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+        }
+        if(!isPart){
+         if ($("#ReceivedMeter").val() == "" || $("#ReceivedMeter").val() == 0) {
+            $("#ReceivedMeter").addClass("invalids");
+            isValid = false;
+        } else {
+            $("#ReceivedMeter").removeClass("invalids");
+        }}
+           if (!isPart) {
+        if (parseInt($('#ReceivedMeter').val()) < parseInt($("#ExitMeter").val())) {
+            $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            Swal.fire("@Common["Error"]", "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]"+" : "+parseInt($("#ExitMeter").val())+" "+"@Common["KiloMeter"]", "error");
+            isValid= false;
+        } else {
+            $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+        }
+    }
+
+        if ($("#InvoceNo").val() == "" && ($("#LaborCost").val() >0 || $("#PartsCost").val() >0) ) {
+            $("#InvoceNo").addClass("invalids");
+            isValid = false;
+        } else {
+            $("#InvoceNo").removeClass("invalids");
+        }
+
+        //if ($("#Vat").val() == "" || $("#Vat").val() == 0 && ($("#LaborCost").val() >0 || $("#PartsCost").val() >0)) {
+        //    $("#Vat").addClass("invalids");
+        //    isValid = false;
+        //} else {
+        //    $("#Vat").removeClass("invalids");
+        //}
+
+        if (!$("#NotTaxable").is(":checked")) {
+            if (
+                ($("#Vat").val() === "" || $("#Vat").val() == 0) &&
+                ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)
+            ) {
+                $("#Vat").addClass("invalids");
+                isValid = false;
+            } else {
+                $("#Vat").removeClass("invalids");
+            }
+        } else {
+            // If NotTaxable is checked, clear invalid class just in case
+            $("#Vat").removeClass("invalids");
+        }
+
+        if ($("#InvoiceTypeId").val() == "" && ($("#LaborCost").val() >0 || $("#PartsCost").val() >0)) {
+            $("#InvoiceTypeId").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            isValid = false;
+        } else {
+            $("#InvoiceTypeId").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+        }
+
+        if ($("#claimType").val() == 2) {
+
+            if ($("#ConsumptionValueOfSpareParts").val() == "" || $("#ConsumptionValueOfSpareParts").val() == 0) {
+                $("#ConsumptionValueOfSpareParts").addClass("invalids");
+                isValid = false;
+            } else {
+                $("#ConsumptionValueOfSpareParts").removeClass("invalids");
+            }
+            if ($("#DeductibleAmount").val() == "" || $("#DeductibleAmount").val() == 0) {
+                $("#DeductibleAmount").addClass("invalids");
+                isValid = false;
+            } else {
+                $("#DeductibleAmount").removeClass("invalids");
+            }
+        }
+        if (!isPart) {
+         if ($("#ExitDriverName").val() == "") {
+            $("#ExitDriverName").addClass("invalids");
+            isValid = false;
+        } else {
+            $("#ExitDriverName").removeClass("invalids");
+        }}
+       
+
+       
+        var isNotTaxable = $('#NotTaxable').is(':checked');
+
+
+    // Collect all checked service IDs
+    var fixedServiceIds = [];
+    $('.service-checkbox:checked').each(function() {
+        var serviceId = $(this).data('service-id');
+        fixedServiceIds.push(serviceId);
+    });
+
+    // Set the hidden field value
+    $('#FixedServiceIds').val(fixedServiceIds.join(','));
+
+
+    var itemForm = new FormData($('#TransferMovementIn').get(0));
+    
+    var movement = {
+        'VehicleID': $('#VehicleID').val(),
+        'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
+        'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
+        'WorkshopId': $('#WorkshopId').val(),
+        'ReceivedMeter': $('#ReceivedMeter').val(),
+        'MasterId': $('#MasterId').val(),
+        'ExitMeter': $('#ExitMeter').val(),
+        'FuelLevelId': $("#OutfuelLevelId").val(),
+        'ReceivedDriverId': $('#ExitDriverName').val(),
+        'ExitDriverId': $('#ExitDriverId').val(),
+        'MovementOutId': $('#MovementId').val(),
+        'InvoceNo': $('#InvoceNo').val(),
+        'TotalWorkOrder': $('#TotalWorkOrder').val(),
+        'Vat': isNotTaxable ? 0 : $("#Vat").val(),
+        'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
+        'DeductibleAmount': $("#DeductibleAmount").val(),
+        'LastVehicleStatus': $('#LastVehicleStatus').val(),
+        'ReceivedTime': $("#ReceivedTime").val(),
+        'PartsCost': $("#PartsCost").val(),
+        'LaborCost': $("#LaborCost").val(),
+        'InvoiceTypeId': $("#InvoiceTypeId").val(),
+        'WorkOrderId': $("#WorkOrderId").val(),
+        'FixedServiceIds': fixedServiceIds.join(','), // Add the comma-separated IDs
+        'isPart': $('#IsPart').is(':checked')
+    };
+
+    // Append each property individually
+    Object.keys(movement).forEach(function(key) {
+        if (movement[key] !== null && movement[key] !== undefined) {
+            itemForm.append(key, movement[key]);
+        }
+    });
+    
+    // Append fixed service IDs
+    itemForm.append('FixedServiceIds', fixedServiceIds.join(','));
+
+        // if (cuspond.getFiles().length == 0 && $("#InvoceNo").val() != "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
+        //         $("#Invoicefile>.filepond--drop-label").css("border", "2px solid red");
+        //         isValid = false;
+        // }
+        // if (cuspond.getFiles().length > 0) {
+        //     for (var j = 0; j < cuspond.getFiles().length; j++) {
+        //         itemForm.append('ExternalWorkshopInvoice', cuspond.getFiles().length > 0 ? cuspond.getFiles()[j].file : null);
+        //     }
+        // }
+
+        if (isValid) {
+            $.ajax({
+
+                url: "@Url.Action("TransferMoveIn", "WIP")",
+                type: 'POST',
+                data:  itemForm,
+                dataType: 'JSON',
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+                    if (data.isSuccess) {
+
+                        Swal.fire({
+                                icon: 'success',
+                                title: "Done Successfully",
+                                confirmButtonText: '@Common["Ok"]',
+                                confirmButtonColor: 'var(--primary-600)',
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+
+                                window.location.href="@Url.Action("TransferMovements", "WIP")";
+                            });
+                    }
+                    else {
+                        Swal.fire("@Common["Error"]", data.message);
+                    }
+                }
+            });
+        }
+    }  
+    $('#NotTaxable').change(function () {
+        ChangeVat();       
+    })
+</script>
+

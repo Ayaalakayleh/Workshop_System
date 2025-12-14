@@ -1,0 +1,14 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+    <div class="tab-pane fade" id="tabCodes" role="tabpanel">
+              <div class="card"><div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4 col-sm-12"><label class="form-label">@Common["Label_Department"]</label><select class="form-control" id="Department"><option>@Common["Label_Workshop"]</option><option>@Common["Label_BodyShop"]</option><option>@Common["Label_Parts"]</option></select></div>
+@*                   <div class="col-md-4 col-sm-12"><label class="form-label">@Common["Label_SaleType"]</label><select class="form-control" id="SaleType"><option>@Common["Label_Internal"]</option><option>@Common["Label_Retail"]</option><option>@Common["Label_Warranty"]</option><option>@Common["Label_Insurance"]</option></select></div>
+ *@                  <div class="col-md-4 col-sm-12"><label class="form-label">@Common["Label_CarPark"]</label><select class="form-control" id="CarPark"><option>@Common["Label_VehicleHere"]</option><option>@Common["Label_Outside"]</option></select></div>
+                </div>
+              </div></div>
+            </div>

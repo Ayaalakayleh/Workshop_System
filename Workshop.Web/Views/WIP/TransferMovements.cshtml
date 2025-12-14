@@ -1,0 +1,138 @@
+﻿@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+@model Workshop.Core.DTOs.Vehicle.VehicleMovement;
+@{
+    ViewBag.Title = Common["TransferMovement"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Transfer Movement"]</h2>
+
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    <table class="table table-bordered table-hover w-100 text-center">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    @Common["Label_Vehicle"]
+                                </th>
+
+                                <th>
+                                    @Common["Label_Workshop"]
+                                </th>
+                                <th>
+                                    @Common["Label_IsPart"]
+                                </th>
+                                <th>
+                                    @Common["Transfer Date"]
+                                </th>
+                                <th>
+                                    @Common["Expected Return Date"]
+                                </th>
+                                <th>
+                                    @Common["Label_Action"]
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl_posts_body">
+
+                            @foreach (var tt in Model.ColMovements)
+                            {
+                                <tr id="@tt.MovementId">
+                                    <td>
+                                        @((Model.vehicleNams).Where(x => x.id == tt.VehicleID).FirstOrDefault() != null ?
+                                                        (Model.vehicleNams).Where(x => x.id == tt.VehicleID).FirstOrDefault().VehicleName : "")
+
+                                    </td>
+
+                                    <td>
+                                        @((Model.workshops).Where(x => x.Id == tt.MoveInWorkshopId).FirstOrDefault() != null ?
+                                                        (Model.workshops).Where(x => x.Id == tt.MoveInWorkshopId).FirstOrDefault().Name : "")
+                                    </td>
+                                    <td>
+
+                                        @(tt.isPart ? "Part" :"Not Part")
+
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => tt.GregorianMovementDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => tt.GregorianMovementEndDate)
+                                    </td>
+
+                                    <td class="text-white">
+
+                                        <button class="btn btn-success btn-sm btn-w-m pencil_before movement-in-btn"
+                                                data-movement-id="@tt.MovementId"
+                                                data-toggle="modal"
+                                                data-target="#MovementIn">
+                                            @Common["Check In"]
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MovementIn" class="modal fade " tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @Common["Transfer Movements"]
+                </h5>
+                <button type="button" class="btn btn-system ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <svg class="sa-icon sa-icon-2x">
+                        <use href="icons/sprite.svg#x"></use>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div id="EditDelete"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+
+             $('.movement-in-btn').on('click', function() {
+            var movementId = $(this).data('movement-id');
+            $('#MovementIn').modal('show');
+
+            $.ajax({
+                url: '@Url.Action("TransferMovementIn", "WIP")',
+                type: 'GET',
+                data: { Id: movementId },
+                contentType: 'application/json',
+                dataType: 'html',
+                success: function(response) {
+                    $('#EditDelete').html(response);
+                },
+            });
+        });
+    })
+</script>
+

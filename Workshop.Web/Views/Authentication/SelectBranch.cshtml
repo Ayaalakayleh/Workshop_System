@@ -1,0 +1,185 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.General.CompanyBranch>
+
+@{
+    ViewBag.Title = "SelectBranch";
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Workshop System
+    </title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+
+    <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/vendors.bundle.css">
+    <link id="appbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/app.bundle.css">
+    <link id="mytheme" rel="stylesheet" media="screen, print">
+    <link id="myskin" rel="stylesheet" media="screen, print" href="~/auth-assets/css/skins/skin-master.css">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png">
+    <link rel="mask-icon" href="img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="stylesheet" media="screen, print" href="~/auth-assets/css/page-login-alt.css">
+    <link href="~/auth-assets/css/themes/cust-theme-3.css" rel="stylesheet" />
+    <style>
+        @@font-face {
+            font-family: 'Tajawal-Bold';
+            src: url('../../smartadmin-5-styles/tajwal-arabic-font/Tajawal-Bold.ttf') format('truetype');
+        }
+
+        body {
+            overflow-y: scroll;
+        }
+
+        .blankpage-form-field {
+            margin: auto;
+        }
+
+        .select2-container {
+            z-index: 9999999 !important
+        }
+
+        #hidden-word {
+            width: 200px;
+            height: 50px;
+            white-space: nowrap;
+            padding-right: 40px
+        }
+
+        .page-logo-text {
+            text-align: start;
+            color: var(--theme-dark) !important
+        }
+
+        .blankpage-form-field .page-logo, .blankpage-form-field .card {
+            background-image: unset !important;
+            background-color: unset !important;
+            background: rgba(255, 255, 255, 0.25) !important;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        }
+
+        .btn.btn-outline-danger {
+            color: #dc3545 !important;
+            border: 1px solid #dc3545 !important
+        }
+
+            .btn.btn-outline-danger:hover {
+                background-color: #dc3545 !important;
+                border: 1px solid #dc3545 !important;
+                color: #fff !important
+            }
+
+        address {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Tajawal-Bold';
+        }
+
+        .btn.btn-glass {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .auth-logo {
+            width: 400px
+        }
+
+        @@media only screen and (max-width: 465px) {
+            .auth-logo {
+                width: 100%;
+            }
+        }
+
+        center {
+            margin: 12%
+        }
+    </style>
+</head>
+
+<body class="d-block">
+
+    <center>
+        <span class="mb-3">
+            <img src="~/smartadmin-5-styles/img/fleetexpresslogo.png" class="auth-logo" />
+        </span>
+        <h1 class="text-black my-5">SelectBranch</h1>
+        <div class="row justify-content-center my-5">
+            @if (Model != null && Model.ToList().Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 my-3">
+                        <div class="blankpage-form-field w-100">
+                            <div class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+                                <a class="page-logo-link d-flex align-items-center">
+                                    @if (item.Img != null)
+                                    {
+                                        <div class="m-auto">
+                                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.Img)" class="rounded-circle" alt="@item.BranchPrimaryName" aria-roledescription="logo">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="m-auto">
+                                            <img src="~/Content/img/branch.png" alt="@item.BranchPrimaryName" class="rounded-circle" aria-roledescription="logo">
+                                        </div>
+                                    }
+                                </a>
+                            </div>
+                            <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0 text-center">
+                                <a href="@Url.Action("SelectBranchLink", "Authentication", new { branch = item.BranchID })">
+                                    <address class="m-t-md text-dark">
+                                        <label>  @Html.DisplayFor(modelItem => item.BranchPrimaryName)</label><br />
+                                        <abbr title="Phone"></abbr>   @Html.DisplayFor(modelItem => item.BranchSecondaryName)
+                                    </address>
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-lg-12">
+                    <div class="wrapper wrapper-content animated  center">
+                        <div class="row ">
+                            <label class="label label-danger">lblNoBranches</label>
+
+                        </div>
+
+                        <br />
+                        <a href="@Url.Action("SelectCompany", "Authentication")">lblAnotherCompany</a>
+
+                        <br />
+                        <a href="@Url.Action("index", "Dashboard")">Logout</a>
+
+                    </div>
+
+                </div>
+            }
+        </div>
+        <a href="@Url.Action("SelectCompany")" class="btn btn-glass text-dark font-weight-bold">BackToCompanies</a>
+    </center>
+    <video poster="~/smartadmin-5-styles/img/clouds.png" id="bgvid" playsinline autoplay muted loop>
+        <source src="~/auth-assets/media/video/cc.webm" type="video/mp4">
+    </video>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+﻿@model Workshop.Core.DTOs.RTSCodeWithAllowedTimeDTO;
+@using Newtonsoft.Json;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@using Workshop.Web.Controllers
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+
+<div class="card-body p-0">
+        <div id="gridContainer"></div>
+    </div>
+<script>
+        var AllowedTimes = @Html.Raw(JsonConvert.SerializeObject(ViewBag.AllowedTimes ?? new List<object>()));
+        var Make = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Make ?? new List<object>()));
+        var Vehicle = @Html.Raw(JsonConvert.SerializeObject(ViewBag.VehiclesModels ?? new List<object>()));
+        var Class = @Html.Raw(JsonConvert.SerializeObject(ViewBag.VehiclesType ?? new List<object>()));
+</script>
+<script src="~/js/Definitions/AllowedTime.js"></script>

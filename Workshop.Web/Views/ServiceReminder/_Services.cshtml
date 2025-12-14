@@ -1,0 +1,51 @@
+﻿@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@using Workshop.Web.Services.Helpers.DateHelper
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model ServiceReminderPageVM
+
+@{
+    var lang = Workshop.Web.Controllers.ServiceReminderController.GetCurrentLanguage();
+}
+
+
+<table id="data" class="table table-striped table-hover text-center w-100 main-table">
+    <thead>
+        <tr>
+            <th>@Common["Label_Vehicle"]</th>
+            <th>@Common["Label_Services"]</th>
+            <th>@Common["Label_Status"]</th>
+            <th>@Common["Label_NextDue"]</th>
+            <th>@Common["Label_Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Reminders != null)
+        {
+            foreach (var item in Model.Reminders)
+            {
+                <tr>
+                    <input name="Id" type="hidden" value="@item.Id" />
+                    <td>@item.VehicleName</td>
+                    <td>@item.ServiceName</td>
+                    <td>@item.ReminderStatusName</td>
+                    <td>
+                        @{
+                            string datediff = DateCalculate.getDateDifference(item.NextDate ?? item.Date ?? DateTime.Now, DateTime.Now);
+                            var fromNow = Common["FromNow"];
+                            var ago = Common["Ago"];
+                        }
+                        @(item.NextDate > DateTime.Now ? datediff + " " + fromNow : (lang == "en" ? datediff + " " + ago : ago + " " + datediff))
+                        <br />
+                        @DateCalculate.getDecimalDifference(item.NextPrimaryMeter, item.CurrentMeter)
+                    </td>
+                    <td>
+                        <button class="btn btn-info btn-sm editBtn" data-id="@item.Id" data-bs-toggle="modal" data-bs-target="#serviceReminderModal"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</button>
+                        <button data-id="@item.Id" class="btn btn-danger btn-sm deleteBtn"><i class="fad fa-trash"></i>&nbsp;@Common["Delete"]</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

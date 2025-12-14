@@ -1,0 +1,32 @@
+﻿@model Workshop.Core.DTOs.LabourRateDTO;
+@using Workshop.Resources;
+
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<td class="d-none">
+    @Html.HiddenFor(a => a.Id)
+</td>
+<td>
+    @Html.TextBoxFor(a => a.LabourCode, new { @class = "form-control EditLookups", type = "form-control", @maxlength = "3" })
+    <span></span>
+<td>
+    @Html.TextBoxFor(a => a.DescriptionEn, new { @class = "form-control EditLookups", type = "form-control", @maxlength = "250" })
+    <span></span>
+</td>
+<td>
+    @Html.TextBoxFor(a => a.DescriptionAr, new { @class = "form-control EditLookup", type = "form-control", @maxlength = "250" })
+    <span></span>
+</td>
+<td>
+    <button type="button" class="btn btn-primary btn-sm" id="SubmitEditLookup">
+        <i class="fa fa-save"></i>&nbsp;SaveChanges
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm" id="cancelEditing"><i class="fa fa-times"></i>&nbsp;Cancel</button>
+</td>
+<script>
+     var Model = @Html.Raw(Json.Serialize(Model));
+</script>
+
+<script src="~/js/definitions/LabourRate.js"></script>

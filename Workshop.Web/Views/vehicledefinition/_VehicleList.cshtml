@@ -1,0 +1,48 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+@model List<Workshop.Core.DTOs.Vehicle.VehicleDefinitions>
+
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@{
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+}
+<div class="row">
+    <div class="col-12">
+        <table class="table table-striped table-hover main-table text-center" aria-describedby="DataTables_Table_0_info" role="grid">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayName(Common["Label_PlateNumber"])</th>
+                    <th> @Common["Label_Manufacturer"]</th>
+                    <th>@Html.DisplayName(Common["Label_Model"])</th>
+                    <th>@Html.DisplayName(Common["Label_ManufacturerYear"])</th>
+                    <th>@Common["Label_Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="gradeX" id="@item.Id">
+                        <td class="text-truncate">@Html.DisplayFor(modelItem => item.PlateNumber)</td>
+                        <td>@(lang == "en" ? item.RefManufacturers.ManufacturerPrimaryName : item.RefManufacturers.ManufacturerSecondaryName)</td>
+                        <td>@(lang == "en" ? item.RefVehicleModels.VehicleModelPrimaryName : item.RefVehicleModels.VehicleModelSecondaryName)</td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ManufacturingYear)
+                        </td>
+                        <td>
+                            @* @if (BaseHttpContext.UserHasPermission(Permissions.AddVehicleDefinitions)) *@
+                            @* { *@
+                            <button class="btn btn-info btn-sm" onclick="location.href = '@Url.Action("Edit", "VehicleDefinition")/@item.Id'"><i class="fa fa-pencil"></i>&nbsp;@Common["Edit"]</button>
+                            @* } *@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+@*         @if (Model.Count > 0)
+        {
+            <input id="total_pages" value="@Math.Ceiling((decimal)Model.ToList()[0].TotalPages / 25)" hidden />
+        } *@
+</div>
+</div>
+<script src="~/js/site.js"></script>

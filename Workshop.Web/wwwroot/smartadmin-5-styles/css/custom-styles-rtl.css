@@ -1,0 +1,9 @@
+﻿[lang="ar"] .fa-arrow-left {
+    transform: rotate(180deg);
+}
+.dir-ltr {
+    transform: scaleX(-1)
+}
+#historyTable_filter{
+    float:left
+}

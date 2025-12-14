@@ -1,0 +1,278 @@
+﻿.panel-hdr {
+    background-color: transparent !important;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+    .panel-hdr h2 {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #333;
+        margin: 0;
+        padding: 0.75rem 1rem;
+    }
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    color: #444;
+    font-weight: 500;
+}
+
+.flatpickr-calendar {
+    border: 1px solid var(--primary-500);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day:hover,
+.flatpickr-day:focus {
+    background: var(--primary-500);
+    color: #fff;
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-weekday,
+.flatpickr-current-month {
+    color: var(--primary-500);
+}
+
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+    fill: var(--primary-500);
+}
+.iti {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.iti__tel-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+    .iti__tel-input:focus {
+        border-color: var(--primary-600);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--dark);
+    }
+
+.validation-result {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+    .validation-result.valid {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .validation-result.invalid {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+.info-display {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.btn-custom {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin: 5px;
+    transition: all 0.3s ease;
+}
+
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); /* You may replace this with rgba of primary if desired */
+    }
+
+.demo-slider {
+    margin: 20px 0;
+}
+
+.demo-description {
+    margin-bottom: 15px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.slider-info {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f1f5f9;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #475569;
+}
+
+/* Custom IonRangeSlider styling with primary color */
+.irs--flat .irs-bar {
+    background-color: var(--primary-600) !important;
+}
+
+.irs--flat .irs-from,
+.irs--flat .irs-to,
+.irs--flat .irs-single {
+    background-color: var(--primary-600) !important;
+}
+
+    .irs--flat .irs-from:before,
+    .irs--flat .irs-to:before,
+    .irs--flat .irs-single:before {
+        border-top-color: var(--primary-600) !important;
+    }
+
+.irs--flat .irs-handle > i:first-child {
+    background-color: var(--primary-600) !important;
+}
+
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+}
+
+#dataGrid {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+    #dataGrid th {
+        background-color: var(--primary-500);
+        color: #fff;
+        font-weight: 600;
+        padding: 12px 8px;
+        border: 1px solid var(--gray-200);
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    #dataGrid td {
+        padding: 4px;
+        border: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+
+/* Input Styles */
+.grid-input {
+    border: 1px solid transparent;
+    background-color: transparent;
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    color: var(--gray-700);
+}
+
+    .grid-input:hover {
+        background-color: var(--gray-50);
+        border-color: var(--gray-300);
+    }
+
+    .grid-input:focus {
+        background-color: var(--white);
+        border-color: var(--primary-500);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+
+    .grid-input.readonly {
+        background-color: var(--gray-100);
+        cursor: not-allowed;
+        color: var(--gray-500);
+    }
+
+/* Row Styles */
+.grid-row {
+    transition: background-color 0.2s ease;
+}
+
+    .grid-row:hover {
+        background-color: var(--gray-50);
+    }
+
+    .grid-row.editing {
+        background-color: #fef3c7;
+    }
+
+/* Helper Text */
+.help-text {
+    color: var(--gray-500);
+    font-size: 12px;
+}
+
+/* Animation for new rows */
+.grid-row.new-row {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem 0.5rem;
+    }
+
+    #dataGrid th,
+    #dataGrid td {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+
+    .grid-input {
+        padding: 6px;
+        font-size: 12px;
+    }
+}

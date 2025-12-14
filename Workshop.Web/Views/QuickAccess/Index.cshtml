@@ -1,0 +1,264 @@
+﻿@using Microsoft.Extensions.Localization
+@using Workshop.Resources
+@using Workshop.Core.DTOs.General
+@inject IStringLocalizer<Common> CommonLocalizer
+@inject IStringLocalizer<Messages> MessagesLocalizer
+
+@{
+    var userInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.User>(Context.Session.GetString("UserInfo"));
+}
+
+<div id="new_quickAccess">
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon">
+                    <img src="~/smartadmin-5-styles/img/boy.png" />
+                </div>
+                <div class="text-start mx-3">
+                    @CommonLocalizer["Hi"], @userInfo?.FirstName @userInfo?.LastName
+                    <div class="page-title-subheading">
+                        @CommonLocalizer["WelcomeMessage"]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2 class="font-weight-bold">
+                        @CommonLocalizer["ScreenShortcuts"]
+                    </h2>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+
+                        <!-- Screen Shortcuts (Workshop) -->
+                        <div class="row">
+
+                            <!-- DEFINITIONS -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2 text-start">
+                                <div data-navid="wk-nav" class="w-100 solid-blue shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "TechnicianProfileDefinition")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-user-cog fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Label_Technicians"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-blue-2 shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "AccountDefinition")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-id-card fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["AccountDefinition"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-cyan shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "LookupManagement")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-search fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["LookupManagement"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-green shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "Recall")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-undo-alt fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Recall"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- RTS -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-purple shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "RTSCode")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-code fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["RTSCodeDefinition"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-purple-2 shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "Menu")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-th-list fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["MenuRTS"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- TEAMS -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-coral shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "Teams")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-users fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Teams"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- SHIFTS -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-orange shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "Shifts")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-business-time fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Shifts"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- PRICING -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-gold shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "PriceMatrix")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-tags fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["PriceMatrix"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- SERVICE REMINDER -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-yellow shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "ServiceReminder")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-bell fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["ServiceReminder"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- WORKSHOP DEFINITION -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-darkblue shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "WorkshopDefinitions")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-tools fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["WorkshopDefinition"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- VEHICLE DEFINITION -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-teal shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "VehicleDefinition")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-car fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["VehicleDefinition"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- WORKSHOP LOADING -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-primary shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "WorkshopLoading")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-dolly fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Label_WorkshopLoading"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- WORK ORDER -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-primary-2 shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "WorkOrder")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-clipboard-check fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["WorkOrder"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- WIP -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-darkgreen shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "WIP")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-tasks fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Title_RepairOrdersWIP"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- TECHNICIAN DASHBOARD -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-indigo shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "TechnicianDashboard")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-tachometer-alt fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["TechniciansDashboard"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- RESERVATIONS -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-pink shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "Reservations")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-calendar-check fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Label_Reservations"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- EXTERNAL WORKSHOP -->
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-brown shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("CollectionMappingIndex", "CollectionMapping")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-file-code fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["ExternalWorkshopTemplate"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-brown-3 shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "ExternalWorkshopInvoice")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-file-invoice fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["ExternalWorkshopInvoice"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-brown-4 shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("TransferMovements", "WIP")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-truck-loading fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["ExternallyTransportedVehicle"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- MOVEMENTS -->
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-slate shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "MovementIn")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-arrow-circle-down fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["MovementIn"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-12 p-2">
+                                <div data-navid="wk-nav" class="w-100 solid-slate-2 shadow-blue margin-5 floatleft HBTMetroMenu bg-primary-700 bg-primary tile-bt-large">
+                                    <a href="@Url.Action("Index", "Movements")" class="gradient d-flex justify-content-left align-items-center">
+                                        <i class="fas fa-exchange-alt fa-lg mx-2 text-white"></i>
+                                        <span class="light-text text-truncate">@CommonLocalizer["Movements"]</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /Screen Shortcuts (Workshop) -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

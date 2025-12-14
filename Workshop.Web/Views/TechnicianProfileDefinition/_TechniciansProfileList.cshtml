@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Workshop.Core.DTOs.TechnicianDTO>
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<table class="table table-striped table-hover main-table w-100">
+    <thead>
+        <tr>
+            <th>@Common["Label_PrimaryName"]</th>
+            <th>@Common["Label_Secondaryname"]</th>
+            <th>@Common["Label_Email"]</th>
+            <th>@Common["Label_Action"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.PrimaryName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.SecondaryName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                    <td>
+                        <a href="@Url.Action("Edit", "TechnicianProfileDefinition", new { id = item.Id })"
+                           class="btn btn-info btn-sm add-record">
+                            <i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+@*             <tr>
+                <td colspan="4">@Common["NoData"]</td>
+            </tr> *@
+        }
+    </tbody>
+</table>
+
+@if (Model != null && Model.Any())
+{
+    var first = Model.First();
+    var totalPages = Math.Ceiling((decimal)first.TotalPages / 25);
+    <input type="hidden" id="total_pages" value="@totalPages" />
+}
+
+<script src="~/js/site.js"></script>
