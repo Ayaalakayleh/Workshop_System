@@ -749,9 +749,10 @@ namespace Workshop.Infrastructure.Repositories
         public async Task<int> UpdatePartStatusForSingleItem(UpdateSinglePartStatusDTO dto)
         {
             var parameters = new DynamicParameters();
+            parameters.Add("Id", dto.Id);
             parameters.Add("WIPId", dto.WIPId);
-            parameters.Add("ItemId", dto.ItemId);
-            parameters.Add("LocatorId", dto.LocatorId);
+            //parameters.Add("ItemId", dto.ItemId);
+            //parameters.Add("LocatorId", dto.LocatorId);
             parameters.Add("StatusId", dto.StatusId);
 
             return await _database.ExecuteUpdateProcedure<int>(
@@ -771,8 +772,9 @@ namespace Workshop.Infrastructure.Repositories
         public async Task<int> WIP_UpdatePartWarehouseForSingleItem(UpdateSinglePartWarehouseDTO dto)
         {
             var parameters = new DynamicParameters();
+            parameters.Add("Id", dto.Id);
             parameters.Add("WIPId", dto.WIPId);
-            parameters.Add("ItemId", dto.ItemId);
+            //parameters.Add("ItemId", dto.ItemId);
             parameters.Add("WarehouseId", dto.WarehouseId);
             parameters.Add("LocatorId", dto.LocatorId);
 

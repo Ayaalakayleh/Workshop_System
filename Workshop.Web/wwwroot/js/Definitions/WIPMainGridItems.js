@@ -738,8 +738,9 @@ function updateStatusItem(e, statusId) {
     debugger;
     let dto = {
         WIPId: Number($("#Id").val()), 
-        ItemId: e.ItemId,
-        LocatorId: e.LocatorId,
+        Id: e.Id, 
+        //ItemId: e.ItemId,
+        //LocatorId: e.LocatorId,
         StatusId: statusId
     }
     $.ajax({
@@ -772,8 +773,9 @@ function IssueParts() {
     const grid = $('#mainItemsGrid').dxDataGrid('instance');
     var GridData = grid.option("dataSource");
     var WIPId = $("#Id").val();
-
+    
     Items = GridData.map(x => ({
+        KeyId: `${x.Id}`,
         FK_ItemId: x.ItemId,
         FK_UnitId: x.fk_UnitId,
         Quantity: x.RequestQuantity,
@@ -821,6 +823,7 @@ function TransferParts() {
     //const fromLocatorId = Number($("#transferFromLocator").val());
 
     const item = {
+        KeyId: `${row.Id}`,
         FK_ItemId: row.ItemId,
         FK_UnitId: row.fk_UnitId,
         UnitQuantity: row.Quantity,

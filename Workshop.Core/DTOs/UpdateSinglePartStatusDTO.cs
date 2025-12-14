@@ -8,9 +8,10 @@ namespace Workshop.Core.DTOs
 {
     public class UpdateSinglePartStatusDTO
     {
+        public int Id { get; set; }
         public int WIPId { get; set; }
-        public int ItemId { get; set; }
-        public int? LocatorId { get; set; }
+        //public int ItemId { get; set; }
+        //public int? LocatorId { get; set; }
         public int StatusId { get; set; }
     }
 
