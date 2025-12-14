@@ -4,6 +4,24 @@
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
 
+@{
+    // Key used to store the last opened WIP id in the browser
+    const string LastWipStorageKey = "last_wip_opened_id";
+    // URL template (we'll replace __ID__ in JS)
+    var editUrlTemplate = Url.Action("Edit", "WIP", new { id = "__ID__" });
+}
+
+<div class="d-flex justify-content-end mb-2">
+    <a id="btnOpenLastWip"
+       class="btn btn-primary btn-sm disabled"
+       data-url-template="@editUrlTemplate"
+       href="javascript:void(0)"
+       aria-disabled="true"
+       tabindex="-1">
+        <i class="fad fa-history"></i>&nbsp;Open last WIP
+    </a>
+</div>
+
 <table class="table table-bordered table-hover text-center w-100 main-table">
     <thead>
         <tr>
@@ -23,7 +41,9 @@
                     <td>@item.LookupCode - @item.LookupPrimaryName</td>
                     <td>@(item.IsExternal ? "External" : "Internal")</td>
                     <td class="d-flex gap-1 justify-content-center">
-                        <a href="@Url.Action("Edit", "WIP", new { id = item.Id })" class="btn btn-success btn-sm">
+                        <a href="@Url.Action("Edit", "WIP", new { id = item.Id })"
+                           class="btn btn-success btn-sm btn-open-wip"
+                           data-wip-id="@item.Id">
                             <i class="fad fa-folder-open"></i>&nbsp;@Common["Button_Open"]
                         </a>
                     </td>
@@ -32,7 +52,7 @@
         }
         else
         {
-@*             <tr>
+            @* <tr>
                 <td colspan="4">@Common["NoData"]</td>
             </tr> *@
         }
@@ -47,3 +67,83 @@
 
     <input id="total_pages" value="@totalPages" hidden />
 }
+
+<script>
+    (function () {
+        const STORAGE_KEY = "@LastWipStorageKey";
+
+        function setLastWipId(id) {
+            if (!id) return;
+            try { localStorage.setItem(STORAGE_KEY, String(id)); } catch (e) { /* ignore */ }
+        }
+
+        function getLastWipId() {
+            try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+        }
+
+        function enableOpenLastButton(lastId) {
+            const btn = document.getElementById("btnOpenLastWip");
+            if (!btn) return;
+
+            const template = btn.getAttribute("data-url-template") || "";
+
+            if (!lastId || !template) {
+                btn.href = "javascript:void(0)";
+                btn.classList.add("disabled");
+                btn.setAttribute("aria-disabled", "true");
+                btn.setAttribute("tabindex", "-1");
+                return;
+            }
+
+            btn.href = template.replace("__ID__", encodeURIComponent(lastId));
+            btn.classList.remove("disabled");
+            btn.setAttribute("aria-disabled", "false");
+            btn.removeAttribute("tabindex");
+        }
+
+        function init() {
+            enableOpenLastButton(getLastWipId());
+        }
+
+        init();
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        }
+
+        function captureFromEventTarget(target) {
+            const link = target.closest && target.closest(".btn-open-wip[data-wip-id]");
+            if (!link) return;
+
+            const id = link.getAttribute("data-wip-id");
+            setLastWipId(id);
+
+            enableOpenLastButton(id);
+        }
+
+        document.addEventListener("pointerdown", function (e) {
+            captureFromEventTarget(e.target);
+        }, true);
+
+        document.addEventListener("contextmenu", function (e) {
+            captureFromEventTarget(e.target);
+        }, true);
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            captureFromEventTarget(e.target);
+        }, true);
+
+        document.addEventListener("click", function (e) {
+            const btn = e.target.closest && e.target.closest("#btnOpenLastWip");
+            if (!btn) return;
+
+            const id = getLastWipId();
+            if (!id) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    })();
+</script>
+

@@ -20,7 +20,20 @@ let currentGroupId = null;  // selected WIP/group id in modal
 
 // ====== HELPERS ======
 const pad2 = n => n.toString().padStart(2, "0");
-function toMinutes(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; }
+
+// tolerant time parser: HH:MM, HH:MM:SS, HH:MM:SS.fff...
+const HHMMSS_to_min = (s) => {
+    if (!s) return NaN;
+    const str = String(s).trim();
+    const m = /^(\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d{1,9})?)?$/.exec(str);
+    if (!m) return NaN;
+    const h = Number(m[1]);
+    const min = Number(m[2]);
+    if (!Number.isFinite(h) || !Number.isFinite(min)) return NaN;
+    return h * 60 + min;
+};
+
+function toMinutes(hhmm) { return HHMMSS_to_min(hhmm); }
 function fromMinutes(mins) { const h = Math.floor(mins / 60), m = mins % 60; return `${pad2(h)}:${pad2(m)}`; }
 function addMinutes(hhmm, add) { return fromMinutes(toMinutes(hhmm) + add); }
 
@@ -33,8 +46,14 @@ function ymd(d) {
     return `${year}-${month}-${day}`;
 }
 
-function parseYMD(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+function parseYMD(s) {
+    const iso = String(s).slice(0, 10);
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d);
+}
+
 function between(min, max, val) { return Math.max(min, Math.min(max, val)); }
+
 function fmtHuman(hhmm) {
     let [h, m] = hhmm.split(":").map(Number);
     const ampm = h >= 12 ? "PM" : "AM";
@@ -42,25 +61,50 @@ function fmtHuman(hhmm) {
     return `${pad2(h)}:${pad2(m)} ${ampm}`;
 }
 
-// tolerant time parser so working/reserved blocks are not dropped
-const HHMMSS_to_min = (s) => {
-    if (!s) return NaN;
-    const m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(String(s).trim());
-    if (!m) return NaN;
-    const h = Number(m[1]);
-    const min = Number(m[2]);
-    if (!Number.isFinite(h) || !Number.isFinite(min)) return NaN;
-    return h * 60 + min;
+// normalize API date into YYYY-MM-DD
+const apiDateISO = (s) => {
+    if (!s) return null;
+    const str = String(s);
+    if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0, 10);
+    try {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) return ymd(d);
+    } catch { }
+    return null;
 };
 
-const apiDateISO = (s) => s ? String(s).slice(0, 10) : null;
+// ✅ UI-selected day key (use everywhere)
+function getSelectedDayISO() {
+    const v = document.getElementById("datePicker")?.value;
+    return v ? convertDateFormat(v) : ymd(currentDate);
+}
+
+// ====== OFF-BY-ONE DATE FIX HELPERS (backend returns previous day sometimes) ======
+function isoUTC(iso) {
+    const [y, m, d] = String(iso).slice(0, 10).split("-").map(Number);
+    return Date.UTC(y, m - 1, d);
+}
+function daysBetweenISO(aISO, bISO) {
+    return Math.round((isoUTC(bISO) - isoUTC(aISO)) / 86400000);
+}
+function shiftISO(iso, days) {
+    const dt = new Date(isoUTC(iso));
+    dt.setUTCDate(dt.getUTCDate() + days);
+    return dt.toISOString().slice(0, 10);
+}
+function modeDateISO(dates) {
+    const counts = new Map();
+    dates.forEach(d => counts.set(d, (counts.get(d) || 0) + 1));
+    let best = null, bestC = 0;
+    counts.forEach((c, d) => { if (c > bestC) { bestC = c; best = d; } });
+    return best;
+}
 
 // ====== HEADER RENDERING ======
 function renderHeaderHours() {
     const hours = document.getElementById("hoursHeader");
     if (!hours) return;
     hours.innerHTML = "";
-    // 08:00 → 17:00 (9 hours, 9 columns: 08..16)
     for (let h = 8; h < 17; h++) {
         const div = document.createElement("div");
         div.className = "wl-hour";
@@ -86,7 +130,10 @@ function setRangeLabel() {
     }
 }
 
-function setDatePicker() { const el = document.getElementById("datePicker"); if (el) el.value = ymd(currentDate); }
+function setDatePicker() {
+    const el = document.getElementById("datePicker");
+    if (el) el.value = ymd(currentDate);
+}
 
 // ====== INTERVAL UTILS ======
 function overlaps(aStart, aEnd, bStart, bEnd) { return aStart < bEnd && bStart < aEnd; }
@@ -123,7 +170,6 @@ function lanePosFromMinutes(startM, endM) {
     };
 }
 
-// merge a list of {start,end} (in minutes) into non-overlapping intervals
 function mergeIntervals(list) {
     if (!Array.isArray(list) || list.length === 0) return [];
     const arr = list
@@ -146,7 +192,6 @@ function mergeIntervals(list) {
     return merged;
 }
 
-// clip interval to visible shift (08–17)
 function clipIntervalToShift(interval) {
     const shiftStart = toMinutes(SHIFT_START);
     const shiftEnd = toMinutes(SHIFT_END);
@@ -156,7 +201,6 @@ function clipIntervalToShift(interval) {
     return { start, end };
 }
 
-// base \ subtract (all minute intervals)
 function subtractIntervals(base, subtract) {
     if (!Array.isArray(base) || !base.length) return [];
     if (!Array.isArray(subtract) || !subtract.length) return base.map(i => ({ ...i }));
@@ -170,14 +214,11 @@ function subtractIntervals(base, subtract) {
         subMerged.forEach(s => {
             const next = [];
             segments.forEach(seg => {
-                // no overlap
                 if (s.end <= seg.start || s.start >= seg.end) {
                     next.push(seg);
                     return;
                 }
-                // left piece
                 if (s.start > seg.start) next.push({ start: seg.start, end: s.start });
-                // right piece
                 if (s.end < seg.end) next.push({ start: s.end, end: seg.end });
             });
             segments = next;
@@ -190,37 +231,25 @@ function subtractIntervals(base, subtract) {
     return result.filter(x => x.end > x.start);
 }
 
-// Compute "visible" working (green) and reservations (red) for a tech/day
-// - working: intervals from API (or full shift if empty)
-// - reserved: reservation intervals from API
-// The green bars become "working BUT NOT reserved".
-// Use ONLY real working intervals. If none exist, show no green bar.
 function computeVisibleWorking(working, reserved) {
-    const shiftStart = toMinutes(SHIFT_START);
-    const shiftEnd = toMinutes(SHIFT_END);
-
-    // 1) Take working intervals from API and clip them to the visible shift
     let baseWorking = Array.isArray(working)
         ? working.map(clipIntervalToShift).filter(Boolean)
         : [];
 
     baseWorking = mergeIntervals(baseWorking);
 
-    // 2) Take reservations and clip/merge them
     const reservedClipped = (Array.isArray(reserved) ? reserved : [])
         .map(clipIntervalToShift)
         .filter(Boolean);
 
     const reservedMerged = mergeIntervals(reservedClipped);
 
-    // 3) Green = working minus reservations. If there was no working, it's simply empty.
     const visibleWorking = baseWorking.length
         ? subtractIntervals(baseWorking, reservedMerged)
         : [];
 
     return { visibleWorking, reservedMerged };
 }
-
 
 // ====== BUILD MAPS ======
 function buildIntervalMaps() {
@@ -235,7 +264,12 @@ function buildIntervalMaps() {
         wList.forEach(w => {
             const dISO = apiDateISO(w.date);
             const s = HHMMSS_to_min(w.startTime);
-            const e = HHMMSS_to_min(w.endTime);
+            let e = HHMMSS_to_min(w.endTime);
+
+            if (!Number.isFinite(e) && Number.isFinite(s) && Number.isFinite(w.durationMinutes)) {
+                e = s + Number(w.durationMinutes);
+            }
+
             if (!dISO || !Number.isFinite(s) || !Number.isFinite(e) || e <= s) return;
             if (!working.has(dISO)) working.set(dISO, new Map());
             const m = working.get(dISO);
@@ -246,7 +280,14 @@ function buildIntervalMaps() {
         rList.forEach(r => {
             const dISO = apiDateISO(r.date);
             const s = HHMMSS_to_min(r.startTime);
-            const e = HHMMSS_to_min(r.endTime);
+            let e = HHMMSS_to_min(r.endTime);
+
+            if (!Number.isFinite(e) && Number.isFinite(s) && Number.isFinite(r.durationMinutes)) {
+                e = s + Number(r.durationMinutes);
+            } else if (!Number.isFinite(e) && Number.isFinite(s) && Number.isFinite(r.durationHours)) {
+                e = s + Math.round(Number(r.durationHours) * 60);
+            }
+
             if (!dISO || !Number.isFinite(s) || !Number.isFinite(e) || e <= s) return;
             if (!reserved.has(dISO)) reserved.set(dISO, new Map());
             const m = reserved.get(dISO);
@@ -260,32 +301,13 @@ function buildIntervalMaps() {
     return { working, reserved };
 }
 
-// Unavailable means: outside working OR collides with a reservation
-function isUnavailable({ dateISO, techId, startM, endM, maps }) {
-    const { working, reserved } = maps;
-    const wDay = working.get(dateISO);
-    const rDay = reserved.get(dateISO);
-
-    let covered = false;
-    if (wDay && wDay.get(techId)) {
-        covered = wDay.get(techId).some(w => w.start <= startM && w.end >= endM);
-    }
-    if (!covered) return true;
-
-    if (rDay && rDay.get(techId)) {
-        const bad = rDay.get(techId).some(r => overlaps(startM, endM, r.start, r.end));
-        if (bad) return true;
-    }
-    return false;
-}
-
 // ====== RENDER GRID ======
 function renderGrid() {
     const body = document.getElementById("gridBody");
     if (!body) return;
     body.innerHTML = "";
 
-    const dayKey = ymd(currentDate);
+    const dayKey = getSelectedDayISO();
     const maps = buildIntervalMaps();
 
     technicians.forEach(t => {
@@ -299,13 +321,12 @@ function renderGrid() {
         const laneCell = document.createElement("div");
         laneCell.className = "wl-lane";
         laneCell.dataset.techId = t.id;
+        if (!laneCell.style.position) laneCell.style.position = "relative";
 
-        // draw availability overlays first
         drawLaneOverlays(laneCell, t, dayKey, maps);
 
-        // then scheduled jobs (events) so they sit above overlays
         events
-            .filter(e => e.techId === t.id && e.date === dayKey)
+            .filter(e => Number(e.techId) === Number(t.id) && e.date === dayKey)
             .forEach(e => laneCell.appendChild(makePeriodElement(e)));
 
         row.appendChild(nameCell);
@@ -321,10 +342,15 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
 
     const { visibleWorking, reservedMerged } = computeVisibleWorking(rawWorking, rawReserved);
 
-    // Green: working/available periods (working minus reservations)
     visibleWorking.forEach(w => {
         const div = document.createElement("div");
         div.className = "wl-bg working";
+        div.style.position = "absolute";
+        div.style.top = "0";
+        div.style.bottom = "0";
+        div.style.pointerEvents = "none";
+        div.style.zIndex = "1";
+
         const pos = lanePosFromMinutes(w.start, w.end);
         div.style.left = pos.left;
         div.style.width = pos.width;
@@ -332,10 +358,15 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         lane.appendChild(div);
     });
 
-    // Red: reserved periods
     reservedMerged.forEach(r => {
         const div = document.createElement("div");
         div.className = "wl-bg reserved";
+        div.style.position = "absolute";
+        div.style.top = "0";
+        div.style.bottom = "0";
+        div.style.pointerEvents = "none";
+        div.style.zIndex = "2";
+
         const pos = lanePosFromMinutes(r.start, r.end);
         div.style.left = pos.left;
         div.style.width = pos.width;
@@ -343,7 +374,6 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         lane.appendChild(div);
     });
 }
-
 
 function makePeriodElement(e) {
     const el = document.createElement("div");
@@ -418,13 +448,14 @@ function renderAvailability() {
     const tbody = document.getElementById("availTbody");
     if (!tbody) return;
     tbody.innerHTML = "";
-    const dayKey = ymd(currentDate);
+
+    const dayKey = getSelectedDayISO();
     const maps = buildIntervalMaps();
 
     technicians.forEach(t => {
         const id = Number(t.id);
         const assigned = events
-            .filter(e => e.techId === id && e.date === dayKey)
+            .filter(e => Number(e.techId) === id && e.date === dayKey)
             .reduce((a, b) => a + b.duration, 0);
 
         const w = maps.working.get(dayKey)?.get(id) || [];
@@ -443,9 +474,10 @@ function renderAvailability() {
 }
 
 function renderStats() {
-    const dayKey = ymd(currentDate);
+    const dayKey = getSelectedDayISO();
     const maps = buildIntervalMaps();
     const top3 = technicians.slice(0, 3);
+
     const capacity = top3.reduce((sum, t) => {
         const w = maps.working.get(dayKey)?.get(Number(t.id)) || [];
         const mins = w.length ? sumIntervalsMins(w) : SHIFT_MINS;
@@ -466,7 +498,6 @@ let scheduleModal;
 function initModal() {
     scheduleModal = new bootstrap.Modal(document.getElementById("scheduleModal"));
     const sel = document.getElementById("schedTech");
-    const date = document.getElementById("schedDate");
     const start = document.getElementById("schedStart");
     const dur = document.getElementById("schedDuration");
     const ends = document.getElementById("schedEnds");
@@ -477,11 +508,8 @@ function initModal() {
         ends.value = fmtHuman(endVal);
         const idx = Number(document.getElementById("jobIndex").value);
         const allowed = unscheduled[idx]?.allowed ?? 0;
-        if (Number(dur.value) > allowed) {
-            overdueBadge.classList.remove("d-none");
-        } else {
-            overdueBadge.classList.add("d-none");
-        }
+        if (Number(dur.value) > allowed) overdueBadge.classList.remove("d-none");
+        else overdueBadge.classList.add("d-none");
     }
     start.addEventListener("input", updateEnds);
     dur.addEventListener("input", updateEnds);
@@ -490,6 +518,8 @@ function initModal() {
     document.getElementById("btnSaveSchedule").addEventListener("click", async () => {
         const idx = Number(document.getElementById("jobIndex").value);
         const job = unscheduled[idx];
+        const date = document.getElementById("schedDate");
+
         if (!job || !date.value || !sel.value || !start.value || !dur.value) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
             return;
@@ -551,11 +581,8 @@ async function GetAvailableTechsForLabour(RequestedDate, duration) {
         dataType: 'json',
         data: JSON.stringify(obj)
     }).then(function (res) {
-        if (!res.success) {
-            alert("Error loading Available Technicians!");
-        } else {
-            fillTechsForLabour(res.data);
-        }
+        if (!res.success) alert("Error loading Available Technicians!");
+        else fillTechsForLabour(res.data);
         return res;
     }).catch(function (xhr) {
         return xhr;
@@ -567,13 +594,8 @@ async function openScheduleModal(jobIndex) {
     const job = unscheduled[jobIndex];
     if (!job) return;
 
-    // if Groups modal is open, hide it first so schedule modal is on top
     if (groupModal && typeof groupModal.hide === "function") {
-        try {
-            groupModal.hide();
-        } catch (e) {
-            console.warn('[openScheduleModal] Failed to hide groupModal:', e);
-        }
+        try { groupModal.hide(); } catch (e) { console.warn('[openScheduleModal] Failed to hide groupModal:', e); }
     }
 
     let Hours = fromMinutes(job.duration);
@@ -604,24 +626,49 @@ function timeToDecimalHours(timeStr) {
     return Math.round(totalHours * 100) / 100;
 }
 
-// ====== CONTROLS ======
+// ====== CONTROLS (FIXED: single source of truth + always refetch for selected day) ======
+async function gotoDate(dateObj) {
+    currentDate = new Date(dateObj);
+    const iso = ymd(currentDate);
+
+    const dp = document.getElementById("datePicker");
+    if (dp) dp.value = iso;
+
+    await GetAllTechnicians(iso);
+    refreshAll();
+}
+
+function stepDaysByView(view) {
+    if (view === "week") return 7;
+    if (view === "month") return 30;
+    return 1;
+}
+
 function wireControls() {
-    document.getElementById("btnToday").addEventListener("click", () => {
-        currentDate = new Date();
-        document.getElementById("datePicker").value = ymd(currentDate);
-        refreshAll();
+    const btnToday = document.getElementById("btnToday");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
+    const datePicker = document.getElementById("datePicker");
+
+    if (btnToday) btnToday.addEventListener("click", async () => gotoDate(new Date()));
+
+    if (btnPrev) btnPrev.addEventListener("click", async () => {
+        const step = stepDaysByView(currentView);
+        const d = new Date(currentDate);
+        d.setDate(d.getDate() - step);
+        await gotoDate(d);
     });
-    document.getElementById("btnPrev").addEventListener("click", () => {
-        currentDate.setDate(currentDate.getDate() - (currentView === "day" ? 1 : currentView === "week" ? 7 : 30));
-        refreshAll();
+
+    if (btnNext) btnNext.addEventListener("click", async () => {
+        const step = stepDaysByView(currentView);
+        const d = new Date(currentDate);
+        d.setDate(d.getDate() + step);
+        await gotoDate(d);
     });
-    document.getElementById("btnNext").addEventListener("click", () => {
-        currentDate.setDate(currentDate.getDate() + (currentView === "day" ? 1 : currentView === "week" ? 7 : 30));
-        refreshAll();
-    });
-    document.getElementById("datePicker").addEventListener("change", (e) => {
-        currentDate = parseYMD(e.target.value);
-        refreshAll();
+
+    if (datePicker) datePicker.addEventListener("change", async (e) => {
+        const picked = convertDateFormat(e.target.value);
+        await gotoDate(parseYMD(picked));
     });
 
     document.querySelectorAll("[data-view]").forEach(btn => {
@@ -633,7 +680,6 @@ function wireControls() {
         });
     });
 
-    // NEW: Groups button
     const btnOpenGroups = document.getElementById("btnOpenGroups");
     if (btnOpenGroups) btnOpenGroups.addEventListener("click", openGroupModal);
 }
@@ -651,6 +697,9 @@ function refreshAll(scrollTop = false) {
 
 // ====== API ======
 function GetAllTechnicians(Date) {
+    const reqISO = apiDateISO(Date) || convertDateFormat(Date);
+    if (reqISO) currentDate = parseYMD(reqISO);
+
     if (technicians.length > 0) technicians.splice(0, technicians.length);
 
     return $.ajax({
@@ -658,12 +707,13 @@ function GetAllTechnicians(Date) {
         type: 'GET',
         dataType: 'json',
         cache: false,
-        data: { Date }
+        data: { Date: reqISO || Date }
     }).then(function (res) {
         const data = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+
         const additions = data.map(item => {
             const id = item?.techId ?? item?.ID ?? item?.Id;
-            const name = (item?.techName ?? item?.techSecondaryName ?? item)?.toString().trim();
+            const name = (item?.techName ?? item?.techSecondaryName ?? "").toString().trim();
 
             let workingHoursList = Array.isArray(item?.workingHoursList) ? item.workingHoursList : [];
             let reservationsList = Array.isArray(item?.reservationsList) ? item.reservationsList : [];
@@ -678,8 +728,9 @@ function GetAllTechnicians(Date) {
             const normW = (workingHoursList || []).map(w => ({
                 date: apiDateISO(w.date),
                 startTime: (w.startTime || '').toString(),
-                endTime: (w.endTime || '').toString()
-            })).filter(x => x.date && x.startTime && x.endTime);
+                endTime: (w.endTime || '').toString(),
+                durationMinutes: w.durationMinutes ?? null
+            })).filter(x => x.date && x.startTime && (x.endTime || Number.isFinite(x.durationMinutes)));
 
             const normR = (reservationsList || []).map(r => ({
                 date: apiDateISO(r.date),
@@ -687,12 +738,32 @@ function GetAllTechnicians(Date) {
                 endTime: (r.endTime || '').toString(),
                 durationHours: r.durationHours ?? null,
                 durationMinutes: r.durationMinutes ?? null
-            })).filter(x => x.date && x.startTime && x.endTime);
+            })).filter(x => x.date && x.startTime && (x.endTime || Number.isFinite(x.durationMinutes) || Number.isFinite(x.durationHours)));
 
             return (name && id != null)
                 ? { id, name, workingHoursList: normW, reservationsList: normR }
                 : null;
         }).filter(Boolean);
+
+        // off-by-one fix
+        if (reqISO) {
+            const allDates = [];
+            additions.forEach(t => {
+                t.workingHoursList.forEach(x => x?.date && allDates.push(x.date));
+                t.reservationsList.forEach(x => x?.date && allDates.push(x.date));
+            });
+
+            const commonDate = modeDateISO(allDates);
+            if (commonDate && commonDate !== reqISO) {
+                const diff = daysBetweenISO(commonDate, reqISO);
+                if (Math.abs(diff) === 1) {
+                    additions.forEach(t => {
+                        t.workingHoursList.forEach(x => x.date = shiftISO(x.date, diff));
+                        t.reservationsList.forEach(x => x.date = shiftISO(x.date, diff));
+                    });
+                }
+            }
+        }
 
         if (additions.length) technicians.push(...additions);
     }).catch(function (xhr) {
@@ -724,7 +795,6 @@ function GetServicesById(id, lang) {
     }).catch(function () { });
 }
 
-// fetch services but return array (do not mutate global `unscheduled`)
 function FetchServicesByIdReturnArray(id, lang) {
     return $.ajax({
         url: window.RazorVars.getServicesByIdUrl,
@@ -800,8 +870,6 @@ function GetGroupedServices(Id) {
         dataType: 'json',
         data: { Id: Id },
     }).then(function (res) {
-        console.log('[GetGroupedServices] RAW response:', res);
-
         if (!res?.success || !Array.isArray(res.data)) {
             groupedServices = [];
             return res;
@@ -820,7 +888,6 @@ function GetGroupedServices(Id) {
             };
         });
 
-        console.table(groupedServices);
         return res;
     }).catch(function (xhr) {
         console.error('[GetGroupedServices] AJAX error:', xhr);
@@ -829,7 +896,6 @@ function GetGroupedServices(Id) {
     });
 }
 
-// Groups Modal init/show
 function initGroupModal() {
     groupModal = new bootstrap.Modal(document.getElementById("groupModal"));
 }
@@ -870,9 +936,9 @@ function renderGroupList() {
 
         const left = document.createElement("div");
         left.innerHTML = `
-          <div class="fw-semibold">WIP #${wipId}</div>
-          <div class="small text-muted">${window.i18n.label_items || "Items"}: ${itemsCount}</div>
-        `;
+      <div class="fw-semibold">WIP #${wipId}</div>
+      <div class="small text-muted">${window.i18n.label_items || "Items"}: ${itemsCount}</div>
+    `;
 
         const openBtn = document.createElement("button");
         openBtn.className = "btn btn-sm btn-primary";
@@ -915,10 +981,10 @@ function renderJobsInGroupModal(jobs) {
 
         const left = document.createElement("div");
         left.innerHTML = `
-          <div class="fw-semibold">${job.ro} — <span class="text-info">${job.rts}</span></div>
-          <div class="small text-muted">${job.title}</div>
-          <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${job.allowed}m</div>
-        `;
+      <div class="fw-semibold">${job.ro} — <span class="text-info">${job.rts}</span></div>
+      <div class="small text-muted">${job.title}</div>
+      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${job.allowed}m</div>
+    `;
 
         const btns = document.createElement("div");
         btns.className = "d-flex gap-2";
@@ -963,30 +1029,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await Promise.all([
         GetAllTechnicians(today),
-        GetServicesById(),          // baseline unscheduled
+        GetServicesById(),
         TechnicianAvailabilty(),
     ]);
 
     initModal();
-    initGroupModal();             // NEW
+    initGroupModal();
     wireControls();
     refreshAll();
 
-    $('#btnToday').on('click', async function () {
-        await GetAllTechnicians(today);
-        //refreshAll();
-    });
-    $('#btnNext, #btnPrev').on('click', async function () {
-        const dateIso = ymd(currentDate);
-        await GetAllTechnicians(dateIso);
-        //refreshAll();
-    });
+    // keep ONLY this jQuery handler (schedule modal date change)
     $('#schedDate').on('change', async () => {
         let schDate = $("#schedDate").val();
         schDate = convertDateFormat(schDate);
         await GetAvailableTechsForLabour(schDate, CurrentDuration);
     });
 
-    // Load groups so the modal is ready
     await GetGroupedServices(null);
 });
