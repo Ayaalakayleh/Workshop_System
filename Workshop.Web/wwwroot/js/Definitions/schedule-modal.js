@@ -179,6 +179,7 @@
     }
 
     function bindEvents() {
+        $('#vehicleTypeDropdown').off('change').on('change', handleVehicleTypeChange);
         $('#vehicleDropdown').off('change').on('change', handleVehicleChange);
         $('#chassisDropdown').off('change').on('change', handleChassisChange);
         $('#schDate').off('change').on('change', handleDateChange);
@@ -256,6 +257,60 @@
             state.dateTo = state.date;
         }
     }
+    function handleVehicleTypeChange() {
+        const vehicleTypeId = $('#vehicleTypeDropdown').val();
+        state.vehicleType = Number(vehicleTypeId);
+
+        const $vehicle = $('#vehicleDropdown');
+        const $chassis = $('#chassisDropdown');
+
+        // reset
+        $vehicle.empty().append('<option value="">Select</option>').trigger('change');
+        $chassis.empty().append('<option value="">Select</option>').trigger('change');
+        $('#CustomerName').val('');
+
+        if (!vehicleTypeId) return;
+
+        // 1️⃣ Load VEHICLES
+        $.ajax({
+            type: 'GET',
+            url: window.RazorVars.vehicleListUrl,
+            data: { VehicleTypeId: vehicleTypeId },
+            dataType: 'json',
+            success: function (data) {
+                if (Array.isArray(data)) {
+                    data.forEach(item => {
+                        $vehicle.append(
+                            `<option value="${item.value}">${item.text}</option>`
+                        );
+                    });
+                    $vehicle.trigger('change.select2');
+                }
+            }
+        });
+
+        $.ajax({
+            type: 'GET',
+            url: window.RazorVars.getChassisByVehicleTypeUrl,
+            data: { vehicleTypeId: vehicleTypeId },
+            dataType: 'json',
+            success: function (data) {
+                if (!Array.isArray(data)) return;
+
+                data.forEach(item => {
+                    $chassis.append(
+                        `<option value="${item.id}">${item.text}</option>`
+                    );
+                });
+
+                $chassis.trigger('change.select2');
+            },
+            error: function () {
+                Swal.fire('Error', 'Failed to load chassis.', 'error');
+            }
+        });
+    }
+
 
     function recomputeEndTime() {
         const startHHMM = $('#schStart').val();
@@ -383,6 +438,7 @@
         // init selects
         initSelect2($('#vehicleDropdown'));
         initSelect2($('#chassisDropdown'));
+        initSelect2($('#vehicleTypeDropdown'));
 
 
 

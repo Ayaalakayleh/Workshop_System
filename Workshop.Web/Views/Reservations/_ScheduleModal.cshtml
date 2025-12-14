@@ -23,6 +23,15 @@
                         <label class="form-label">@Common["Label_Date"]</label>
                         <input type="text" class="form-control flat-picker" id="schDate" autocomplete="off" />
                     </div>
+                    <div class="col-md-4 col-sm-12">
+                        <label>@Common["Label_VehicleType"]</label>
+                        <select id="vehicleTypeDropdown" class="form-control">
+                            <option value="">@Common["Select"]</option>
+                            <option value="1">Internal</option>
+                            <option value="2">External</option>
+                        </select>
+                    </div>
+
 
                     <div class="col-md-4 col-sm-12">
                         <div class="form-group">
@@ -43,12 +52,9 @@
 
                     <div class="col-md-4 col-sm-12">
                         <label>@Common["Label_Chassis"]</label>
-                        @Html.DropDownList(
-                                                "ChassisNo",
-                                                (SelectList)ViewBag.Chassis,
-                                                Common["Select"].Value,
-                                                new { @class = "form-control", id = "chassisDropdown" }
-                                                )
+                        <select id="chassisDropdown" class="form-control">
+                            <option value="">@Common["Select"]</option>
+                        </select>
                     </div>
 
                     <div class="col-md-4 col-sm-12">
@@ -91,6 +97,8 @@
     window.RazorVars = Object.assign({}, window.RazorVars || {}, {
         insertReservationUrl: '@Url.Action("InsertReservation", "Reservations")',
         getVehicleByChassis: '@Url.Action("VehicleDefinitionsGetByChassisNo", "Reservations")',
+        vehicleListUrl: '@Url.Action("VehicleList", "Reservations")',
+        getChassisByVehicleTypeUrl: '@Url.Action("GetChassisByVehicleType", "Reservations")',
 
         reservationInserted: '@Html.Raw(Common["Booked_Reservation"])',
         reservationAlreadyExist: '@Html.Raw(Common["ActiveReservationExists"])',

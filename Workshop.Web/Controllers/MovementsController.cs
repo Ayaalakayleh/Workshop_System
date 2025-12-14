@@ -44,7 +44,7 @@ namespace Workshop.Web.Controllers
             List<VehicleNams> vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
 
             ViewBag.VehicleNams = new SelectList(vehicleNams ?? new List<VehicleNams>(), "id", "VehicleName");
-            var chassisList = await _vehicleApiClient.GetChassiDDL(CompanyId);
+            var chassisList = await _vehicleApiClient.GetChassiDDL(CompanyId, 1); // To be modified for real vehicleType
             ViewBag.Chassis = new SelectList(chassisList, "Id", "ChassisNo");
             //ToDo: Caching
             //if (cache.Get(string.Format(CacheKeys.VehiclesDDL, language)) != null)
