@@ -372,7 +372,7 @@
                 End_Time: ensureTimeWithSeconds(state.endTime),
                 Duration: toNumber($('#schDuration').val()),
                 Description: $('#descriptionInput').val() ?? '',
-                Chassis: $('#chassisInput').val() ?? '',
+                Chassis: $('#chassisDropdown option:selected').text() || null,
                 Status: 44,
                 CustomerName: $('#CustomerName').val() ?? ''
             };
