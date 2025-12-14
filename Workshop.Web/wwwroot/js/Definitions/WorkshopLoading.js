@@ -79,7 +79,7 @@ function getSelectedDayISO() {
     return v ? convertDateFormat(v) : ymd(currentDate);
 }
 
-// ====== OFF-BY-ONE DATE FIX HELPERS (backend returns previous day sometimes) ======
+// ====== OFF-BY-ONE DATE FIX HELPERS (backend sometimes returns previous day) ======
 function isoUTC(iso) {
     const [y, m, d] = String(iso).slice(0, 10).split("-").map(Number);
     return Date.UTC(y, m - 1, d);
@@ -91,13 +91,6 @@ function shiftISO(iso, days) {
     const dt = new Date(isoUTC(iso));
     dt.setUTCDate(dt.getUTCDate() + days);
     return dt.toISOString().slice(0, 10);
-}
-function modeDateISO(dates) {
-    const counts = new Map();
-    dates.forEach(d => counts.set(d, (counts.get(d) || 0) + 1));
-    let best = null, bestC = 0;
-    counts.forEach((c, d) => { if (c > bestC) { bestC = c; best = d; } });
-    return best;
 }
 
 // ====== HEADER RENDERING ======
@@ -151,7 +144,6 @@ function sumIntervalsMins(list) {
     return total;
 }
 
-// position helper (all in minutes from midnight)
 function lanePosFromMinutes(startM, endM) {
     const shiftStart = toMinutes(SHIFT_START);
     const shiftEnd = toMinutes(SHIFT_END);
@@ -626,7 +618,7 @@ function timeToDecimalHours(timeStr) {
     return Math.round(totalHours * 100) / 100;
 }
 
-// ====== CONTROLS (FIXED: single source of truth + always refetch for selected day) ======
+// ====== CONTROLS (single source of truth + always refetch for selected day) ======
 async function gotoDate(dateObj) {
     currentDate = new Date(dateObj);
     const iso = ymd(currentDate);
@@ -745,7 +737,8 @@ function GetAllTechnicians(Date) {
                 : null;
         }).filter(Boolean);
 
-        // off-by-one fix
+        // ✅ FIX: only apply the off-by-one shift when the response is UNIFORMLY off by 1 day.
+        // This prevents newly-added working hours from being pushed to the next day.
         if (reqISO) {
             const allDates = [];
             additions.forEach(t => {
@@ -753,9 +746,17 @@ function GetAllTechnicians(Date) {
                 t.reservationsList.forEach(x => x?.date && allDates.push(x.date));
             });
 
-            const commonDate = modeDateISO(allDates);
-            if (commonDate && commonDate !== reqISO) {
-                const diff = daysBetweenISO(commonDate, reqISO);
+            const uniqDates = [...new Set(allDates)];
+            const hasReq = uniqDates.includes(reqISO);
+
+            // Only shift when:
+            // - there are dates
+            // - none match reqISO
+            // - ALL dates are the same single day
+            // - and that single day differs by exactly 1 from reqISO
+            if (uniqDates.length === 1 && !hasReq) {
+                const only = uniqDates[0];
+                const diff = daysBetweenISO(only, reqISO);
                 if (Math.abs(diff) === 1) {
                     additions.forEach(t => {
                         t.workingHoursList.forEach(x => x.date = shiftISO(x.date, diff));
@@ -1006,20 +1007,31 @@ function renderJobsInGroupModal(jobs) {
     document.getElementById("groupItemsSection").classList.remove("d-none");
 }
 
-// ====== DATE FORMATTER ======
+// ====== DATE FORMATTER (UPDATED: supports dd/MM/yyyy too) ======
 function convertDateFormat(dateStr) {
     if (typeof dateStr !== "string") return dateStr;
     const s = dateStr.trim();
+
+    // already ISO
     const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
     if (isoMatch) return s;
-    const dmyMatch = /^(\d{2})-(\d{2})-(\d{4})$/.exec(s);
-    if (dmyMatch) {
-        const [, dd, MM, yyyy] = dmyMatch;
+
+    // dd-MM-yyyy
+    const dmyDash = /^(\d{2})-(\d{2})-(\d{4})$/.exec(s);
+    if (dmyDash) {
+        const [, dd, MM, yyyy] = dmyDash;
         const day = Number(dd), month = Number(MM);
-        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-            return `${yyyy}-${MM}-${dd}`;
-        }
+        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) return `${yyyy}-${MM}-${dd}`;
     }
+
+    // dd/MM/yyyy
+    const dmySlash = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);
+    if (dmySlash) {
+        const [, dd, MM, yyyy] = dmySlash;
+        const day = Number(dd), month = Number(MM);
+        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) return `${yyyy}-${MM}-${dd}`;
+    }
+
     return dateStr;
 }
 

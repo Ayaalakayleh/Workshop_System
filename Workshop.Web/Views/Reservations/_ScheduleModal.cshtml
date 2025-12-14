@@ -21,7 +21,7 @@
 
                     <div class="col-md-4 col-sm-12">
                         <label class="form-label">@Common["Label_Date"]</label>
-                        <input type="text" class="form-control flat-picker" id="schDate" autocomplete="off" />
+                        <input type="text" class="form-control flat-picker-future" id="schDate" autocomplete="off" />
                     </div>
                     <div class="col-md-4 col-sm-12">
                         <label>@Common["Label_VehicleType"]</label>
@@ -134,6 +134,15 @@
             });
         });
 
+    });
+        flatpickr(".flat-picker-future", {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        minDate: "today",
+        maxDate: "2100-12-31",
+        disableMobile: true,
+        defaultDate: "today"
     });
 </script>
 
