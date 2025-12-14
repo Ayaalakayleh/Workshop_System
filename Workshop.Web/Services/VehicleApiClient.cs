@@ -230,9 +230,9 @@ namespace Workshop.Web.Services
              var result = await SendRequest<VehicleDefinitions>(url, HttpMethod.Get);
             return result;
         }
-        public async Task<List<VehicleDefinitions>> GetChassiDDL(int CompanyId)
+        public async Task<List<VehicleDefinitions>> GetChassiDDL(int CompanyId, int vehicleType)
         {
-            string url = $"/VehicleDefinition/GetChassiDDL?CompanyId={CompanyId}";
+            string url = $"/VehicleDefinition/GetChassiDDL?CompanyId={CompanyId}&vehicleType={vehicleType}";
             var result = await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
             return result;
         }

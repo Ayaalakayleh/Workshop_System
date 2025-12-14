@@ -95,14 +95,21 @@ namespace Workshop.Web.Controllers
         public async Task<IActionResult> LoadScheduleDialog()
         {
 
-            List<VehicleNams> vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
-/*            ViewBag.Companies = await _eRPApiClient.GetCompaniesInfo(100);
-*/            ViewBag.Vehicles = new SelectList(vehicleNams, "id", "VehicleName");
+            //List<VehicleNams> vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+            /*            ViewBag.Companies = await _eRPApiClient.GetCompaniesInfo(100);
+            */
+            ViewBag.Vehicles = new SelectList(Enumerable.Empty<SelectListItem>());
             var isCompanyCenterialized = 1;
             var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
             ViewBag.Customers = allCustomers;
-            var chassisList = await _vehicleApiClient.GetChassiDDL(CompanyId);
-            ViewBag.Chassis = new SelectList(chassisList, "Id", "ChassisNo");
+            ViewBag.VehicleType = Enum.GetValues(typeof(VehicleTypeId))
+             .Cast<VehicleTypeId>()
+             .Select(v => new SelectListItem
+             {
+                 Text = v.ToString(),        // "Internal", "External", etc.
+                 Value = ((int)v).ToString() // "1", "2", "3"
+             })
+             .ToList();
 
 
             var model = new WIPSChedule();
@@ -285,6 +292,70 @@ namespace Workshop.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+        public async Task<IActionResult> VehicleList(int VehicleTypeId)
+        {
+            var filter = new VehicleAdvancedFilter();
+            var colVehicleDefinitions = new List<SelectListItem>();
+            string language = "en";
+            filter.VehicleTypeId = VehicleTypeId;
+            filter.CompanyId = CompanyId;
+
+
+            if (filter.VehicleTypeId == 1) // internal
+            {
+                colVehicleDefinitions = (await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId))
+                    .Select(item => new SelectListItem
+                    {
+                        Text = lang == "en" ? item.VehicleName : item.VehicleName,
+                        Value = item.id.ToString()
+                    })
+                    .ToList();
+            }
+            else if (filter.VehicleTypeId == 2) // external
+            {
+                colVehicleDefinitions = (await _vehicleApiClient.GetExteralVehicleName(lang))
+                .Select(item => new SelectListItem
+                {
+                    Text = lang == "en" ? item.VehicleName : item.VehicleName,
+                    Value = item.id.ToString()
+                })
+                .ToList();
+            }
+
+            else
+            {
+                colVehicleDefinitions = new List<SelectListItem>();
+            }
+
+            return Json(colVehicleDefinitions);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetChassisByVehicleType(int vehicleTypeId)
+        {
+            try
+            {
+                var chassisList = await _vehicleApiClient.GetChassiDDL(
+              CompanyId,
+              vehicleTypeId
+          );
+
+                return Json(
+                    chassisList.Select(c => new
+                    {
+                        id = c.Id,
+                        text = c.ChassisNo
+                    })
+                );
+            }
+            catch(Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+
+            }
+
+        }
+
+
 
 
     }
