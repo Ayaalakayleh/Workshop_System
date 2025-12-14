@@ -428,7 +428,9 @@ $(function () {
         ],
         allowColumnReordering: true,
         allowColumnResizing: true,
-        columnAutoWidth: true,
+        columnAutoWidth: false,
+        columnMinWidth: 60,
+        wordWrapEnabled: false,
         hoverStateEnabled: true,
         paging: {
             pageSize: 10
