@@ -150,9 +150,9 @@ function updateSelectionCount(count) {
 }
 
 function showItemSelectionModal() {
-    //$("#mainItemsGrid").show();
-    //$("#RequestDescription").val("");
     initializeItemSelectionGrid();
+    $("#ours-tab").addClass("active");
+    $("#others-tab").removeClass("active");
     loadItemsData();
 }
 
@@ -187,16 +187,31 @@ function loadItemsData() {
     });
 }
 
-$("#ours-tab").on("click", function () {
-    const grid = $("#gridContainer").dxDataGrid("instance");
-    grid.option("dataSource", allItemsOurs);
-});
+//$("#ours-tab").on("click", function () {
+//    const grid = $("#gridContainer").dxDataGrid("instance");
+//    grid.option("dataSource", allItemsOurs);
+//});
 
-$("#others-tab").on("click", function () {
-    const grid = $("#gridContainer").dxDataGrid("instance");
-    grid.option("dataSource", allItemsOthers);
-});
+//$("#others-tab").on("click", function () {
+//    const grid = $("#gridContainer").dxDataGrid("instance");
+//    grid.option("dataSource", allItemsOthers);
+//});
 
+$("#ours-tab, #others-tab").on("click", function () {
+    // toggle active class
+    $("#ours-tab, #others-tab").removeClass("active");
+    $(this).addClass("active");
+
+    // switch datasource
+    const grid = $("#gridContainer").dxDataGrid("instance");
+    if (!grid) return;
+
+    if (this.id === "ours-tab") {
+        grid.option("dataSource", allItemsOurs);
+    } else {
+        grid.option("dataSource", allItemsOthers);
+    }
+});
 
 
 
