@@ -44,14 +44,14 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.TechnicianProfile.Edit)]
         public async Task<IActionResult> Edit(int? id)
         {
-           // var lang = "ar";
+            // var lang = "ar";
             var technician = new TechnicianDTO();
             if (id != null)
             {
                 var relativePath = base._configuration["FileUpload:DirectoryPath"] ?? "Uploads";
                 technician = await _apiClient.GetTechnicianByIdAsync((int)id);
                 var fullURL = Path.Combine(relativePath, technician.FilePath ?? string.Empty).Replace("\\", "/");
-                technician.FilePath = fullURL ;
+                technician.FilePath = fullURL;
             }
 
             if (technician == null) return NotFound();
@@ -68,6 +68,7 @@ namespace Workshop.Web.Controllers
                 FK_SkillId = technician.FK_SkillId,
                 Code = technician.Code,
                 //HourCost = technician.HourCost,
+                IsResigned = technician.IsResigned,
                 FordPID = technician.FordPID,
                 PIN = technician.PIN,
                 ResignedDate = technician.ResignedDate,
@@ -94,7 +95,7 @@ namespace Workshop.Web.Controllers
             var TeamsList = await _apiClient.GetAllTeamsDDLAsync();
             ViewBag.Teams = TeamsList.Select(t => new SelectListItem { Text = lang == "en" ? t.PrimaryName : t.SecondaryName, Value = t.Id.ToString() }).ToList();
             ViewBag.TeamsValue = TeamsList.Where(t => dto.Teams != null && dto.Teams.Contains(t.Id)).ToList();
-            
+
             var ShiftsList = await _apiClient.GetAllShiftsAsync();
             ViewBag.Shift = ShiftsList.Select(t => new SelectListItem { Text = lang == "en" ? t.PrimaryName + " " + "(" + t.WorkingFromTime.Value.ToString(@"hh\:mm") + "-" + t.WorkingToTime.Value.ToString(@"hh\:mm") + ")" : t.SecondaryName + " " + "(" + t.WorkingFromTime.Value.ToString(@"hh\:mm") + "-" + t.WorkingToTime.Value.ToString(@"hh\:mm") + ")", Value = t.Id.ToString() }).ToList();
             ViewBag.ShiftValue = ShiftsList.Where(t => dto.FK_ShiftId != null && dto.FK_ShiftId.Equals(t.Id)).ToList();
@@ -115,7 +116,7 @@ namespace Workshop.Web.Controllers
 
             if (TechnicianPhoto != null && TechnicianPhoto.Length > 0)
             {
-                var relativePath = base._configuration["FileUpload:DirectoryPath"] ;
+                var relativePath = base._configuration["FileUpload:DirectoryPath"];
                 var guid = Guid.NewGuid().ToString();
 
                 // Combine with wwwroot to get the absolute path
@@ -209,6 +210,7 @@ namespace Workshop.Web.Controllers
                 //HourCost = dto.HourCost,
                 FordPID = dto.FordPID,
                 PIN = dto.PIN,
+                IsResigned = dto.IsResigned,
                 ResignedDate = dto.ResignedDate,
                 FK_ShiftId = dto.FK_ShiftId,
                 IsActive = dto.IsActive,
@@ -238,6 +240,7 @@ namespace Workshop.Web.Controllers
                 //HourCost = dto.HourCost,
                 FordPID = dto.FordPID,
                 PIN = dto.PIN,
+                IsResigned = dto.IsResigned,
                 ResignedDate = dto.ResignedDate,
                 FK_ShiftId = dto.FK_ShiftId,
                 Code = dto.Code,

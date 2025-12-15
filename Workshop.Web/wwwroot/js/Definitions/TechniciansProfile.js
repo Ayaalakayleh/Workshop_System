@@ -111,7 +111,7 @@ $(document).ready(function () {
             // PrimaryAddress: { required: false },
             // SecondaryAddress: { required: false },
             // BirthDate: { required: true, date: true, minAge: 18 },
-            PIN: { required: true, minlength: 6,maxlength:6 },
+            PIN: { required: true, minlength: 6, maxlength: 6 },
             FK_SkillId: { required: true, minlength: 1 }
         },
         messages: {
@@ -276,25 +276,16 @@ $(document).ready(function () {
     }
     var tempID = $("#Id").val();
     if (!(tempID > 0))
-    $('#PIN').val(generateRandomPIN());
+        $('#PIN').val(generateRandomPIN());
 
     // Optional: regenerate PIN on focus or button click
     // $('#PIN').on('focus', function () {
     //     $(this).val(generateRandomPIN());
     // });
-    var tempID = $("#Id").val();
-    if (!tempID || tempID == "0" || tempID == 0) {
-        $("input[type='text'], input[type='email'], input[type='date'], textarea").val("");
-        $("#Email").val("");
-
-        $("#ResignedSwitch").prop("checked", false);
-        $("#ResignedDate").val("").prop("disabled", true);
-
-        if (typeof pond !== "undefined") {
-            pond.removeFiles();
-        }
-
-        $('#PIN').val(generateRandomPIN());
+    if ($("#IsResigned").is(":checked")) {
+        $("#ResignedDate").prop("disabled", false);
+    } else {
+        $("#ResignedDate").prop("disabled", true).val("");
     }
 });
 
@@ -347,52 +338,16 @@ $(document).on('click', '.toggle-pin', function () {
     if (el) {
         var len = el.value.length;
         el.focus();
-        try { el.setSelectionRange(len, len); } catch (e) {}
+        try { el.setSelectionRange(len, len); } catch (e) { }
     }
 });
 
 $("#btnSearch").click(function () { getData(); });
 
-
-//$(function () {
-//    const $switch = $("#ResignedSwitch");
-//    const $dateInput = $("#ResignedDate");
-
-//    function toggleResignedDate() {
-//        if ($switch.is(":checked")) {
-//            $dateInput.prop("disabled", false);
-//        } else {
-//            $dateInput.val("").prop("disabled", true);
-//        }
-//    }
-
-//    $switch.on("change", toggleResignedDate);
-
-//    toggleResignedDate();
-//});
-
-$(function () {
-    const $switch = $("#ResignedSwitch");
-    const $dateInput = $("#ResignedDate");
-
-    function toggleResignedDate() {
-        if ($switch.is(":checked")) {
-            $dateInput.prop("disabled", false);
-        } else {
-            $dateInput.val("").prop("disabled", true);
-        }
-    }
-
-    if ($dateInput.val()) {
-
-        $switch.prop("checked", true);
-        $dateInput.prop("disabled", false);
+$("#IsResigned").on("change", function () {
+    if ($(this).is(":checked")) {
+        $("#ResignedDate").prop("disabled", false);
     } else {
-
-        $switch.prop("checked", false);
-        $dateInput.prop("disabled", true);
+        $("#ResignedDate").prop("disabled", true).val("");
     }
-
-    $switch.on("change", toggleResignedDate);
 });
-

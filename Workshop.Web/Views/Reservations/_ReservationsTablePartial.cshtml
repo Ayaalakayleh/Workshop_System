@@ -70,6 +70,12 @@
                                 <i class="fad fa-times-circle"></i>&nbsp;@Common["Button_Cancel"]
                             </button>
                         }
+                        <button class="btn btn-sm btn-warning btn-edit-reservation"
+                                data-id="@item.Id"
+                                title="@Common["Button_Edit"]">
+                            <i class="fa fa-edit"></i>
+                        </button>
+
 
                         @* If no actions were rendered, drop a placeholder to equalize row height *@
                         @if (!hasAction)
@@ -189,6 +195,7 @@
             }
         });
     });
+
 
     // If getData(page) returns new HTML that includes the pager fields,
     // be sure to call initPager(page) after injecting the HTML.

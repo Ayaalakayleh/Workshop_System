@@ -249,12 +249,6 @@ namespace Workshop.Web.Controllers
             {
                 var isCompanyCenterialized = 1;
                 var result = await _workshopapiClient.GetReservationsByIdsAsync(ids);
-               /* var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
-                foreach (var r in result)
-                {
-                    var customer = allCustomers.FirstOrDefault(c => c.Id == r.CompanyId);
-                    r.CompanyName = customer?.CustomerName;   
-                }*/
 
                 return Json(new
                 {
@@ -353,6 +347,23 @@ namespace Workshop.Web.Controllers
 
             }
 
+        }
+
+        public async Task<JsonResult> UpdateReservation([FromBody] ReservationDTO reservationDTO)
+        {
+            try
+            {
+                if (reservationDTO.VehicleId == 0 || reservationDTO.ChassisId == 0) {
+                return Json(new { isSuccess = false, message = "Please check the data passed" });
+                }
+                var result = await _workshopapiClient.UpdateReservation(reservationDTO);
+                return Json(new { isSuccess = true, message = result });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { isSuccess = false, message = ex.Message });
+            }
         }
 
 

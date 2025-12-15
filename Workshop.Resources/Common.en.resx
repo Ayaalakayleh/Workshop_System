@@ -2373,4 +2373,7 @@
   <data name="Button_OpenLastWIP" xml:space="preserve">
     <value>Open Last WIP</value>
   </data>
+  <data name="Label_IsResigned" xml:space="preserve">
+    <value>Is Resigned</value>
+  </data>
 </root>

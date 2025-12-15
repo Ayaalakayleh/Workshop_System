@@ -15,6 +15,7 @@ namespace Workshop.Core.Interfaces.IServices
         Task<IEnumerable<ReservationListItemDTO>> GetAllActiveReservationsFilteredAsync(DateTime? dateFrom, DateTime? dateTo);
         Task<IEnumerable<ReservationListItemDTO>> GetReservationsByIdsAsync(string ids);
         Task<int> CheckIfVehicleHasActiveReservation(int vehicleId);
+        Task<int> UpdateReservation(ReservationDTO reservationDTO);
 
     }
 }
