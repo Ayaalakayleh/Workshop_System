@@ -50,7 +50,9 @@ namespace Workshop.Infrastructure.Repositories
                 Description = reservationDTO.Description,
                 Chassis = reservationDTO.Chassis,
                 CompanyId = reservationDTO.CompanyId,
-                CustomerName = reservationDTO.CustomerName
+                CustomerName = reservationDTO.CustomerName,
+                ChassisId = reservationDTO.ChassisId,
+                VehicleTypeId = reservationDTO.vehicleTypeId
 
             };
 
@@ -110,6 +112,35 @@ namespace Workshop.Infrastructure.Repositories
 
             return result;
         }
+        public async Task<int> UpdateReservation(ReservationDTO reservationDTO)
+        {
+            var parameters = new
+            {
+                Id = reservationDTO.Id,
+                Date = reservationDTO.Date,
+                VehicleId = reservationDTO.VehicleId,
+                Plate_Number = reservationDTO.PlateNumber,
+                Start_Time = reservationDTO.Start_Time,
+                End_Time = reservationDTO.End_Time,
+                Duration = reservationDTO.Duration,
+                Status = reservationDTO.Status,
+                UpdatedBy = reservationDTO.CreatedBy,
+                Description = reservationDTO.Description,
+                Chassis = reservationDTO.Chassis,
+                CustomerName = reservationDTO.CustomerName,
+                ChassisId = reservationDTO.ChassisId,
+                VehicleTypeId = reservationDTO.vehicleTypeId
+
+            };
+
+            var result = await _database.ExecuteUpdateProcedure<int>(
+                "M_Reservations_Update",
+                parameters
+            );
+
+            return result;
+        }
+
 
 
 

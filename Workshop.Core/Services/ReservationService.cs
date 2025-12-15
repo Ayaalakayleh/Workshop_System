@@ -43,5 +43,9 @@ namespace Workshop.Core.Services
         {
             return await _reservationRepository.CheckIfVehicleHasActiveReservation(vehicleId);
         }
+        public async Task<int> UpdateReservation(ReservationDTO reservationDTO)
+        {
+            return await _reservationRepository.UpdateReservation(reservationDTO);
+        }
     }
 }

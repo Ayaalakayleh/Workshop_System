@@ -25,6 +25,8 @@ namespace Workshop.Core.DTOs
         public int? Status { get; set; }
         //public List<TechnicianDTO> Tech { get; set; }
         public string CustomerName { get; set; }
+        public int ChassisId { get; set; }
+        public int vehicleTypeId { get; set; }
 
     }
     public class ReservationDTO: BaseReservationDTO
@@ -72,6 +74,9 @@ namespace Workshop.Core.DTOs
         public int CompanyId { get; set; }
         public string? CompanyName { get; set; }
         public string CustomerName { get; set; }
+        public int ChassisId { get; set; }
+        public int vehicleTypeId { get; set; }
+
 
 
     }

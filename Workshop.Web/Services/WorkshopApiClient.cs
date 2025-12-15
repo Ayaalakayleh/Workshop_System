@@ -2531,6 +2531,15 @@ namespace Workshop.Web.Services
             var response = await _httpClient.GetFromJsonAsync<int>($"api/Reservation/VehicleHasActiveReservation?vehicleId={vehicleId}");
             return response;
         }
+        public async Task<int> UpdateReservation(ReservationDTO reservationDTO)
+        {
+            var response = await _httpClient.PutAsJsonAsync("api/Reservation/UpdateReservation", reservationDTO);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var result = json.GetProperty("reservationId").GetInt32();
+            return result;
+        }
 
         #endregion
 
