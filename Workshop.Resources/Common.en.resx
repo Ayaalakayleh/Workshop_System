@@ -2364,10 +2364,13 @@
   <data name="Discount" xml:space="preserve">
     <value>Discount</value>
   </data>
-	<data name="Label_Color" xml:space="preserve">
+  <data name="Label_Color" xml:space="preserve">
     <value>Color</value>
   </data>
-	<data name="Label_Class" xml:space="preserve">
+  <data name="Label_Class" xml:space="preserve">
     <value>Class</value>
+  </data>
+  <data name="Button_OpenLastWIP" xml:space="preserve">
+    <value>Open Last WIP</value>
   </data>
 </root>
