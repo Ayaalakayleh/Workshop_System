@@ -276,33 +276,30 @@ namespace Workshop.Web.Controllers
                 try
                 {
                     dto = dto ?? new WIPDTO();
-
-                    VehicleAdvancedFilter filterInternal = new VehicleAdvancedFilter
-                    {
-                        VehicleTypeId = 1, // internal
-                        CompanyId = CompanyId,
-                        VehicleId = dto.VehicleId
-                    };
+                    WorkOrderFilterDTO workOrderFilterDTO = new WorkOrderFilterDTO();
+                    workOrderFilterDTO.VehicleID = dto.VehicleId;
+                    workOrderFilterDTO.CompanyId = CompanyId;
+                    workOrderFilterDTO.BranchId = BranchId;
+                    var workOrder = (await _apiClient.GetMWorkOrdersAsync(workOrderFilterDTO));
                     dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id) ?? new VehicleTabDTO();
-                    var CurrentWIP = await _apiClient.GetWIPByIdAsync(dto.Id);
-                    dto.WorkOrderId = CurrentWIP?.WorkOrderId;
-                    var VehicleColor = await _vehicleApiClient.GetAllColors(lang);
+                    dto.WorkOrderId = workOrder?.FirstOrDefault()?.Id;
+                    var VehiclesColors = await _vehicleApiClient.GetAllColors(lang);
                     if (dto.WorkOrderId != null && dto.WorkOrderId > 0)
                     {
                         var workorder = await _apiClient.GetMWorkOrderByID(dto.WorkOrderId ?? 0);
 
                         if (workorder?.VehicleType == (int)VehicleTypeId.Internal)
                         {
-                            var vehicleDetails = (await _vehicleApiClient.GetVehicleDetails(dto.Id, lang));
-
+                            var vehicleDetails = (await _vehicleApiClient.GetVehicleDetails(dto.VehicleId, lang));
+                            
                             dto.VehicleTab.ManufacturerId = vehicleDetails?.RefManufacturers.Id;
                             dto.VehicleTab.ModelId = vehicleDetails?.RefVehicleModels.Id;
                             dto.VehicleTab.ClassId = vehicleDetails?.RefVehicleClasses.Id;
                             dto.VehicleTab.PlateNumber = vehicleDetails?.PlateNumber;
                             dto.VehicleTab.ManufacturingYear = vehicleDetails?.ManufacturingYear;
                             dto.VehicleTab.Color = vehicleDetails?.Color;
-                            dto.VehicleTab.ColorName = VehicleColor?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color).Name;
-                            dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
+                            dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
+                            dto.VehicleTab.ChassisNo = vehicleDetails?.ChassisNo;
 
                         }
                         else
@@ -313,7 +310,7 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
                             dto.VehicleTab.ManufacturingYear = vehicleDetails.ManufacturingYear;
                             dto.VehicleTab.Color = vehicleDetails.Color;
-                            dto.VehicleTab.ColorName = VehicleColor?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color).Name;
+                            dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
                             dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
 
                         }
