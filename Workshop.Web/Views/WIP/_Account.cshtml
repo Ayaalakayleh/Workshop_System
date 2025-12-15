@@ -6,47 +6,43 @@
 
 
 <div class="tab-pane fade show active" id="tabAccount" role="tabpanel">
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label>@Common["Label_AccountType"]</label>
-                    @Html.DropDownListFor(m => m.AccountType,new SelectList(ViewBag.AccountTypes, "Value", "Text"),"Select",new { @class = "form-control", id = "AccountType" })
-                    @Html.ValidationMessageFor(m => m.AccountType, "", new { @class = "text-danger" })
+    <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label>@Common["Label_AccountType"]</label>
+            @Html.DropDownListFor(m => m.AccountType, new SelectList(ViewBag.AccountTypes, "Value", "Text"), "Select", new { @class = "form-control", id = "AccountType" })
+            @Html.ValidationMessageFor(m => m.AccountType, "", new { @class = "text-danger" })
 
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label>@Common["SalesType"]</label>
-                    @Html.DropDownListFor(m => m.SalesType, new SelectList(ViewBag.SalesType ?? new List<SelectListItem>(), "Value", "Text"),"Select", new { @class = "form-control", id = "SalesType" })
-                    @Html.ValidationMessageFor(m => m.SalesType, "", new { @class = "text-danger" })
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label class="form-label">@Common["Label_Customer"]</label>
-                    @Html.DropDownListFor(m => m.CustomerId, new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CustomerId" })
-                    @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label class="form-label">@Common["Label_Currency"]</label>
-                    @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CurrencyId", disabled = "disabled " })
-                    @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
-                </div>
-
-         
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label class="form-label">@Common["Label_Terms"]</label>
-                    @Html.DropDownListFor(m => m.TermsId, new SelectList(ViewBag.Terms ?? new List<SelectListItem>(), "Value", "Text"), new { @class = "form-control", id = "TermsId", disabled = "disabled " })
-                    @Html.ValidationMessageFor(m => m.TermsId, "", new { @class = "text-danger" })
-                </div>
-         
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label class="form-label">@Common["Label_Tax"]</label>
-                    @Html.DropDownListFor(model => model.Vat, new SelectList(ViewBag.VatClassificationList ?? new List<SelectListItem>(), "Value", "Text"), Common["Select"], new { @class = "form-control", id = "Vat", disabled = "disabled " })
-                    @Html.ValidationMessageFor(m => m.Vat, "", new { @class = "text-danger" })
-                </div> 
-                
-            </div>
         </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label>@Common["SalesType"]</label>
+            @Html.DropDownListFor(m => m.SalesType, new SelectList(ViewBag.SalesType ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "SalesType" })
+            @Html.ValidationMessageFor(m => m.SalesType, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label class="form-label">@Common["Label_Customer"]</label>
+            @Html.DropDownListFor(m => m.CustomerId, new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CustomerId" })
+            @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label class="form-label">@Common["Label_Currency"]</label>
+            @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CurrencyId", disabled = "disabled " })
+            @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
+        </div>
+
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label class="form-label">@Common["Label_Terms"]</label>
+            @Html.DropDownListFor(m => m.TermsId, new SelectList(ViewBag.Terms ?? new List<SelectListItem>(), "Value", "Text"), new { @class = "form-control", id = "TermsId", disabled = "disabled " })
+            @Html.ValidationMessageFor(m => m.TermsId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label class="form-label">@Common["Label_Tax"]</label>
+            @Html.DropDownListFor(model => model.Vat, new SelectList(ViewBag.VatClassificationList ?? new List<SelectListItem>(), "Value", "Text"), Common["Select"], new { @class = "form-control", id = "Vat", disabled = "disabled " })
+            @Html.ValidationMessageFor(m => m.Vat, "", new { @class = "text-danger" })
+        </div>
+
     </div>
 </div>
 <script>

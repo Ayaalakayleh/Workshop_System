@@ -23,6 +23,7 @@ namespace Workshop.Core.DTOs
         //public decimal? HourCost { get; set; }
         public int? FordPID { get; set; }
         public int? PIN { get; set; }
+        public bool IsResigned { get; set; }
         public DateTime? ResignedDate { get; set; }
         public int? FK_ShiftId { get; set; }
         public List<int>? Teams { get; set; }
@@ -93,10 +94,10 @@ namespace Workshop.Core.DTOs
         public string TechName { get; init; } = string.Empty;
         public string TechSecondaryName { get; init; } = string.Empty;
 
-        public DateTime Date { get; init; }         
-        public TimeSpan StartTime { get; init; }     
-        public int Duration { get; init; }      
-        public TimeSpan EndTime { get; init; }  
+        public DateTime Date { get; init; }
+        public TimeSpan StartTime { get; init; }
+        public int Duration { get; init; }
+        public TimeSpan EndTime { get; init; }
 
     }
     public sealed class TechnicianAvailabiltyDTO

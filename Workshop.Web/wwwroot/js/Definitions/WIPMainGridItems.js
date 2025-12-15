@@ -1,4 +1,31 @@
 ﻿window.transferLocatorsCache = [];
+ 
+// --- Smooth refresh batching (one repaint for many updates) ---
+let _gridRepaintTimer = null;
+
+function scheduleGridRepaint() {
+    clearTimeout(_gridRepaintTimer);
+    _gridRepaintTimer = setTimeout(() => {
+        const grid = $("#mainItemsGrid").dxDataGrid("instance");
+        if (grid) grid.repaint(); 
+    }, 50);
+}
+
+function updateRowInGrid(row) {
+    const grid = $("#mainItemsGrid").dxDataGrid("instance");
+    if (!grid) return $.Deferred().resolve().promise();
+
+    const store = grid.getDataSource().store();
+    return store.update(row.Id, row).then(() => {
+        const idx = grid.getRowIndexByKey(row.Id);
+        if (idx >= 0) grid.repaintRows([idx]);
+        else scheduleGridRepaint();
+
+        if (typeof updateFieldsFromGrid === "function") updateFieldsFromGrid();
+    });
+}
+
+
 $(function () {
     let locatorsLoadedOnInit = false;
     $("#mainItemsGrid").dxDataGrid({
@@ -428,7 +455,9 @@ $(function () {
         ],
         allowColumnReordering: true,
         allowColumnResizing: true,
-        columnAutoWidth: true,
+        columnAutoWidth: false,
+        columnMinWidth: 50,
+        wordWrapEnabled: false,
         hoverStateEnabled: true,
         paging: {
             pageSize: 10
@@ -516,14 +545,35 @@ $(function () {
 $(function () {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     const rows = grid.getDataSource().items();
-    fillLocators(rows);
+    //fillLocators(rows);
 });
 
-function fillLocators(rows) {
-    console.log("fillLocators called with:", rows);
+window.locatorsCache = window.locatorsCache || {}; 
 
+function getLocatorsCached(dto) {
+    const key = `${dto.ItemId}|${dto.Fk_UnitId}|${dto.Fk_WarehouseId}`;
+    if (window.locatorsCache[key]) {
+        return $.Deferred().resolve(window.locatorsCache[key]).promise();
+    }
+
+    return $.ajax({
+        url: window.RazorVars.getAvailableLocatorsUrl,
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify(dto)
+    }).then(function (res) {
+        const locs = (res && res.success && Array.isArray(res.data)) ? res.data : [];
+        window.locatorsCache[key] = locs;
+        return locs;
+    });
+}
+
+function fillLocators(rows) {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     if (!grid || !rows || !rows.length) return;
+
+    const updates = [];
 
     rows.forEach(function (row) {
         const dto = {
@@ -531,38 +581,33 @@ function fillLocators(rows) {
             Fk_UnitId: Number(row.fk_UnitId),
             Fk_WarehouseId: row.WarehouseId
         };
-        debugger;
-        $.ajax({
-            url: window.RazorVars.getAvailableLocatorsUrl,
-            type: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            data: JSON.stringify(dto),
-            success: function (res) {
-                debugger;
-                if (res && res.success && res.data) {
-                    const locators = res.data;
-                    row.AvailableLocators = locators;
 
-                    if (!row.LocatorId && locators.length > 0) {
-                        row.LocatorId = locators[0].locatorId;
-                        row.LocatorCode = locators[0].locatorCode;
-                        row.AvailableQty = locators[0].onHandQtyInUnit;
-                    }
+        const p = getLocatorsCached(dto).then(function (locators) {
+            row.AvailableLocators = locators || [];
 
-                    const match = locators.find(x => x.locatorId == row.LocatorId);
-                    if (match) {
-                        row.LocatorCode = match.locatorCode;
-                        row.AvailableQty = match.onHandQtyInUnit;
-                    }
-
-                    const store = grid.getDataSource().store();
-                    store.update(row.Id, row).then(() => grid.refresh());
-                }
+            if (!row.LocatorId && row.AvailableLocators.length > 0) {
+                row.LocatorId = row.AvailableLocators[0].locatorId;
+                row.LocatorCode = row.AvailableLocators[0].locatorCode;
+                row.AvailableQty = row.AvailableLocators[0].onHandQtyInUnit;
             }
+
+            const match = row.AvailableLocators.find(x => x.locatorId == row.LocatorId);
+            if (match) {
+                row.LocatorCode = match.locatorCode;
+                row.AvailableQty = match.onHandQtyInUnit;
+            }
+
+            return updateRowInGrid(row);
         });
+
+        updates.push(p);
+    });
+
+    $.when.apply($, updates).always(function () {
+        scheduleGridRepaint(); 
     });
 }
+
 
 $('#AccountType, #Vat').on('change', function () {
     $('#mainItemsGrid').dxDataGrid('instance').refresh();
@@ -723,9 +768,10 @@ function UpdatePartStatus(newStatus, statusText) {
         success: function (res) {
             Swal.fire({
                 icon: "success",
-                title: statusText
+                title: statusTextById(newStatus, true)
             }).then(() => {
-                location.reload();
+                //location.reload();
+                $("#mainItemsGrid").dxDataGrid("instance")?.repaint();
             });
         },
         error: function (err) {
@@ -734,40 +780,55 @@ function UpdatePartStatus(newStatus, statusText) {
     });
 }
 
-function updateStatusItem(e, statusId) {
-    debugger;
-    let dto = {
-        WIPId: Number($("#Id").val()), 
-        Id: e.Id, 
-        //ItemId: e.ItemId,
-        //LocatorId: e.LocatorId,
-        StatusId: statusId
+function statusTextById(statusId, forPopup = false) {
+    if (forPopup) {
+        return statusId == 36 ? "Approved" :
+            statusId == 37 ? "Rejected" :
+                statusId == 41 ? "Waiting Part" :
+                    statusId == 42 ? "Part Received" :
+                        "Updated";
+    } else {
+        return statusId == 36 ? window.RazorVars.DXPartApproved :
+            statusId == 37 ? window.RazorVars.DXPartRejected :
+                statusId == 41 ? window.RazorVars.DXPartTransferReq :
+                    statusId == 42 ? window.RazorVars.DXPartReceived :
+                        "Updated";
     }
-    $.ajax({
+}
+
+
+function updateStatusItem(row, statusId) {
+    const dto = {
+        WIPId: Number($("#Id").val()),
+        Id: row.Id,
+        StatusId: statusId
+    };
+
+    return $.ajax({
         url: window.RazorVars.updatePartStatusWithSingleItem,
         type: 'POST',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-        data: JSON.stringify(dto),
-        success: function (res) {
-            if (res && res.success && res.data) {
-                console.log("Item Updated", res.data);
+        data: JSON.stringify(dto)
+    }).done(function (res) {
+        if (res && res.success) {
+           
+            row.Status = statusId;
+            row.StatusText = statusTextById(statusId, true);
+
+            updateRowInGrid(row).then(() => {
                 Swal.fire({
                     icon: "success",
-                    title: statusId == 36 ? window.RazorVars.DXPartApproved :
-                        statusId == 37 ? window.RazorVars.DXPartRejected :
-                            statusId == 41 ? window.RazorVars.DXPartTransferReq :
-                                statusId == 42 ? window.RazorVars.DXPartReceived :
-                                    "success"
+                    title: statusTextById(statusId, false)
                 });
-                location.reload();
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error getting :", row.Id, error);
+            });
         }
+    }).fail(function (xhr, st, err) {
+        console.error("Error updating status:", err);
+        Swal.fire({ icon: "error", title: "Status update failed" });
     });
 }
+
 
 function IssueParts() {
     const grid = $('#mainItemsGrid').dxDataGrid('instance');
@@ -820,7 +881,6 @@ function TransferParts() {
 
     const fromWh = $("#transferFromWarehouse").val();
     const toWh = $("#transferToWarehouse").val();
-    //const fromLocatorId = Number($("#transferFromLocator").val());
 
     const item = {
         KeyId: `${row.Id}`,
@@ -830,7 +890,7 @@ function TransferParts() {
         Price: 0,
         Total: 0,
         FK_LocatorId: row.LocatorId,
-        FK_WarehouseId: fromWh 
+        FK_WarehouseId: fromWh
     };
 
     const data = {
@@ -844,35 +904,43 @@ function TransferParts() {
         FK_WarehouseId: fromWh,
         Details: [item]
     };
-    //saveData();
-    $.ajax({
-        type: 'POST',
-        url: window.RazorVars.createInventoryTransactionUrl,
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function (res) {
-            if (res.success) {
 
-                //row.LocatorId = fromLocatorId;
+    const btn = $("#btnConfirmTransfer");
+    const oldTxt = btn.html();
+    btn.prop("disabled", true).html('<i class="fa fa-spinner fa-spin me-1"></i>');
+
+    const saveReq = saveData?.() || $.Deferred().resolve().promise();
+
+    $.when(saveReq).always(function () {
+        $.ajax({
+            type: 'POST',
+            url: window.RazorVars.createInventoryTransactionUrl,
+            contentType: 'application/json',
+            data: JSON.stringify(data)
+        }).done(function (res) {
+            if (res && res.success) {
+
                 row.WarehouseId = fromWh;
 
-                Swal.fire({
-                    icon: "success",
-                    title: "Transfer request prepared",
-                    text: "You can now proceed with stock transfer"
+                updateRowInGrid(row).then(() => {
+
+                    updateStatusItem(row, 41).then(() => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Transfer request prepared",
+                            text: "You can now proceed with stock transfer"
+                        });
+                    });
                 });
-                const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                grid.getDataSource().store().update(row.Id, row).then(() => {
-                    grid.refresh();
-                });
-                updateStatusItem(row, 41);
             } else {
                 Swal.fire("Error", "Transaction failed", "error");
             }
-        },
-        error: function (err) {
+        }).fail(function (err) {
             console.error("Error updating status:", err);
-        }
+            Swal.fire("Error", "Transaction failed", "error");
+        }).always(function () {
+            btn.prop("disabled", false).html(oldTxt);
+        });
     });
 }
 function saveData() {
@@ -1020,19 +1088,19 @@ function saveData() {
         dataType: 'json',
         data: model
     }).done(function (result) {
-        console.log("Edit_Post result:", result);
+        //console.log("Edit_Post result:", result);
 
-        if (result && result.success && result.wipId) {
-            Swal.fire("Success", "WIP " + WIPId + " Saved Successfully!").then(() => {
-                window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-            });
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Save Failed",
-                text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
-            });
-        }
+        //if (result && result.success && result.wipId) {
+        //    Swal.fire("Success", "WIP " + WIPId + " Saved Successfully!").then(() => {
+        //        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+        //    });
+        //} else {
+        //    Swal.fire({
+        //        icon: "error",
+        //        title: "Save Failed",
+        //        text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
+        //    });
+        //}
 
     });
 
@@ -1177,7 +1245,7 @@ function UndoIssueVoucher(row) {
                 Swal.fire({
                     icon: "success",
                     title: "Undo completed"
-                }).then(() => location.reload());
+                }).then(() => $("#mainItemsGrid").dxDataGrid("instance")?.repaint());
             } else {
                 Swal.fire("Error", "Undo failed.", "error");
             }
@@ -1255,10 +1323,18 @@ function loadTransferLocators() {
                 ddlLoc.append(`<option value="${l.id}">${l.code} (Available: ${l.qty})</option>`);
             });
 
-            const firstVal = ddlLoc.find("option:eq(1)").val();
-            if (firstVal) ddlLoc.val(firstVal);
+            const preferredId = Number(window.transferRow.LocatorId || 0);
+            const exists = window.transferLocatorsCache.some(l => l.id === preferredId);
 
-            ddlLoc.trigger("change");
+            let valueToSet = "";
+            if (exists) {
+                valueToSet = String(preferredId);
+            } else {
+                const firstVal = ddlLoc.find("option:eq(1)").val(); 
+                valueToSet = firstVal ? String(firstVal) : "";
+            }
+
+            ddlLoc.val(valueToSet).trigger("change"); 
         },
         error: function (xhr) {
             console.error("Failed to load transfer locators", xhr);
@@ -1267,7 +1343,8 @@ function loadTransferLocators() {
 }
 
 
-//$(document).on("change", "#transferFromWarehouse", loadTransferLocators);
+
+$(document).on("change", "#transferFromWarehouse", loadTransferLocators);
 
 $("#transferPartModal").on("shown.bs.modal", loadTransferLocators);
 
@@ -1276,23 +1353,23 @@ $("#transferPartModal").on("shown.bs.modal", loadTransferLocators);
 //    window.transferRow.LocatorId = Number($(this).val() || 0) || null;
 //});
 
-//$(document).on("change", "#transferFromLocator", function () {
-//    if (!window.transferRow) return;
+$(document).on("change", "#transferFromLocator", function () {
+    if (!window.transferRow) return;
 
-//    const selectedId = Number($(this).val() || 0) || null;
+    const selectedId = Number($(this).val() || 0) || null;
 
-//    const loc = window.transferLocatorsCache.find(x => x.id === selectedId);
+    const loc = window.transferLocatorsCache.find(x => x.id === selectedId);
 
-//    window.transferRow.LocatorId = selectedId;
-//    window.transferRow.LocatorCode = loc ? loc.code : null;
-//    window.transferRow.AvailableQty = loc ? loc.qty : null;
+    window.transferRow.LocatorId = selectedId;
+    window.transferRow.LocatorCode = loc ? loc.code : null;
+    window.transferRow.AvailableQty = loc ? loc.qty : null;
 
-//    const grid = $("#mainItemsGrid").dxDataGrid("instance");
-//    if (!grid) return;
+    const grid = $("#mainItemsGrid").dxDataGrid("instance");
+    if (!grid) return;
 
-//    grid.getDataSource().store().update(window.transferRow.Id, window.transferRow)
-//        .then(() => grid.refresh());
-//});
+    grid.getDataSource().store().update(window.transferRow.Id, window.transferRow)
+        .then(() => grid.refresh());
+});
 
 
 $("#btnConfirmTransfer").on("click", function () {

@@ -1,29 +1,32 @@
-﻿
-@using Workshop.Resources
+﻿@using Workshop.Resources
 @using Microsoft.Extensions.Localization
+@using System.Drawing
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
 @model Workshop.Core.DTOs.VehicleTabDTO
 @functions {
-    public static string VehicleColorName(int colorId)
-    {
-        // Map DB color IDs to names
-        return colorId switch
-        {
-            1 => "Red",
-            2 => "Blue",
-            3 => "Black",
-            4 => "White",
-            5 => "Silver",
-            6 => "Gray",
-            7 => "Green",
-            8 => "Yellow",
-            9 => "Orange",
-            10 => "Brown",
-            _ => "Unknown"
-        };
-    }
+	public static string VehicleColorName(int colorId)
+	{
+		// Map DB color IDs to names
+		return colorId switch
+		{
+			1 => "Red",
+			2 => "Blue",
+			3 => "Black",
+			4 => "White",
+			5 => "Silver",
+			6 => "Gray",
+			7 => "Green",
+			8 => "Yellow",
+			9 => "Orange",
+			10 => "Brown",
+			_ => "Unknown"
+		};
+	}
 }
+
+
+
 <div class="tab-pane fade" id="tabVehicle" role="tabpanel">
 	<div class="row">
 		<div class="col-xl-6">
@@ -32,10 +35,10 @@
 				<div class="card-body">
 					<div class="row g-3">
 
-						<div class="col-lg-6"><label class="form-label">@Common["Label_Registration"]</label><input class="form-control" id="VehRegistration" value="@ViewBag.RegDate" readonly></div>
+						<div class="col-lg-6"><label class="form-label">@Common["Label_Registration"]</label><input class="form-control" id="VehRegistration" value="@ViewBag.RegDate" disabled="disabled"></div>
 						<div class="col-lg-6">
 							<label class="form-label">@Common["Label_PlateNumber"]</label>
-							@Html.TextBoxFor(model => model.PlateNumber, Model.PlateNumber, new { @class = "form-control", @id = "VehPlate", @readonly = "readonly" })
+							@Html.TextBoxFor(model => model.PlateNumber, Model.PlateNumber, new { @class = "form-control", @id = "VehPlate", disabled = "disabled" })
 
 						</div>
 						<div class="col-lg-6">
@@ -58,29 +61,36 @@
 							<label class="form-label">@Common["Label_Class"]</label>
 							@Html.DropDownListFor(
 														model => model.ClassId,
-														(IEnumerable<SelectListItem>)ViewBag.classes,
+														(IEnumerable<SelectListItem>)ViewBag.Classes,
 														new { id = "VehClass", @class = "form-control", disabled = "disabled" }
 														)
 						</div>
 						<div class="col-lg-6">
 							<label class="form-label">@Common["Label_Year"]</label>
-							@Html.TextBoxFor(model => model.ManufacturingYear, Model.ManufacturingYear.ToString(), new { @class = "form-control", @id = "VehYear", @readonly = "readonly" })
+							@Html.TextBoxFor(model => model.ManufacturingYear, Model.ManufacturingYear.ToString(), new { @class = "form-control", @id = "VehYear", disabled = "disabled" })
 						</div>
 						<div class="col-lg-6">
 							<label class="form-label">@Common["Label_Color"]</label>
-							@Html.TextBoxFor(model => model.Color, @VehicleColorName(Model.Color ?? 0), new { @class = "form-control", @id = "VehColor", @readonly = "readonly" })
+							@Html.DropDownListFor(
+														model => model.Color,
+														(IEnumerable<SelectListItem>)ViewBag.Colors,
+														new { @class = "form-control", @id = "VehColor", disabled = "disabled" }
+														)
 
 						</div>
-						<div class="col-lg-6"><label class="form-label">@Common["Label_VIN"]</label><input class="form-control" id="VehVIN" readonly></div>
+						<div class="col-lg-6">
+							<label class="form-label">@Common["Label_VIN"]</label>
+							@Html.TextBoxFor(model => model.ChassisNo, Model.ChassisNo, new { @class = "form-control", id = "VehVIN", disabled = "disabled" })
+						</div>
 						<div class="col-lg-6">
 							<label class="form-label">@Common["Label_Department"]</label>
-							<select class="form-control" id="DepartmentId">
+							<select class="form-control" id="DepartmentId" disabled="disabled">
 								<option value="1">@Common["Label_Workshop"]</option>
 								<option value="2">@Common["Label_BodyShop"]</option>
 								<option value="3">@Common["Label_Parts"]</option>
 							</select>
 						</div>
-						<div class="col-lg-6"><label class="form-label">@Common["Label_CarPark"]</label><select class="form-control" id="CarPark"><option value="1">@Common["Label_VehicleHere"]</option><option value="2">@Common["Label_Outside"]</option></select></div>
+						<div class="col-lg-6"><label class="form-label">@Common["Label_CarPark"]</label><select class="form-control" id="CarPark" disabled="disabled"><option value="1">@Common["Label_VehicleHere"]</option><option value="2">@Common["Label_Outside"]</option></select></div>
 
 					</div>
 				</div>
