@@ -36,12 +36,14 @@
                         @{
                             var hasAction = false;
                         }
-
+                        <button class="btn btn-sm btn-info btn-edit-reservation my-1" data-id="@item.Id">
+                            <i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
+                        </button>
                         @* Book *@
                         @if (item.Status == (int)ReservationStatus.New)
                         {
                             hasAction = true;
-                            <button class="btn btn-sm btn-primary btn-book reservations-button"
+                            <button class="btn btn-sm btn-primary btn-book reservations-button my-1"
                                     title="@Common["Button_Book"]"
                                     data-reservationid="@item.Id"
                                     data-statusid="@((int)ReservationStatus.Booked)">
@@ -53,7 +55,7 @@
                         {
                             hasAction = true;
                             <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId })"
-                               class="btn btn-sm btn-success reservations-button"
+                               class="btn btn-sm btn-success reservations-button my-1"
                                title="@Common["Label_MovementIn"]">
                                 <i class="fad fa-clipboard-list"></i>&nbsp;@Common["Label_MovementIn"]
                             </a>
@@ -63,18 +65,13 @@
                         @if (item.Status != (int)ReservationStatus.Completed && item.Status != (int)ReservationStatus.Canceled)
                         {
                             hasAction = true;
-                            <button class="btn btn-sm btn-danger btn-cancel reservations-button"
+                            <button class="btn btn-sm btn-danger btn-cancel reservations-button my-1"
                                     title="@Common["Button_Cancel"]"
                                     data-reservationid="@item.Id"
                                     data-statusid="@((int)ReservationStatus.Canceled)">
                                 <i class="fad fa-times-circle"></i>&nbsp;@Common["Button_Cancel"]
                             </button>
                         }
-                        <button class="btn btn-sm btn-warning btn-edit-reservation"
-                                data-id="@item.Id"
-                                title="@Common["Button_Edit"]">
-                            <i class="fa fa-edit"></i>
-                        </button>
 
 
                         @* If no actions were rendered, drop a placeholder to equalize row height *@

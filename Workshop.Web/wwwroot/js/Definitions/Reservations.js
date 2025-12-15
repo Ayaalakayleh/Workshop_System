@@ -5,18 +5,6 @@
     const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
     // -------- Data from server (reservations only) --------
-    // Example shape from API:
-    // {
-    //   "id": 3,
-    //   "date": "2025-11-20T00:00:00",
-    //   "vehicleId": 6242,
-    //   "plate_Number": "...",
-    //   "start_Time": "08:00:00",
-    //   "end_Time": "09:00:00",
-    //   "duration": 1.00,
-    //   "description": "Some description",
-    //   "companyId": 1202
-    // }
     let RESERVATIONS = [];
 
     // Page calls this with response.data
@@ -50,7 +38,7 @@
     const pad = (n) => (n < 10 ? "0" + n : "" + n);
     const DOW = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-    // Static day bounds for DAY VIEW: 8:00 AM → 4:00 PM
+    // Default day bounds (will auto-expand to include reservations)
     const DAY_START_MIN = 8 * 60;   // 480
     const DAY_END_MIN = 16 * 60;    // 960
 
@@ -117,14 +105,10 @@
         return arr;
     }
 
+    // ✅ FIX: don't wrap <tr> inside another <tr> (this breaks Day header selection in some DOMs)
     function setThead(rowsHtml) {
         if (!thead) return;
-        thead.innerHTML = "";
-        rowsHtml.forEach(html => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = html;
-            thead.appendChild(tr);
-        });
+        thead.innerHTML = rowsHtml.join("");
     }
 
     function ensureDate() {
@@ -174,6 +158,9 @@
         return Math.max(a, Math.min(b, v));
     }
 
+    const floorToHour = (m) => Math.floor(m / 60) * 60;
+    const ceilToHour = (m) => Math.ceil(m / 60) * 60;
+
     // Map dateISO -> [{ id, start, end, description, plate }]
     function buildIntervalsMap() {
         const map = new Map();
@@ -197,7 +184,7 @@
         return map;
     }
 
-    // ---------- formatting helpers for modal ----------
+    // ---------- modal helpers ----------
     function formatDateDisplay(dateStr) {
         if (!dateStr) return "";
         const d = new Date(dateStr);
@@ -207,7 +194,6 @@
 
     function formatTimeDisplay(time) {
         if (!time) return "";
-        // handle "HH:mm:ss" or "HH:mm"
         const str = String(time);
         const parts = str.split(':');
         if (parts.length >= 2) {
@@ -216,7 +202,6 @@
         return str;
     }
 
-    // ---------- modal: show reservation details (1..N) ----------
     function openReservationDetailsModal(idsArray) {
         if (!window.$ || !$.ajax) {
             console.error("jQuery is not available for openReservationDetailsModal");
@@ -231,37 +216,28 @@
             return;
         }
 
-        // ✅ backend expects: ids=1,2,3 (comma separated)
         const idsCsv = idsArray
             .map(x => String(x).trim())
             .filter(Boolean)
             .join(',');
 
-        if (!idsCsv) {
-            console.warn('openReservationDetailsModal called with empty ids.');
-            return;
-        }
+        if (!idsCsv) return;
 
-        const url = window.API_BASE.getReservationsByIds;
         $.ajax({
-            url: url,
+            url: window.API_BASE.getReservationsByIds,
             type: 'GET',
-            data: { ids: idsCsv }, // -> ?ids=1,2,3
+            data: { ids: idsCsv },
             success: function (resp) {
                 if (!resp || resp.isSuccess === false) {
                     const msg = resp && resp.message ? resp.message : 'Failed to load reservations.';
                     if (window.Swal && Swal.fire) Swal.fire('Error', msg, 'error');
                     return;
                 }
-
-                const list = resp.data || [];
-                buildReservationDetailsModal(list);
+                buildReservationDetailsModal(resp.data || []);
             },
             error: function (xhr, status, error) {
                 console.error("Error loading reservation details:", error || xhr?.responseText);
-                if (window.Swal && Swal.fire) {
-                    Swal.fire('Error', 'Failed to load reservation details.', 'error');
-                }
+                if (window.Swal && Swal.fire) Swal.fire('Error', 'Failed to load reservation details.', 'error');
             }
         });
     }
@@ -270,7 +246,6 @@
         const container = $('#reservationDetailsModalContainer');
         if (!container.length) return;
 
-        // remove old modal if exists
         $('#reservationDetailsModal').remove();
 
         const many = list.length > 1;
@@ -281,7 +256,6 @@
         if (!list.length) {
             bodyHtml = `<p class="text-muted mb-0">No reservation details found.</p>`;
         } else if (!many) {
-            // ---------- SINGLE RESERVATION ----------
             const r = list[0];
 
             const dateText = formatDateDisplay(r.date);
@@ -340,7 +314,6 @@
             </div>
         `;
         } else {
-            // ---------- MULTIPLE RESERVATIONS ----------
             bodyHtml += `<div class="accordion" id="resDetailsAccordion">`;
             list.forEach((r, idx) => {
                 const idSafe = r.id || idx;
@@ -446,7 +419,6 @@
         modal.show();
     }
 
-
     // ---------- Overlay helpers (vertical bars) ----------
     function getResGridBits() {
         const scroll = qs('.resv-scroll');
@@ -458,7 +430,19 @@
     function ensureOverlay() {
         const { scroll } = getResGridBits();
         if (!scroll) return null;
+
         let ov = qs('.resv-overlay', scroll);
+
+        // dispose existing tooltips to avoid ghost tooltips
+        if (ov && window.bootstrap && bootstrap.Tooltip) {
+            qsa('[data-bs-toggle="tooltip"]', ov).forEach(node => {
+                try {
+                    const inst = bootstrap.Tooltip.getInstance(node);
+                    if (inst) inst.dispose();
+                } catch { /* ignore */ }
+            });
+        }
+
         if (!ov) {
             ov = document.createElement('div');
             ov.className = 'resv-overlay';
@@ -470,7 +454,7 @@
     }
 
     function centersFromSelector(sel, scroll) {
-        const nodes = qsa(sel);
+        const nodes = qsa(sel, scroll).filter(n => n && n.getClientRects && n.getClientRects().length);
         const sRect = scroll.getBoundingClientRect();
         return nodes.map(th => {
             const r = th.getBoundingClientRect();
@@ -491,9 +475,20 @@
         return Array.from(groupsMap.values());
     }
 
+    // ✅ Tooltip: show PLATE numbers (not description)
+    function buildTooltipHtmlForGroup(group) {
+        const plates = group.items
+            .map(item => (item.plate || "").trim())
+            .filter(Boolean);
+
+        const uniquePlates = [...new Set(plates)];
+        return uniquePlates.length ? uniquePlates.join('<br>') : labelReserved;
+    }
+
     function renderOverlayDay({ startM, endM, dateISO, intervalsMap }) {
         const { scroll, table, tbody } = getResGridBits();
         if (!scroll || !table || !tbody) return;
+
         const overlay = ensureOverlay();
         if (!overlay) return;
 
@@ -501,9 +496,11 @@
         const tbRect = tbody.getBoundingClientRect();
         const bodyTop = (tbRect.top - sRect.top) + scroll.scrollTop;
         const bodyH = tbody.scrollHeight;
+
         const range = Math.max(1, endM - startM);
         const timeToY = (mins) => bodyTop + ((mins - startM) / range) * bodyH;
 
+        // Day has ONE schedule column
         const centers = centersFromSelector('.resv-grid thead th.schedule-col', scroll);
         if (!centers.length) return;
         const cx = centers[0];
@@ -532,44 +529,25 @@
             el.style.left = `${cx}px`;
             el.style.top = `${y1}px`;
             el.style.height = `${h}px`;
-            if (ids.length) el.setAttribute('data-ids', ids.join(',')); // ✅ comma separated
+            if (ids.length) el.setAttribute('data-ids', ids.join(','));
 
-            const startH = pad(Math.floor(cStart / 60));
-            const startMins = pad(cStart % 60);
-            const endH = pad(Math.floor(cEnd / 60));
-            const endMins = pad(cEnd % 60);
-
-            // Build a label for *each* reservation (no time)
-            const labels = group.items.map(item =>
-                item.description || item.plate || labelReserved
-            );
-
-            // If you want to avoid duplicates:
-            const uniqueLabels = [...new Set(labels)];
-
-            // Tooltip text: show all elements (one per line), no "+n more", no time
-            const tip = uniqueLabels.join('<br>');
+            const tip = buildTooltipHtmlForGroup(group);
 
             el.innerHTML = `
-    <span class="sr">${tip}</span>
-    <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
-`;
+                <span class="sr">${tip}</span>
+                <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
+            `;
 
-            // Enable HTML so <br> works, and set tooltip
             el.setAttribute('data-bs-toggle', 'tooltip');
             el.setAttribute('data-bs-html', 'true');
             el.setAttribute('data-bs-title', tip);
-
 
             el.addEventListener('click', function (ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
                 const idsAttr = el.getAttribute('data-ids');
                 if (!idsAttr) return;
-                const ids = idsAttr
-                    .split(',')
-                    .map(s => s.trim())
-                    .filter(Boolean);
+                const ids = idsAttr.split(',').map(s => s.trim()).filter(Boolean);
                 if (!ids.length) return;
                 openReservationDetailsModal(ids);
             });
@@ -586,6 +564,7 @@
     function renderOverlayWeek({ startM, endM, weekStartDate, intervalsMap }) {
         const { scroll, table, tbody } = getResGridBits();
         if (!scroll || !table || !tbody) return;
+
         const overlay = ensureOverlay();
         if (!overlay) return;
 
@@ -593,10 +572,10 @@
         const tbRect = tbody.getBoundingClientRect();
         const bodyTop = (tbRect.top - sRect.top) + scroll.scrollTop;
         const bodyH = tbody.scrollHeight;
+
         const range = Math.max(1, endM - startM);
         const timeToY = (mins) => bodyTop + ((mins - startM) / range) * bodyH;
 
-        // Day columns centers
         const centers = centersFromSelector('.resv-grid thead th.day-col', scroll);
         if (!centers.length) return;
 
@@ -637,41 +616,25 @@
                 el.style.left = `${cx}px`;
                 el.style.top = `${y1}px`;
                 el.style.height = `${h}px`;
-                if (ids.length) el.setAttribute('data-ids', ids.join(',')); 
+                if (ids.length) el.setAttribute('data-ids', ids.join(','));
 
-                const cS = cStart;
-                const cE = cEnd;
-                const startH = pad(Math.floor(cS / 60));
-                const startMins = pad(cS % 60);
-                const endH = pad(Math.floor(cE / 60));
-                const endMins = pad(cE % 60);
-
-                const labels = group.items.map(item =>
-                    item.description || item.plate || labelReserved
-                );
-
-                const uniqueLabels = [...new Set(labels)];
-                const tip = uniqueLabels.join('<br>');
+                const tip = buildTooltipHtmlForGroup(group);
 
                 el.innerHTML = `
-    <span class="sr">${tip}</span>
-    <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
-`;
+                    <span class="sr">${tip}</span>
+                    <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
+                `;
 
                 el.setAttribute('data-bs-toggle', 'tooltip');
                 el.setAttribute('data-bs-html', 'true');
                 el.setAttribute('data-bs-title', tip);
-
 
                 el.addEventListener('click', function (ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
                     const idsAttr = el.getAttribute('data-ids');
                     if (!idsAttr) return;
-                    const ids = idsAttr
-                        .split(',')
-                        .map(s => s.trim())
-                        .filter(Boolean);
+                    const ids = idsAttr.split(',').map(s => s.trim()).filter(Boolean);
                     if (!ids.length) return;
                     openReservationDetailsModal(ids);
                 });
@@ -693,19 +656,34 @@
         const dateISO = toISODate(chosen);
         const today = new Date();
 
-        // STATIC time bounds: 8:00 AM to 4:00 PM, regardless of reservations
-        const startM = DAY_START_MIN; // 08:00
-        const endM = DAY_END_MIN;     // 16:00
+        // ✅ Auto-expand Day bounds to include reservations (otherwise you see nothing if 예약 is outside 8–16)
+        const dayList = RESERVATIONS.filter(r => dateISOfromApi(r.date) === dateISO);
+        const mm = getMinMaxFromReservations(dayList);
 
-        const step = 60;
+        let startM = DAY_START_MIN;
+        let endM = DAY_END_MIN;
 
-        // We want labels including 8:00, 9:00, ..., 16:00
-        const times = [];
-        for (let t = startM; t <= endM; t += step) {
-            times.push(t);
+        // also respect user inputs if present
+        const inStart = toMinutesApi(((elStart?.value) || "") + ":00");
+        const inEnd = toMinutesApi(((elEnd?.value) || "") + ":00");
+        if (Number.isFinite(inStart) && Number.isFinite(inEnd) && inEnd > inStart) {
+            startM = Math.min(startM, inStart);
+            endM = Math.max(endM, inEnd);
         }
 
-        // Header: Time + one column with date pill
+        if (mm) {
+            startM = Math.min(startM, floorToHour(mm.minStart));
+            endM = Math.max(endM, ceilToHour(mm.maxEnd));
+        }
+
+        startM = clamp(startM, 0, 24 * 60);
+        endM = clamp(endM, 0, 24 * 60);
+        if (endM <= startM) { startM = DAY_START_MIN; endM = DAY_END_MIN; }
+
+        const step = 60;
+        const times = [];
+        for (let t = startM; t <= endM; t += step) times.push(t);
+
         setThead([`
             <tr class="head-row-1">
                 <th class="text-uppercase time-cell">Time</th>
@@ -723,28 +701,17 @@
         if (!elBody) return;
         elBody.innerHTML = "";
 
-        if (!times.length) {
+        times.forEach(mins => {
             const tr = document.createElement("tr");
-            tr.innerHTML = ``;
+            tr.innerHTML = `
+                <td class="time-cell align-middle">${formatHourLabel(mins)}</td>
+                <td class="schedule-cell"></td>
+            `;
             elBody.appendChild(tr);
-        } else {
-            times.forEach(mins => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="time-cell align-middle">${formatHourLabel(mins)}</td>
-                    <td class="schedule-cell"></td>
-                `;
-                elBody.appendChild(tr);
-            });
-        }
+        });
 
         requestAnimationFrame(() => {
-            renderOverlayDay({
-                startM,
-                endM,
-                dateISO,
-                intervalsMap
-            });
+            renderOverlayDay({ startM, endM, dateISO, intervalsMap });
         });
     }
 
@@ -770,10 +737,10 @@
             const endM = toMinutesApi(((elEnd?.value) || "17:00") + ":00");
             minMax = { minStart: startM, maxEnd: endM };
         }
+
         const step = 60;
         const times = timesBetween(minMax.minStart, minMax.maxEnd, step);
 
-        // Header: Time + 7 day columns
         let header = `<th class="text-uppercase time-cell">Time</th>`;
         weekDates.forEach(d => {
             header += `
@@ -791,21 +758,13 @@
         if (!elBody) return;
         elBody.innerHTML = "";
 
-        if (!times.length) {
+        times.forEach(mins => {
             const tr = document.createElement("tr");
-            tr.innerHTML = ``;
+            let rowHtml = `<td class="time-cell align-middle">${formatHourLabel(mins)}</td>`;
+            for (let i = 0; i < 7; i++) rowHtml += `<td class="schedule-cell"></td>`;
+            tr.innerHTML = rowHtml;
             elBody.appendChild(tr);
-        } else {
-            times.forEach(mins => {
-                const tr = document.createElement("tr");
-                let rowHtml = `<td class="time-cell align-middle">${formatHourLabel(mins)}</td>`;
-                for (let i = 0; i < 7; i++) {
-                    rowHtml += `<td class="schedule-cell"></td>`;
-                }
-                tr.innerHTML = rowHtml;
-                elBody.appendChild(tr);
-            });
-        }
+        });
 
         requestAnimationFrame(() => {
             renderOverlayWeek({
@@ -834,14 +793,15 @@
 
         if (!elBody) return;
         elBody.innerHTML = "";
+
         for (let r = 0; r < 6; r++) {
             const tr = document.createElement("tr");
             tr.innerHTML = `<td class="time-cell"></td>`;
             for (let c = 0; c < 7; c++) {
                 const cellDate = new Date(start);
                 cellDate.setDate(start.getDate() + r * 7 + c);
-                const td = document.createElement("td");
 
+                const td = document.createElement("td");
                 const isToday = sameDate(cellDate, today);
                 const inMonth = cellDate.getMonth() === base.getMonth();
 
@@ -870,9 +830,10 @@
         const grid = qs(".resv-grid");
         if (grid) grid.classList.remove("month-table");
 
-        // clear overlay container when rebuilding
-        const existingOverlay = qs('.resv-overlay');
-        if (existingOverlay) existingOverlay.innerHTML = '';
+        // clear overlay container when rebuilding (scoped)
+        const { scroll } = getResGridBits();
+        const ov = scroll ? qs('.resv-overlay', scroll) : qs('.resv-overlay');
+        if (ov) ov.innerHTML = '';
 
         if (state.view === "Day") buildDay();
         else if (state.view === "Week") buildWeek();
@@ -880,10 +841,7 @@
 
         setViewTitle();
 
-        // We no longer have selectable tech slots, hide Clear button
-        if (btnClear) {
-            btnClear.style.display = "none";
-        }
+        if (btnClear) btnClear.style.display = "none";
     }
 
     function switchView(v) {
@@ -895,34 +853,21 @@
         build();
     }
 
-    if (elDate) {
-        elDate.addEventListener("change", () => {
-            setViewTitle();
-        });
-    }
+    // ✅ rebuild on date change (not only title)
+    if (elDate) elDate.addEventListener("change", build);
     if (elStart) elStart.addEventListener("change", build);
     if (elEnd) elEnd.addEventListener("change", build);
     if (viewDay) viewDay.addEventListener("click", () => switchView("Day"));
     if (viewWeek) viewWeek.addEventListener("click", () => switchView("Week"));
     if (viewMonth) viewMonth.addEventListener("click", () => switchView("Month"));
-        // ---- flatpickr for dcDate ----
+
+    // ---- flatpickr for dcDate ----
     if (elDate && window.flatpickr) {
         flatpickr(elDate, {
-            // match the YYYY-MM-DD format expected by parseDateInput / toISODate
             dateFormat: "Y-m-d",
-
-            // today is selected by default
-            defaultDate: "today",
-
-            // disable past days
             minDate: "today",
-
-            // keep everything else wired to the existing "change" handler
             onChange: function (selectedDates, dateStr) {
-                // update the input value
                 elDate.value = dateStr;
-
-                // trigger the native change event so setViewTitle (and any other listeners) run
                 elDate.dispatchEvent(new Event("change", { bubbles: true }));
             }
         });

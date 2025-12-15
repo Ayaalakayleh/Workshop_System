@@ -3110,10 +3110,10 @@ html[dir="rtl"] .toggle-pin {
     min-width: 120px
 }
 
-.reservations-button {
+/*.reservations-button {
     width: 155px;
     margin: .5rem 0
-}
+}*/
 
 .resv-grid th {
     color: #444 !important

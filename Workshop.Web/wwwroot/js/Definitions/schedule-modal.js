@@ -1,6 +1,5 @@
 ﻿// ~/js/definitions/schedule-modal.js
 (() => {
-    // --- tiny loader to ensure flatpickr is available before init ---
     function ensureFlatpickr() {
         return new Promise((resolve, reject) => {
             if (window.flatpickr && typeof window.flatpickr === 'function') return resolve();
@@ -32,18 +31,14 @@
         });
     }
 
-    // z-index patch so calendar shows above Bootstrap modal/backdrop
     function ensureFlatpickrZIndexPatch() {
         if (document.getElementById('flatpickr-zindex-patch')) return;
         const style = document.createElement('style');
         style.id = 'flatpickr-zindex-patch';
-        style.textContent = `
-            .flatpickr-calendar { z-index: 200000 !important; }
-        `;
+        style.textContent = `.flatpickr-calendar { z-index: 200000 !important; }`;
         document.head.appendChild(style);
     }
 
-    // --- helpers ---
     function callApi({ url, type = 'GET', data = null, isFormData = false, onSuccess = null, onError = null }) {
         const ajaxOptions = {
             url, type, dataType: 'json',
@@ -62,14 +57,13 @@
 
     const state = {
         date: null,
-        // NEW: optional dateTo for range-based APIs (e.g. GetAllReservationsFilteredJSON)
         dateTo: null,
         plate: null,
         vehicleId: null,
         customerId: null,
-        duration: 0,      // minutes
-        startTime: null,  // "HH:mm"
-        endTime: null,    // "HH:mm"
+        duration: 0,
+        startTime: null,
+        endTime: null,
         isSaving: false
     };
 
@@ -89,7 +83,6 @@
         return `${pad2(h)}:${pad2(m)}`;
     }
 
-    // Duration is in MINUTES
     function normalizeDurationToMinutes(rawDuration) {
         const num = parseFloat(rawDuration || 0);
         if (!isFinite(num) || num <= 0) return 0;
@@ -143,17 +136,14 @@
         $el.select2(select2Options($el));
     }
 
-    function refreshSelect2($el) {
-        isSelect2($el) ? $el.trigger('change.select2') : initSelect2($el);
-    }
-
-    // flatpickr instance & initializer
+    // flatpickr instance
     let datePickrInstance = null;
 
     function initDatePicker() {
         ensureFlatpickrZIndexPatch();
+
         const modal = document.getElementById('scheduleModal');
-        const input = modal ? modal.querySelector('#schDate.flat-picker') : document.querySelector('#schDate.flat-picker');
+        const input = modal ? modal.querySelector('#schDate.flat-picker-future') : document.querySelector('#schDate.flat-picker-future');
         if (!input) return;
 
         if (datePickrInstance && datePickrInstance.destroy) {
@@ -167,12 +157,19 @@
             dateFormat: "Y-m-d",
             allowInput: false,
             clickOpens: true,
-            minDate: "1950-01-01",
+            minDate: "today",
             maxDate: "2100-12-31",
             disableMobile: true,
+            defaultDate: "today",
             appendTo: appendTarget,
+            onReady: (_sel, dateStr) => {
+                state.date = dateStr || $('#schDate').val() || null;
+                if (!state.dateTo) state.dateTo = state.date;
+                $('#schDate').trigger('change');
+            },
             onChange: (_selectedDates, dateStr) => {
                 state.date = dateStr || null;
+                if (!state.dateTo) state.dateTo = state.date;
                 $('#schDate').trigger('change');
             }
         });
@@ -185,11 +182,6 @@
         $('#schDate').off('change').on('change', handleDateChange);
         $('#schStart').off('change').on('change', recomputeEndTime);
         $('#schDuration').off('input change').on('input change', recomputeEndTime);
-
-        // NEW: optional #dateTo field (e.g. in a filter modal) to store dateTo
-        $('#dateTo').off('change').on('change', function () {
-            state.dateTo = $(this).val() || null;
-        });
     }
 
     function handleVehicleChange() {
@@ -207,7 +199,7 @@
                     const data = res.data;
                     $('#chassisDropdown').val(data.vehicle?.id).trigger('change.select2');
                     state.chassisId = Number(data.vehicle?.id);
-                    // only overwrite CustomerName when API returned a non-empty value
+
                     if (data.customerName && String(data.customerName).trim().length) {
                         $('#CustomerName').val(data.customerName);
                     }
@@ -219,19 +211,14 @@
             onError: () => Swal.fire('Error', 'Failed to load vehicle details.', 'error')
         });
     }
+
     function handleChassisChange() {
         const chassisId = $(this).val();
-        const chassisText = $(this).find('option:selected').text();
-        //debugger;
         state.chassisId = Number(chassisId);
-
-
         if (!chassisId) return;
 
-        // sync into state
         state.vehicleId = chassisId;
-        state.chassisId = Number(chassisId);
-        // Call the same API used for vehicle dropdown
+
         callApi({
             url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&lang=en`,
             onSuccess: (res) => {
@@ -240,16 +227,15 @@
 
                     $("#vehicleDropdown").val(chassisId).trigger("change.select2").trigger("change");
 
-                    // Reflect fields
-                    $('#chassisInput').val(data.vehicle?.chassisNo || '');
-                    // only overwrite CustomerName when API returned a non-empty value
                     if (data.customerName && String(data.customerName).trim().length) {
                         $('#CustomerName').val(data.customerName);
                     }
                     $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
 
                     const vehicleOptionText = $("#vehicleDropdown").find('option:selected').text();
-                    state.plate = (vehicleOptionText && vehicleOptionText.trim()) ? vehicleOptionText : (data.vehicle?.plateNumber || '');
+                    state.plate = (vehicleOptionText && vehicleOptionText.trim())
+                        ? vehicleOptionText
+                        : (data.vehicle?.plateNumber || '');
                 } else {
                     console.warn("Failed to load chassis vehicle details:", res.message);
                 }
@@ -258,15 +244,11 @@
         });
     }
 
-
     function handleDateChange() {
         state.date = $(this).val() || null;
-
-        // If dateTo is not explicitly chosen anywhere, default it to same date
-        if (!state.dateTo) {
-            state.dateTo = state.date;
-        }
+        if (!state.dateTo) state.dateTo = state.date;
     }
+
     function handleVehicleTypeChange() {
         const vehicleTypeId = $('#vehicleTypeDropdown').val();
         state.vehicleType = Number(vehicleTypeId);
@@ -274,20 +256,15 @@
         const $vehicle = $('#vehicleDropdown');
         const $chassis = $('#chassisDropdown');
 
-        // retain current customer value if present
         const existingCustomer = ($('#CustomerName').val() || '').toString().trim();
 
-        // reset
         $vehicle.empty().append('<option value="">Select</option>').trigger('change');
         $chassis.empty().append('<option value="">Select</option>').trigger('change');
-        // only clear CustomerName if it was empty before — avoid overwriting a programmatically set value
-        if (!existingCustomer) {
-            $('#CustomerName').val('');
-        }
+
+        if (!existingCustomer) $('#CustomerName').val('');
 
         if (!vehicleTypeId) return;
 
-        // 1️⃣ Load VEHICLES
         $.ajax({
             type: 'GET',
             url: window.RazorVars.vehicleListUrl,
@@ -296,9 +273,7 @@
             success: function (data) {
                 if (Array.isArray(data)) {
                     data.forEach(item => {
-                        $vehicle.append(
-                            `<option value="${item.value}">${item.text}</option>`
-                        );
+                        $vehicle.append(`<option value="${item.value}">${item.text}</option>`);
                     });
                     $vehicle.trigger('change.select2');
                 }
@@ -314,9 +289,7 @@
                 if (!Array.isArray(data)) return;
 
                 data.forEach(item => {
-                    $chassis.append(
-                        `<option value="${item.id}">${item.text}</option>`
-                    );
+                    $chassis.append(`<option value="${item.id}">${item.text}</option>`);
                 });
 
                 $chassis.trigger('change.select2');
@@ -326,7 +299,6 @@
             }
         });
     }
-
 
     function recomputeEndTime() {
         const startHHMM = $('#schStart').val();
@@ -346,19 +318,76 @@
         const endHHMM = minutesToHHMM(endMin);
 
         state.endTime = endHHMM;
-        $('#schEnd').val(endHHMM);
+        $('#schEnd').val(endHHMM).trigger('change');
+    }
+
+    function initValidation() {
+        const $form = $('#scheduleForm');
+        if (!$form.length) return;
+
+        if ($form.data('validator')) return;
+
+        $form.validate({
+            // IMPORTANT for select2: don't ignore hidden select2 originals
+            ignore: ":hidden:not(.select2-hidden-accessible)",
+
+            rules: {
+                Date: { required: true },
+                VehicleTypeId: { required: true },
+                VehicleId: { required: true },
+                CustomerName: { required: true },
+                ChassisId: { required: true },
+                Start_Time: { required: true },
+                Duration: { required: true, min: 1 },
+                End_Time: { required: true }
+                // Description is OPTIONAL (no rule)
+            },
+
+            errorClass: 'is-invalid',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+
+                // If select2, place error after its container
+                if (element.hasClass('select2-hidden-accessible')) {
+                    error.insertAfter(element.next('.select2'));
+                    return;
+                }
+
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+
+            highlight: function (element) {
+                const $el = $(element);
+                $el.addClass('is-invalid');
+
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.next('.select2').find('.select2-selection').addClass('is-invalid');
+                }
+            },
+
+            unhighlight: function (element) {
+                const $el = $(element);
+                $el.removeClass('is-invalid');
+
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.next('.select2').find('.select2-selection').removeClass('is-invalid');
+                }
+            }
+        });
     }
 
     function bindSaveHandlerOnce() {
-        debugger;
         $(document).off('click.save', '#btnSaveSchedule').on('click.save', '#btnSaveSchedule', function () {
-            const $form = $('#scheduleForm'); // or $('#scheduleModal form')
+            const $form = $('#scheduleForm');
 
-            // 🔹 First: run validation
-            if ($form.length && !$form.valid()) {
-                // form has validation errors -> don't submit / save
-                return;
-            }
+            // recompute end before validation (so End_Time becomes filled)
+            recomputeEndTime();
+
+            if ($form.length && !$form.valid()) return;
 
             if (state.isSaving) return;
             state.isSaving = true;
@@ -367,31 +396,20 @@
             const originalText = $btn.text();
             $btn.prop('disabled', true).text(originalText || 'Saving...');
 
-            // sync latest values from inputs
             if (!state.date) state.date = $('#schDate').val() || null;
-
-            // Ensure dateTo is captured if there's a #dateTo input
-            if (!state.dateTo) {
-                const dt = $('#dateTo').val();
-                state.dateTo = dt || state.date || null;
-            }
+            if (!state.dateTo) state.dateTo = state.date;
 
             state.startTime = $('#schStart').val() || state.startTime;
             state.duration = normalizeDurationToMinutes($('#schDuration').val());
-            recomputeEndTime(); // recompute end from current start/duration
+            recomputeEndTime();
 
-            // Ensure we have latest vehicle/chassis ids in state — fallback to DOM values
-            try {
-                if (!state.vehicleId) {
-                    const v = $('#vehicleDropdown').val();
-                    if (v) state.vehicleId = v;
-                }
-                if (!state.chassisId) {
-                    const c = $('#chassisDropdown').val();
-                    if (c) state.chassisId = Number(c);
-                }
-            } catch (e) {
-                console.warn('Failed to sync vehicle/chassis ids from DOM', e);
+            if (!state.vehicleId) {
+                const v = $('#vehicleDropdown').val();
+                if (v) state.vehicleId = v;
+            }
+            if (!state.chassisId) {
+                const c = $('#chassisDropdown').val();
+                if (c) state.chassisId = Number(c);
             }
 
             const scheduleData = {
@@ -408,18 +426,14 @@
                 CustomerName: $('#CustomerName').val() ?? '',
                 VehicleTypeId: toNumber(state.vehicleType),
                 ChassisId: toNumber(state.chassisId),
-
             };
+
             const isEdit = $('#scheduleModal').data('mode') === 'edit';
             const reservationId = $('#scheduleModal').data('reservationId');
 
-            const url = isEdit
-                ? window.API_BASE.updateReservation
-                : window.RazorVars.insertReservationUrl;
+            const url = isEdit ? window.API_BASE.updateReservation : window.RazorVars.insertReservationUrl;
+            if (isEdit) scheduleData.Id = reservationId;
 
-            if (isEdit) {
-                scheduleData.Id = reservationId;
-            }
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -427,10 +441,9 @@
                 dataType: 'json',
                 data: JSON.stringify(scheduleData),
                 success: function (res) {
-                    debugger;
                     if (res?.isActive) {
                         Swal.fire({
-                            title: window.RazorVars.Warning,
+                            title: window.RazorVars.warning,
                             text: window.RazorVars.reservationAlreadyExist,
                             icon: 'warning'
                         });
@@ -460,21 +473,12 @@
         });
     }
 
-
     $(document).on('shown.bs.modal', '#scheduleModal', async function () {
         bindEvents();
 
-        // ✅ make sure start time & duration are enabled and editable
         $('#schStart, #schDuration')
             .prop('disabled', false)
             .prop('readonly', false);
-
-        try {
-            await ensureFlatpickr();
-            initDatePicker();
-        } catch (e) {
-            console.error('flatpickr failed to load', e);
-        }
 
         // End time should be calculated only
         $('#schEnd').prop('readonly', true).on('keydown paste', (e) => e.preventDefault());
@@ -484,59 +488,25 @@
         initSelect2($('#chassisDropdown'));
         initSelect2($('#vehicleTypeDropdown'));
 
+        initValidation();
 
+        try {
+            await ensureFlatpickr();
+            initDatePicker();
+        } catch (e) {
+            console.error('flatpickr failed to load', e);
+        }
 
-        // initialize internal duration and end time once
         state.duration = normalizeDurationToMinutes($('#schDuration').val());
         recomputeEndTime();
-
-        // 🔹 INIT VALIDATION HERE
-        const $form = $('#scheduleForm'); // or $('#scheduleModal form') if you prefer
-        if ($form.length && !$form.data('validator')) {
-            $form.validate({
-                ignore: [], // also validate hidden fields if needed
-                rules: {
-                    CustomerName: {
-                        required: true
-                    }
-                },
-                errorClass: 'is-invalid',
-                errorPlacement: function (error, element) {
-                    error.addClass('invalid-feedback');
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent());
-                    } else {
-                        error.insertAfter(element);
-                    }
-                },
-                highlight: function (element) {
-                    $(element).addClass('is-invalid')
-                },
-                unhighlight: function (element) {
-                    $(element).removeClass('is-invalid')
-                }
-            });
-        }
 
         bindSaveHandlerOnce();
     });
 
-
-    // Optional preload of flatpickr if modal is already in DOM
     $(document).ready(async function () {
         ensureFlatpickrZIndexPatch();
         try {
             await ensureFlatpickr();
-            if (document.querySelector('#schDate.flat-picker') && !$('#scheduleModal').hasClass('show')) {
-                flatpickr('#schDate.flat-picker', {
-                    dateFormat: "Y-m-d",
-                    allowInput: false,
-                    clickOpens: true,
-                    minDate: "1950-01-01",
-                    maxDate: "2100-12-31",
-                    disableMobile: true
-                });
-            }
         } catch (e) {
             console.warn('flatpickr not available yet', e);
         }
