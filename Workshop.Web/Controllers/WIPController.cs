@@ -543,6 +543,8 @@ namespace Workshop.Web.Controllers
                     {
                         if (item.WIPId == 0)
                             item.WIPId = dto.Id;
+
+                        item.Discount = item.Discount;
                     }
                 }
 

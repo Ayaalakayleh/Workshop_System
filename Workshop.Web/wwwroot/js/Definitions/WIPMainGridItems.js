@@ -251,17 +251,64 @@ $(function () {
                     return Number(discountedPrice.toFixed(2));
                 }
             },
+            //{
+            //    dataField: "Discount",
+            //    caption: window.RazorVars.DXDiscount,
+            //    dataType: "number",
+            //    allowEditing: true,
+            //    defaultValue: 0,
+            //    alignment: "left",
+            //    editorOptions: {
+            //        min: 0,
+            //        max: 100
+            //    }
+            //},
             {
-                dataField: "Discount",
+                dataField: "DiscountPct",
                 caption: window.RazorVars.DXDiscount,
                 dataType: "number",
                 allowEditing: true,
-                defaultValue: 0,
                 alignment: "left",
                 editorOptions: {
                     min: 0,
-                    max: 100
+                    max: 100,
+                    showSpinButtons: true
+                },
+                calculateCellValue: function (rowData) {
+                    const qty = +rowData.Quantity || +rowData.RequestQuantity || 0;
+                    const price = +rowData.Price || 0;
+                    const base = +(qty * price).toFixed(4);   
+
+                    const discAmt = +rowData.Discount || 0;
+                    if (base === 0) return 0;
+
+                    const pct = (discAmt / base) * 100;
+
+                    return pct;
+                },
+                setCellValue: function (newData, value, currentRowData) {
+                    const pct = +value || 0;
+                    const qty = +currentRowData.Quantity || +currentRowData.RequestQuantity || 0;
+                    const price = +currentRowData.Price || 0;
+                    const base = +(qty * price).toFixed(4);
+
+                    const discAmt = base * (pct / 100);
+
+                    newData.Discount = discAmt;
+                },
+                customizeText: function (cellInfo) {
+                    return (Number(cellInfo.value) || 0).toFixed(2) + " %";
                 }
+            },
+
+            {
+                dataField: "Discount",
+                caption: window.RazorVars.DXDiscount,     
+                dataType: "number",
+                allowEditing: false,                     
+                defaultValue: 0,
+                alignment: "left",
+                visible: false
             },
             {
                 dataField: "Tax",
@@ -296,13 +343,13 @@ $(function () {
                     var price = parseFloat(rowData.Price) || 0;
                     var tax = parseFloat(rowData.Vat) || 0;
                     var _rowDiscount = parseFloat(rowData.Discount) || 0;
-
+                    var _rowDiscountAmt = parseFloat(rowData.Discount) || 0;
                     var Qty = quantity > 0 ? quantity : requestQuantity;
 
                     var totalValue = (Qty * price) + tax;
-
-                    if (_rowDiscount > 0) {
-                        totalValue -= totalValue * (_rowDiscount / 100);
+                    if (_rowDiscountAmt > 0) {
+                        totalValue -= _rowDiscountAmt;   
+                        if (totalValue < 0) totalValue = 0;
                     }
 
                     rowData.Total = totalValue;
@@ -476,7 +523,7 @@ $(function () {
             allowUpdating: true
         },
         onCellValueChanged: function (e) {
-            if (["Quantity", "Price", "Discount", "UsedQuantity"].includes(e.column.dataField)) {
+            if (["Quantity", "Price", "DiscountPct", "UsedQuantity"].includes(e.column.dataField)) {
                 e.component.updateDimensions();
             }
 
@@ -522,7 +569,7 @@ $(function () {
         },
         onEditorPreparing: function (e) {                                   // need Testing
 
-            if (e.parentType === "dataRow" && e.dataField === "Discount") {
+            if (e.parentType === "dataRow" && e.dataField === "DiscountPct") {
 
                 var pageAccountType = parseInt($("#AccountType").val()) || 0;
 
@@ -629,11 +676,16 @@ function updateFieldsFromGrid() {
         var tax = parseFloat(d.Tax) || 0;
 
         var base = qty * price;
-        var discAmt = base * (disc / 100);
+
+        var discAmt = parseFloat(d.Discount) || 0;  
+        //var discAmt = base * (disc / 100);
+
         var lineTot = base - discAmt;
 
         totalDiscountsPart += discAmt;
         totalSum += lineTot;
+
+        var lineTot = base - discAmt;
     });
 
     $("#totParts").text("SAR " + totalSum.toFixed(2));
