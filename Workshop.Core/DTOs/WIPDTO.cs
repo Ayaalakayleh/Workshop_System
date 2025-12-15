@@ -255,7 +255,7 @@ namespace Workshop.Core.DTOs
         public int? ManufacturerId { get; set; }
         public int? ModelId { get; set; }
         public int? ClassId { get; set; }
-
+        public string? ColorName { get; set; }
     }
 
     public class OperatorDetailsDTO

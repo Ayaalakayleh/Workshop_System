@@ -122,7 +122,7 @@ namespace Workshop.Web.Controllers
             return View();
         }
 
-        
+
         public async Task<IActionResult> Edit(int? id, int? movementId = 0)
         {
             try
@@ -161,7 +161,7 @@ namespace Workshop.Web.Controllers
                     }
 
                     ViewBag.CreationDate = dto.CreatedAt?.ToString("dd-MM-yyyy");
-                    
+
                     // Get vehicle documents - handle nulls
                     try
                     {
@@ -237,7 +237,7 @@ namespace Workshop.Web.Controllers
 
                     // Get account details
 
-                        dto.InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(dto.Id,null);
+                    dto.InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(dto.Id, null);
 
 
                     // Get items
@@ -284,21 +284,27 @@ namespace Workshop.Web.Controllers
                         VehicleId = dto.VehicleId
                     };
                     dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id);
-                    if (dto.VehicleTab == null)
+
+
+                    var CurrentWIP = await _apiClient.GetWIPByIdAsync(dto.Id);
+                    dto.WorkOrderId = CurrentWIP?.WorkOrderId;
+                    var VehicleColor = await _vehicleApiClient.GetAllColors(lang);
+                    if (dto.WorkOrderId > 0 && dto.WorkOrderId != null)
                     {
-                        var CurrentWIP = await _apiClient.GetWIPByIdAsync(dto.Id);
-                        dto.WorkOrderId = CurrentWIP?.WorkOrderId;
                         var workorder = await _apiClient.GetMWorkOrderByID(dto.WorkOrderId ?? 0);
 
                         if (workorder?.VehicleType == (int)VehicleTypeId.Internal)
                         {
-                            var vehicleDetails = (await _vehicleApiClient.GetWorkshopVehicles(filterInternal)).FirstOrDefault();
+                            var vehicleDetails = (await _vehicleApiClient.GetVehicleDetails(dto.Id, lang));
+
                             dto.VehicleTab.ManufacturerId = vehicleDetails?.RefManufacturers.Id;
                             dto.VehicleTab.ModelId = vehicleDetails?.RefVehicleModels.Id;
                             dto.VehicleTab.ClassId = vehicleDetails?.RefVehicleClasses.Id;
                             dto.VehicleTab.PlateNumber = vehicleDetails?.PlateNumber;
                             dto.VehicleTab.ManufacturingYear = vehicleDetails?.ManufacturingYear;
                             dto.VehicleTab.Color = vehicleDetails?.Color;
+                            dto.VehicleTab.ColorName = VehicleColor?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color).Name;
+                            dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
 
                         }
                         else
@@ -309,12 +315,16 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
                             dto.VehicleTab.ManufacturingYear = vehicleDetails.ManufacturingYear;
                             dto.VehicleTab.Color = vehicleDetails.Color;
+                            dto.VehicleTab.ColorName = VehicleColor?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color).Name;
+                            dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
 
                         }
                     }
                     ViewBag.Makes = await GetMakes();
                     ViewBag.Models = await GetModels(dto.VehicleTab.ManufacturerId ?? 0);
                     ViewBag.Classes = await GetClasses();
+                    ViewBag.Colors = await GetColors();
+
                 }
                 catch (Exception ex)
                 {
@@ -661,6 +671,18 @@ namespace Workshop.Web.Controllers
             {
                 Value = m.Id.ToString(),
                 Text = lang == "en" ? m.VehicleClassPrimaryName : m.VehicleClassSecondaryName
+            }).ToList();
+        }
+
+        private async Task<List<SelectListItem>> GetColors()
+        {
+
+            var models = await _vehicleApiClient.GetAllColors(lang);
+
+            return models.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = lang == "en" ? m.Name : m.Name
             }).ToList();
         }
 
