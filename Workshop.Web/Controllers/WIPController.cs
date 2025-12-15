@@ -283,9 +283,7 @@ namespace Workshop.Web.Controllers
                         CompanyId = CompanyId,
                         VehicleId = dto.VehicleId
                     };
-                    dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id);
-
-
+                    dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id) ?? new VehicleTabDTO();
                     var CurrentWIP = await _apiClient.GetWIPByIdAsync(dto.Id);
                     dto.WorkOrderId = CurrentWIP?.WorkOrderId;
                     var VehicleColor = await _vehicleApiClient.GetAllColors(lang);
