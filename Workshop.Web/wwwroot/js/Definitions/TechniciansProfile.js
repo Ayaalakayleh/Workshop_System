@@ -282,6 +282,11 @@ $(document).ready(function () {
     // $('#PIN').on('focus', function () {
     //     $(this).val(generateRandomPIN());
     // });
+    if ($("#IsResigned").is(":checked")) {
+        $("#ResignedDate").prop("disabled", false);
+    } else {
+        $("#ResignedDate").prop("disabled", true).val("");
+    }
 });
 
 // ---------- List load + pager ----------
