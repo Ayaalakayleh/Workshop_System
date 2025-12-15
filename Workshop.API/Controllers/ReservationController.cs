@@ -61,6 +61,15 @@ namespace Workshop.API.Controllers
             var result = await _reservationService.CheckIfVehicleHasActiveReservation(vehicleId);
             return Ok(result);
         }
+        [HttpPut("UpdateReservation")]
+        public async Task<IActionResult> UpdateReservation(ReservationDTO reservationDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updatedId = await _reservationService.UpdateReservation(reservationDTO);
+            return Ok(new { ReservationId = updatedId });
+        }
 
 
     }

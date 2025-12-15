@@ -206,7 +206,11 @@
                 if (res.success && res.data) {
                     const data = res.data;
                     $('#chassisDropdown').val(data.vehicle?.id).trigger('change.select2');
-                    $('#CustomerName').val(data.customerName);
+                    state.chassisId = Number(data.vehicle?.id);
+                    // only overwrite CustomerName when API returned a non-empty value
+                    if (data.customerName && String(data.customerName).trim().length) {
+                        $('#CustomerName').val(data.customerName);
+                    }
                     $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
                 } else {
                     console.warn('Failed to load vehicle details:', res.message);
@@ -218,12 +222,15 @@
     function handleChassisChange() {
         const chassisId = $(this).val();
         const chassisText = $(this).find('option:selected').text();
+        //debugger;
+        state.chassisId = Number(chassisId);
+
 
         if (!chassisId) return;
 
         // sync into state
         state.vehicleId = chassisId;
-
+        state.chassisId = Number(chassisId);
         // Call the same API used for vehicle dropdown
         callApi({
             url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&lang=en`,
@@ -235,7 +242,10 @@
 
                     // Reflect fields
                     $('#chassisInput').val(data.vehicle?.chassisNo || '');
-                    $('#CustomerName').val(data.customerName);
+                    // only overwrite CustomerName when API returned a non-empty value
+                    if (data.customerName && String(data.customerName).trim().length) {
+                        $('#CustomerName').val(data.customerName);
+                    }
                     $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
 
                     const vehicleOptionText = $("#vehicleDropdown").find('option:selected').text();
@@ -264,10 +274,16 @@
         const $vehicle = $('#vehicleDropdown');
         const $chassis = $('#chassisDropdown');
 
+        // retain current customer value if present
+        const existingCustomer = ($('#CustomerName').val() || '').toString().trim();
+
         // reset
         $vehicle.empty().append('<option value="">Select</option>').trigger('change');
         $chassis.empty().append('<option value="">Select</option>').trigger('change');
-        $('#CustomerName').val('');
+        // only clear CustomerName if it was empty before — avoid overwriting a programmatically set value
+        if (!existingCustomer) {
+            $('#CustomerName').val('');
+        }
 
         if (!vehicleTypeId) return;
 
@@ -334,6 +350,7 @@
     }
 
     function bindSaveHandlerOnce() {
+        debugger;
         $(document).off('click.save', '#btnSaveSchedule').on('click.save', '#btnSaveSchedule', function () {
             const $form = $('#scheduleForm'); // or $('#scheduleModal form')
 
@@ -363,6 +380,20 @@
             state.duration = normalizeDurationToMinutes($('#schDuration').val());
             recomputeEndTime(); // recompute end from current start/duration
 
+            // Ensure we have latest vehicle/chassis ids in state — fallback to DOM values
+            try {
+                if (!state.vehicleId) {
+                    const v = $('#vehicleDropdown').val();
+                    if (v) state.vehicleId = v;
+                }
+                if (!state.chassisId) {
+                    const c = $('#chassisDropdown').val();
+                    if (c) state.chassisId = Number(c);
+                }
+            } catch (e) {
+                console.warn('Failed to sync vehicle/chassis ids from DOM', e);
+            }
+
             const scheduleData = {
                 Date: formatDateISO(state.date),
                 DateTo: formatDateISO(state.dateTo || state.date),
@@ -374,16 +405,29 @@
                 Description: $('#descriptionInput').val() ?? '',
                 Chassis: $('#chassisDropdown option:selected').text() || null,
                 Status: 44,
-                CustomerName: $('#CustomerName').val() ?? ''
-            };
+                CustomerName: $('#CustomerName').val() ?? '',
+                VehicleTypeId: toNumber(state.vehicleType),
+                ChassisId: toNumber(state.chassisId),
 
+            };
+            const isEdit = $('#scheduleModal').data('mode') === 'edit';
+            const reservationId = $('#scheduleModal').data('reservationId');
+
+            const url = isEdit
+                ? window.API_BASE.updateReservation
+                : window.RazorVars.insertReservationUrl;
+
+            if (isEdit) {
+                scheduleData.Id = reservationId;
+            }
             $.ajax({
                 type: 'POST',
-                url: window.RazorVars.insertReservationUrl,
+                url: url,
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 data: JSON.stringify(scheduleData),
                 success: function (res) {
+                    debugger;
                     if (res?.isActive) {
                         Swal.fire({
                             title: window.RazorVars.Warning,

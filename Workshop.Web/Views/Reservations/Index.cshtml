@@ -139,7 +139,9 @@
         loadScheduleDialog: '@Url.Action("LoadScheduleDialog", "Reservations")',
         getAllReservationsFiltered: '@Url.Action("GetAllReservationsFiltered", "Reservations")',
         getAllReservationsFilteredJSON: '@Url.Action("GetAllReservationsFilteredJSON", "Reservations")',
-        getReservationsByIds: '@Url.Action("GetReservationsByIds", "Reservations")'
+        getReservationsByIds: '@Url.Action("GetReservationsByIds", "Reservations")',
+        updateReservation: '@Url.Action("UpdateReservation", "Reservations")'
+
     };
 
 </script>
@@ -278,5 +280,90 @@
     });
        
 </script>
+<script>
+    $(document).on('click', '.btn-edit-reservation', function () {
+        const reservationId = $(this).data('id');
+
+        // Load SAME modal used by Add New
+        $.get(window.API_BASE.loadScheduleDialog, function (html) {
+            $("#scheduleModalContainer").html(html);
+
+            const modalEl = document.getElementById('scheduleModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            modalEl.addEventListener('shown.bs.modal', function () {
+                loadReservationForEdit(reservationId);
+            }, { once: true });
+        });
+    });
+</script>
+<script>
+    function waitForOption(selector, value, timeout = 2000) {
+        return new Promise((resolve) => {
+            const start = Date.now();
+            const check = () => {
+                const $el = $(selector);
+                if ($el.find(`option[value="${value}"]`).length) return resolve(true);
+                if (Date.now() - start > timeout) return resolve(false);
+                setTimeout(check, 100);
+            };
+            check();
+        });
+    }
+
+    function loadReservationForEdit(id) {
+        $.get(window.API_BASE.getReservationsByIds, { ids: id }, function (res) {
+            if (!res.isSuccess || !res.data || !res.data.length) {
+                Swal.fire('Error', 'Reservation not found', 'error');
+                return;
+            }
+            const r = res.data[0];
+
+            // 🔹 mark modal as EDIT mode
+            $('#scheduleModal').data('mode', 'edit');
+            $('#scheduleModal').data('reservationId', r.id);
+
+            // 🔹 fill fields
+            $('#schDate').val(r.date?.split('T')[0]).trigger('change');
+            $('#CustomerName').val(r.customerName);
+            $('#schStart').val(r.start_Time?.substring(0,5));
+            $('#schDuration').val(r.duration).trigger('change');
+            $('#descriptionInput').val(r.description);
+
+            // vehicle type first
+            $('#vehicleTypeDropdown').val(r.vehicleTypeId).trigger('change');
+
+            // determine desired values
+            const desiredVehicleId = r.vehicleId;
+            const desiredChassisId = (typeof r.chassisId !== 'undefined' && r.chassisId !== null) ? r.chassisId : r.vehicleId;
+
+            // wait for options to be loaded, then set values and trigger change handlers
+            Promise.all([
+                waitForOption('#vehicleDropdown', desiredVehicleId, 3000),
+                waitForOption('#chassisDropdown', desiredChassisId, 3000)
+            ]).then((results) => {
+                // set vehicle if option exists or fallback to setting value anyway
+                if (results[0]) {
+                    $('#vehicleDropdown').val(desiredVehicleId).trigger('change');
+                } else {
+                    $('#vehicleDropdown').val(desiredVehicleId).trigger('change');
+                }
+
+                if (results[1]) {
+                    $('#chassisDropdown').val(desiredChassisId).trigger('change');
+                } else {
+                    $('#chassisDropdown').val(desiredChassisId).trigger('change');
+                }
+
+                // also trigger select2 refresh if used
+                $('#vehicleDropdown').trigger('change.select2');
+                $('#chassisDropdown').trigger('change.select2');
+            });
+        });
+    }
+</script>
+
+
 
 

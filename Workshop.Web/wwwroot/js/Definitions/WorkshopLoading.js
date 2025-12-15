@@ -3,7 +3,11 @@ const SHIFT_START = "08:00";
 const SHIFT_END = "17:00";
 const SHIFT_MINS = 9 * 60; // 08:00 → 17:00
 
-const technicians = [];                 // [{ id,name,workingHoursList:[{date,startTime,endTime}], reservationsList:[...] }]
+// ✅ Backend saves schedules on NEXT DAY => compensate by -1.
+// If backend is fixed later, set this back to 0.
+const SAVE_DATE_COMPENSATION_DAYS = -1;
+
+const technicians = []; // [{ id,name,workingHoursList:[{date,startTime,endTime}], reservationsList:[...] }]
 const AvailableTechnicians = [];
 let unscheduled = [];
 let events = [];
@@ -77,6 +81,31 @@ const apiDateISO = (s) => {
 function getSelectedDayISO() {
     const v = document.getElementById("datePicker")?.value;
     return v ? convertDateFormat(v) : ymd(currentDate);
+}
+
+// ✅ Date-only normalizer for save
+function normalizeISODateOnly(dateStr) {
+    return convertDateFormat(dateStr);
+}
+
+// ✅ Compensate day locally
+function shiftISODateLocal(dateISO, days) {
+    const [y, m, d] = String(dateISO).slice(0, 10).split("-").map(Number);
+    const dt = new Date(y, m - 1, d);
+    dt.setDate(dt.getDate() + Number(days || 0));
+    return ymd(dt);
+}
+
+// ✅ After Save: refetch same day so working/reserved overlays update immediately
+async function refetchDayAndRender(dayISO) {
+    const iso = dayISO || getSelectedDayISO();
+    await GetAllTechnicians(iso);
+
+    currentDate = parseYMD(iso);
+    const dp = document.getElementById("datePicker");
+    if (dp) dp.value = iso;
+
+    refreshAll(true);
 }
 
 // ====== OFF-BY-ONE DATE FIX HELPERS (backend sometimes returns previous day) ======
@@ -496,8 +525,8 @@ function initModal() {
     const overdueBadge = document.getElementById("schedStatusOverdue");
 
     function updateEnds() {
-        const endVal = addMinutes(start.value || SHIFT_START, Number(dur.value || 0));
-        ends.value = fmtHuman(endVal);
+        const endVal24 = addMinutes(start.value || SHIFT_START, Number(dur.value || 0));
+        ends.value = fmtHuman(endVal24);
         const idx = Number(document.getElementById("jobIndex").value);
         const allowed = unscheduled[idx]?.allowed ?? 0;
         if (Number(dur.value) > allowed) overdueBadge.classList.remove("d-none");
@@ -510,41 +539,57 @@ function initModal() {
     document.getElementById("btnSaveSchedule").addEventListener("click", async () => {
         const idx = Number(document.getElementById("jobIndex").value);
         const job = unscheduled[idx];
-        const date = document.getElementById("schedDate");
+        const dateEl = document.getElementById("schedDate");
 
-        if (!job || !date.value || !sel.value || !start.value || !dur.value) {
+        if (!job || !dateEl.value || !sel.value || !start.value || !dur.value) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
             return;
         }
 
-        var TechId = $('#schedTech').find(":selected").val();
-        let EndTime = $('#schedEnds').val();
-        EndTime = EndTime.replace('AM', '').replace('PM', '').trim();
+        const TechId = Number($('#schedTech').find(":selected").val());
+
+        const uiDateISO = normalizeISODateOnly(dateEl.value); // ✅ selected date
+        const apiDateISOFixed = shiftISODateLocal(uiDateISO, SAVE_DATE_COMPENSATION_DAYS); // ✅ compensate backend bug
+
+        const start24 = start.value; // "HH:MM"
+        const durationMins = Number(dur.value);
+        const end24 = addMinutes(start24, durationMins); // "HH:MM"
 
         const WIPSCheduleObject = {
             Id: Number(job.id),
             WIPId: Number(job.wipid),
             RTSId: job.rtsid ? Number(job.rtsid) : 0,
             TechnicianId: Number(TechId),
-            Date: date.value,
-            StartTime: `${start.value}:00`,
-            Duration: Number(dur.value),
-            EndTime: EndTime,
+            Date: apiDateISOFixed,
+            StartTime: `${start24}:00`,
+            Duration: durationMins,
+            EndTime: `${end24}:00`,
         };
-        WIPSCheduleObject.Date = convertDateFormat(WIPSCheduleObject.Date);
 
         const request = await SaveSchedule(WIPSCheduleObject);
         if (!request?.success) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
             return;
-        } else {
-            $('#unscheduledList').html('');
-            unscheduled.splice(idx, 1);
         }
 
+        // ✅ update local UI (unscheduled list)
+        $('#unscheduledList').html('');
+        unscheduled.splice(idx, 1);
+
+        // ✅ close modal first
         scheduleModal.hide();
-        refreshAll(true);
-        Swal.fire({ icon: "success", title: window.i18n.label_saved, text: window.i18n.label_savedMsg, timer: 1400, showConfirmButton: false });
+
+        // ✅ IMPORTANT: refresh tech working/reserved hours immediately on same selected day
+        await refetchDayAndRender(uiDateISO);
+
+        // ✅ show swal after UI is updated
+        Swal.fire({
+            icon: "success",
+            title: window.i18n.label_saved,
+            text: window.i18n.label_savedMsg,
+            timer: 1400,
+            showConfirmButton: false
+        });
     });
 }
 
@@ -592,12 +637,15 @@ async function openScheduleModal(jobIndex) {
 
     let Hours = fromMinutes(job.duration);
     Hours = timeToDecimalHours(Hours);
-    let TodayDate = ymd(currentDate);
-    await GetAvailableTechsForLabour(TodayDate, Hours);
+
+    // ✅ Use currently selected UI day
+    const selectedISO = getSelectedDayISO();
+
+    await GetAvailableTechsForLabour(selectedISO, Hours);
     CurrentDuration = Hours;
 
     document.getElementById("jobIndex").value = jobIndex;
-    document.getElementById("schedDate").value = ymd(currentDate);
+    document.getElementById("schedDate").value = selectedISO;
     document.getElementById("schedStart").value = SHIFT_START;
     document.getElementById("schedDuration").value = job.duration;
     document.getElementById("schedEnds").value = fmtHuman(addMinutes(SHIFT_START, job.duration));
@@ -737,8 +785,7 @@ function GetAllTechnicians(Date) {
                 : null;
         }).filter(Boolean);
 
-        // ✅ FIX: only apply the off-by-one shift when the response is UNIFORMLY off by 1 day.
-        // This prevents newly-added working hours from being pushed to the next day.
+        // ✅ FIX: only apply off-by-one shift when response is UNIFORMLY off by 1 day.
         if (reqISO) {
             const allDates = [];
             additions.forEach(t => {
@@ -749,11 +796,6 @@ function GetAllTechnicians(Date) {
             const uniqDates = [...new Set(allDates)];
             const hasReq = uniqDates.includes(reqISO);
 
-            // Only shift when:
-            // - there are dates
-            // - none match reqISO
-            // - ALL dates are the same single day
-            // - and that single day differs by exactly 1 from reqISO
             if (uniqDates.length === 1 && !hasReq) {
                 const only = uniqDates[0];
                 const diff = daysBetweenISO(only, reqISO);
