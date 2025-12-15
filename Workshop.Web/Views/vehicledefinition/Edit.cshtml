@@ -43,10 +43,14 @@
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_Model"] <span class="text-danger">*</span></label>
-                                <select class="form-control select2" id="VehicleModelId" name="VehicleModelId">
-                                    <option value="">@Common["Select"]</option>
-                                </select>
+                                @Html.DropDownListFor(
+                                                                model => model.VehicleModelId,
+                                                                new SelectList(Model.ColVehicleModels, "Id", lang == "en" ? "VehicleModelPrimaryName" : "VehicleModelSecondaryName"),
+                                                                Common["Select"],
+                                                                new { @class = "form-control select2", @id = "VehicleModelId" }
+                                                                )
                             </div>
+
                         </div>
 
                         <div class="col-lg-4 col-md-6 col-sm-12">
@@ -69,15 +73,16 @@
                                 {
                                     <div class="form-group">
                                         <label>@Common["Label_PlateNumber"] <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="11" name="PlateNumber" value="@Model.PlateNumber">
+                                           @Html.TextBoxFor(model => model.PlateNumber,Model.PlateNumber, new {id="PlateNumber", maxlength="11", name="PlateNumber"})
                                     </div>
                                 }
                                 else
                                 {
                                     <div class="form-group">
                                         <label>@Common["Label_PlateNumber"] <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control plate-mask" id="PlateNumber" maxlength="12" name="PlateNumber" value="@Model.PlateNumber">
-                                    </div>
+                                        @Html.TextBoxFor(model => model.PlateNumber, Model.PlateNumber, new { id = "PlateNumber", maxlength = "12", name = "PlateNumber", @class= "form-control plate-mask" })
+
+                                     </div>
                                 }
                             </div>
 

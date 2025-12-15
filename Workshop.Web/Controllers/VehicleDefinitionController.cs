@@ -155,7 +155,7 @@ namespace Workshop.Controllers
             var isCompanyCenterialized = 1;
             var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
             ViewBag.Customers = allCustomers;
-
+            vehicle.ColVehicleModels = await _vehicleApiClient.GetAllVehicleModel(vehicle.ManufacturerId, lang);
             //ToDo : Caching
             //if (cache.Get(string.Format(CacheKeys.VehicleColors)) != null)
             //{
