@@ -290,11 +290,11 @@ namespace Workshop.Web.Controllers
 
                         if (workorder?.VehicleType == (int)VehicleTypeId.Internal)
                         {
-                            var vehicleDetails = (await _vehicleApiClient.GetVehicleDetails(dto.VehicleId, lang));
+                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_Find(dto.VehicleId)) ?? new VehicleDefinitions();
                             
-                            dto.VehicleTab.ManufacturerId = vehicleDetails?.RefManufacturers.Id;
-                            dto.VehicleTab.ModelId = vehicleDetails?.RefVehicleModels.Id;
-                            dto.VehicleTab.ClassId = vehicleDetails?.RefVehicleClasses.Id;
+                            dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
+                            dto.VehicleTab.ModelId = vehicleDetails?.VehicleModelId;
+                            dto.VehicleTab.ClassId = vehicleDetails?.VehicleClassId;
                             dto.VehicleTab.PlateNumber = vehicleDetails?.PlateNumber;
                             dto.VehicleTab.ManufacturingYear = vehicleDetails?.ManufacturingYear;
                             dto.VehicleTab.Color = vehicleDetails?.Color;
@@ -304,7 +304,7 @@ namespace Workshop.Web.Controllers
                         }
                         else
                         {
-                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId));
+                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId))?? new CreateVehicleDefinitionsModel();
                             dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
                             dto.VehicleTab.ModelId = vehicleDetails.VehicleModelId;
                             dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
