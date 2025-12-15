@@ -2373,4 +2373,7 @@
   <data name="Button_OpenLastWIP" xml:space="preserve">
     <value>فتح آخر أمر عمل</value>
   </data>
+  <data name="Label_IsResigned" xml:space="preserve">
+    <value>هل استقال؟</value>
+  </data>
 </root>

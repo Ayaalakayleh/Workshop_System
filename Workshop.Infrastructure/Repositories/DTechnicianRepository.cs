@@ -135,6 +135,7 @@ namespace Workshop.Infrastructure.Repositories
             //parameters.Add("@HourCost", dto.HourCost);
             parameters.Add("@FordPID", dto.FordPID);
             parameters.Add("@PIN", dto.PIN);
+            parameters.Add("@IsResigned", dto.IsResigned);
             parameters.Add("@ResignedDate", dto.ResignedDate);
             parameters.Add("@FK_ShiftId", dto.FK_ShiftId);
             parameters.Add("@Type", dto.Type);
@@ -195,6 +196,7 @@ namespace Workshop.Infrastructure.Repositories
             //parameters.Add("@HourCost", dto.HourCost);
             parameters.Add("@FordPID", dto.FordPID);
             parameters.Add("@PIN", dto.PIN);
+            parameters.Add("@IsResigned", dto.IsResigned);
             parameters.Add("@ResignedDate", dto.ResignedDate);
             parameters.Add("@FK_ShiftId", dto.FK_ShiftId);
             parameters.Add("@Type", dto.Type);
