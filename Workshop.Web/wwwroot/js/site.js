@@ -20,7 +20,7 @@
             emptyTable: resources.EmptyData
         }
     });
-    flatpickr(".flat-picker", {
+    flatpickr(".flat-picker-today", {
         dateFormat: "Y-m-d",
         allowInput: false,
         clickOpens: true,
@@ -28,6 +28,14 @@
         maxDate: "2100-12-31",
         disableMobile: true,
         defaultDate: "today"
+    });
+    flatpickr(".flat-picker", {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        minDate: "1950-01-01",
+        maxDate: "2100-12-31",
+        disableMobile: true
     });
     flatpickr(".flat-picker-future", {
         dateFormat: "Y-m-d",

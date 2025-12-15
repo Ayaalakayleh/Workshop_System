@@ -17,67 +17,116 @@
             </div>
 
             <div class="modal-body">
-                <form id="scheduleForm" class="row g-3">
+                <form id="scheduleForm" class="row g-3" novalidate="novalidate">
 
                     <div class="col-md-4 col-sm-12">
-                        <label class="form-label">@Common["Label_Date"]</label>
-                        <input type="text" class="form-control flat-picker-future" id="schDate" autocomplete="off" />
+                        <label class="form-label">
+                            @Common["Label_Date"] <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control flat-picker-future"
+                               id="schDate"
+                               name="Date"
+                               autocomplete="off"
+                               required />
                     </div>
+
                     <div class="col-md-4 col-sm-12">
-                        <label>@Common["Label_VehicleType"]</label>
-                        <select id="vehicleTypeDropdown" class="form-control">
+                        <label>
+                            @Common["Label_VehicleType"] <span class="text-danger">*</span>
+                        </label>
+                        <select id="vehicleTypeDropdown" name="VehicleTypeId" class="form-control" required>
                             <option value="">@Common["Select"]</option>
                             <option value="1">Internal</option>
                             <option value="2">External</option>
                         </select>
                     </div>
 
-
                     <div class="col-md-4 col-sm-12">
                         <div class="form-group">
-                            <label>@Common["Label_VehicleName"]</label>
-                            @Html.DropDownListFor(model => model.Id,
-                            (SelectList)ViewBag.Vehicles,
+                            <label>
+                                @Common["Label_VehicleName"] <span class="text-danger">*</span>
+                            </label>
+                            @Html.DropDownList(
+                            "VehicleId",
+                                                        (SelectList)ViewBag.Vehicles,
                                                         Common["Select"].Value,
-                                                        new { @class = "form-control", id = "vehicleDropdown" })
+                                                        new { @class = "form-control", id = "vehicleDropdown", required = "required" }
+                                                        )
                         </div>
                     </div>
 
                     <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label>Customer <span class="text-danger">*</span></label>
-                            <input type="text" id="CustomerName" name="CustomerName" class="form-control" placeholder="Customer" />
+                            <input type="text"
+                                   id="CustomerName"
+                                   name="CustomerName"
+                                   class="form-control"
+                                   placeholder="Customer"
+                                   required />
                         </div>
                     </div>
 
                     <div class="col-md-4 col-sm-12">
-                        <label>@Common["Label_Chassis"]</label>
-                        <select id="chassisDropdown" class="form-control">
+                        <label>
+                            @Common["Label_Chassis"] <span class="text-danger">*</span>
+                        </label>
+                        <select id="chassisDropdown" name="ChassisId" class="form-control" required>
                             <option value="">@Common["Select"]</option>
                         </select>
                     </div>
 
                     <div class="col-md-4 col-sm-12">
-                        <label class="form-label">@Common["Label_Start"]</label>
-                        <input type="time" class="form-control" id="schStart" value="08:00" />
+                        <label class="form-label">
+                            @Common["Label_Start"] <span class="text-danger">*</span>
+                        </label>
+                        <input type="time"
+                               class="form-control"
+                               id="schStart"
+                               name="Start_Time"
+                               value="08:00"
+                               required />
                     </div>
 
                     <div class="col-md-4 col-sm-12">
-                        <label class="form-label">@Common["Label_DurationHour"]</label>
-                        <input type="number" class="form-control" id="schDuration" min="1"  value="30" />
+                        <label class="form-label">
+                            @Common["Label_DurationHour"] <span class="text-danger">*</span>
+                        </label>
+                        <input type="number"
+                               class="form-control"
+                               id="schDuration"
+                               name="Duration"
+                               min="1"
+                               step="1"
+                               value="30"
+                               required />
                     </div>
 
                     <div class="col-md-4 col-sm-12">
-                        <label class="form-label">@Common["Label_Ends"]</label>
-                        <input type="time" class="form-control" id="schEnd" />
+                        <label class="form-label">
+                            @Common["Label_Ends"] <span class="text-danger">*</span>
+                        </label>
+                        <input type="time"
+                               class="form-control"
+                               id="schEnd"
+                               name="End_Time"
+                               readonly
+                               required />
                     </div>
+
                     <div class="col-md-8 col-sm-12">
                         <div class="form-group">
                             <label>@Common["Label_Description"]</label>
-                            <textarea class="form-control" id="descriptionInput" rows="3" maxlength="510"
+                            <textarea class="form-control"
+                                      id="descriptionInput"
+                                      name="Description"
+                                      rows="3"
+                                      maxlength="510"
                                       placeholder="@Common["Label_Description"]"></textarea>
                         </div>
                     </div>
+
                 </form>
             </div>
 
@@ -108,46 +157,11 @@
         doneSuccessfully: '@Html.Raw(Common["Label_DoneSuccessfully"])'
     });
 </script>
+
 <script>
     $(document).ready(function () {
-
-        // Fields in exact order
-        const order = [
-            "#schDate",
-            "#schTech",
-            "#schStart",
-            "#schDuration",
-            "#schEnd"
-        ];
-
-        // Disable all except first
-        for (let i = 1; i < order.length; i++) {
-            $(order[i]).prop("disabled", true);
-        }
-
-        // Enable next field only when current field has a value
-        order.forEach((selector, i) => {
-            $(selector).on("change input", function () {
-                const hasValue = $(this).val()?.trim().length > 0;
-                if (hasValue && order[i + 1]) {
-                    $(order[i + 1]).prop("disabled", false);
-                }
-            });
-        });
-
-    });
-        flatpickr(".flat-picker-future", {
-        dateFormat: "Y-m-d",
-        allowInput: false,
-        clickOpens: true,
-        minDate: "today",
-        maxDate: "2100-12-31",
-        disableMobile: true,
-        defaultDate: "today"
+    $('#schEnd').prop('readonly', true).on('keydown paste', (e) => e.preventDefault());
     });
 </script>
-
-
-
 
 <script src="~/js/definitions/schedule-modal.js"></script>
