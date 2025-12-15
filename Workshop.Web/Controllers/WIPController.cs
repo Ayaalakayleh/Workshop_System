@@ -287,7 +287,7 @@ namespace Workshop.Web.Controllers
                     var CurrentWIP = await _apiClient.GetWIPByIdAsync(dto.Id);
                     dto.WorkOrderId = CurrentWIP?.WorkOrderId;
                     var VehicleColor = await _vehicleApiClient.GetAllColors(lang);
-                    if (dto.WorkOrderId > 0 && dto.WorkOrderId != null)
+                    if (dto.WorkOrderId != null && dto.WorkOrderId > 0)
                     {
                         var workorder = await _apiClient.GetMWorkOrderByID(dto.WorkOrderId ?? 0);
 
