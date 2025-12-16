@@ -283,7 +283,7 @@ $(function () {
                     if (base === 0) return 0;
 
                     const pct = (discAmt / base) * 100;
-
+                    rowData.DiscountPct = pct;
                     return pct;
                 },
                 setCellValue: function (newData, value, currentRowData) {
@@ -314,23 +314,27 @@ $(function () {
                 dataField: "Tax",
                 caption: window.RazorVars.DXTax,
                 dataType: "number",
-                allowEditing: true,
+                allowEditing: false, 
                 alignment: "left",
                 calculateCellValue: function (rowData) {
                     var vatId = $("#Vat").val();
-                    var vatPercent = parseFloat(GetVatValueById(vatId) / 100) || 0;
+                    var vatPercent = parseFloat(GetVatValueById(vatId)) || 0;
+                    vatPercent = vatPercent > 1 ? vatPercent / 100 : vatPercent; 
 
                     var qty = parseFloat(rowData.Quantity) || 0;
-
                     var price = parseFloat(rowData.Price) || 0;
+                    var discountPct = parseFloat(rowData.DiscountPct) || 0;
 
-                    var taxAmount = qty * price * vatPercent;
+                    var discountedPrice = price - (price * (discountPct / 100));
 
-                    rowData.Tax = taxAmount.toFixed(2);
+                    var taxAmount = qty * discountedPrice * vatPercent;
 
-                    return parseFloat(taxAmount.toFixed(2));
+                    rowData.Tax = +taxAmount.toFixed(2);
+
+                    return rowData.Tax;
                 }
-            },
+            } ,
+
             {
                 dataField: "Total",
                 caption: window.RazorVars.DXTotal,
@@ -338,10 +342,11 @@ $(function () {
                 allowEditing: false,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
+                    debugger
                     var requestQuantity = parseFloat(rowData.RequestQuantity) || 0;
                     var quantity = parseFloat(rowData.Quantity) || 0;
                     var price = parseFloat(rowData.Price) || 0;
-                    var tax = parseFloat(rowData.Vat) || 0;
+                    var tax = parseFloat(rowData.Tax) || 0;
                     var _rowDiscount = parseFloat(rowData.Discount) || 0;
                     var _rowDiscountAmt = parseFloat(rowData.Discount) || 0;
                     var Qty = quantity > 0 ? quantity : requestQuantity;

@@ -127,6 +127,7 @@ $(function () {
                 caption: window.RazorVars.DXRate,
                 dataType: "number",
                 allowEditing: false,
+                alignment: "left",
                 calculateCellValue: function (rowData) {
                     return ensureDiscountedRate(rowData);
                 }
@@ -826,3 +827,37 @@ function ensureDiscountedRate(rowData) {
     rowData.Rate = +discounted.toFixed(2);
     return rowData.Rate;
 }
+
+$("#Vat").on("change", function () {
+    const grid = $("#mainRTSGrid").dxDataGrid("instance");
+    if (!grid) return;
+    debugger
+    const vatId = $("#Vat").val();
+    const vatValue = parseFloat(GetVatValueById(vatId)) || 0;
+    const vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;
+
+    const rows = grid.getVisibleRows() || [];
+
+    rows.forEach((r) => {
+        const data = r.data;
+        const accType = parseInt(data.AccountType) || 0;
+
+        if (accType === 2) {
+            const rate = ensureDiscountedRate(data);
+            const hours = parseFloat(data.StandardHours) || 0;
+
+            const newTax = +(hours * rate * vatPercent).toFixed(2);
+
+            grid.cellValue(r.rowIndex, "Tax", newTax);
+            data.Tax = newTax;
+        } else {
+            grid.cellValue(r.rowIndex, "Tax", 0);
+            data.Tax = 0;
+        }
+    });
+
+    grid.saveEditData();
+    grid.refresh();
+    updateTotalLabourFieldsFromGrid();
+});
+
