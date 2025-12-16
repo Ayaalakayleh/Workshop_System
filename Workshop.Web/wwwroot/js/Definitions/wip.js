@@ -321,6 +321,21 @@
                 return;
             }
 
+            
+            var notCompletedItems = gridItems.filter(function (row) {
+
+                return row.StatusId !== 42;
+            });
+
+            if (notCompletedItems.length > 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "You have uncompleted Items"
+                });
+                return;
+            }
+
             var invalidItems = gridItems.filter(function (row) {
                 debugger
                 return row.UsedQuantity === null ||
@@ -334,19 +349,6 @@
                     icon: "warning",
                     title: "Warning",
                     text: "Used  Quantity Is Requierd"
-                });
-                return; 
-            }
-            var notCompletedItems = gridItems.filter(function (row) {
-
-                return row.StatusId !== 42;
-            });
-
-            if (notCompletedItems.length > 0) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Warning",
-                    text: "You have uncompleted Items"
                 });
                 return;
             }
