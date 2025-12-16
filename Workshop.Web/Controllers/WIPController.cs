@@ -279,10 +279,10 @@ namespace Workshop.Web.Controllers
                     WorkOrderFilterDTO workOrderFilterDTO = new WorkOrderFilterDTO();
                     workOrderFilterDTO.VehicleID = dto.VehicleId;
                     workOrderFilterDTO.CompanyId = CompanyId;
-                    workOrderFilterDTO.BranchId = BranchId;
+                    //workOrderFilterDTO.BranchId = BranchId;
                     var workOrder = (await _apiClient.GetMWorkOrdersAsync(workOrderFilterDTO));
                     dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id) ?? new VehicleTabDTO();
-                    dto.WorkOrderId = workOrder?.FirstOrDefault()?.Id;
+                    dto.WorkOrderId = dto.WorkOrderId ?? workOrder?.FirstOrDefault()?.Id;
                     var VehiclesColors = await _vehicleApiClient.GetAllColors(lang);
                     if (dto.WorkOrderId != null && dto.WorkOrderId > 0)
                     {

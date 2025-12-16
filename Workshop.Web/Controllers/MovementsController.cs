@@ -185,6 +185,7 @@ namespace Workshop.Web.Controllers
             WorkOrderFilterDTO workOrderFilter = new WorkOrderFilterDTO();
             workOrderFilter.VehicleID = movement.VehicleID;
             workOrderFilter.CompanyId = CompanyId;
+            //workOrderFilter.BranchId = BranchId;
             workOrderFilter.language = lang;
             //workOrderFilter.IsExternal = movement.IsExternal;
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);

@@ -29,7 +29,7 @@ namespace Workshop.Web.Controllers
                     PageNumber = 1,
                     Email = "",
                     Name = "",
-                    WorkshopId = 386
+                    WorkshopId = BranchId
                 };
 
                 var technicians = await _apiClient.GetAllPINTechniciansAsync(filterTechnician);
