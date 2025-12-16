@@ -183,6 +183,19 @@ namespace Workshop.Infrastructure.Repositories
             return result?.ToList();
         }
 
+        public async Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovementDDL(WorkshopMovementFilter filter)
+        {
+            var parameters = new
+            {
+
+                branchId = filter.WorkshopId
+
+            };
+
+            var result = await _database.ExecuteGetAllStoredProcedure<VehicleMovement>("[D_WorkshopVehicleMovementDDL]", parameters);
+            return result?.ToList();
+        }
+
         public async Task<VehicleMovement> GetVehicleMovementByIdAsync(int movementId)
         {
             var parameters = new

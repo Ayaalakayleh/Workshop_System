@@ -815,6 +815,19 @@ namespace Workshop.Web.Services
                 throw new Exception(e.Message);
             }
         }
+        public async Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovementDDL(WorkshopMovementFilter filter)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/WorkshopMovement/GetAllDWorkshopVehicleMovementDDL", filter);
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<VehicleMovement>>();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
         public async Task<VehicleMovement> GetVehicleMovementByIdAsync(int id)
         {

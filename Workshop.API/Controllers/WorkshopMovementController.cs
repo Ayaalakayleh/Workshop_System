@@ -85,6 +85,12 @@ namespace Workshop.API.Controllers
             var result = await _workshopMovementService.GetAllDWorkshopVehicleMovement(filter);
             return Ok(result);
         }
+        [HttpPost("GetAllDWorkshopVehicleMovementDDL")]
+        public async Task<IActionResult> GetAllDWorkshopVehicleMovementDDL([FromBody] WorkshopMovementFilter filter)
+        {
+            var result = await _workshopMovementService.GetAllDWorkshopVehicleMovementDDL(filter);
+            return Ok(result);
+        }
 
         [HttpGet("GetVehicleMovementById/{movementId}")]
         public async Task<IActionResult> GetVehicleMovementById(int movementId)

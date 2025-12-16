@@ -86,6 +86,12 @@ namespace Workshop.Core.Services
         {
             return await _workshopMovementRepository.GetVehicleMovementStrikeAsync(movementId);
         }
+
+        public async Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovementDDL(WorkshopMovementFilter filter)
+        {
+            return await _workshopMovementRepository.GetAllDWorkshopVehicleMovementDDL(filter);
+        }
+
         #endregion
 
         #region MovementOut

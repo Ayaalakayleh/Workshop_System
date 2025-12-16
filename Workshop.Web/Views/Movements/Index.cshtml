@@ -23,7 +23,7 @@
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_VehicleName"]</label>
-                                @Html.DropDownListFor(model => model.VehicleID, (SelectList)ViewBag.VehicleNams, Common["Select"], htmlAttributes: new { @class = "form-control" })
+                                @Html.DropDownListFor(model => model.VehicleID, (IEnumerable<SelectListItem>)ViewBag.VehicleNams, Common["Select"], htmlAttributes: new { @class = "form-control" })
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-12">

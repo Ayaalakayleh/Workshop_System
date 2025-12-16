@@ -40,12 +40,41 @@ namespace Workshop.Web.Controllers
         {
 
             WorkshopMovementFilter filter = new WorkshopMovementFilter();
-
+            filter.WorkshopId = BranchId;
             List<VehicleNams> vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+            VehicleMovement movement = new VehicleMovement();
+            movement.ColMovements = await _workshopapiClient.GetAllDWorkshopVehicleMovementDDL(filter);
+            
+            movement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+            List<VehicleNams> ExternalVehicles = new List<VehicleNams>();
+            ExternalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
 
-            ViewBag.VehicleNams = new SelectList(vehicleNams ?? new List<VehicleNams>(), "id", "VehicleName");
+            foreach (var m in movement.ColMovements)
+            {
+                if (m.IsExternal == true)
+                {
+                    var match = ExternalVehicles.Find(p => p.id == m.VehicleID);
+                    m.VehicleName = match?.VehicleName ?? "Unknown Vehicle";
+                }
+                else
+                {
+                    var match = movement.vehicleNams.Find(p => p.id == m.VehicleID);
+                    m.VehicleName = match?.VehicleName ?? "Unknown Vehicle";
+                }
+            }
+
+            var allVeh = movement.ColMovements;
+            ViewBag.VehicleNams = (allVeh ?? new List<VehicleMovement>())
+                .Select(s => new SelectListItem
+                {
+                    Value = s.VehicleID.ToString(),
+                    Text = s.VehicleName
+                })
+                .ToList();
+
             var chassisList = await _vehicleApiClient.GetChassiDDL(CompanyId, 1); // To be modified for real vehicleType
             ViewBag.Chassis = new SelectList(chassisList, "Id", "ChassisNo");
+
             //ToDo: Caching
             //if (cache.Get(string.Format(CacheKeys.VehiclesDDL, language)) != null)
             //{
@@ -208,5 +237,7 @@ namespace Workshop.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        
     }
 }
