@@ -133,6 +133,16 @@ $(function () {
                 }
             },
             {
+                dataField: "Discount", caption: window.RazorVars.DXDiscount, dataType: "number", allowEditing: true, alignment: "left",
+                editorOptions: {
+                    min: 0,
+                    max: 100
+                },
+                customizeText: function (cellInfo) {
+                    return (Number(cellInfo.value) || 0).toFixed(1) + " %";
+                }
+            },
+            {
                 dataField: "Tax",
                 caption: window.RazorVars.DXTax,
                 dataType: "number",
@@ -151,18 +161,6 @@ $(function () {
                     rowData.Tax = +taxAmount.toFixed(2);
                     return rowData.Tax;
                 }
-            },
-            {
-                dataField: "Discount", caption: window.RazorVars.DXDiscount, dataType: "number", allowEditing: true, alignment: "left",
-                editorOptions: {
-                    min: 0,
-                    max: 100
-                }
-            },
-            { dataField: "TimeTaken", caption: window.RazorVars.DXTimeTaken, dataType: "number", allowEditing: false, alignment: "left" },
-            { dataField: "Status", caption: "Status", dataType: "number", visible: false, alignment: "left" },
-            {
-                dataField: "StatusText", caption: window.RazorVars.DXStatus, allowEditing: false, alignment: "left",
             },
             {
                 dataField: "Total",
@@ -187,6 +185,11 @@ $(function () {
                     rowData.Total = +totalValue.toFixed(2);
                     return rowData.Total;
                 }
+            },
+            { dataField: "TimeTaken", caption: window.RazorVars.DXTimeTaken, dataType: "number", allowEditing: false, alignment: "left" },
+            { dataField: "Status", caption: "Status", dataType: "number", visible: false, alignment: "left" },
+            {
+                dataField: "StatusText", caption: window.RazorVars.DXStatus, allowEditing: false, alignment: "left",
             },
             //{
             //    dataField: "AccountType", caption: window.RazorVars.DXAccountType, dataType: "number", allowEditing: true,

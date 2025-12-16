@@ -12,6 +12,7 @@
 	var WIPstatus = Model.Status;
 	ViewData["WIPstatus"] = WIPstatus;
 	ViewData["WIPId"] = Model.Id;
+	var AddDiscount = PermissionHelper.UserHasPermission(Permissions.WIP.AddDiscount);
 }
 <div class="row">
     <div class="col-12">
@@ -198,7 +199,8 @@
   var generalRequest = @Html.Raw(JsonConvert.SerializeObject(ViewBag.GeneralRequest));
   var OurWarehouses = @Html.Raw(Json.Serialize(ViewBag.OurWarehouses));
   var movementId = '@Model.MovementId';
-	var AllowActions = @Html.Raw(Json.Serialize(ViewBag.AllowActions));
+  var AllowActions = @Html.Raw(Json.Serialize(ViewBag.AllowActions));
+  var Permission_AddDiscount = @(AddDiscount.ToString().ToLower());
 	window.URLs = {
 		indexUrl: '@Url.Action("Index", "WIP")',
 		vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',

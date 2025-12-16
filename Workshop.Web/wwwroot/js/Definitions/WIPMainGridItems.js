@@ -267,7 +267,7 @@ $(function () {
                 dataField: "DiscountPct",
                 caption: window.RazorVars.DXDiscount,
                 dataType: "number",
-                allowEditing: true,
+                allowEditing: Permission_AddDiscount,
                 alignment: "left",
                 editorOptions: {
                     min: 0,

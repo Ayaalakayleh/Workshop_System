@@ -224,6 +224,7 @@
             public const int Close = 542;
             public const int Invoice = 542;
             public const int Transfer = 542;
+            public const int AddDiscount = 542;
         }
         #endregion
 
