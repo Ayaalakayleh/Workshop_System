@@ -160,7 +160,7 @@ namespace Workshop.Web.Controllers
                         }
                     }
 
-                    ViewBag.CreationDate = dto.CreatedAt?.ToString("dd-MM-yyyy");
+         
 
                     // Get vehicle documents - handle nulls
                     try
@@ -507,6 +507,7 @@ namespace Workshop.Web.Controllers
                 {
                     dto.WipDate = DateTime.Today;
                 }
+                ViewBag.CreationDate = dto.WipDate?.ToString("yyyy-MM-dd");
 
                 return View(dto);
             }

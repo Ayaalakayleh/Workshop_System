@@ -276,9 +276,9 @@
                 data: model
             }).done(function (result) {
                 console.log("Edit_Post result:", result);
-
+                debugger
                 if (result && result.success && result.wipId) {
-                    Swal.fire("Success", "WIP " + WIPId + " Saved Successfully!").then(() => {
+                    Swal.fire("Success", "WIP " + result.wipId + " Saved Successfully!").then(() => {
                         window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
                     });
                 } else {
