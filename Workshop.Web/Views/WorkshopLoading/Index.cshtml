@@ -83,52 +83,66 @@
 </div>
 
 <!-- Schedule Modal -->
-<div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="scheduleModal2" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">@Common["Label_ScheduleLabour"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Common["Button_Close"]"></button>
             </div>
+
             <div class="modal-body">
-                <form id="scheduleForm" class="row g-3">
-                    <input type="hidden" id="jobIndex" />
+                <form id="scheduleForm2" class="row g-3">
+                    <input type="hidden" id="jobIndex2" />
+
                     <div class="col-lg-4">
                         <label class="form-label">@Common["Label_Date"]</label>
                         <input type="date" id="schedDate" class="form-control flat-picker" />
                     </div>
+
                     <div class="col-lg-4">
                         <label class="form-label">@Common["Label_Technician"]</label>
-                        <select id="schedTech" class="form-control"></select>
+                        <select id="schedTech" class="form-control" disabled>
+                            <option value="">Select</option>
+                        </select>
                     </div>
+
                     <div class="col-lg-4">
                         <label class="form-label">@Common["Label_Start"]</label>
-                        <input type="time" id="schedStart" class="form-control" step="60" />
+                        <!-- Use text for jquery datetimepicker allowTimes -->
+                        <input type="text" id="schedStart" class="form-control" disabled autocomplete="off" />
                     </div>
 
                     <div class="col-lg-4">
                         <label class="form-label">@Common["Label_DurationMins"]</label>
-                        <input type="number" id="schedDuration" class="form-control" min="1" readonly />
+                        <input type="number" id="schedDuration" class="form-control" min="1" readonly disabled />
                     </div>
+
                     <div class="col-lg-8">
                         <label class="form-label">@Common["Label_Ends"]</label>
-                        <input type="text" id="schedEnds" class="form-control" readonly />
+                        <input type="text" id="schedEnds" class="form-control" readonly disabled />
                     </div>
 
                     <div class="col-12 d-flex align-items-center gap-2">
                         <span class="badge bg-dark" id="schedJobTag"></span>
-                        <span class="badge bg-secondary" id="schedAllowedTag"></span>
+                        <span class="badge bg-secondary" id="schedAllowedTag">Allowed: 0m</span>
                         <span class="badge bg-danger d-none" id="schedStatusOverdue">@Common["Label_Overdue"]</span>
                     </div>
                 </form>
             </div>
+
             <div class="modal-footer justify-content-center gap-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]</button>
-                <button type="button" class="btn btn-primary" id="btnSaveSchedule"><i class="fad fa-save"></i>&nbsp;@Common["Label_SaveSchedule"]</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>&nbsp;@Common["Button_Cancel"]
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSaveSchedule2">
+                    <i class="fad fa-save"></i>&nbsp;@Common["Label_SaveSchedule"]
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- NEW: Groups Modal -->
 <div class="modal fade" id="groupModal" tabindex="-1" aria-hidden="true">

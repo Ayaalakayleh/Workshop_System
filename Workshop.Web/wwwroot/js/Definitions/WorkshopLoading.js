@@ -14,7 +14,7 @@ let events = [];
 let AvailableTechniciansByDate = [];
 let currentView = "day";
 let currentDate = new Date();
-let CurrentDuration = Number(0);
+let CurrentDuration = Number(0); // hours for API
 let selectedTech = "";
 
 // NEW: Groups state
@@ -96,7 +96,7 @@ function shiftISODateLocal(dateISO, days) {
     return ymd(dt);
 }
 
-// ✅ After Save: refetch same day so working/reserved overlays update immediately
+// ✅ After Save: refetch same day so overlays update immediately
 async function refetchDayAndRender(dayISO) {
     const iso = dayISO || getSelectedDayISO();
     await GetAllTechnicians(iso);
@@ -108,7 +108,7 @@ async function refetchDayAndRender(dayISO) {
     refreshAll(true);
 }
 
-// ====== OFF-BY-ONE DATE FIX HELPERS (backend sometimes returns previous day) ======
+// ====== OFF-BY-ONE DATE FIX HELPERS ======
 function isoUTC(iso) {
     const [y, m, d] = String(iso).slice(0, 10).split("-").map(Number);
     return Date.UTC(y, m - 1, d);
@@ -514,52 +514,274 @@ function renderStats() {
     document.getElementById("statUtil").textContent = `${util}%`;
 }
 
-// ====== SCHEDULING MODAL ======
-let scheduleModal;
-function initModal() {
-    scheduleModal = new bootstrap.Modal(document.getElementById("scheduleModal"));
-    const sel = document.getElementById("schedTech");
-    const start = document.getElementById("schedStart");
-    const dur = document.getElementById("schedDuration");
-    const ends = document.getElementById("schedEnds");
-    const overdueBadge = document.getElementById("schedStatusOverdue");
+// ============================================================================
+// ✅ SCHEDULE MODAL 2 (SEQUENTIAL ENABLE + TIMEPICKER FOR schedStart)
+// ============================================================================
+let scheduleModal2 = null;
+let scheduleModal2Bound = false;
 
-    function updateEnds() {
-        const endVal24 = addMinutes(start.value || SHIFT_START, Number(dur.value || 0));
-        ends.value = fmtHuman(endVal24);
-        const idx = Number(document.getElementById("jobIndex").value);
-        const allowed = unscheduled[idx]?.allowed ?? 0;
-        if (Number(dur.value) > allowed) overdueBadge.classList.remove("d-none");
-        else overdueBadge.classList.add("d-none");
+function getSchedule2Els() {
+    const modalEl = document.getElementById("scheduleModal2");
+    if (!modalEl) return null;
+
+    const q = (sel) => modalEl.querySelector(sel);
+
+    const els = {
+        modalEl,
+        jobIndex: q("#jobIndex2"),
+        date: q("#schedDate"),
+        tech: q("#schedTech"),
+        start: q("#schedStart"),
+        duration: q("#schedDuration"),
+        ends: q("#schedEnds"),
+        jobTag: q("#schedJobTag"),
+        allowedTag: q("#schedAllowedTag"),
+        overdue: q("#schedStatusOverdue"),
+        saveBtn: q("#btnSaveSchedule2"),
+    };
+
+    const missing = [];
+    ["jobIndex", "date", "tech", "start", "duration", "ends", "saveBtn"].forEach(k => {
+        if (!els[k]) missing.push(k);
+    });
+
+    if (missing.length) {
+        console.error("[schedule2] Missing elements in #scheduleModal2:", missing, els);
+        return null;
     }
-    start.addEventListener("input", updateEnds);
-    dur.addEventListener("input", updateEnds);
-    ends.addEventListener("input", updateEnds);
 
-    document.getElementById("btnSaveSchedule").addEventListener("click", async () => {
-        const idx = Number(document.getElementById("jobIndex").value);
+    return els;
+}
+
+// Select2-safe enable/disable
+function setDisabledSmart(el, disabled) {
+    if (!el) return;
+    $(el).prop("disabled", !!disabled);
+    if ($(el).hasClass("select2-hidden-accessible")) {
+        $(el).trigger("change.select2");
+    }
+}
+
+function schedule2SetStep(els, step) {
+    setDisabledSmart(els.date, false);
+
+    setDisabledSmart(els.tech, step < 2);
+    setDisabledSmart(els.start, step < 3);
+    setDisabledSmart(els.duration, step < 4);
+    setDisabledSmart(els.ends, step < 5);
+
+    els.duration.readOnly = true;
+    els.ends.readOnly = true;
+}
+
+// ---- timepicker helpers ----
+function minutesToHHMM(total) {
+    total = Math.max(0, total);
+    const h = Math.floor(total / 60) % 24;
+    const m = total % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+}
+
+function normalizeIntervalTime(v) {
+    if (!v) return null;
+    const s = String(v).trim();
+    // accept "HH:MM", "HH:MM:SS"
+    if (/^\d{1,2}:\d{2}/.test(s)) return s.slice(0, 5);
+    return null;
+}
+
+function computeAllowedStartTimes(freeIntervals, durationMin, stepMin = 5) {
+    if (!Array.isArray(freeIntervals) || !durationMin) return [];
+
+    // accept different shapes from backend
+    const ranges = freeIntervals
+        .map(i => {
+            const s = normalizeIntervalTime(i.startFree ?? i.StartFree ?? i.start ?? i.Start);
+            const e = normalizeIntervalTime(i.endFree ?? i.EndFree ?? i.end ?? i.End);
+            return [toMinutes(s), toMinutes(e)];
+        })
+        .filter(([s, e]) => Number.isFinite(s) && Number.isFinite(e) && e > s)
+        .sort((a, b) => a[0] - b[0]);
+
+    // merge
+    const merged = [];
+    for (const [s, e] of ranges) {
+        if (!merged.length || s > merged[merged.length - 1][1]) merged.push([s, e]);
+        else merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], e);
+    }
+
+    // enumerate possible starts
+    const out = [];
+    for (const [s, e] of merged) {
+        for (let t = s; t + durationMin <= e; t += stepMin) out.push(minutesToHHMM(t));
+    }
+
+    // unique + sorted
+    return [...new Set(out)].sort((a, b) => toMinutes(a) - toMinutes(b));
+}
+
+function destroyStartPicker($start) {
+    try { $start.datetimepicker('destroy'); } catch { }
+}
+
+function initStartTimePicker($start, allowedTimes, defaultTime) {
+    destroyStartPicker($start);
+
+    // if plugin not loaded -> fallback
+    if (typeof $start.datetimepicker !== "function") {
+        $start.val(defaultTime || SHIFT_START);
+        return;
+    }
+
+    const opts = {
+        datepicker: false,
+        format: 'H:i',
+        step: 5,
+        scrollInput: false
+    };
+
+    if (Array.isArray(allowedTimes) && allowedTimes.length) {
+        opts.allowTimes = allowedTimes;
+    }
+
+    $start.datetimepicker(opts);
+    $start.val(defaultTime || (allowedTimes?.[0]) || SHIFT_START);
+}
+
+function schedule2UpdateEnds(els) {
+    const startVal = (els.start.value || "").trim();
+    const durationMins = Number(els.duration.value || 0);
+
+    if (!startVal || !durationMins) {
+        els.ends.value = "";
+        return;
+    }
+
+    const end24 = addMinutes(startVal, durationMins);
+    els.ends.value = fmtHuman(end24);
+
+    if (els.overdue) {
+        const idx = Number(els.jobIndex.value);
+        const allowed = unscheduled[idx]?.allowed ?? 0;
+        if (durationMins > allowed) els.overdue.classList.remove("d-none");
+        else els.overdue.classList.add("d-none");
+    }
+}
+
+function initModal2() {
+    const els = getSchedule2Els();
+    if (!els) return;
+
+    scheduleModal2 = bootstrap.Modal.getOrCreateInstance(els.modalEl, { backdrop: true, keyboard: true });
+
+    if (scheduleModal2Bound) return;
+    scheduleModal2Bound = true;
+
+    // block editing ends
+    $(els.ends).off(".block2").on("keydown.block2 paste.block2", (e) => e.preventDefault());
+
+    // Date change -> fetch tech -> enable tech
+    $(els.date).off(".sched2").on("change.sched2", async function () {
+        schedule2SetStep(els, 1);
+
+        els.tech.value = "";
+        els.start.value = "";
+        els.ends.value = "";
+        if (els.overdue) els.overdue.classList.add("d-none");
+
+        // reset tech options
+        $(els.tech).empty().append(new Option("Select", ""));
+
+        // reset timepicker
+        destroyStartPicker($(els.start));
+
+        const schDate = convertDateFormat(els.date.value);
+        if (!schDate) return;
+
+        try {
+            await GetAvailableTechsForLabour(schDate, CurrentDuration);
+        } catch (e) {
+            console.error("[sched2] GetAvailableTechsForLabour failed:", e);
+        } finally {
+            schedule2SetStep(els, 2);
+        }
+    });
+
+    // Tech change -> enable start + init timepicker
+    $(els.tech).off(".sched2").on("change.sched2", function () {
+        els.start.value = "";
+        els.ends.value = "";
+        if (els.overdue) els.overdue.classList.add("d-none");
+
+        // reset timepicker each time tech changes
+        destroyStartPicker($(els.start));
+
+        if (!els.tech.value) {
+            schedule2SetStep(els, 2);
+            return;
+        }
+
+        schedule2SetStep(els, 3);
+
+        // read free intervals (if backend provides)
+        let freeIntervals = [];
+        try {
+            const raw = $(els.tech).find("option:selected").attr("data-free-intervals");
+            if (raw) freeIntervals = JSON.parse(raw);
+        } catch { freeIntervals = []; }
+
+        const durationMin = Number(els.duration.value || 0);
+        const allowedTimes = computeAllowedStartTimes(freeIntervals, durationMin, 5);
+
+        // init timepicker (restricted if allowedTimes exists)
+        initStartTimePicker($(els.start), allowedTimes, allowedTimes[0] || SHIFT_START);
+
+        // IMPORTANT: don't auto-advance to next step here.
+        // user must change/pick start time -> then we enable next fields.
+    });
+
+    // Start picked/changed -> enable duration+ends and compute
+    $(els.start).off(".sched2").on("change.sched2 input.sched2", function () {
+        if (!els.tech.value) { schedule2SetStep(els, 2); return; }
+        if (!els.start.value) { schedule2SetStep(els, 3); return; }
+
+        schedule2SetStep(els, 5);
+        schedule2UpdateEnds(els);
+    });
+
+    // duration (readonly but still recompute if changed by code)
+    $(els.duration).off(".sched2").on("change.sched2 input.sched2", function () {
+        schedule2UpdateEnds(els);
+    });
+
+    // Save
+    $(els.saveBtn).off(".sched2").on("click.sched2", async function () {
+        const idx = Number(els.jobIndex.value);
         const job = unscheduled[idx];
-        const dateEl = document.getElementById("schedDate");
-
-        if (!job || !dateEl.value || !sel.value || !start.value || !dur.value) {
+        if (!job) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
             return;
         }
 
-        const TechId = Number($('#schedTech').find(":selected").val());
+        const dateISO = convertDateFormat(els.date.value);
+        const techId = Number(els.tech.value || 0);
+        const start24 = (els.start.value || "").trim();
+        const durationMins = Number(els.duration.value || 0);
 
-        const uiDateISO = normalizeISODateOnly(dateEl.value); // ✅ selected date
-        const apiDateISOFixed = shiftISODateLocal(uiDateISO, SAVE_DATE_COMPENSATION_DAYS); // ✅ compensate backend bug
+        if (!dateISO || !techId || !start24 || !durationMins) {
+            Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
+            return;
+        }
 
-        const start24 = start.value; // "HH:MM"
-        const durationMins = Number(dur.value);
-        const end24 = addMinutes(start24, durationMins); // "HH:MM"
+        const uiDateISO = normalizeISODateOnly(dateISO);
+        const apiDateISOFixed = shiftISODateLocal(uiDateISO, SAVE_DATE_COMPENSATION_DAYS);
+        const end24 = addMinutes(start24, durationMins);
 
         const WIPSCheduleObject = {
             Id: Number(job.id),
             WIPId: Number(job.wipid),
             RTSId: job.rtsid ? Number(job.rtsid) : 0,
-            TechnicianId: Number(TechId),
+            TechnicianId: techId,
             Date: apiDateISOFixed,
             StartTime: `${start24}:00`,
             Duration: durationMins,
@@ -572,17 +794,13 @@ function initModal() {
             return;
         }
 
-        // ✅ update local UI (unscheduled list)
-        $('#unscheduledList').html('');
         unscheduled.splice(idx, 1);
+        renderUnscheduled();
 
-        // ✅ close modal first
-        scheduleModal.hide();
+        scheduleModal2.hide();
 
-        // ✅ IMPORTANT: refresh tech working/reserved hours immediately on same selected day
         await refetchDayAndRender(uiDateISO);
 
-        // ✅ show swal after UI is updated
         Swal.fire({
             icon: "success",
             title: window.i18n.label_saved,
@@ -593,20 +811,37 @@ function initModal() {
     });
 }
 
+// This populates the dropdown AND stores freeIntervals (if provided)
 function fillTechsForLabour(data) {
     AvailableTechniciansByDate = [];
-    $.each(data, function (ind, value) {
-        AvailableTechniciansByDate.push({ Id: value.technicianId, name: value.primaryName, secondaryName: value.secondaryName });
+
+    $.each(data || [], function (_ind, value) {
+        AvailableTechniciansByDate.push({
+            Id: value.technicianId,
+            name: value.primaryName,
+            secondaryName: value.secondaryName,
+            freeIntervalsList: value.freeIntervalsList
+        });
     });
-    const sel = document.getElementById("schedTech");
+
+    const els = getSchedule2Els();
+    if (!els) return;
+
+    const sel = els.tech;
     $(sel).empty();
+    $(sel).append($('<option>', { value: "", text: "Select" }));
+
     if (AvailableTechniciansByDate.length > 0) {
         $.each(AvailableTechniciansByDate, function (_, t) {
-            $(sel).append($('<option>', { value: t.Id, text: t.name }));
+            const opt = $('<option>', { value: t.Id, text: t.name });
+            if (t.freeIntervalsList) opt.attr("data-free-intervals", JSON.stringify(t.freeIntervalsList));
+            $(sel).append(opt);
         });
     } else {
-        $(sel).append($('<option>', { value: null, text: "No Available Technicians" }));
+        $(sel).append($('<option>', { value: "", text: "No Available Technicians", disabled: true }));
     }
+
+    sel.value = "";
 }
 
 async function GetAvailableTechsForLabour(RequestedDate, duration) {
@@ -626,33 +861,54 @@ async function GetAvailableTechsForLabour(RequestedDate, duration) {
     });
 }
 
-// >>> UPDATED FUNCTION HERE <<<
+// ✅ This is called by Schedule button
 async function openScheduleModal(jobIndex) {
     const job = unscheduled[jobIndex];
     if (!job) return;
 
     if (groupModal && typeof groupModal.hide === "function") {
-        try { groupModal.hide(); } catch (e) { console.warn('[openScheduleModal] Failed to hide groupModal:', e); }
+        try { groupModal.hide(); } catch (e) { }
     }
 
+    const els = getSchedule2Els();
+    if (!els) {
+        Swal.fire("Error", "scheduleModal2 elements not found. Check IDs.", "error");
+        return;
+    }
+
+    // duration used by API (hours)
     let Hours = fromMinutes(job.duration);
     Hours = timeToDecimalHours(Hours);
-
-    // ✅ Use currently selected UI day
-    const selectedISO = getSelectedDayISO();
-
-    await GetAvailableTechsForLabour(selectedISO, Hours);
     CurrentDuration = Hours;
 
-    document.getElementById("jobIndex").value = jobIndex;
-    document.getElementById("schedDate").value = selectedISO;
-    document.getElementById("schedStart").value = SHIFT_START;
-    document.getElementById("schedDuration").value = job.duration;
-    document.getElementById("schedEnds").value = fmtHuman(addMinutes(SHIFT_START, job.duration));
-    document.getElementById("schedJobTag").textContent = `${window.i18n.label_job}: ${job.rts} — ${job.title}`;
-    document.getElementById("schedAllowedTag").textContent = `${window.i18n.label_allowed}: ${job.allowed}m`;
-    document.getElementById("schedStatusOverdue").classList.add("d-none");
-    scheduleModal.show();
+    const selectedISO = getSelectedDayISO();
+
+    // tags (fix undefined)
+    if (els.jobTag) els.jobTag.textContent = `${window.i18n.label_job}: ${job.rts} — ${job.title}`;
+    if (els.allowedTag) els.allowedTag.textContent = `${window.i18n.label_allowed}: ${(job.allowed ?? 0)}m`;
+    if (els.overdue) els.overdue.classList.add("d-none");
+
+    // set fields
+    els.jobIndex.value = jobIndex;
+    els.date.value = selectedISO;
+
+    // reset downstream
+    $(els.tech).empty().append(new Option("Select", ""));
+    els.tech.value = "";
+
+    // reset timepicker
+    destroyStartPicker($(els.start));
+    els.start.value = "";
+
+    els.duration.value = job.duration; // readonly but present
+    els.ends.value = "";
+
+    schedule2SetStep(els, 1);
+
+    scheduleModal2 = bootstrap.Modal.getOrCreateInstance(els.modalEl, { backdrop: true, keyboard: true });
+    scheduleModal2.show();
+
+    $(els.date).trigger("change");
 }
 
 function timeToDecimalHours(timeStr) {
@@ -666,7 +922,7 @@ function timeToDecimalHours(timeStr) {
     return Math.round(totalHours * 100) / 100;
 }
 
-// ====== CONTROLS (single source of truth + always refetch for selected day) ======
+// ====== CONTROLS ======
 async function gotoDate(dateObj) {
     currentDate = new Date(dateObj);
     const iso = ymd(currentDate);
@@ -785,7 +1041,7 @@ function GetAllTechnicians(Date) {
                 : null;
         }).filter(Boolean);
 
-        // ✅ FIX: only apply off-by-one shift when response is UNIFORMLY off by 1 day.
+        // ✅ only apply off-by-one shift when response is uniformly off by 1 day
         if (reqISO) {
             const allDates = [];
             additions.forEach(t => {
@@ -823,7 +1079,7 @@ function GetServicesById(id, lang) {
         cache: false,
         data: { id, lang }
     }).then(function (res) {
-        $.each(res, function (index, value) {
+        $.each(res, function (_index, value) {
             unscheduled.push({
                 id: value.id,
                 ro: value.code,
@@ -847,7 +1103,7 @@ function FetchServicesByIdReturnArray(id, lang) {
         data: { id, lang }
     }).then(function (res) {
         const result = [];
-        $.each(res, function (index, value) {
+        $.each(res, function (_index, value) {
             result.push({
                 id: value.id,
                 ro: value.code,
@@ -885,7 +1141,7 @@ function TechnicianAvailabilty() {
         dataType: 'json',
         cache: false,
     }).then(function (res) {
-        $.each(res, function (index, value) {
+        $.each(res, function (_index, value) {
             AvailableTechnicians.push({
                 techId: value.techId,
                 code: value.TechName,
@@ -940,7 +1196,9 @@ function GetGroupedServices(Id) {
 }
 
 function initGroupModal() {
-    groupModal = new bootstrap.Modal(document.getElementById("groupModal"));
+    const el = document.getElementById("groupModal");
+    if (!el) return;
+    groupModal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: true, keyboard: true });
 }
 
 function openGroupModal() {
@@ -1026,7 +1284,7 @@ function renderJobsInGroupModal(jobs) {
         left.innerHTML = `
       <div class="fw-semibold">${job.ro} — <span class="text-info">${job.rts}</span></div>
       <div class="small text-muted">${job.title}</div>
-      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${job.allowed}m</div>
+      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${(job.allowed ?? 0)}m</div>
     `;
 
         const btns = document.createElement("div");
@@ -1049,7 +1307,7 @@ function renderJobsInGroupModal(jobs) {
     document.getElementById("groupItemsSection").classList.remove("d-none");
 }
 
-// ====== DATE FORMATTER (UPDATED: supports dd/MM/yyyy too) ======
+// ====== DATE FORMATTER (supports dd/MM/yyyy too) ======
 function convertDateFormat(dateStr) {
     if (typeof dateStr !== "string") return dateStr;
     const s = dateStr.trim();
@@ -1087,17 +1345,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         TechnicianAvailabilty(),
     ]);
 
-    initModal();
+    initModal2();       // ✅ scheduleModal2 with timepicker for schedStart
     initGroupModal();
     wireControls();
     refreshAll();
-
-    // keep ONLY this jQuery handler (schedule modal date change)
-    $('#schedDate').on('change', async () => {
-        let schDate = $("#schedDate").val();
-        schDate = convertDateFormat(schDate);
-        await GetAvailableTechsForLabour(schDate, CurrentDuration);
-    });
 
     await GetGroupedServices(null);
 });

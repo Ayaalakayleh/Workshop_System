@@ -292,7 +292,7 @@
         height: 500px;
         border: 1px dashed #ccc;
         border-radius: .5rem;
-        background-image: url('@Url.Content("../../images/tajeer-car-assets/tajeer-car.jpeg")');
+        background-image: url('@Url.Content("../images/tajeer-car-assets/tajeer-car.jpeg")');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -562,14 +562,14 @@
 
                             <div class="col-lg-6 col-md-12 col-sm-12 mt-3">
                                 <fieldset class="ui-fieldset">
-                                    <legend>@Common["MovementIn"]</legend>
+                                    <legend>@Common["Movement In"]</legend>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             @Html.AntiForgeryToken()
                                             <div class="form-group">
-                                                <label>@Common["MovementDate"]</label>
+                                                <label>@Common["Movement Date"]</label>
                                                 <div class="input-group">
-                                                    @Html.EditorFor(model => model.GregorianMovementDate, new { htmlAttributes = new { @class = "form-control hijri-date-input1", id = "GregorianMovementDate" } })
+                                                    @Html.EditorFor(model => model.GregorianMovementDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "GregorianMovementDate" } })
                                                     @Html.EditorFor(model => model.hijriMovementDate, new { htmlAttributes = new { style = "display:none" } })
                                                     <div class="input-group-append">
                                                         <span class="input-group-text fs-xl">
@@ -669,10 +669,10 @@
 
                     <div class="text-center mt-4">
                         <a href="@Url.Action("Index", "Movements")" class="btn btn-secondary btn-w-m">
-                            <i class="fa @(true ? "fa-arrow-right" : "fa-arrow-left")"></i>&nbsp;@Common["BackToList"]
+                            <i class="fa fa-arrow-left"></i>&nbsp;@Common["Button_BackToList"]
                         </a>
                         <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary btn-w-m">
-                            <i class="fa fa-save"></i>&nbsp;@Common["Save"]
+                            <i class="fa fa-save"></i>&nbsp;@Common["Button_Save"]
                         </button>
                     </div>
                                         }
@@ -681,144 +681,144 @@
         </div>
     </div>
 </div>
+<script src="~/js/site.js"></script>
 
 <script>
     $(document).ready(function () {
-        /*Start Scratches js*/
+        /* Start Scratches js */
         var d = new Date(),
             h = d.getHours(),
             m = d.getMinutes();
+
         if (h < 10) h = '0' + h;
         if (m < 10) m = '0' + m;
 
         $('#ExitTime').val(h + ":" + m);
-        $(function () {
-            // initHijrDatePicker();
-            // initHijrDatePickerDefault();
-        });
 
-        //Initialize hijri date picker
-        function initHijrDatePicker(pickDateHidden) {
-            // $(".hijri-date-input1").hijriDatePicker({
-            //     format: "DD-MM-YYYY",
-            //     hijriFormat: "iYYYY-iMM-iDD",
-            //     dayViewHeaderFormat: "MMMM YYYY",
-            //     hijriDayViewHeaderFormat: "iMMMM iYYYY",
-            //     showTodayButton: true,
-            //     hijriText: "@Common["Hijri"]",
-            //     gregorianText: "@Common["Gregorian"]",
-            //     icons: {
-            //     today: '@Common["Today"]'
-            //     },
-            //     hijri: false,
-            //     showSwitcher: false,
-            //     minDate: '@(ViewBag.LastMovementDate.ToString("yyyy-MM-dd"))',"1900-01-01",
-            //     maxDate: '@(DateTime.Now.AddDays(2).ToString("yyyy-MM-dd"))',"1900-01-01",
-            // });
+        function updateDamageHidden() {
+            $('#WorkshopMovDmg').val(JSON.stringify(shapesJson));
         }
 
-        function initHijrDatePickerDefault() {
-            $(".hijri-date-input1").hijriDatePicker();
+        function resetCursorClasses() {
+            $("#panel").removeClass("deep-scratch-cursor small-scratch-cursor very-deep-cursor bend-body-cursor");
         }
 
         var shapesJson = [];
-        var fd = new FormData();
-
         var shapeType;
         var xCoord;
         var yCoord;
         var shapeCount = 0;
+
         var undoButton = $('#undo-button');
         var clearButton = $('#clear-button');
 
         $('#DeepScratch-btn').click(function () {
             shapeType = 'deep-scratch';
             $('#coordinates').text('DeepScratch coordinates: ');
+            resetCursorClasses();
             $("#panel").addClass("deep-scratch-cursor");
         });
 
         $('#SmallScratch-btn').click(function () {
             shapeType = 'small-scratch';
             $('#coordinates').text('SmallScratch coordinates: ');
+            resetCursorClasses();
             $("#panel").addClass("small-scratch-cursor");
         });
 
         $('#VeryDeepScratch-btn').click(function () {
             shapeType = 'very-deep-scratch';
             $('#coordinates').text('VeryDeepScratch coordinates: ');
+            resetCursorClasses();
             $("#panel").addClass("very-deep-cursor");
         });
 
         $('#BendInBody-btn').click(function () {
             shapeType = 'bend-in-body';
             $('#coordinates').text('BendInBody coordinates: ');
+            resetCursorClasses();
             $("#panel").addClass("bend-body-cursor");
         });
 
+        // Get existing strikes
         $.ajax({
             type: "GET",
             url: "@Url.Action("GetStrike", "Movements")" + '?MovementId=' + '@Model.MovementId',
-            dataType: "JSON",
+            dataType: "text",
             success: function (Data) {
-                if (Data != "") {
-                    let jsonObject = JSON.parse(Data);
-                    var shapeTypeLocal;
-                    var xCoordLocal;
-                    var yCoordLocal;
-                    for (var i = 0; i < jsonObject.length; i++) {
-                        shapeTypeLocal = jsonObject[i].type;
-                        xCoordLocal = jsonObject[i].x + 35;
-                        yCoordLocal = jsonObject[i].y + 23;
-                        var $shape = $('<div class="shape shape-' + i + '" id="' + shapeTypeLocal + '"></div>');
-                        $shape.css({ 'left': xCoordLocal - 2, 'top': yCoordLocal - 2 });
+                if (!Data || Data === "") return;
 
-                        $("#panel").append($shape);
-
-                        shapesJson.push({
-                            "type": "" + shapeTypeLocal + "",
-                            "x": xCoordLocal - 35,
-                            "y": yCoordLocal - 23
-                        });
-                    }
-
-                    $('#WorkshopMovDmg').val(JSON.stringify(shapesJson));
+                var jsonObject;
+                try {
+                    jsonObject = (typeof Data === 'string') ? JSON.parse(Data) : Data;
+                } catch (e) {
+                    jsonObject = Data;
                 }
+
+                if (!jsonObject || !jsonObject.length) return;
+
+                for (var i = 0; i < jsonObject.length; i++) {
+                    var shapeTypeLocal = jsonObject[i].type;
+                    var xCoordLocal = jsonObject[i].x + 35;
+                    var yCoordLocal = jsonObject[i].y + 23;
+
+                    var $shape = $('<div class="shape shape-' + i + '" id="' + shapeTypeLocal + '"></div>');
+                    $shape.css({ 'left': xCoordLocal - 2, 'top': yCoordLocal - 2 });
+
+                    $("#panel").append($shape);
+
+                    shapesJson.push({
+                        "type": "" + shapeTypeLocal + "",
+                        "x": xCoordLocal - 35,
+                        "y": yCoordLocal - 23
+                    });
+                }
+
+                updateDamageHidden();
             }
         });
 
+        // Add new strike
         $('#panel').click(function (e) {
-            if (shapeType) {
-                var id = ++shapeCount;
-                xCoord = e.pageX - $(this).offset().left;
-                yCoord = e.pageY - $(this).offset().top;
+            if (!shapeType) return;
 
-                var $shape = $('<div class="shape shape-' + id + '" id="' + shapeType + '"></div>');
-                $shape.css({ 'left': xCoord - 2, 'top': yCoord - 2 });
+            var id = ++shapeCount;
+            xCoord = e.pageX - $(this).offset().left;
+            yCoord = e.pageY - $(this).offset().top;
 
-                $(this).append($shape);
+            var $shape = $('<div class="shape shape-' + id + '" id="' + shapeType + '"></div>');
+            $shape.css({ 'left': xCoord - 2, 'top': yCoord - 2 });
 
-                $('#coordinates').append(shapeType + ': (' + xCoord + ', ' + yCoord + ') ');
-                shapesJson.push({
-                    "type": "" + shapeType + "",
-                    "x": xCoord - 35,
-                    "y": yCoord - 23
-                });
-                $('#WorkshopMovDmg').val(JSON.stringify(shapesJson));
-            }
+            $(this).append($shape);
+
+            $('#coordinates').append(shapeType + ': (' + xCoord + ', ' + yCoord + ') ');
+            shapesJson.push({
+                "type": "" + shapeType + "",
+                "x": xCoord - 35,
+                "y": yCoord - 23
+            });
+
+            updateDamageHidden();
         });
 
+        // Undo
         undoButton.on('click', function () {
             var lastShape = shapesJson.pop();
             if (lastShape) {
                 $('.shape:last-child').remove();
+                updateDamageHidden();
             }
         });
 
+        // Clear
         clearButton.on('click', function () {
             shapesJson = [];
             $("#panel").empty();
+            updateDamageHidden();
         });
-        /*End Scratches js*/
+
+        /* End Scratches js */
+
         GetVehicleData();
 
         $("#ExitMeter").val(parseFloat($("#ReceivedMeter").val()) + 1);
@@ -833,8 +833,31 @@
 
     var rowCount = $('#tblMainteneance  >tbody >tr').length;
 
+    function toBool(v) {
+        if (typeof v === "boolean") return v;
+        if (typeof v === "number") return v === 1;
+        if (typeof v === "string") {
+            var s = v.trim().toLowerCase();
+            return (s === "true" || s === "1" || s === "yes" || s === "ok");
+        }
+        return false;
+    }
+
+    function getSuccessFlag(resp) {
+        // resp might be: {isSuccess:true} OR {IsSuccess:true} OR {success:true} OR plain true/1/"true"
+        if (resp && typeof resp === "object") {
+            return toBool(resp.IsSuccess ?? resp.isSuccess ?? resp.success ?? resp.Success ?? resp.ok);
+        }
+        return toBool(resp);
+    }
+
+    function getMessage(resp) {
+        if (!resp || typeof resp !== "object") return "";
+        return resp.Message ?? resp.message ?? resp.error ?? resp.Error ?? "";
+    }
+
     function ValidOut() {
-        isValid = true;
+        var isValid = true;
 
         if ($("#OutfuelLevelId").val() == "") {
             $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red");
@@ -844,9 +867,15 @@
         if ($("#ExitMeter").val() == "" || $("#ExitMeter").val() == 0) {
             $("#ExitMeter").addClass("invalid");
             isValid = false;
-        } else if ($("#ExitMeter").val() < $("#ReceivedMeter").val()) {
+        } else if (parseFloat($("#ExitMeter").val()) < parseFloat($("#ReceivedMeter").val())) {
             $("#ExitMeter").addClass("invalid");
-            swal("@Common["Error"]", "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " + parseInt($("#ReceivedMeter").val()) + " " + "@Common["KiloMeter"]", "error");
+
+            alert(
+                '@Common["Error"]' + "\n" +
+                '@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]' +
+                " : " + parseInt($("#ReceivedMeter").val()) + " " + '@Common["KiloMeter"]'
+            );
+
             $("#ExitMeter").focus();
             isValid = false;
         } else {
@@ -857,11 +886,6 @@
             $("#ExitDriverName").addClass("invalid");
             isValid = false;
         }
-
-        @* if ($("#TotalCost").val() == "" || $("#TotalCost").val() < 0) {
-            $("#TotalCost").addClass("invalid");
-            isValid = false;
-        } *@
 
         if ($("#VehicleSubStatusId").val() == "" || $("#VehicleSubStatusId").val() == 0) {
             $("#VehicleSubStatusId").next().children().children().addClass("invalid");
@@ -882,6 +906,10 @@
             i = i + 1;
         });
 
+        // Make bool parsing robust (handles "True"/"False" too)
+        var isRegularMaintenanceVal = String($('#IsRegularMaintenance').val() ?? '').toLowerCase() === 'true';
+        var isExternalVal = String($('#IsExternal').val() ?? '').toLowerCase() === 'true';
+
         var movement = {
             MovementInId: parseInt($('#MovementId').val()) || null,
             InvoiceId: parseInt('@Model.InvoiceId') || null,
@@ -895,11 +923,11 @@
             ExitMeter: parseFloat($('#ExitMeter').val()) || null,
             FuelLevelId: parseInt($("#OutfuelLevelId").val()) || null,
             ExitDriverId: $('#ExitDriverName').val() || null,
-            IsRegularMaintenance: $('#IsRegularMaintenance').val() === 'true',
+            IsRegularMaintenance: isRegularMaintenanceVal,
             strikes: $('#WorkshopMovDmg').val() || null,
             LastVehicleStatus: parseInt($('#LastVehicleStatus').val()) || null,
             ColMaintenanceCard: cards,
-            IsExternal: $('#IsExternal').val() === 'true',
+            IsExternal: isExternalVal,
             GregorianMovementDate: $("#GregorianMovementDate").val() || null,
             ExitTime: $('#ExitTime').val() || null,
             TotalCost: parseFloat($('#TotalCost').val()) || null,
@@ -911,17 +939,31 @@
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("MoveOut", "MovementOut")",
-                dataType: 'json',
                 data: JSON.stringify(movement),
-                contentType: 'application/json',
-                success: function (data) {
-                    if (data.IsSuccess) {
-                        swal("@Common["DoneSuccessfully"]", "", "success");
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (data, textStatus, xhr) {
+                    // Debug: see the real response in console
+                    console.log("MoveOut response:", data);
+
+                    var ok = getSuccessFlag(data);
+
+                    // Some APIs return empty body with 200 OK (ok should be true in that case)
+                    if (!ok && (data == null || data === "")) {
+                        ok = (xhr && xhr.status >= 200 && xhr.status < 300);
+                    }
+
+                    if (ok) {
                         window.location.href = "@Url.Action("Index", "Movements")";
+                    } else {
+                        var msg = getMessage(data) || "Failed (response didn't include success flag). Check console log.";
+                        alert(msg);
                     }
-                    else {
-                        swal(data.Message, "", data.Type);
-                    }
+                },
+                error: function (xhr) {
+                    // This will show you the actual server response if JSON parse failed or server returned HTML/text
+                    console.log("MoveOut error:", xhr.status, xhr.responseText);
+                    alert("Error from Api: " + xhr.status);
                 }
             });
         }
