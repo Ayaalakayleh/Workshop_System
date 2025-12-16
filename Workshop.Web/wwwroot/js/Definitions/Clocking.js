@@ -194,11 +194,6 @@
         moveToHistoryAndRemove($(this).data('id'));
     });
 
-    $('#btnClockAllOut').on('click', function () {
-        Object.keys(rows).forEach(moveToHistoryAndRemove);
-    });
-
-
 })(jQuery, window, document);
 $('#historyTable').DataTable({
     responsive: true,
@@ -236,6 +231,7 @@ function setListClockStatus(item, status) {
     if (statusInput) statusInput.value = status;
     return true;
 }
+
 
 // elapsed display
 
@@ -326,6 +322,21 @@ function WIPChange(controlItem) {
             alert("Failed to load labour data.");
         }
     });
+}
+function clockAllOut() {
+    $.ajax({
+        url: window.appUrls.clockAllOut,
+        type: 'POST',
+        contentType: 'application/json',
+        success: function () {
+            window.location.reload();
+
+        },
+        error: function () {
+            return false;
+        }
+    });
+
 }
 
 function TechnicianChange(controlItem) {
