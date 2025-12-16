@@ -237,6 +237,7 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("Description", typeof(string));
             table.Columns.Add("LongDescription", typeof(string));
             table.Columns.Add("StandardHours", typeof(decimal));
+            table.Columns.Add("BaseRate", typeof(decimal));
             table.Columns.Add("Rate", typeof(decimal));
             table.Columns.Add("TimeTaken", typeof(decimal));
             table.Columns.Add("Discount", typeof(decimal));
@@ -247,7 +248,7 @@ namespace Workshop.Infrastructure.Repositories
             foreach (var item in Services)
             {
                 table.Rows.Add(item.Id, item.WIPId, item.Code, item.Description, item.LongDescription, item.StandardHours,
-                                item.Rate, item.TimeTaken, item.Discount, item.Total, item.Status, item.AccountType);
+                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.Total, item.Status, item.AccountType);
             }
 
 

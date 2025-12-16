@@ -125,15 +125,21 @@
 
         /* ------- Save ------- */
         function saveData() {
+            const servicesGrid = $('#mainRTSGrid').dxDataGrid('instance');
+            if (servicesGrid) servicesGrid.saveEditData();
+
+            const itemsGrid = $('#mainItemsGrid').dxDataGrid('instance');
+            if (itemsGrid) itemsGrid.saveEditData();
+
             // RTS - Services
-            var Services_grid = $('#mainRTSGrid').dxDataGrid('instance');
+            var Services_grid = servicesGrid;
             var Services_Items = Services_grid.getDataSource().items();
 
             var ServicesJson = JSON.stringify(Services_Items);
             $("#Services").val(ServicesJson);
 
             // Items
-            var grid = $('#mainItemsGrid').dxDataGrid('instance');
+            var grid = itemsGrid;
             var gridItems = grid.getDataSource().items();
 
             var itemsJson = JSON.stringify(gridItems);

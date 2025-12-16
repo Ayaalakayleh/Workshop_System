@@ -121,23 +121,34 @@ $(function () {
                         .appendTo(container);
                 }
             },
-
             { dataField: "StandardHours", dataType: "number", caption: window.RazorVars.DXStandardHours, allowEditing: true, alignment: "left" },
-            {
-                dataField: "Rate",
+            { dataField: "BaseRate", visible: false, allowEditing: false },
+            { dataField: "Rate",
                 caption: window.RazorVars.DXRate,
                 dataType: "number",
                 allowEditing: false,
                 calculateCellValue: function (rowData) {
-                    var discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
-                    var rate = rowData._originalRate || rowData.Rate || 0;
+                    return ensureDiscountedRate(rowData);
+                }
+            },
+            {
+                dataField: "Tax",
+                caption: window.RazorVars.DXTax,
+                dataType: "number",
+                allowEditing: false,
+                alignment: "left",
+                calculateCellValue: function (rowData) {
+                    var vatId = $("#Vat").val();
+                    var vatValue = parseFloat(GetVatValueById(vatId)) || 0;
+                    var vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;
 
-                    if (!rowData._originalRate)
-                        rowData._originalRate = rate;
+                    var hours = parseFloat(rowData.StandardHours) || 0;
 
-                    var discountedRate = rate - (rate * (discount / 100));
-                    rowData.Rate = discountedRate;
-                    return parseFloat(discountedRate.toFixed(2));
+                    var price = ensureDiscountedRate(rowData); 
+                    var taxAmount = hours * price * vatPercent;
+
+                    rowData.Tax = +taxAmount.toFixed(2);
+                    return rowData.Tax;
                 }
             },
             {
@@ -156,21 +167,24 @@ $(function () {
                 dataField: "Total",
                 caption: window.RazorVars.DXTotal,
                 dataType: "number",
-               alignment: "left",
+                alignment: "left",
                 allowEditing: false,
                 calculateCellValue: function (rowData) {
-                    var rate = parseFloat(rowData.Rate) || 0;
+                    var rate = ensureDiscountedRate(rowData);
                     var standardHours = parseFloat(rowData.StandardHours) || 1;
+                    var tax = parseFloat(rowData.Tax) || 0;
                     var rowDiscount = parseFloat(rowData.Discount) || 0;
 
-                    var totalValue = (rate * standardHours);
+                    var totalValue = rate * standardHours;
 
                     if (rowDiscount > 0) {
                         totalValue -= totalValue * (rowDiscount / 100);
                     }
 
-                    rowData.Total = totalValue;
-                    return parseFloat(totalValue.toFixed(2));
+                    totalValue += tax;
+
+                    rowData.Total = +totalValue.toFixed(2);
+                    return rowData.Total;
                 }
             },
             //{
@@ -774,4 +788,41 @@ function updateStatusInGrid(RTSId, newStatus, statusText) {
             console.error("Error updating status:", err);
         }
     });
+}
+function GetVatValueById(vatId) {
+    var vatValue = 0;
+    $.ajax({
+        url: window.RazorVars.getVatValueByIdUrl,
+        method: 'Get',
+        dataType: 'json',
+        data: { VatId: vatId },
+        async: false,
+        success: function (result) {
+            vatValue = result;
+        },
+        error: function () {
+            vatValue = 0;
+        }
+    });
+    return vatValue;
+}
+function ensureDiscountedRate(rowData) {
+    const discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
+
+    let rate = parseFloat(rowData.Rate) || 0;
+    let base = parseFloat(rowData.BaseRate);
+
+    if (!isFinite(base) || base <= 0) {
+        rowData.BaseRate = rate;
+        base = rowData.BaseRate;
+    }
+
+    const alreadyDiscounted = Math.abs((rate || 0) - (base || 0)) > 0.0001;
+    if (alreadyDiscounted) {
+        return +rate.toFixed(2);
+    }
+
+    const discounted = base - (base * (discount / 100));
+    rowData.Rate = +discounted.toFixed(2);
+    return rowData.Rate;
 }

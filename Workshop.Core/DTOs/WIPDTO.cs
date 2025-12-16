@@ -123,6 +123,7 @@ namespace Workshop.Core.DTOs
         public decimal StandardHours { get; set; }
         //public decimal Allowed { get; set; }
         public decimal Rate { get; set; }
+        public decimal BaseRate { get; set; }
         public decimal Total { get; set; }
         public decimal? Discount { get; set; } = 0;
         public decimal TimeTaken { get; set; }
