@@ -327,10 +327,24 @@
                 return;
             }
 
-            
+            debugger
+            var notCompletedService = Services_Items.filter(function (row) {
+
+                return parseInt(row.Status) !== 25;
+            });
+            if (notCompletedService.length > 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "You have uncompleted service"
+                });
+                return;
+            }
+
+
             var notCompletedItems = gridItems.filter(function (row) {
 
-                return row.StatusId !== 42;
+                return parseInt(row.Status) !== 42;
             });
 
             if (notCompletedItems.length > 0) {
@@ -354,7 +368,7 @@
                 Swal.fire({
                     icon: "warning",
                     title: "Warning",
-                    text: "Used  Quantity Is Requierd"
+                    text: "Used  Quantity Is Required"
                 });
                 return;
             }

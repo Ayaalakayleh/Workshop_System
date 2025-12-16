@@ -253,8 +253,11 @@ $(function () {
                     {
                         hint: "Delete",
                         icon: "fad fa-trash",
-                        visible: function () {
-                            return !(wipStatus === Gone || wipStatus === Invoiced);
+                        visible: function (e) {
+                            debugger
+                            return !(wipStatus === Gone || wipStatus === Invoiced) &&
+                                parseInt(e.row.data.Status) !== 19 &&
+                                parseInt(e.row.data.Status) !== 25;
                         },
                         onClick: function (e) {
                             var grid = e.component;

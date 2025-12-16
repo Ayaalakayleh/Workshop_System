@@ -486,6 +486,14 @@ $(function () {
                                 !OurWarehouses.includes(parseInt(e.row.data.WarehouseId));
                         },
                         onClick: function (e) {
+                            if (parseInt(e.row.data.Status) !== 36) {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Please request approval first",
+                                    text: "You cannot Transfer this item until it is approved."
+                                });
+                                return;
+                            }
                             TransferItem(e.row.data);
                         }
                     },
