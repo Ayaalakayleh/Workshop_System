@@ -223,8 +223,8 @@ namespace Workshop.Web.Controllers
                         main.Labourlines = schedules?.Select(s => new CreateWIPServiceDTO { Id = (s.RTSId ?? 0), StandardHours = 0 }).ToList() ?? new List<CreateWIPServiceDTO>();
                     }
 
-                    var labour = main.Labourlines.FirstOrDefault(s => s.Id == clocking.ClockingForm.RTSID);
-                    clocking.ClockingForm.AllowedTime = labour?.StandardHours ?? 0;
+                    var Rlabour = main?.RTSCodes?.FirstOrDefault(s => s.Id == clocking.ClockingForm.RTSID);
+                    clocking.ClockingForm.AllowedTime = Rlabour?.StandardHours ?? 0;
 
                     main.ClockingList = main.ClockingList ?? new List<ClockingDTO>();
 
@@ -428,21 +428,26 @@ namespace Workshop.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClockAllOut()
         {
             var main = GetMainModel();
+
             if (main.ClockingList != null)
             {
                 foreach (var item in main.ClockingList.ToList())
                 {
                     await BreakClock(item.ID ?? 0, (int)Status.ClockOut);
+                    main?.LabourlinesSelectList?.RemoveAll(s => s.Value == item.RTSID.ToString());
                 }
+
+              
+
                 SaveMainModel(main);
             }
 
-            return RedirectToAction(nameof(Clocking));
+            return Json(new { success = true });
         }
+
 
         [HttpGet]
         public async Task<IEnumerable<TechnicianDTO>> GetTechniciansPIN()
@@ -562,7 +567,7 @@ namespace Workshop.Web.Controllers
                 }
                 main.WIPSSelectList = main.WIPSSelectList ?? new List<SelectListItem>();
                 main.LabourlinesSelectList = main.LabourlinesSelectList ?? new List<SelectListItem>();
-
+                main.RTSCodes = rtsCodes ?? Enumerable.Empty<RTSCodeDTO>();
                 main.Reasons = reasons ?? new List<LookupDetailsDTO>();
 
                 var clocks = (await _apiClient.GetClocksAsync())?.ToList() ?? new List<ClockingDTO>();
