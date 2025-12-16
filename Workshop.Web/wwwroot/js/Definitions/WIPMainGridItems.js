@@ -279,7 +279,7 @@ $(function () {
                     const price = +rowData.Price || 0;
                     const base = +(qty * price).toFixed(4);   
 
-                    const discAmt = +rowData.Discount || 0;
+                    const discAmt = +rowData.Discount.toFixed(5) || 0;
                     if (base === 0) return 0;
 
                     const pct = (discAmt / base) * 100;
@@ -297,7 +297,7 @@ $(function () {
                     newData.Discount = discAmt;
                 },
                 customizeText: function (cellInfo) {
-                    return (Number(cellInfo.value) || 0).toFixed(2) + " %";
+                    return (Number(cellInfo.value) || 0).toFixed(1) + " %";
                 }
             },
 
