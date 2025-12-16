@@ -80,12 +80,11 @@
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center">
 							<h5 class="mb-0">@Common["Title_ActiveClockings"]</h5>
-							@using (Html.BeginForm("ClockAllOut", "TechnicianDashboard", FormMethod.Post))
-							{
-								<button type="submit" class="btn btn-danger" id="btnClockAllOut">
+
+							<button type="button" class="btn btn-danger" id="btnClockAllOut" onclick="clockAllOut()">
 									<i class="fas fa-stop-circle"></i>&nbsp;@Common["Button_ClockAllOut"]
 								</button>
-							}
+	
 						</div>
 						<div class="card-body">
 							<table class="table mb-0 align-middle table-bordered" id="activeTable">
@@ -380,7 +379,8 @@
 		window.appUrls = {
 			setWIP: '@Url.Action("SetWIP", "TechnicianDashboard")',
 			setTechnician: '@Url.Action("SetTechnician", "TechnicianDashboard")',
-			getLogs: '@Url.Action("GetLogs", "TechnicianDashboard")'
+			getLogs: '@Url.Action("GetLogs", "TechnicianDashboard")',
+			clockAllOut: '@Url.Action("ClockAllOut", "TechnicianDashboard")'
 		};
 			function initRtsPopovers() {
 				var els = document.querySelectorAll('.rts-ellipsis');
