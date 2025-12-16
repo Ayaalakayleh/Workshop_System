@@ -186,8 +186,9 @@ namespace Workshop.Web.Controllers
             workOrderFilter.VehicleID = movement.VehicleID;
             workOrderFilter.CompanyId = CompanyId;
             workOrderFilter.language = lang;
-            workOrderFilter.IsExternal = movement.IsExternal;
+            //workOrderFilter.IsExternal = movement.IsExternal;
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);
+
             movement.VehicleMovementDocuments = new List<VehicleMovementDocument>();
             movement.VehicleMovementDocuments = await _workshopapiClient.GetMovementDocumentsAsync(movement.MovementId.Value);
             movement.MovementInvoice = await _workshopapiClient.GetWorkshopInvoiceByMovementId(movementId);

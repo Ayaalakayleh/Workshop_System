@@ -375,6 +375,12 @@ namespace Workshop.Web.Controllers
                 workOrderModel.WorkOrderForm.ImagesFilePath = Path.Combine("WorkOrderAttachments", guid).Replace("\\", "/");
                 workOrderModel.WorkOrderForm.FileName = filename;
             }
+            if (workOrderModel.WorkOrderForm.VehicleType == (int)VehicleTypeId.Internal)
+                workOrderModel.WorkOrderForm.IsExternal = false;
+            else
+            {
+                workOrderModel.WorkOrderForm.IsExternal = true;
+            }
 
             if (workOrderModel.WorkOrderForm != null && workOrderModel.WorkOrderForm.Id > 0)
             {
