@@ -88,11 +88,20 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
+                            <label>@Common["Label_VehicleType"] </label>
+                            <select id="vehicleType" class="form-control">
+                                <option value="">@Common["Select"]</option>
+                                <option value="1">Internal</option>
+                                <option value="2">External</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
                             <label>@Common["Label_VehicleName"]</label>
-                            @Html.DropDownListFor(model => model.Id,
-                            (SelectList)ViewBag.Vehicles,
-                                                        Common["Select"].Value,
-                                                        new { @class = "form-control", id = "filterPlateNumber" })
+                            <select id="filterPlateNumber" name="Id" class="form-control">
+                                <option value="">@Common["Select"]</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -361,6 +370,28 @@
             });
         });
     }
+</script>
+<script>
+    $(document).ready(function() {
+        debugger;
+        const internalVehicles = @Html.Raw(Json.Serialize(ViewBag.InternalVehicles));
+        const externalVehicles = @Html.Raw(Json.Serialize(ViewBag.ExternalVehicles));
+        $('#vehicleType').change(function() {
+        debugger;
+
+            const type = $(this).val();
+            const vehicleDropdown = $('#filterPlateNumber');
+
+            vehicleDropdown.empty().append('<option value="">@Common["Select"]</option>');
+
+            const vehicles = type === '1' ? internalVehicles :
+                           type === '2' ? externalVehicles : [];
+
+            vehicles.forEach(v => {
+                vehicleDropdown.append(`<option value="${v.id}">${v.vehicleName}</option>`);
+            });
+        });
+    });
 </script>
 
 

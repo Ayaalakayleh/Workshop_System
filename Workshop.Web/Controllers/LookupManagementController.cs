@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Workshop.Core.DTOs;
 using Workshop.Infrastructure;
@@ -17,7 +18,7 @@ namespace Workshop.Web.Controllers
         private readonly IWebHostEnvironment _env;
         public readonly string lang;
         public LookupManagementController(WorkshopApiClient apiClient, ERPApiClient erpApiClient,
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;

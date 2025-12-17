@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.Data;
 using System.Text.Json;
@@ -33,7 +34,7 @@ namespace Workshop.Web.Controllers
             AccountingApiClient accountingApiClient,
             IFileService fileService,
             IFileValidationService fileValidationService,
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _vehicleApiClient = vehicleApiClient;
             _workshopApiClient = workshopApiClient;

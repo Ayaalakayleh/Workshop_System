@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -22,7 +23,7 @@ namespace Workshop.Web.Controllers
         private readonly IWebHostEnvironment _env;
         public readonly string lang;
         public RecallController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, IConfiguration configuration, 
-            IWebHostEnvironment env, VehicleApiClient vehicleApiClient) : base(configuration, env)
+            IWebHostEnvironment env, VehicleApiClient vehicleApiClient, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;

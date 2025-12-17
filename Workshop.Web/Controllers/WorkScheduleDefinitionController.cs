@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Workshop.Web.Controllers
         public readonly string lang;
 
         public WorkScheduleDefinitionController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, 
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;

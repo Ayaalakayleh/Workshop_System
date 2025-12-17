@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.General;
 using Workshop.Core.DTOs.Vehicle;
@@ -26,7 +27,7 @@ namespace Workshop.Web.Controllers
             VehicleApiClient vehicleApiClient,
             ERPApiClient ERPAPI,
             IFileService fileService,
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _workshopapiClient = workshopapiClient;
             _vehicleApiClient = vehicleApiClient;

@@ -44,6 +44,7 @@ builder.Services.AddScoped<IFileValidationService, FileValidationService>();
 
 // Add Resource Services
 builder.Services.AddResourceServices();
+builder.Services.AddMemoryCache();
 
 
 //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Workshop.Core.DTOs;
@@ -22,7 +23,7 @@ namespace Workshop.Web.Controllers
         private readonly string lang;
         private static readonly string INDEX_PAGE = "Index";
         public ServiceReminderController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient serviceReminderService, 
-            VehicleApiClient vehicleApiClient, AccountingApiClient accountingApiClient, ERPApiClient erpApiClient) : base(configuration, env)
+            VehicleApiClient vehicleApiClient, AccountingApiClient accountingApiClient, ERPApiClient erpApiClient, IMemoryCache cache) : base(cache, configuration, env)
         {
             _configuration = configuration;
             _env = env;
