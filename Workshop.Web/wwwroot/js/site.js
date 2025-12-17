@@ -46,6 +46,25 @@
         disableMobile: true,
         defaultDate: "today"
     });
+    flatpickr(".flat-picker-movement", {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        disableMobile: true,
+
+        defaultDate: new Date(),
+        minDate: "today",
+        maxDate: "today",
+        disable: [
+            function (date) {
+                const t = new Date();
+                t.setHours(0, 0, 0, 0);
+                const d = new Date(date);
+                d.setHours(0, 0, 0, 0);
+                return d.getTime() !== t.getTime();
+            }
+        ]
+    });
 
 
     $(document).on("input", 'input[type="number"]', function () {

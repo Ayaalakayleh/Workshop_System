@@ -21,18 +21,19 @@
 <div class="row">
 	<div class="col-12">
 		<div id="panel-1" class="panel p-3">
-			<div class="text-start px-3 py-2">
-				<div class="fw-semibold">
-					<i class="fad fa-wrench me-2"></i>
-					@Common["Hi"],
-					@userInfo?.FirstName @userInfo?.LastName
+			<div class="d-flex justify-content-between">
+				<div class="text-start px-3 py-2">
+					<div class="fw-semibold">
+						<i class="fad fa-wrench me-2"></i>
+						@Common["Hi"],
+						@userInfo?.FirstName @userInfo?.LastName
+					</div>
+
 				</div>
-
+				<strong>@Model.VehicleTab.PlateNumber</strong>
+				<div>&nbsp;</div>
 			</div>
 
-			<div class="px-3 pb-2">
-				@Model.VehicleTab.PlateNumber
-			</div>
 		</div>
 	</div>
 </div>
