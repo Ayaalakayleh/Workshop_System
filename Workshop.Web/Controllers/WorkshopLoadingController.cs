@@ -56,7 +56,7 @@ namespace Workshop.Web.Controllers
                 var Obj = await _apiclient.WIP_GetServicesById(Id, lang);
                 Obj = Obj.Where(x => x.Status == 23).ToList();
                 var scObj = await _apiclient.WIP_SChedule_GetAll();
-                var objWipIds = Obj.Select(x => x?.WIPId).ToHashSet();
+                var objWipIds = Obj.Where(s => s?.Status == 23).Select(x => x?.WIPId).ToHashSet();
 
                 //var result = Obj
                 //.Where(o => !scObj.Any(sc => sc.WIPId == o?.WIPId))
