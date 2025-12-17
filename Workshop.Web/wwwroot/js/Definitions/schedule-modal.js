@@ -1,13 +1,78 @@
-﻿// schedule-modal-2.js
+﻿// ~/js/definitions/schedule-modal.js
 (() => {
-    const modalSel = '#scheduleModal2';
+    function ensureFlatpickr() {
+        return new Promise((resolve, reject) => {
+            if (window.flatpickr && typeof window.flatpickr === 'function') return resolve();
 
-    // --------- helpers ----------
-    const pad2 = (n) => String(n).padStart(2, '0');
+            const cssId = 'flatpickr-css';
+            if (!document.getElementById(cssId)) {
+                const link = document.createElement('link');
+                link.id = cssId;
+                link.rel = 'stylesheet';
+                link.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+                document.head.appendChild(link);
+            }
+
+            const jsId = 'flatpickr-js';
+            if (document.getElementById(jsId)) {
+                const el = document.getElementById(jsId);
+                el.addEventListener('load', () => resolve());
+                el.addEventListener('error', reject);
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.id = jsId;
+            script.src = 'https://cdn.jsdelivr.net/npm/flatpickr';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = (e) => reject(e);
+            document.body.appendChild(script);
+        });
+    }
+
+    function ensureFlatpickrZIndexPatch() {
+        if (document.getElementById('flatpickr-zindex-patch')) return;
+        const style = document.createElement('style');
+        style.id = 'flatpickr-zindex-patch';
+        style.textContent = `.flatpickr-calendar { z-index: 200000 !important; }`;
+        document.head.appendChild(style);
+    }
+
+    function callApi({ url, type = 'GET', data = null, isFormData = false, onSuccess = null, onError = null }) {
+        const ajaxOptions = {
+            url, type, dataType: 'json',
+            contentType: isFormData ? false : 'application/json; charset=utf-8',
+            processData: !isFormData, cache: false,
+            success: (response) => { if (onSuccess) onSuccess(response); },
+            error: (xhr, _status, error) => {
+                console.error("API Error:", xhr?.responseText || error);
+                if (onError) onError(xhr);
+                else Swal.fire('Error', 'Something went wrong while fetching data.', 'error');
+            }
+        };
+        if (data) ajaxOptions.data = isFormData ? data : JSON.stringify(data);
+        $.ajax(ajaxOptions);
+    }
+
+    const state = {
+        date: null,
+        dateTo: null,
+        plate: null,
+        vehicleId: null,
+        customerId: null,
+        duration: 0,
+        startTime: null,
+        endTime: null,
+        isSaving: false
+    };
+
+    const pad2 = (n) => n.toString().padStart(2, '0');
 
     function toMinutes(hhmm) {
         if (!hhmm) return NaN;
-        const [h, m] = hhmm.split(':').map(x => parseInt(x, 10) || 0);
+        const parts = hhmm.split(':').map(x => parseInt(x, 10) || 0);
+        const h = parts[0] || 0, m = parts[1] || 0;
         return h * 60 + m;
     }
 
@@ -18,287 +83,432 @@
         return `${pad2(h)}:${pad2(m)}`;
     }
 
-    function normalizeDurationToMinutes(v) {
-        const num = parseFloat(v || 0);
+    function normalizeDurationToMinutes(rawDuration) {
+        const num = parseFloat(rawDuration || 0);
         if (!isFinite(num) || num <= 0) return 0;
         return Math.round(num);
     }
 
-    function computeStartOptionsEnumerate(freeIntervals, durationMin, stepMin = 5) {
-        if (!Array.isArray(freeIntervals) || durationMin <= 0) return [];
+    function formatDateISO(d) {
+        if (!d) return '';
+        const sep = d.includes('/') ? '/' : '-';
+        const parts = d.split(sep);
+        if (parts.length !== 3) return d;
 
-        const ranges = freeIntervals
-            .map(i => [toMinutes(i.startFree), toMinutes(i.endFree)])
-            .filter(([s, e]) => Number.isFinite(s) && Number.isFinite(e) && e > s)
-            .sort((a, b) => a[0] - b[0]);
-
-        const merged = [];
-        for (const [s, e] of ranges) {
-            if (!merged.length || s > merged[merged.length - 1][1]) merged.push([s, e]);
-            else merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], e);
+        if (/^\d{4}$/.test(parts[0])) {
+            const [y, m, day] = parts;
+            return `${y}-${pad2(parseInt(m, 10))}-${pad2(parseInt(day, 10))}`;
         }
 
-        const out = [];
-        for (const [s, e] of merged) {
-            for (let t = s; t + durationMin <= e; t += stepMin) out.push(minutesToHHMM(t));
-        }
-
-        return [...new Set(out)].sort((a, b) => toMinutes(a) - toMinutes(b));
+        const [day, m, y] = parts;
+        return `${y}-${pad2(parseInt(m, 10))}-${pad2(parseInt(day, 10))}`;
     }
 
-    function getEls() {
-        const $m = $(modalSel);
+    function ensureTimeWithSeconds(hhmmOrHhmmss) {
+        if (!hhmmOrHhmmss) return '';
+        const p = hhmmOrHhmmss.split(':');
+        if (p.length >= 3) return `${pad2(p[0])}:${pad2(p[1])}:${pad2(p[2])}`;
+        if (p.length === 2) return `${pad2(p[0])}:${pad2(p[1])}:00`;
+        return hhmmOrHhmmss;
+    }
+
+    const toNumber = (v) => Number.isFinite(Number(v)) ? Number(v) : null;
+
+    function select2Options($el) {
         return {
-            $m,
-            $date: $m.find('#schedDate'),
-            $tech: $m.find('#schedTech'),
-            $start: $m.find('#schedStart'),
-            $dur: $m.find('#schedDuration'),
-            $ends: $m.find('#schedEnds'),
-            $jobTag: $m.find('#schedJobTag'),
-            $allowedTag: $m.find('#schedAllowedTag')
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#scheduleModal'),
+            minimumResultsForSearch: 0,
+            placeholder: $el.data('placeholder') || $el.attr('placeholder') || 'Select an option',
+            allowClear: true
         };
     }
 
-    function setEnabled($el, enabled) {
-        $el.prop('disabled', !enabled);
+    function isSelect2($el) { return $el.hasClass('select2-hidden-accessible'); }
+
+    function initSelect2($el) {
+        if (!$el.length) return;
+        if (isSelect2($el)) $el.select2('destroy');
+        if ($el.find('option[value=""]').length === 0) {
+            $el.prepend(new Option('', ''));
+        }
+        $el.select2(select2Options($el));
     }
 
-    function recomputeEnds($start, $dur, $ends) {
-        const startHHMM = ($start.val() || '').trim();
-        const durationMin = normalizeDurationToMinutes($dur.val());
+    // flatpickr instance
+    let datePickrInstance = null;
 
-        if (!startHHMM || !durationMin) {
-            $ends.val('');
-            return;
-        }
-        $ends.val(minutesToHHMM(toMinutes(startHHMM) + durationMin));
-    }
+    function initDatePicker() {
+        ensureFlatpickrZIndexPatch();
 
-    function initStartTimepicker($start, allowedTimes, defaultTime, onChange) {
-        // destroy previous instance
-        try { $start.datetimepicker('destroy'); } catch (e) { }
+        const modal = document.getElementById('scheduleModal');
+        const input = modal ? modal.querySelector('#schDate.flat-picker-future') : document.querySelector('#schDate.flat-picker-future');
+        if (!input) return;
 
-        // fallback if plugin missing
-        if (typeof $start.datetimepicker !== 'function') {
-            $start.val(defaultTime || allowedTimes?.[0] || '08:00');
-            onChange?.();
-            return;
-        }
-
-        const opts = {
-            datepicker: false,
-            format: 'H:i',
-            step: 5,
-            scrollInput: false,
-            onSelectTime: onChange,
-            onChangeDateTime: onChange
-        };
-
-        if (Array.isArray(allowedTimes) && allowedTimes.length) {
-            opts.allowTimes = allowedTimes;
+        if (datePickrInstance && datePickrInstance.destroy) {
+            datePickrInstance.destroy();
+            datePickrInstance = null;
         }
 
-        $start.datetimepicker(opts);
-        $start.val(defaultTime || allowedTimes?.[0] || '08:00');
-        onChange?.();
-    }
+        const appendTarget = modal || document.body;
 
-    function resetLockStepUI() {
-        const { $date, $tech, $start, $dur, $ends } = getEls();
-
-        // only date enabled
-        setEnabled($date, true);
-        setEnabled($tech, false);
-        setEnabled($start, false);
-        setEnabled($dur, false);
-        setEnabled($ends, false);
-
-        // reset values
-        $tech.empty().append(new Option('Select', ''));
-        $start.val('');
-        $ends.val('');
-
-        // ends readonly always
-        $ends.prop('readonly', true).off('.block').on('keydown.block paste.block', (e) => e.preventDefault());
-    }
-
-    function loadTechsByDate() {
-        const { $date, $tech, $start, $dur, $ends } = getEls();
-
-        const date = ($date.val() || '').trim();
-
-        // reset downstream
-        setEnabled($tech, false);
-        setEnabled($start, false);
-        setEnabled($dur, false);
-        setEnabled($ends, false);
-
-        $tech.empty().append(new Option('Select', ''));
-        $start.val('');
-        $ends.val('');
-
-        if (!date) return;
-
-        const durationMin = normalizeDurationToMinutes($dur.val());
-        const durationHours = durationMin ? (durationMin / 60) : 0;
-
-        $.ajax({
-            type: 'GET',
-            url: window.URL.getAvailableTechnicians +
-                `?date=${encodeURIComponent(date)}&duration=${encodeURIComponent(durationHours)}`,
-            dataType: 'json',
-            success: function (result) {
-                const list = result?.data ?? result ?? [];
-
-                $tech.empty().append(new Option('Select', ''));
-
-                (Array.isArray(list) ? list : []).forEach(item => {
-                    const opt = new Option(item.text, item.value);
-                    if (item.freeIntervalsList) {
-                        $(opt).attr('data-free-intervals', JSON.stringify(item.freeIntervalsList));
-                    }
-                    $tech.append(opt);
-                });
-
-                setEnabled($tech, true); // enable next step
+        datePickrInstance = flatpickr(input, {
+            dateFormat: "Y-m-d",
+            allowInput: false,
+            clickOpens: true,
+            minDate: "today",
+            maxDate: "2100-12-31",
+            disableMobile: true,
+            defaultDate: "today",
+            appendTo: appendTarget,
+            onReady: (_sel, dateStr) => {
+                state.date = dateStr || $('#schDate').val() || null;
+                if (!state.dateTo) state.dateTo = state.date;
+                $('#schDate').trigger('change');
             },
-            error: function (xhr, _s, err) {
-                console.error("getAvailableTechnicians failed:", xhr?.responseText || err);
-                // enable tech anyway so UI doesn't get stuck
-                setEnabled($tech, true);
+            onChange: (_selectedDates, dateStr) => {
+                state.date = dateStr || null;
+                if (!state.dateTo) state.dateTo = state.date;
+                $('#schDate').trigger('change');
             }
         });
     }
 
-    function handleTechChange() {
-        const { $tech, $start, $dur, $ends } = getEls();
+    function bindEvents() {
+        $('#vehicleTypeDropdown').off('change').on('change', handleVehicleTypeChange);
+        $('#vehicleDropdown').off('change').on('change', handleVehicleChange);
+        $('#chassisDropdown').off('change').on('change', handleChassisChange);
+        $('#schDate').off('change').on('change', handleDateChange);
+        $('#schStart').off('change').on('change', recomputeEndTime);
+        $('#schDuration').off('input change').on('input change', recomputeEndTime);
+    }
 
-        const $opt = $tech.find('option:selected');
-        const techId = ($opt.val() || '').trim();
+    function handleVehicleChange() {
+        const vehicleId = $(this).val();
+        const vehicleName = $(this).find('option:selected').text();
+        if (!vehicleId) return;
 
-        // reset downstream
-        setEnabled($start, false);
-        setEnabled($dur, false);
-        setEnabled($ends, false);
+        state.vehicleId = vehicleId;
+        state.plate = vehicleName;
 
-        $start.val('');
-        $ends.val('');
+        callApi({
+            url: `${window.API_BASE.getVehicleDefentionById}?id=${vehicleId}&lang=en`,
+            onSuccess: (res) => {
+                if (res.success && res.data) {
+                    const data = res.data;
+                    $('#chassisDropdown').val(data.vehicle?.id).trigger('change.select2');
+                    state.chassisId = Number(data.vehicle?.id);
 
-        if (!techId) return;
+                    if (data.customerName && String(data.customerName).trim().length) {
+                        $('#CustomerName').val(data.customerName);
+                    }
+                    $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
+                } else {
+                    console.warn('Failed to load vehicle details:', res.message);
+                }
+            },
+            onError: () => Swal.fire('Error', 'Failed to load vehicle details.', 'error')
+        });
+    }
 
-        let freeIntervals = [];
+    function handleChassisChange() {
+        const chassisId = $(this).val();
+        state.chassisId = Number(chassisId);
+        if (!chassisId) return;
+
+        state.vehicleId = chassisId;
+
+        callApi({
+            url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&lang=en`,
+            onSuccess: (res) => {
+                if (res.success && res.data) {
+                    const data = res.data;
+
+                    $("#vehicleDropdown").val(chassisId).trigger("change.select2").trigger("change");
+
+                    if (data.customerName && String(data.customerName).trim().length) {
+                        $('#CustomerName').val(data.customerName);
+                    }
+                    $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
+
+                    const vehicleOptionText = $("#vehicleDropdown").find('option:selected').text();
+                    state.plate = (vehicleOptionText && vehicleOptionText.trim())
+                        ? vehicleOptionText
+                        : (data.vehicle?.plateNumber || '');
+                } else {
+                    console.warn("Failed to load chassis vehicle details:", res.message);
+                }
+            },
+            onError: () => Swal.fire("Error", "Failed to load vehicle data from chassis.", "error")
+        });
+    }
+
+    function handleDateChange() {
+        state.date = $(this).val() || null;
+        if (!state.dateTo) state.dateTo = state.date;
+    }
+
+    function handleVehicleTypeChange() {
+        const vehicleTypeId = $('#vehicleTypeDropdown').val();
+        state.vehicleType = Number(vehicleTypeId);
+
+        const $vehicle = $('#vehicleDropdown');
+        const $chassis = $('#chassisDropdown');
+
+        const existingCustomer = ($('#CustomerName').val() || '').toString().trim();
+
+        $vehicle.empty().append('<option value="">Select</option>').trigger('change');
+        $chassis.empty().append('<option value="">Select</option>').trigger('change');
+
+        if (!existingCustomer) $('#CustomerName').val('');
+
+        if (!vehicleTypeId) return;
+
+        $.ajax({
+            type: 'GET',
+            url: window.RazorVars.vehicleListUrl,
+            data: { VehicleTypeId: vehicleTypeId },
+            dataType: 'json',
+            success: function (data) {
+                if (Array.isArray(data)) {
+                    data.forEach(item => {
+                        $vehicle.append(`<option value="${item.value}">${item.text}</option>`);
+                    });
+                    $vehicle.trigger('change.select2');
+                }
+            }
+        });
+
+        $.ajax({
+            type: 'GET',
+            url: window.RazorVars.getChassisByVehicleTypeUrl,
+            data: { vehicleTypeId: vehicleTypeId },
+            dataType: 'json',
+            success: function (data) {
+                if (!Array.isArray(data)) return;
+
+                data.forEach(item => {
+                    $chassis.append(`<option value="${item.id}">${item.text}</option>`);
+                });
+
+                $chassis.trigger('change.select2');
+            },
+            error: function () {
+                Swal.fire('Error', 'Failed to load chassis.', 'error');
+            }
+        });
+    }
+
+    function recomputeEndTime() {
+        const startHHMM = $('#schStart').val();
+        const rawDuration = $('#schDuration').val();
+
+        state.startTime = startHHMM || null;
+        state.duration = normalizeDurationToMinutes(rawDuration);
+
+        if (!state.startTime || !state.duration) {
+            state.endTime = null;
+            $('#schEnd').val('');
+            return;
+        }
+
+        const startMin = toMinutes(state.startTime);
+        const endMin = startMin + state.duration;
+        const endHHMM = minutesToHHMM(endMin);
+
+        state.endTime = endHHMM;
+        $('#schEnd').val(endHHMM).trigger('change');
+    }
+
+    function initValidation() {
+        const $form = $('#scheduleForm');
+        if (!$form.length) return;
+
+        if ($form.data('validator')) return;
+
+        $form.validate({
+            // IMPORTANT for select2: don't ignore hidden select2 originals
+            ignore: ":hidden:not(.select2-hidden-accessible)",
+
+            rules: {
+                Date: { required: true },
+                VehicleTypeId: { required: true },
+                VehicleId: { required: true },
+                CustomerName: { required: true },
+                ChassisId: { required: true },
+                Start_Time: { required: true },
+                Duration: { required: true, min: 1 },
+                End_Time: { required: true }
+                // Description is OPTIONAL (no rule)
+            },
+
+            errorClass: 'is-invalid',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+
+                // If select2, place error after its container
+                if (element.hasClass('select2-hidden-accessible')) {
+                    error.insertAfter(element.next('.select2'));
+                    return;
+                }
+
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+
+            highlight: function (element) {
+                const $el = $(element);
+                $el.addClass('is-invalid');
+
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.next('.select2').find('.select2-selection').addClass('is-invalid');
+                }
+            },
+
+            unhighlight: function (element) {
+                const $el = $(element);
+                $el.removeClass('is-invalid');
+
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.next('.select2').find('.select2-selection').removeClass('is-invalid');
+                }
+            }
+        });
+    }
+
+    function bindSaveHandlerOnce() {
+        $(document).off('click.save', '#btnSaveSchedule').on('click.save', '#btnSaveSchedule', function () {
+            const $form = $('#scheduleForm');
+
+            // recompute end before validation (so End_Time becomes filled)
+            recomputeEndTime();
+
+            if ($form.length && !$form.valid()) return;
+
+            if (state.isSaving) return;
+            state.isSaving = true;
+
+            const $btn = $('#btnSaveSchedule');
+            const originalText = $btn.text();
+            $btn.prop('disabled', true).text(originalText || 'Saving...');
+
+            if (!state.date) state.date = $('#schDate').val() || null;
+            if (!state.dateTo) state.dateTo = state.date;
+
+            state.startTime = $('#schStart').val() || state.startTime;
+            state.duration = normalizeDurationToMinutes($('#schDuration').val());
+            recomputeEndTime();
+
+            if (!state.vehicleId) {
+                const v = $('#vehicleDropdown').val();
+                if (v) state.vehicleId = v;
+            }
+            if (!state.chassisId) {
+                const c = $('#chassisDropdown').val();
+                if (c) state.chassisId = Number(c);
+            }
+
+            const scheduleData = {
+                Date: formatDateISO(state.date),
+                DateTo: formatDateISO(state.dateTo || state.date),
+                VehicleId: toNumber(state.vehicleId),
+                PlateNumber: state.plate ?? '',
+                Start_Time: ensureTimeWithSeconds(state.startTime),
+                End_Time: ensureTimeWithSeconds(state.endTime),
+                Duration: toNumber($('#schDuration').val()),
+                Description: $('#descriptionInput').val() ?? '',
+                Chassis: $('#chassisDropdown option:selected').text() || null,
+                Status: 44,
+                CustomerName: $('#CustomerName').val() ?? '',
+                VehicleTypeId: toNumber(state.vehicleType),
+                ChassisId: toNumber(state.chassisId),
+            };
+
+            const isEdit = $('#scheduleModal').data('mode') === 'edit';
+            const reservationId = $('#scheduleModal').data('reservationId');
+
+            const url = isEdit ? window.API_BASE.updateReservation : window.RazorVars.insertReservationUrl;
+            if (isEdit) scheduleData.Id = reservationId;
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                data: JSON.stringify(scheduleData),
+                success: function (res) {
+                    if (res?.isActive) {
+                        Swal.fire({
+                            title: window.RazorVars.warning,
+                            text: window.RazorVars.reservationAlreadyExist,
+                            icon: 'warning'
+                        });
+                        return;
+                    }
+
+                    if (res?.isSuccess) {
+                        Swal.fire({
+                            title: window.RazorVars.doneSuccessfully,
+                            text: window.RazorVars.reservationInserted,
+                            icon: 'success'
+                        }).then(() => location.reload());
+                        return;
+                    }
+
+                    Swal.fire('Error', 'Failed to insert reservation.', 'error');
+                },
+                error: function (xhr, _s, err) {
+                    console.error("Insert failed:", xhr?.responseText || err);
+                    Swal.fire('Error', 'Failed to insert reservation.', 'error');
+                },
+                complete: function () {
+                    state.isSaving = false;
+                    $btn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+    }
+
+    $(document).on('shown.bs.modal', '#scheduleModal', async function () {
+        bindEvents();
+
+        $('#schStart, #schDuration')
+            .prop('disabled', false)
+            .prop('readonly', false);
+
+        // End time should be calculated only
+        $('#schEnd').prop('readonly', true).on('keydown paste', (e) => e.preventDefault());
+
+        // init selects
+        initSelect2($('#vehicleDropdown'));
+        initSelect2($('#chassisDropdown'));
+        initSelect2($('#vehicleTypeDropdown'));
+
+        initValidation();
+
         try {
-            freeIntervals = JSON.parse($opt.attr('data-free-intervals') || '[]');
-        } catch {
-            freeIntervals = [];
+            await ensureFlatpickr();
+            initDatePicker();
+        } catch (e) {
+            console.error('flatpickr failed to load', e);
         }
 
-        const durationMin = normalizeDurationToMinutes($dur.val());
-        const allowedStarts = computeStartOptionsEnumerate(freeIntervals, durationMin, 5);
+        state.duration = normalizeDurationToMinutes($('#schDuration').val());
+        recomputeEndTime();
 
-        // enable start no matter what
-        setEnabled($start, true);
-
-        // init picker with restrictions if available
-        initStartTimepicker(
-            $start,
-            allowedStarts,
-            allowedStarts[0] || '08:00',
-            () => recomputeEnds($start, $dur, $ends)
-        );
-    }
-
-    function handleStartChange() {
-        const { $start, $dur, $ends } = getEls();
-
-        recomputeEnds($start, $dur, $ends);
-
-        if (($start.val() || '').trim()) {
-            setEnabled($dur, true);   // still readonly
-            setEnabled($ends, true);  // readonly
-        } else {
-            setEnabled($dur, false);
-            setEnabled($ends, false);
-        }
-    }
-
-    // --------- public opener (call this from anywhere) ----------
-    // openScheduleModal2({ durationMin: 60, jobText: "Job: X", allowedMin: 90, jobIndex: 2 })
-    window.openScheduleModal2 = function ({ durationMin, jobText, allowedMin, jobIndex } = {}) {
-        const el = document.querySelector(modalSel);
-        if (!el) {
-            console.error('Modal not found:', modalSel);
-            return;
-        }
-
-        const { $m, $date, $dur, $jobTag, $allowedTag } = getEls();
-
-        if (Number.isFinite(Number(jobIndex))) $m.find('#jobIndex2').val(jobIndex);
-
-        const dur = Number.isFinite(Number(durationMin)) ? Number(durationMin) : 30;
-        $dur.val(dur);
-
-        $jobTag.text(jobText || '');
-
-        // FIX #1: undefined -> 0
-        const allowed = Number.isFinite(Number(allowedMin)) ? Number(allowedMin) : 0;
-        $allowedTag.text(`Allowed: ${allowed}m`);
-
-        resetLockStepUI();
-
-        if (!$date.val()) {
-            $date.val(new Date().toISOString().slice(0, 10));
-        }
-
-        // show modal safely (NO backdrop error)
-        bootstrap.Modal.getOrCreateInstance(el).show();
-
-        // trigger API load -> enables technician
-        $date.trigger('change');
-    };
-
-    // --------- bind events when modal opens ----------
-    $(document).on('shown.bs.modal', modalSel, function () {
-        const { $date, $tech, $start, $dur } = getEls();
-
-        resetLockStepUI();
-
-        // default duration if not set from opener
-        if (!$dur.val()) $dur.val(30);
-
-        // default date today
-        if (!$date.val()) $date.val(new Date().toISOString().slice(0, 10));
-
-        // bind (no duplicates)
-        $date.off('.sched2').on('change.sched2', loadTechsByDate);
-        $tech.off('.sched2').on('change.sched2', handleTechChange);
-        $start.off('.sched2').on('change.sched2 input.sched2', handleStartChange);
-        $dur.off('.sched2').on('change.sched2 input.sched2', handleStartChange);
-
-        // kick flow
-        $date.trigger('change');
+        bindSaveHandlerOnce();
     });
 
-    // save click (simple required check)
-    $(document).off('click.sched2', '#btnSaveSchedule2').on('click.sched2', '#btnSaveSchedule2', function () {
-        const { $date, $tech, $start, $dur, $ends } = getEls();
-
-        const date = ($date.val() || '').trim();
-        const techId = ($tech.val() || '').trim();
-        const start = ($start.val() || '').trim();
-        const duration = normalizeDurationToMinutes($dur.val());
-        const ends = ($ends.val() || '').trim();
-
-        if (!date || !techId || !start || !duration || !ends) {
-            alert('Please fill required fields');
-            return;
+    $(document).ready(async function () {
+        ensureFlatpickrZIndexPatch();
+        try {
+            await ensureFlatpickr();
+        } catch (e) {
+            console.warn('flatpickr not available yet', e);
         }
-
-        // TODO: post your payload here
-
-        const el = document.querySelector(modalSel);
-        bootstrap.Modal.getInstance(el)?.hide();
     });
-
 })();
