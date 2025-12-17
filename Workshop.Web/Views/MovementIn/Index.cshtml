@@ -11,29 +11,8 @@
 <link href="~/js/literallycanvas/_assets/literallycanvas.css" rel="stylesheet" />
 <link href="~/smartadmin-5-styles/plugins/dynameter/css/jquery.dynameter.css" rel="stylesheet" />
 <link href="~/smartadmin-5-styles/plugins/dynameter/css/index.css" rel="stylesheet" />
-<!-- FilePond core CSS -->
 <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.min.css">
-
-<!-- Image preview plugin CSS (needed for previews to appear nicely) -->
 <link rel="stylesheet" href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
-
-<!-- FilePond core JS -->
-<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
-
-<!-- Validate file type plugin -->
-<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
-
-<!-- Image preview plugin -->
-<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
-
-<!-- (Recommended) Fix orientation from phone photos -->
-<script src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.min.js"></script>
-
-<!-- IMPORTANT: crop depends on image-transform -->
-<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
-
-<!-- Image crop plugin -->
-<script src="https://unpkg.com/filepond-plugin-image-crop/dist/filepond-plugin-image-crop.min.js"></script>
 
 <style>
     /* === SCRATCH CANVAS + CURSORS === */
@@ -200,7 +179,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>@Common["Label_MovementDate"]</label>
-                                        @Html.TextBoxFor(model => model.GregorianMovementDate, "{0:yyyy-MM-dd}", new { @class = "form-control  flat-picker-future", type = "text", id = "GregorianMovementDate" })
+                                        @Html.TextBoxFor(model => model.GregorianMovementDate, "{0:yyyy-MM-dd}", new { @class = "form-control  flat-picker-movement", type = "text", id = "GregorianMovementDate" })
                                         <label id="GregorianMovementDate-error" class="error" for="GregorianMovementDate"></label>
                                     </div>
                                 </div>
@@ -261,7 +240,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="font-bold">@Common["Label_Upload"]&nbsp;<span class="text-warning font-normal"> @Common["Label_AllowedExtensions"]: pdf, png , jpeg</span></label>
-                                    <input type="file" id="Uploadfile" name="filepondfordoc" />
+                                    <input type="file" id="Uploadfile" name="filepondfordoc" accept="image/*,application/pdf" />
                                 </div>
                             </div>
                         </div>
@@ -413,10 +392,14 @@
 <input type="hidden" id="VehicleTypeFromReservation"
        value="@ViewBag.FromReservationVehicleTypeId" />
 
-
-<!-- Vendor scripts -->
 <script src="~/js/site.js"></script>
 <script src="~/smartadmin-5-styles/plugins/dynameter/js/jquery.dynameter.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-crop/dist/filepond-plugin-image-crop.min.js"></script>
 
 <script>
     window.RazorVars = {
