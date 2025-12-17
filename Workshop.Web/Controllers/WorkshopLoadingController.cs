@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Domain.Enum;
 using Workshop.Web.Models;
@@ -11,7 +12,7 @@ namespace Workshop.Web.Controllers
     public class WorkshopLoadingController : BaseController
     {
         private readonly WorkshopApiClient _apiclient;
-        public WorkshopLoadingController(WorkshopApiClient apiclient, IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+        public WorkshopLoadingController(WorkshopApiClient apiclient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             this._apiclient = apiclient;
         }

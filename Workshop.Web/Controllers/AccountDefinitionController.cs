@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using NPOI.Util;
 using System.Threading.Tasks;
 using Workshop.Core.DTOs;
@@ -20,8 +21,8 @@ namespace Workshop.Web.Controllers
         public readonly string lang;
 
 
-        public AccountDefinitionController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient apiClient, AccountingApiClient accountingApiClient)
-            : base(configuration, env)
+        public AccountDefinitionController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient apiClient, AccountingApiClient accountingApiClient, IMemoryCache cache)
+            : base(cache, configuration, env)
         {
             _configuration = configuration;
             _env = env;

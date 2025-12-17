@@ -1,6 +1,7 @@
 ﻿// Controllers/AllowedTimesController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
 using Workshop.Web.Models;
@@ -16,7 +17,7 @@ namespace Workshop.Web.Controllers
         private readonly string lang;
 
         public AllowedTimeController(WorkshopApiClient apiClient, VehicleApiClient vehicleApiClient, 
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _vehicleApiClient = vehicleApiClient;

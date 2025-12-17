@@ -260,6 +260,12 @@ namespace Workshop.Web.Services
                 return null;
             }
         }
+        public async Task<List<User>> Get_UsersByCompanyId(int companyId)
+        {
+            string url = $"/Users/Company_Users_Get?CompanyId={companyId}";
+            return await SendRequest<List<User>>(url, HttpMethod.Get);
+
+        }
 
     }
 }

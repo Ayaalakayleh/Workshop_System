@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Quartz;
 using Quartz.Impl;
 using System.Collections.Specialized;
@@ -32,7 +33,7 @@ namespace Workshop.Web.Controllers
         };
 
         public TechnicianDashboardController(WorkshopApiClient apiClient, IRecurringJobManager recurringJobManager,
-            IBackgroundJobClient backgroundJobClient, IConfiguration configuration, ILogger<TechnicianDashboardController> logger, IWebHostEnvironment env) : base(configuration, env)
+            IBackgroundJobClient backgroundJobClient, IConfiguration configuration, ILogger<TechnicianDashboardController> logger, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));

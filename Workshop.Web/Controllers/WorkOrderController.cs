@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Workshop.Core.DTOs;
@@ -21,7 +22,7 @@ namespace Workshop.Web.Controllers
         //private readonly IWebHostEnvironment _env;
 
         public readonly string lang;
-        public WorkOrderController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, IConfiguration configuration, IWebHostEnvironment env, VehicleApiClient vehicleApiClient) : base(configuration, env)
+        public WorkOrderController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, IConfiguration configuration, IWebHostEnvironment env, VehicleApiClient vehicleApiClient, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _vehicleApiClient = vehicleApiClient;

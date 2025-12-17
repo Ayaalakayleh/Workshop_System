@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
 
@@ -12,7 +13,7 @@ namespace Workshop.Web.Controllers
         public readonly string lang;
 
         public QuickAccessController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, 
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;

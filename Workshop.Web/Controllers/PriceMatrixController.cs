@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Domain.Enum;
 using Workshop.Web.Models;
@@ -16,7 +17,7 @@ namespace Workshop.Web.Controllers
         private readonly VehicleApiClient _vehicleApiClient;
         private readonly string lang;
         public PriceMatrixController(AccountingApiClient accountingApiClient, WorkshopApiClient apiClient, 
-            VehicleApiClient vehicleApiClient, IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            VehicleApiClient vehicleApiClient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _accountingApiClient = accountingApiClient;
             _apiClient = apiClient;

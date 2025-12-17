@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Workshop.Web.Controllers
         private static readonly string INDEX_PAGE = "Index";
         public readonly string lang;
 
-        public TeamsController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient teamsService) : base(configuration, env)
+        public TeamsController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient teamsService, IMemoryCache cache) : base(cache, configuration, env)
         {
             _configuration = configuration;
             _env = env;

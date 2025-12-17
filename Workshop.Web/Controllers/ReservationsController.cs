@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.General;
 using Workshop.Core.DTOs.Vehicle;
@@ -23,7 +24,7 @@ namespace Workshop.Web.Controllers
         private readonly string lang; 
 
         public ReservationsController(VehicleApiClient vehicleApiClient, WorkshopApiClient workshopApiClient,
-            ERPApiClient eRPApiClient, AccountingApiClient accountingApiClient, IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            ERPApiClient eRPApiClient, AccountingApiClient accountingApiClient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache,configuration, env)
         {
             _vehicleApiClient = vehicleApiClient;
             _workshopapiClient = workshopApiClient;
@@ -42,9 +43,28 @@ namespace Workshop.Web.Controllers
             //    Text = lang == "ar" ? t.SecondaryName : t.PrimaryName
             //}).ToList();
 
+            var cacheKey = string.Format(CacheKeys.Users, CompanyId);
 
+            if (!cache.TryGetValue(cacheKey, out List<User> users))
+            {
+                users = await _eRPApiClient.Get_UsersByCompanyId(CompanyId);
+
+                cache.Set(
+                    cacheKey,
+                    users,
+                    TimeSpan.FromHours(24)
+                );
+            }
+
+            ViewBag.Users = users;
             var filter = new ReservationFilterDTO();
             var reservations = await _workshopapiClient.GetAllReservationsAsync(filter);
+            foreach (var r in reservations)
+            {
+                r.UserName = users
+                    .FirstOrDefault(u => u.UserID == r.CreatedBy)
+                    ?.Name;
+            }
             ViewBag.Reservaions = reservations;
 
 

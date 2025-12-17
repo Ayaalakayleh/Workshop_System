@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.AccountingDTOs;
@@ -40,7 +41,7 @@ namespace Workshop.Controllers
             IFileService fileService,
             IFileValidationService fileValidationService,
             ILogger<TechnicianDashboardController> logger,
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _workshopApiClient = workshopApiClient;
             _accountingApiClient = accountingApiClient;

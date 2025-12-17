@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
@@ -12,7 +13,7 @@ namespace Workshop.Web.Controllers
         WorkshopApiClient _apiClient;
         public readonly string lang;
         public ClockingController(WorkshopApiClient apiClient, 
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
 
             _apiClient = apiClient;
