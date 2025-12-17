@@ -35,12 +35,12 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.Reservations.View)]
         public async Task<IActionResult> Index()
         {
-            var technicians = await _workshopapiClient.GetTechniciansDDL(BranchId);
-            ViewBag.Technicians = technicians.Select(t => new SelectListItem
-            {
-                Value = t.Id.ToString(),
-                Text = lang == "ar" ? t.SecondaryName : t.PrimaryName
-            }).ToList();
+            //var technicians = await _workshopapiClient.GetTechniciansDDL(BranchId);
+            //ViewBag.Technicians = technicians.Select(t => new SelectListItem
+            //{
+            //    Value = t.Id.ToString(),
+            //    Text = lang == "ar" ? t.SecondaryName : t.PrimaryName
+            //}).ToList();
 
 
             var filter = new ReservationFilterDTO();
@@ -48,8 +48,12 @@ namespace Workshop.Web.Controllers
             ViewBag.Reservaions = reservations;
 
 
-            List<VehicleNams> vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
-            ViewBag.Vehicles = new SelectList(vehicleNams, "id", "VehicleName");
+            var internalVehicles = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+            var externalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
+
+            // Pass raw data to view for JavaScript
+            ViewBag.InternalVehicles = internalVehicles;
+            ViewBag.ExternalVehicles = externalVehicles;
 
             return View();
         }
