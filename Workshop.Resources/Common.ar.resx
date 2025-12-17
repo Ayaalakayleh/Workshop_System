@@ -2379,4 +2379,10 @@
   <data name="Label_Ended At" xml:space="preserve">
     <value>انتهى عند</value>
   </data>
+  <data name="Label_Item" xml:space="preserve">
+    <value>المادة</value>
+  </data>
+  <data name="Label_Items" xml:space="preserve">
+    <value>المواد</value>
+  </data>
 </root>

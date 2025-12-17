@@ -77,7 +77,6 @@
         <div class="panel-container show">
             <div class="panel-content text-start">
 
-                <!-- 🔍 Filters section -->
                 <div class="row">
                     <div class="col-md-3">
                         <label class="form-label">@Common["Label_FromDate"]</label>
@@ -105,8 +104,8 @@
 
                 </div>
                 <div class="text-center mt-3">
-                    <button class="btn btn-primary" id="btnSearch"><i class="fad fa-search"></i>@Common["Button_Search"]</button>
-                    <button class="btn btn-secondary" type="reset" id="btnReset"><i class="fas fa-times"></i>@Common["Button_Reset"]</button>
+                    <button class="btn btn-primary" id="btnSearch"><i class="fad fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                    <button class="btn btn-secondary" type="reset" id="btnReset"><i class="fas fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
                 </div>
                 <div id="reservationsTableContainer" class="mt-2">
                     @Html.Partial("_ReservationsTablePartial", ViewBag.Reservaions as IEnumerable<Workshop.Core.DTOs.ReservationListItemDTO>)

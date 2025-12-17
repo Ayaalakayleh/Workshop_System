@@ -14,15 +14,21 @@ var shapesJson = [];
    FilePond plugin register (safe)
 ================================================== */
 if (window.FilePond) {
-    try {
-        const regs = [
-            window.FilePondPluginImagePreview,
-            window.FilePondPluginFileValidateType,
-            window.FilePondPluginImageCrop
-        ].filter(Boolean);
-        if (regs.length) FilePond.registerPlugin.apply(FilePond, regs);
-    } catch (e) { /* ignore */ }
+    const plugins = [];
+
+    if (window.FilePondPluginFileValidateType) plugins.push(window.FilePondPluginFileValidateType);
+    if (window.FilePondPluginImagePreview) plugins.push(window.FilePondPluginImagePreview);
+    if (window.FilePondPluginImageExifOrientation) plugins.push(window.FilePondPluginImageExifOrientation);
+
+    // Crop needs Transform. Only register crop if transform exists.
+    if (window.FilePondPluginImageTransform) plugins.push(window.FilePondPluginImageTransform);
+    if (window.FilePondPluginImageCrop && window.FilePondPluginImageTransform) {
+        plugins.push(window.FilePondPluginImageCrop);
+    }
+
+    FilePond.registerPlugin(...plugins);
 }
+
 
 /* ==================================================
    Ready
