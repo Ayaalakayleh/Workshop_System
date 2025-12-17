@@ -2376,4 +2376,7 @@
   <data name="Label_IsResigned" xml:space="preserve">
     <value>هل استقال؟</value>
   </data>
+  <data name="Label_Ended At" xml:space="preserve">
+    <value>انتهى عند</value>
+  </data>
 </root>

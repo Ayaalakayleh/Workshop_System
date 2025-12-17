@@ -216,6 +216,7 @@
 										<th>@Common["Label_Description"]</th>
 										<th>@Common["Label_Period"]</th>
 										<th>@Common["Label_Started At"]</th>
+										<th>@Common["Label_Ended At"]</th>
 										<th>@Common["Label_Breaks"]</th>
 										<th>@Common["Button_Logs"]</th>
 									</tr>
@@ -230,14 +231,18 @@
 												<td>@item.WIPName</td>
 												<td>
 													<span class="rts-ellipsis"
-														  data-fulltext="@item.RTSName">
+														data-fulltext="@item.RTSName">
 														@item.RTSName
 													</span>
 												</td>
 
-
-												<td class="elapsed">@item.Elapsed</td>
-												<td>@(item.StartedAt?.ToString("yyyy-MM-dd"))</td>
+												<td class="elapsed">
+													@(item.Elapsed.HasValue
+													? $"{(int)item.Elapsed.Value.TotalHours:00}:{item.Elapsed.Value.Minutes:00}:{item.Elapsed.Value.Seconds:00}"
+													: "")
+												</td>
+												<td>@(item.StartedAt?.ToString("yyyy-MM-dd HH:mm"))</td>
+												<td>@(item.EndedAt?.ToString("yyyy-MM-dd HH:mm"))</td>
 												<td>@item.ClockingBreaksLogs?.Count()</td>
 												<td>
 													<button type="button" class="btn btn-secondary" onclick="return ShowLogs(this, @item.ID)">

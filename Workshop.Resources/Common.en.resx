@@ -2376,4 +2376,7 @@
   <data name="Label_IsResigned" xml:space="preserve">
     <value>Is Resigned</value>
   </data>
+  <data name="Label_Ended At" xml:space="preserve">
+    <value>Ended At</value>
+  </data>
 </root>

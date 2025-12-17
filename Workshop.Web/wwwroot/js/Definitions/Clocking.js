@@ -364,6 +364,18 @@ function TechnicianChange(controlItem) {
     });
 }
 // Logs modal: i18n + date-only
+function formatDateTime(value) {
+    if (!value) return '';
+
+    const d = value instanceof Date ? value : new Date(value);
+    if (isNaN(d)) return '';
+
+    const pad = n => String(n).padStart(2, '0');
+
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+        `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
 function ShowLogs(item, ID) {
     $('#breakLogsContainer').html(`<p class="text-muted">${(window.resources && window.resources.loading) || 'Loading...'}</p>`);
 
@@ -392,6 +404,7 @@ function ShowLogs(item, ID) {
                 data.forEach(breakLog => {
                     const s = breakLog.startAt ? new Date(breakLog.startAt) : null;
                     const e = breakLog.endAt ? new Date(breakLog.endAt) : null;
+
                     const diffMs = (s && e) ? (e - s) : NaN;
                     const diffMinutes = isNaN(diffMs) ? null : Math.floor(diffMs / 60000);
                     const period = diffMinutes == null ? '' :
@@ -399,20 +412,18 @@ function ShowLogs(item, ID) {
                             ? `${Math.floor(diffMinutes / 60)}h ${diffMinutes % 60}m`
                             : `${diffMinutes}m`);
 
-                    const sD = s ? s.toLocaleDateString() : '';
-                    const eD = e ? e.toLocaleDateString() : '';
-
                     html += `
-            <tr>
-              <td>${breakLog.id ?? ''}</td>
-              <td>${breakLog.reasonString ?? ''}</td>
-              <td>${breakLog.note ?? ''}</td>
-              <td>${period}</td>
-              <td>${sD}</td>
-              <td>${eD}</td>
-            </tr>
-          `;
+        <tr>
+          <td>${breakLog.id ?? ''}</td>
+          <td>${breakLog.reasonString ?? ''}</td>
+          <td>${breakLog.note ?? ''}</td>
+          <td>${period}</td>
+          <td>${formatDateTime(s)}</td>
+          <td>${formatDateTime(e)}</td>
+        </tr>
+    `;
                 });
+
 
                 html += '</tbody></table>';
                 $('#breakLogsContainer').html(html);
@@ -429,6 +440,7 @@ function ShowLogs(item, ID) {
     modal.show();
     return true;
 }
+
 
 function setBreak(item, status) {
     // Set status
@@ -479,15 +491,15 @@ function getDuration(start, end) {
 
 
 
-    function parseDateSafe(v) {
-        if (!v) return null;
-        // Try standard ISO, or replace space with T for common MVC formats
-        var d = new Date(v);
-        if (isNaN(d)) {
-            d = new Date(String(v).replace(' ', 'T'));
-        }
-        return isNaN(d) ? null : d;
+function parseDateSafe(v) {
+    if (!v) return null;
+    // Try standard ISO, or replace space with T for common MVC formats
+    var d = new Date(v);
+    if (isNaN(d)) {
+        d = new Date(String(v).replace(' ', 'T'));
     }
+    return isNaN(d) ? null : d;
+}
 // Make sure this runs after the DOM is ready
 $(function () {
     $('.the-parent').hover(
