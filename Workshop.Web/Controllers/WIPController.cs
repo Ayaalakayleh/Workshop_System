@@ -127,6 +127,13 @@ namespace Workshop.Web.Controllers
         {
             try
             {
+                //var user = await _erpApiClient.GetUserInfoById(UserId);
+
+                //var first = user?.FirstName?.Trim();
+                //var last = user?.LastName?.Trim();
+
+                //string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
+
                 var isCompanyCenterialized = 1;
                 WIPDTO dto = new WIPDTO();
                 VehicleMovement movement = new VehicleMovement();
@@ -155,7 +162,13 @@ namespace Workshop.Web.Controllers
                         movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
                         if (movement != null)
                         {
-                            ViewBag.CreatingOperator = movement.CreatedBy;
+                            var user = await _erpApiClient.GetUserInfoById((int)movement.CreatedBy);
+
+                            var first = user?.FirstName?.Trim();
+                            var last = user?.LastName?.Trim();
+
+                            string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                            ViewBag.CreatingOperator = userFullName;
                             ViewBag.DueInDate = movement.CreatedAt?.ToString("dd-MM-yyyy");
                         }
                     }

@@ -14,6 +14,30 @@
 	ViewData["WIPId"] = Model.Id;
 	var AddDiscount = PermissionHelper.UserHasPermission(Permissions.WIP.AddDiscount);
 }
+@{
+	var userInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.User>(Context.Session.GetString("UserInfo"));
+}
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel p-3">
+			<div class="text-start px-3 py-2">
+				<div class="fw-semibold">
+					<i class="fad fa-wrench me-2"></i>
+					@Common["Hi"],
+					@userInfo?.FirstName @userInfo?.LastName
+				</div>
+
+			</div>
+
+			<div class="px-3 pb-2">
+				@Model.VehicleTab.PlateNumber
+			</div>
+		</div>
+	</div>
+</div>
+
+
 <div class="row">
     <div class="col-12">
         <div id="panel-1" class="panel">

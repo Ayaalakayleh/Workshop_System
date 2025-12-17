@@ -46,12 +46,13 @@ namespace Workshop.Web.Controllers
         }
 
         [CustomAuthorize(Permissions.MovementIn.View)]
-        public async Task<IActionResult> Index(int? vehicleId)
+        public async Task<IActionResult> Index(int? vehicleId, int? vehicleTypeId)
         {
 
             ViewBag.Makes = await GetMakes();
             ViewBag.SubStatuses = await GetSubStatuses();
             ViewBag.FromReservationVehicleId = vehicleId ?? 0;
+            ViewBag.FromReservationVehicleTypeId = vehicleTypeId ?? 0;
             return View(new VehicleMovement());
 
         }

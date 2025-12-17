@@ -610,7 +610,10 @@ function GetVehicleData(vehicleId) {
     $('.MaintenanceDesc').val("");
     $('#WorkOrderId').html("");
     $('input[name="MaintenanceDesc"]').val("");
-    Etype = $("#VehicleTypeId").val();
+    let reservationType = Number($("#VehicleTypeFromReservation").val() || 0);
+    Etype = reservationType > 0
+        ? reservationType
+        : Number($("#VehicleTypeId").val());
 
     if (Etype == 2) { $('input[type="radio"][value="option2"][id="Type"]').prop('disabled', true); }
 
@@ -692,7 +695,7 @@ function getVehicleWorkOrders(vehicleId, type, external) {
         WorkOrdersList = [];
         $.ajax({
             type: 'GET',
-            url: RazorVars.vehicleWorkOrderListUrl + '?id=' + vehicleId + '&type=' + type + '&isExternal=' + (external != 1),
+            url: RazorVars.vehicleWorkOrderListUrl + '?id=' + vehicleId + '&type=' + type + '&isExternal=' + external,
             dataType: 'json'
         }).done(function (result) {
             WorkOrdersList = result || [];

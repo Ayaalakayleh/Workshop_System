@@ -242,5 +242,24 @@ namespace Workshop.Web.Services
             return await SendRequest<List<ModulesDTO>>(url, HttpMethod.Get);
         }
 
+        public async Task<User?> GetUserInfoById(int Id)
+        {
+            try
+            {
+                // Build request
+                string url = $"/Users/GetUserInfoById?Id={Id}";
+                return await SendRequest<User>(url, HttpMethod.Get);
+
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex,
+                //    "Error in GetUserPermission (userId={userId}, moduleId={moduleId}, companyId={companyId}, branchId={branchId})",
+                //    userId, moduleId, companyId, branchId);
+
+                return null;
+            }
+        }
+
     }
 }
