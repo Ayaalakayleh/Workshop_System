@@ -64,10 +64,10 @@
                                 </div>
 
                                 <div class="col-lg-4 col-md-6 col-sm-12">
-<div class="form-check form-switch mt-5">
-    @Html.CheckBox("IsActive", true, new { @class = "form-check-input", id = "customSwitch1" })
-    @Html.LabelFor(m => m.IsActive, (string)Common["Label_IsActive"], new { @class = "form-check-label", @for = "customSwitch1" })
-</div>
+                                <div class="form-check form-switch mt-5">
+                                @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input", id = "customSwitch1" })
+                                @Html.LabelFor(m => m.IsActive, (string)Common["Label_IsActive"], new { @class = "form-check-label", @for = "customSwitch1" })
+                                </div>
 
                                 </div>
                             </div>
