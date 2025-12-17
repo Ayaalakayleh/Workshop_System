@@ -604,8 +604,7 @@
                         //$('#VehClass').val(result.vehicleClassPrimaryName);
                         //$('#VehYear').val(result.manufacturingYear);
                         //$('#Color').val(result.color);
-                        $('#VehVIN').val(result.chassisNo);
-
+                        //$('#VehVIN').val(result.chassisNo);
                         $('#VehServiceDesc').val(result.vehServiceDesc);
                         $('#VehConcerns').val(result.vehConcerns);
                         $('#VehAdvisorNotes').val(result.vehAdvisorNotes);
