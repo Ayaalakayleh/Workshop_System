@@ -54,7 +54,7 @@
                         else if (item.Status == (int)ReservationStatus.Booked)
                         {
                             hasAction = true;
-                            <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId })"
+                            <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId, vehicleTypeId = item.vehicleTypeId })"
                                class="btn btn-sm btn-success reservations-button my-1"
                                title="@Common["Label_MovementIn"]">
                                 <i class="fad fa-clipboard-list"></i>&nbsp;@Common["Label_MovementIn"]
