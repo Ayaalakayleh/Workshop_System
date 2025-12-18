@@ -170,7 +170,7 @@ namespace Workshop.Web.Controllers
 
                             string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
                             ViewBag.CreatingOperator = userFullName;
-                            ViewBag.DueInDate = movement.CreatedAt?.ToString("dd-MM-yyyy");
+                            ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
                         }
                     }
 
