@@ -62,6 +62,7 @@ $(function () {
                 caption: LABELS.Model || "Model",
                 allowEditing: true,
                 validationRules: [{ type: "required", message: VALIDATION.Required || "Required" }],
+                setCellValue(rowData, value) { rowData.ModelID = value; },
                 lookup: {
                     dataSource(options) {
                         const store = (typeof Vehicle !== "undefined" && Vehicle) ? Vehicle : [];
@@ -79,13 +80,41 @@ $(function () {
                 caption: LABELS.Chassis || "Chassis",
                 allowEditing: true,
                 validationRules: [{ type: "required", message: VALIDATION.Required || "Required" }],
-                setCellValue(rowData, value) { rowData.Chassis = value; },
+                setCellValue(rowData, value) {
+                    rowData.Chassis = value;
+                    if (value && typeof Chasses !== "undefined" && Chasses) {
+                        const chassisObj = Chasses.find(ch => ch.ChassisNo === value);
+                        if (chassisObj && typeof MakeID !== "undefined" && MakeID && typeof Vehicle !== "undefined" && Vehicle) {
+                            const make = MakeID.find(m => m.Text?.toLowerCase() === chassisObj.ManufacturerName?.toLowerCase());
+                            if (make) {
+                                rowData.MakeID = make.Value;
+                                const model = Vehicle.find(v => v.Name?.toLowerCase() === chassisObj.ModelName?.toLowerCase() && v.ManufacturerId == make.Value);
+                                if (model) {
+                                    rowData.ModelID = model.Id;
+                                }
+                            }
+                        }
+                    }
+                },
                   lookup: {
-                    dataSource: (typeof Chasses !== "undefined" && Chasses) ? Chasses : [],
+                    dataSource(options) {
+                        const store = (typeof Chasses !== "undefined" && Chasses) ? Chasses : [];
+                        if (!options?.data?.MakeID || !options?.data?.ModelID) {
+                            return { store };
+                        }
+                        const make = (typeof MakeID !== "undefined" && MakeID) ? MakeID.find(m => m.Value == options.data.MakeID) : null;
+                        if (!make) return { store };
+                        const model = (typeof Vehicle !== "undefined" && Vehicle) ? Vehicle.find(v => v.Id == options.data.ModelID) : null;
+                        if (!model) return { store };
+                        return {
+                            store,
+                            filter: [['ManufacturerName', '=', make.Text], 'and', ['ModelName', '=', model.Name]]
+                        };
+                    },
                       valueExpr: 'ChassisNo',
                       displayExpr: 'ChassisNo'
                 }
-                
+
             },
             {
                 caption: LABELS.Action || "Action",
@@ -137,6 +166,15 @@ $(function () {
                 colStart++;
             });
 
+            // Check if grid is empty, add dummy row if so
+            let data = e.component.getDataSource().items();
+            const originalLength = data.length;
+            let addedDummy = false;
+            if (originalLength === 0) {
+                addedDummy = true;
+                data.push({ Id: counter--, MakeID: null, ModelID: null, Chassis: '' });
+            }
+
             DevExpress.excelExporter.exportDataGrid({
                 worksheet: worksheet,
                 component: e.component,
@@ -150,6 +188,10 @@ $(function () {
                     }
                 }
             }).then(function () {
+                // Remove dummy row if added
+                if (addedDummy && data.length > originalLength) {
+                    data.pop();
+                }
                 workbook.xlsx.writeBuffer().then(function (buffer) {
                     saveAs(new Blob([buffer], { type: "application/octet-stream" }), "Vehicles.xlsx");
                 });

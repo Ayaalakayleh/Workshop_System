@@ -266,9 +266,9 @@ namespace Workshop.Web.Controllers
             var WIPSchedules = await _apiClient.GetClockingFilter();
 
             var bServiceIds = services
-    .Where(s => s?.StatusCode == "B")
-    .Select(s => s?.Id)
-    .ToHashSet();
+                .Where(s => s?.Status == 19)
+                .Select(s => s?.Id)
+                .ToHashSet();
 
             var serviceList = WIPSchedules?
                 .Where(s => s.WIPId == WIPId && bServiceIds.Contains(s.RTSId ?? 0))
