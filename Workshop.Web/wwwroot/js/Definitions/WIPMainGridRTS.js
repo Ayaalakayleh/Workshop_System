@@ -345,19 +345,25 @@ function updateTotalLabourFieldsFromGrid() {
 
     let totalAfterDiscount = 0;
     let totalDiscountAmount = 0;
-    debugger
+    let totalTaxAmount = 0;
+
     rows.forEach(r => {
         const d = r.data || {};
         const rate = parseFloat(d.Rate) || 0;
-        debugger
         const hours = parseFloat(d.StandardHours) || 0;
         const pct = parseFloat(d.Discount) || 0;
+        const tax = parseFloat(d.Tax) || 0;
 
         const lineBase = rate * hours;
+
         const lineDisc = lineBase * (pct / 100);
-        const lineTotal = lineBase - lineDisc;
+
+        const lineAfterDiscount = lineBase - lineDisc;
+
+        const lineTotal = lineAfterDiscount + tax;
 
         totalDiscountAmount += lineDisc;
+        totalTaxAmount += tax;
         totalAfterDiscount += lineTotal;
 
         d.Total = +lineTotal.toFixed(2);
@@ -365,7 +371,10 @@ function updateTotalLabourFieldsFromGrid() {
 
     $("#totLabour").text("SAR " + totalAfterDiscount.toFixed(2));
     setAmount("#totLabour", totalAfterDiscount);
+
     $("#TotalDiscountsLabour").text("SAR " + totalDiscountAmount.toFixed(2));
+    $("#TotalTaxLabour").text("SAR " + totalTaxAmount.toFixed(2)); 
+
     updateSubtotal();
 }
 
@@ -830,8 +839,9 @@ function ensureDiscountedRate(rowData) {
     }
 
     const discounted = base - (base * (discount / 100));
-    rowData.Rate = +discounted.toFixed(2);
-    return rowData.Rate;
+    //rowData.Rate = +discounted.toFixed(2);
+    //return rowData.Rate;
+    return discounted;
 }
 
 $("#Vat").on("change", function () {

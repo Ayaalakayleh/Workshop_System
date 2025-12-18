@@ -507,10 +507,13 @@ namespace Workshop.Web.Controllers
                             }).ToList();
                         }
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
+                        var status = "No Agreement";
                         if (activeAgreement.AgreementId > 0)
                         {
-                            ViewBag.AgreementStatus = "Open";
+                            status = "Open";
                         }
+
+                        ViewBag.AgreementStatus = status;
                     }
                 }
                 catch (Exception ex)
