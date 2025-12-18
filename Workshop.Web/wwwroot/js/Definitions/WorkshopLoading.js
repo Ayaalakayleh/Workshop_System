@@ -1143,7 +1143,7 @@ function GetServicesById(id, lang) {
                 rts: value.code,
                 duration: value.standardHours * 60,
                 title: value.description,
-                allowed: value.allowed,
+                allowed: value.standardHours,
                 wipid: value.wipId,
                 rtsid: value.id
             });
@@ -1167,7 +1167,7 @@ function FetchServicesByIdReturnArray(id, lang) {
                 rts: value.code,
                 duration: value.standardHours * 60,
                 title: value.description,
-                allowed: value.allowed,
+                allowed: value.standardHours,
                 wipid: value.wipId,
                 rtsid: value.id
             });
@@ -1341,9 +1341,9 @@ function renderJobsInGroupModal(jobs) {
         left.innerHTML = `
       <div class="fw-semibold">${job.ro} — <span class="text-info">${job.rts}</span></div>
       <div class="small text-muted">${job.title}</div>
-      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${(job.allowed ?? 0)}m</div>
+      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${(job.allowed ?? 0)}h</div>
     `;
-
+  
         const btns = document.createElement("div");
         btns.className = "d-flex gap-2";
 

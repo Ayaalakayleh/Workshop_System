@@ -170,7 +170,7 @@ namespace Workshop.Web.Controllers
 
                             string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
                             ViewBag.CreatingOperator = userFullName;
-                            ViewBag.DueInDate = movement.CreatedAt?.ToString("dd-MM-yyyy");
+                            ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
                         }
                     }
 
@@ -507,10 +507,13 @@ namespace Workshop.Web.Controllers
                             }).ToList();
                         }
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
+                        var status = "No Agreement";
                         if (activeAgreement.AgreementId > 0)
                         {
-                            ViewBag.AgreementStatus = "Open";
+                            status = "Open";
                         }
+
+                        ViewBag.AgreementStatus = status;
                     }
                 }
                 catch (Exception ex)
