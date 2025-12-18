@@ -129,6 +129,8 @@ namespace Workshop.Core.DTOs.General
         public string CustomerName { set; get; }
         public int? LeaseCustomerId { get; set; }
         public Reservation refReservation { get; set; }
+        public int? AgreementStatusId { get; set; }
+        public int? VehicleDefinitionId { get; set; }
 
     }
 

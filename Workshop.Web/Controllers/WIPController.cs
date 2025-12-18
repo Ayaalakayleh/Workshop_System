@@ -505,6 +505,11 @@ namespace Workshop.Web.Controllers
                                 Text = s.CustomerName
                             }).ToList();
                         }
+                        var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
+                        if (activeAgreement.AgreementId > 0)
+                        {
+                            ViewBag.AgreementStatus = "Open";
+                        }
                     }
                 }
                 catch (Exception ex)

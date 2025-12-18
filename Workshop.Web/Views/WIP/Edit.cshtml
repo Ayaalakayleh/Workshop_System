@@ -18,20 +18,53 @@
 	var userInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.User>(Context.Session.GetString("UserInfo"));
 }
 
+<style>
+	.Header{
+		display: flex;
+		align-content: space-around;
+		flex-wrap: wrap;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-around;
+	}
+
+	.statusContainer {
+		min-width: 200px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.agreementStatus {
+		width: 100px;
+		background: #7a59ad;
+		color: #fff;
+		text-align: center;
+		border-radius: 25px;
+		padding: 5px;
+	}
+</style>
+
 <div class="row">
 	<div class="col-12">
-		<div id="panel-1" class="panel p-3">
-			<div class="d-flex justify-content-between">
+		<div id="panel-1" class="panel p-3 ">
+			<div class="d-flex justify-content-between Header">
 				<div class="text-start px-3 py-2">
 					<div class="fw-semibold">
 						<i class="fad fa-wrench me-2"></i>
 						@Common["Hi"],
 						@userInfo?.FirstName @userInfo?.LastName
 					</div>
-
 				</div>
-				<strong>@Model.VehicleTab.PlateNumber</strong>
-				<div>&nbsp;</div>
+				<div>
+					<div>@Model.VehicleTab.PlateNumber / @Model.VehicleTab.ChassisNo</div>
+				</div>
+				<div class="statusContainer">
+					<label>
+						Agreement:
+					</label>
+					<div class="agreementStatus">@ViewBag.AgreementStatus</div>
+				</div>
 			</div>
 
 		</div>
