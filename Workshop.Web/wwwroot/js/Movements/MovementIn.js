@@ -719,7 +719,7 @@
             dataType: "JSON"
         }).done(function (Data) {
 
-            $("#ReceivedMeter").val(Data.CurrentMeter + 1);
+            $("#ReceivedMeter").val(Data.CurrentMeter);
             $("#VehicleOdoMeter").val(Data.CurrentMeter);
             $("#VehicleManufacturer").text(Data.RefManufacturers.ManufacturerPrimaryName);
             $("#VehicleClass").text(Data.RefVehicleClasses.VehicleClassPrimaryName);
