@@ -79,12 +79,13 @@ $(function () {
                 caption: LABELS.Chassis || "Chassis",
                 allowEditing: true,
                 validationRules: [{ type: "required", message: VALIDATION.Required || "Required" }],
-                editorType: "dxTextBox",
-                editorOptions: {
-                    mode: "text",
-                    placeholder: LABELS.ChassisPlaceholder || ""
-                },
-                setCellValue(rowData, value) { rowData.Chassis = value; }
+                setCellValue(rowData, value) { rowData.Chassis = value; },
+                  lookup: {
+                    dataSource: (typeof Chasses !== "undefined" && Chasses) ? Chasses : [],
+                      valueExpr: 'ChassisNo',
+                      displayExpr: 'ChassisNo'
+                }
+                
             },
             {
                 caption: LABELS.Action || "Action",
