@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 using Workshop.Core.DTOs.TempData;
 using Workshop.Core.DTOs.Vehicle;
@@ -17,7 +18,7 @@ namespace Workshop.Controllers
         private readonly string lang;
 
         public VehicleDefinitionController(VehicleApiClient vehicleApiClient, ERPApiClient eRPApiClient, AccountingApiClient accountingApiClient, 
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _vehicleApiClient = vehicleApiClient;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;

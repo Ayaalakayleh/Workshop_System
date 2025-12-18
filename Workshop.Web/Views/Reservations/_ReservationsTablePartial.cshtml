@@ -31,7 +31,7 @@
                     <td>@item.Start_Time.ToString(@"hh\:mm") - @item.End_Time.ToString(@"hh\:mm")</td>
                     <td>@item.Duration</td>
                     <td>@(lang == "ar" ? item.StatusSecondaryName : item.StatusPrimaryName)</td>
-                    <td>@item.CreatedBy</td>
+                    <td>@item.UserName</td>
                     <td class="actions-cell">
                         @{
                             var hasAction = false;

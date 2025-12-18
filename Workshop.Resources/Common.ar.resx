@@ -2385,4 +2385,7 @@
   <data name="Label_Items" xml:space="preserve">
     <value>المواد</value>
   </data>
+  <data name="Label_IsFix" xml:space="preserve">
+    <value>Is Fix</value>
+  </data>
 </root>

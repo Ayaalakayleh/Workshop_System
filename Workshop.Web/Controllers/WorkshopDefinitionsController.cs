@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs.TempData;
 using Workshop.Core.DTOs.WorkshopDTOs;
 using Workshop.Web.Controllers;
@@ -21,7 +22,7 @@ namespace Workshop.Controllers
             ERPApiClient erpApiClient,
             AccountingApiClient accountingApiClient,
             VehicleApiClient vehicleApiClient,
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _erpApiClient = erpApiClient;
             _workshopApiClient = workshopApiClient;

@@ -1,17 +1,18 @@
 ﻿
-using System.Linq;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.ExtendedProperties;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.AccountingDTOs;
 using Workshop.Core.DTOs.General;
@@ -52,7 +53,7 @@ namespace Workshop.Web.Controllers
             IFileService fileService,
             IFileValidationService fileValidationService,
             ILogger<WIPController> logger
-            ) : base(configuration, env)
+            , IMemoryCache cache) : base(cache, configuration, env)
         {
             _accountingApiClient = accountingApiClient;
             _vehicleApiClient = vehicleApiClient;

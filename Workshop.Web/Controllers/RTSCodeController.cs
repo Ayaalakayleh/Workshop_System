@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
@@ -18,7 +19,7 @@ namespace Workshop.Web.Controllers
         private readonly IWebHostEnvironment _env;
         public readonly string lang;
         public RTSCodeController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, IConfiguration configuration, 
-            IWebHostEnvironment env, VehicleApiClient vehicleApiClient) : base(configuration, env)
+            IWebHostEnvironment env, VehicleApiClient vehicleApiClient, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;

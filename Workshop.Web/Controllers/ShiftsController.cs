@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
@@ -11,7 +12,7 @@ namespace Workshop.Web.Controllers
         private readonly WorkshopApiClient _apiClient;
         private readonly IConfiguration _configuration;
         public readonly string lang;
-        public ShiftsController(WorkshopApiClient apiClient, IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+        public ShiftsController(WorkshopApiClient apiClient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _configuration = configuration;

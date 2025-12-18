@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
@@ -21,7 +22,7 @@ namespace Workshop.Web.Controllers
         private readonly IWebHostEnvironment _env;
         private readonly string lang;
         public MenuController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, InventoryApiClient inventoryApiClient,
-            IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+            IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;

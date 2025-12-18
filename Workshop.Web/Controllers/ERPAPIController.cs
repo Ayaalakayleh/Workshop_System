@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Workshop.Core.DTOs.General;
 using Workshop.Web.Controllers;
 using Workshop.Web.Services;
@@ -10,7 +11,7 @@ namespace Workshop.Controllers
         private readonly ERPApiClient _eRPApiClient;
         private readonly string lang;
 
-        public ERPAPIController(ERPApiClient eRPApiClient, IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env)
+        public ERPAPIController(ERPApiClient eRPApiClient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _eRPApiClient = eRPApiClient;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;

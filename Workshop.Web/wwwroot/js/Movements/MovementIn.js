@@ -1,6 +1,8 @@
 ﻿/* ==================================================
    MovementIn.js (FULL UPDATED)
-   Adds:
+   Fixes:
+   - ✅ Restore AJAX Save (Swal + redirect) and prevent normal POST navigation
+   - ✅ Modal opens on page load
    - FilePond preview fixes (safe init + plugin registration)
    - Time restriction:
      If GregorianMovementDate == today => ReceivedTime allowed only from (now - 3h) .. now
@@ -19,6 +21,9 @@
     var WorkOrdersList = [];
     var Etype = 1;
     var shapesJson = [];
+
+    // prevent double submit
+    var isSubmitting = false;
 
     /* ==================================================
        Small utilities
@@ -41,6 +46,11 @@
     }
 
     function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+    function endSubmit() {
+        isSubmitting = false;
+        $('#submitMovement').prop("disabled", false);
+    }
 
     /* ==================================================
        Date/Time restriction helpers
@@ -95,14 +105,12 @@
         var selected = getSelectedMovementDate();
         var now = new Date();
 
-        // If date isn't parsable, just clear constraints
         if (!selected) {
             timeEl.removeAttribute('min');
             timeEl.removeAttribute('max');
             return;
         }
 
-        // Only constrain when selected date == today
         if (!sameDay(selected, now)) {
             timeEl.removeAttribute('min');
             timeEl.removeAttribute('max');
@@ -111,7 +119,7 @@
         }
 
         var nowMins = now.getHours() * 60 + now.getMinutes();
-        var minMins = Math.max(0, nowMins - 180); // last 3 hours (180 mins), clamp to midnight
+        var minMins = Math.max(0, nowMins - 180);
 
         var minStr = minutesToTimeStr(minMins);
         var maxStr = minutesToTimeStr(nowMins);
@@ -119,10 +127,8 @@
         timeEl.setAttribute('min', minStr);
         timeEl.setAttribute('max', maxStr);
 
-        // Clamp current value if user typed something outside range
         var curMins = timeStrToMinutes(timeEl.value);
         if (curMins == null) {
-            // If empty/invalid, set to now
             timeEl.value = maxStr;
             timeEl.classList.remove('is-invalid');
             return;
@@ -144,15 +150,12 @@
         var timeEl = document.getElementById('ReceivedTime');
         if (!dateEl || !timeEl) return;
 
-        // Re-apply on date changes (flatpickr usually triggers change/input)
         dateEl.addEventListener('change', applyTimeWindowConstraint);
         dateEl.addEventListener('input', applyTimeWindowConstraint);
 
-        // Re-apply on time typing/picking
         timeEl.addEventListener('change', applyTimeWindowConstraint);
         timeEl.addEventListener('input', applyTimeWindowConstraint);
 
-        // Apply once at startup
         applyTimeWindowConstraint();
     }
 
@@ -167,7 +170,6 @@
         if (window.FilePondPluginImagePreview) plugins.push(window.FilePondPluginImagePreview);
         if (window.FilePondPluginImageExifOrientation) plugins.push(window.FilePondPluginImageExifOrientation);
 
-        // Crop depends on Transform
         if (window.FilePondPluginImageTransform) plugins.push(window.FilePondPluginImageTransform);
         if (window.FilePondPluginImageCrop && window.FilePondPluginImageTransform) plugins.push(window.FilePondPluginImageCrop);
 
@@ -230,10 +232,8 @@
        Boot
     ================================================== */
     domReady(function () {
-        // date/time restriction doesn't need jQuery
         initializeDateTimeRestrictionHandlers();
 
-        // FilePond might be loaded after this file if order is wrong; wait a bit
         waitForGlobal('FilePond', function (ok) {
             if (!ok) {
                 console.error('[FilePond] core not found. Check script order / CSP / network.');
@@ -242,7 +242,6 @@
             initializeFilePond();
         });
 
-        // The rest of the page relies on jQuery
         waitForGlobal('jQuery', function (jqOk) {
             if (!jqOk) {
                 console.error('[jQuery] not found. Page logic (except FilePond + time constraints) will not run.');
@@ -255,6 +254,9 @@
                 initializejSignature();
                 initializeEventHandlers();
                 initializeValidation();
+
+                // ✅ always open modal on page load
+                OpenChangeCarModal();
             });
         });
     });
@@ -263,14 +265,11 @@
        Components
     ================================================== */
     function initializeComponents() {
-        // Set time now
         var d = new Date(), h = d.getHours(), m = d.getMinutes();
         if (h < 10) h = '0' + h;
         if (m < 10) m = '0' + m;
 
         $('#ReceivedTime').val(h + ":" + m);
-
-        // Apply time window after setting default time
         applyTimeWindowConstraint();
 
         ChangeWorkOrderType();
@@ -297,7 +296,6 @@
             }
         }
 
-        // ---- DynaMeter init ----
         if ($.fn && $.fn.dynameter) {
             $myFuelMeter = $("div#fuelMeterDiv").dynameter({
                 width: 200,
@@ -312,7 +310,6 @@
             console.error('DynaMeter plugin not loaded');
         }
 
-        // native range slider
         var sliderEl = document.getElementById('fuelSlider');
         var sliderValEl = document.getElementById('fuelSliderValue');
         if (sliderEl) {
@@ -387,11 +384,13 @@
         $('#undo-button').on('click', function () {
             var last = shapesJson.pop();
             if (last) $('.shape:last-child').remove();
+            $('#strikes').val(JSON.stringify(shapesJson));
         });
 
         $('#clear-button').on('click', function () {
             shapesJson = [];
             $("#panel").empty();
+            $('#strikes').val(JSON.stringify(shapesJson));
         });
 
         $(document).on("contextmenu", ".shape", function () {
@@ -436,6 +435,20 @@
                 if (wo) row.find('.MaintenanceDesc').val(wo.Description || "");
             }
         });
+
+        // ✅ Critical: STOP normal navigation submit, ALWAYS go through AJAX
+        $(document).on('submit', 'form#movements', function (e) {
+            e.preventDefault();
+            handleFormSubmission(this);
+            return false;
+        });
+
+        // ✅ If your Save button is not type="submit", this makes it work
+        $(document).on('click', '#submitMovement', function (e) {
+            e.preventDefault();
+            var $form = $('form#movements');
+            if ($form.length) $form.trigger('submit');
+        });
     }
 
     /* ==================================================
@@ -467,7 +480,6 @@
             return thisHas || otherHas;
         }, RazorVars.requiredField);
 
-        // ✅ Time rule validator: if date is today => time must be within [now-3h, now]
         $.validator.addMethod("timeWithinLast3HoursIfToday", function (value) {
             var selected = getSelectedMovementDate();
             if (!selected) return true;
@@ -483,7 +495,6 @@
 
             return tMins >= minMins && tMins <= nowMins;
         }, function () {
-            // message
             return "Time must be within the last 3 hours (and not in the future) when the date is today.";
         });
 
@@ -515,6 +526,7 @@
             }
         });
 
+        // NOTE: no submitHandler here — our form submit handler above always AJAX-submits.
         $('form[id="movements"]').validate({
             ignore: ':hidden:not(.select2-hidden-accessible)',
             rules: {
@@ -536,42 +548,47 @@
                 VehicleSubStatusId: { valueNotEquals: RazorVars.requiredField },
                 WorkOrderId: { requireOneGroup: RazorVars.requiredField },
                 Complaint: { requireOneGroup: RazorVars.requiredField }
-            },
-            submitHandler: function (form) { handleFormSubmission(form); return false; }
+            }
         });
     }
 
     /* ==================================================
-       Submit
+       Submit (AJAX only)
     ================================================== */
     function handleFormSubmission(form) {
-        // Ensure time is constrained right before submit too
         applyTimeWindowConstraint();
 
-        if (!$(form).valid()) return false;
+        // validate first (don’t lock submit if invalid)
+        if ($.validator && $(form).data('validator')) {
+            if (!$(form).valid()) return false;
+        }
+
+        if (isSubmitting) return false;
+        isSubmitting = true;
+
         $('#submitMovement').prop("disabled", true);
 
         var files = (cuspond && typeof cuspond.getFiles === 'function') ? cuspond.getFiles() : [];
         if (files.length <= 0) {
             Swal.fire(RazorVars.addFilesForVehicle, '', 'error');
-            $('#submitMovement').prop("disabled", false);
+            endSubmit();
             return false;
         }
-        if (!validPhoto) { $('#submitMovement').prop("disabled", false); return false; }
+        if (!validPhoto) { endSubmit(); return false; }
 
         if (selectCount === 0 || !($("#VehicleID").val() > 0)) {
             Swal.fire(RazorVars.chooseVehicle, '', 'error');
-            $('#submitMovement').prop("disabled", false);
+            endSubmit();
             return false;
         }
 
         if (!$("input[name='Type']:checked").val()) {
             Swal.fire(RazorVars.chooseMovementType, '', 'error');
-            $('#submitMovement').prop("disabled", false);
+            endSubmit();
             return false;
         }
 
-        if (!validateOdometer()) { $('#submitMovement').prop("disabled", false); return false; }
+        if (!validateOdometer()) { endSubmit(); return false; }
 
         var fd = new FormData(form);
         for (var i = 0; i < files.length; i++) fd.append('Photos', files[i].file);
@@ -597,7 +614,7 @@
         }).done(CreateMovementSuccess)
             .fail(function () {
                 Swal.fire(RazorVars.swalErrorHappened, RazorVars.error, 'error');
-                $('#submitMovement').prop("disabled", false);
+                endSubmit();
             });
     }
 
@@ -635,7 +652,7 @@
             });
         } else {
             Swal.fire(RazorVars.swalErrorHappened, (data && data.message) || RazorVars.error, 'error');
-            $('#submitMovement').prop("disabled", false);
+            endSubmit();
         }
     }
 

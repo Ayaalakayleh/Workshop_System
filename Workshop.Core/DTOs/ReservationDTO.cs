@@ -76,6 +76,7 @@ namespace Workshop.Core.DTOs
         public string CustomerName { get; set; }
         public int ChassisId { get; set; }
         public int vehicleTypeId { get; set; }
+        public string? UserName { get; set; }
 
 
 

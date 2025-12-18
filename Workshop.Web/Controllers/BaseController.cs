@@ -1,11 +1,12 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using DocumentFormat.OpenXml.InkML;
+﻿using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Configuration;
+using System.IO;
 using Workshop.Core.DTOs.General;
 using Workshop.Web.Services;
 
@@ -15,6 +16,7 @@ namespace Workshop.Web.Controllers
     {
         protected readonly IConfiguration _configuration;
         protected readonly IWebHostEnvironment _env;
+        protected readonly IMemoryCache cache;
         protected int CompanyId { get; private set; }
         protected int BranchId { get; private set; }
         protected int UserId { get; private set; }
@@ -31,10 +33,11 @@ namespace Workshop.Web.Controllers
                 : 0;
             base.OnActionExecuting(context);
         }
-        public BaseController(IConfiguration configuration, IWebHostEnvironment environment)
+        public BaseController(IMemoryCache memoryCache, IConfiguration configuration, IWebHostEnvironment environment)
         {
             _configuration = configuration;
             _env = environment;
+            cache = memoryCache;
         }
 
         public ActionResult GetImage(string Name, int D, string BasePath = "", bool IsExternal = false)
