@@ -39,6 +39,87 @@
         document.head.appendChild(style);
     }
 
+    // ==================== jQuery DateTimePicker (xdsoft) for schStart ====================
+    function ensureJQDateTimePicker() {
+        return new Promise((resolve, reject) => {
+            if ($.fn && typeof $.fn.datetimepicker === "function") return resolve();
+
+            const cssId = "jq-dtp-css";
+            if (!document.getElementById(cssId)) {
+                const link = document.createElement("link");
+                link.id = cssId;
+                link.rel = "stylesheet";
+                link.href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.21/jquery.datetimepicker.min.css";
+                document.head.appendChild(link);
+            }
+
+            const jsId = "jq-dtp-js";
+            if (document.getElementById(jsId)) {
+                const el = document.getElementById(jsId);
+                el.addEventListener("load", () => resolve());
+                el.addEventListener("error", reject);
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.id = jsId;
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.21/jquery.datetimepicker.full.min.js";
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = (e) => reject(e);
+            document.body.appendChild(script);
+        });
+    }
+
+    function ensureJQDateTimePickerZIndexPatch() {
+        if (document.getElementById("jq-dtp-zindex-patch")) return;
+        const style = document.createElement("style");
+        style.id = "jq-dtp-zindex-patch";
+        style.textContent = `.xdsoft_datetimepicker { z-index: 200000 !important; }`;
+        document.head.appendChild(style);
+    }
+
+    // optional: allowedTimes like ["08:00","08:05",...]
+    function initSchStartTimepicker(allowedTimes = [], defaultTime = null) {
+        const $schStart = $("#schStart");
+        if (!$schStart.length) return;
+        if (!($.fn && typeof $.fn.datetimepicker === "function")) return;
+
+        // destroy previous instance if any
+        try { $schStart.datetimepicker("destroy"); } catch (e) { }
+
+        const opts = {
+            datepicker: false,
+            format: "H:i",
+            step: 5,
+            scrollInput: false,
+            closeOnTimeSelect: true,
+            onSelectTime: function () {
+                recomputeEndTime();
+                $schStart.trigger("change");
+            },
+            onChangeDateTime: function () {
+                recomputeEndTime();
+            }
+        };
+
+        if (Array.isArray(allowedTimes) && allowedTimes.length > 0) {
+            opts.allowTimes = allowedTimes;
+        }
+
+        $schStart.datetimepicker(opts);
+
+        const val =
+            defaultTime ||
+            $schStart.val() ||
+            (allowedTimes && allowedTimes[0]) ||
+            "08:00";
+
+        $schStart.val(val);
+        recomputeEndTime();
+    }
+    // ================================================================================
+
     function callApi({ url, type = 'GET', data = null, isFormData = false, onSuccess = null, onError = null }) {
         const ajaxOptions = {
             url, type, dataType: 'json',
@@ -497,18 +578,41 @@
             console.error('flatpickr failed to load', e);
         }
 
+        // init schStart timepicker (same library as your other code)
+        try {
+            await ensureJQDateTimePicker();
+            ensureJQDateTimePickerZIndexPatch();
+            initSchStartTimepicker([], $('#schStart').val() || "08:00");
+        } catch (e) {
+            console.warn("jQuery DateTimePicker failed to load", e);
+        }
+
         state.duration = normalizeDurationToMinutes($('#schDuration').val());
         recomputeEndTime();
 
         bindSaveHandlerOnce();
     });
 
+    // optional cleanup when modal closes
+    $(document).on('hidden.bs.modal', '#scheduleModal', function () {
+        const $schStart = $("#schStart");
+        try { $schStart.datetimepicker("destroy"); } catch (e) { }
+    });
+
     $(document).ready(async function () {
         ensureFlatpickrZIndexPatch();
+        ensureJQDateTimePickerZIndexPatch();
+
         try {
             await ensureFlatpickr();
         } catch (e) {
             console.warn('flatpickr not available yet', e);
+        }
+
+        try {
+            await ensureJQDateTimePicker();
+        } catch (e) {
+            console.warn("jQuery DateTimePicker not available yet", e);
         }
     });
 })();

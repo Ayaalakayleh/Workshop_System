@@ -91,6 +91,9 @@
     $(document).ready(function () {
         loadVehicles();
         GetBranches();
+            $('#OpenAddVehicleModal').on('shown.bs.modal', function () {
+      $(this).find('.select2').select2({ dropdownParent: $(this),theme: 'bootstrap-5',width: '100%' });
+    });
 
         $('#ManufacturerId').on('change', function () {
             var manufacturerId = $('#ManufacturerId').val();
