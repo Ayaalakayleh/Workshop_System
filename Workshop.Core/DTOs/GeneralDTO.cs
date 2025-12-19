@@ -131,6 +131,8 @@ namespace Workshop.Core.DTOs.General
         public Reservation refReservation { get; set; }
         public int? AgreementStatusId { get; set; }
         public int? VehicleDefinitionId { get; set; }
+        public int CustomerId { get; set; }
+
 
     }
 

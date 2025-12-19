@@ -128,12 +128,6 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                //var user = await _erpApiClient.GetUserInfoById(UserId);
-
-                //var first = user?.FirstName?.Trim();
-                //var last = user?.LastName?.Trim();
-
-                //string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
 
                 var isCompanyCenterialized = 1;
                 WIPDTO dto = new WIPDTO();
@@ -148,6 +142,26 @@ namespace Workshop.Web.Controllers
                         dto.MovementId = (int)movementId;
                     }
                 }
+
+                if (dto.MovementId > 0)
+                {
+                    movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
+                    if (movement != null)
+                    {
+                        var user = await _erpApiClient.GetUserInfoById((int)movement.CreatedBy);
+
+                        var first = user?.FirstName?.Trim();
+                        var last = user?.LastName?.Trim();
+
+                        string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                        ViewBag.CreatingOperator = userFullName;
+                        ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
+
+                        ViewBag.DueOutDate = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+
+                    }
+                }
+
 
                 if (id.HasValue && id.Value > 0)
                 {
@@ -171,10 +185,11 @@ namespace Workshop.Web.Controllers
                             string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
                             ViewBag.CreatingOperator = userFullName;
                             ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
-                        }
-                    }
 
-         
+                        }
+                            var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
+                            ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                    }
 
                     // Get vehicle documents - handle nulls
                     try
@@ -497,15 +512,15 @@ namespace Workshop.Web.Controllers
                 {
                     if (dto.VehicleId > 0)
                     {
-                        var customerAgreements = await _vehicleApiClient.GetAgreementbyVehicleId(dto.VehicleId);
-                        if (customerAgreements != null && customerAgreements.Count > 0)
-                        {
-                            ViewBag.Customers = customerAgreements.Select(s => new SelectListItem
-                            {
-                                Value = s.LeaseCustomerId.ToString(),
-                                Text = s.CustomerName
-                            }).ToList();
-                        }
+                        //var customerAgreements = await _vehicleApiClient.GetAgreementbyVehicleId(dto.VehicleId);
+                        //if (customerAgreements != null && customerAgreements.Count > 0)
+                        //{
+                        //    ViewBag.Customers = customerAgreements.Select(s => new SelectListItem
+                        //    {
+                        //        Value = s.LeaseCustomerId.ToString(),
+                        //        Text = s.CustomerName
+                        //    }).ToList();
+                        //}
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
                         var status = "No Agreement";
                         if (activeAgreement.AgreementId > 0)
@@ -1031,7 +1046,7 @@ namespace Workshop.Web.Controllers
             dto = await _apiClient.GetWIPByIdAsync((int)filter.WIPId);
             var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_Find(dto.VehicleId);
             filter.Make = vehicleDetails.ManufacturerId;
-            if(filter.TechnicianId != null)
+            if (filter.TechnicianId != null)
             {
                 var tech = await _apiClient.GetTechnicianByIdAsync((int)filter.TechnicianId);
                 filter.Skills = tech.FK_SkillId;
