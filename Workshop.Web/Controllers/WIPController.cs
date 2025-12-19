@@ -389,21 +389,7 @@ namespace Workshop.Web.Controllers
                     ViewBag.Status = new List<SelectListItem>();
                 }
 
-                // Get customers
-                try
-                {
-                    var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
-                    ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
-                    {
-                        Value = c.Id.ToString(),
-                        Text = c.CustomerName
-                    }).ToList() ?? new List<SelectListItem>();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error fetching customers");
-                    ViewBag.Customers = new List<SelectListItem>();
-                }
+                
 
                 // Get units
                 try
@@ -507,33 +493,48 @@ namespace Workshop.Web.Controllers
                     ViewBag.IsWaitingInvoiced = true;
                 }
 
+                int? selectedCustomerId = null;
+
                 // Get customer agreements for vehicle
                 try
                 {
                     if (dto.VehicleId > 0)
                     {
-                        //var customerAgreements = await _vehicleApiClient.GetAgreementbyVehicleId(dto.VehicleId);
-                        //if (customerAgreements != null && customerAgreements.Count > 0)
-                        //{
-                        //    ViewBag.Customers = customerAgreements.Select(s => new SelectListItem
-                        //    {
-                        //        Value = s.LeaseCustomerId.ToString(),
-                        //        Text = s.CustomerName
-                        //    }).ToList();
-                        //}
+                        
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
-                        var status = "No Agreement";
-                        if (activeAgreement.AgreementId > 0)
-                        {
-                            status = "Open";
-                        }
+
+                        selectedCustomerId = activeAgreement?.CustomerId;
+                        var status = (activeAgreement?.AgreementId > 0) ? "Open" : "No Agreement";
+
 
                         ViewBag.AgreementStatus = status;
+                        if (activeAgreement != null)
+                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
                     }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Error fetching customer agreements for vehicle {VehicleId}", dto.VehicleId);
+                }
+
+                // Get customers
+                try
+                {
+                    var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+                    ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.CustomerName,
+                        Selected = selectedCustomerId.HasValue && c.Id == selectedCustomerId.Value
+                    }).ToList() ?? new List<SelectListItem>();
+
+                    if (selectedCustomerId.HasValue)
+                        dto.AccountDetails.CustomerId = selectedCustomerId.Value;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error fetching customers");
+                    ViewBag.Customers = new List<SelectListItem>();
                 }
 
 

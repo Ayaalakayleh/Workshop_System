@@ -132,8 +132,7 @@ namespace Workshop.Core.DTOs.General
         public int? AgreementStatusId { get; set; }
         public int? VehicleDefinitionId { get; set; }
         public int CustomerId { get; set; }
-
-
+        public DateTime GregorianReturnDate { get; set; }
     }
 
     public class Reservation
