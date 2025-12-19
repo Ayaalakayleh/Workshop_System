@@ -337,43 +337,47 @@ $(function () {
     });
 });
 
-function updateTotalLabourFieldsFromGrid() {
+async function updateTotalLabourFieldsFromGrid() {
     const grid = $("#mainRTSGrid").dxDataGrid("instance");
     if (!grid) return;
 
-    const rows = grid.getVisibleRows() || [];
+    const ds = grid.getDataSource();
+    if (!ds) return;
 
-    let totalAfterDiscount = 0;
-    let totalDiscountAmount = 0;
-    let totalTaxAmount = 0;
+    const allRows = await ds.store().load();
 
-    rows.forEach(r => {
-        const d = r.data || {};
-        const rate = parseFloat(d.Rate) || 0;
+    let totalBase = 0;            
+    let totalDiscountAmount = 0;  
+    let totalTaxAmount = 0;      
+    let totalAfterDiscount = 0;  
+
+    allRows.forEach(d => {
+        d = d || {};
+
+        const rate = ensureDiscountedRate(d); 
         const hours = parseFloat(d.StandardHours) || 0;
         const pct = parseFloat(d.Discount) || 0;
         const tax = parseFloat(d.Tax) || 0;
 
         const lineBase = rate * hours;
-
         const lineDisc = lineBase * (pct / 100);
-
         const lineAfterDiscount = lineBase - lineDisc;
-
         const lineTotal = lineAfterDiscount + tax;
 
+        totalBase += lineBase;
         totalDiscountAmount += lineDisc;
         totalTaxAmount += tax;
         totalAfterDiscount += lineTotal;
-
-        d.Total = +lineTotal.toFixed(2);
     });
+
+    const totalDiscountPct = totalBase > 0 ? (totalDiscountAmount / totalBase) * 100 : 0;
 
     $("#totLabour").text("SAR " + totalAfterDiscount.toFixed(2));
     setAmount("#totLabour", totalAfterDiscount);
 
     $("#TotalDiscountsLabour").text("SAR " + totalDiscountAmount.toFixed(2));
-    $("#TotalTaxLabour").text("SAR " + totalTaxAmount.toFixed(2)); 
+
+    $("#TotalTaxLabour").text("SAR " + totalTaxAmount.toFixed(2));
 
     updateSubtotal();
 }

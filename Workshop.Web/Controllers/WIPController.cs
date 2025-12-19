@@ -524,12 +524,12 @@ namespace Workshop.Web.Controllers
                     ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
                     {
                         Value = c.Id.ToString(),
-                        Text = c.CustomerName,
-                        Selected = selectedCustomerId.HasValue && c.Id == selectedCustomerId.Value
+                        Text = c.CustomerName
+                        //Selected = selectedCustomerId.HasValue && c.Id == selectedCustomerId.Value
                     }).ToList() ?? new List<SelectListItem>();
 
-                    if (selectedCustomerId.HasValue)
-                        dto.AccountDetails.CustomerId = selectedCustomerId.Value;
+                    //if (selectedCustomerId.HasValue)
+                    //    dto.AccountDetails.CustomerId = selectedCustomerId.Value;
                 }
                 catch (Exception ex)
                 {
