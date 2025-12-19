@@ -91,8 +91,8 @@
 									<td>@item.AppliesTo</td>
 									<td>@((Basis)@item.BasisId)</td>
 									<td>@String.Join(", ", @item.MatchValueTextPair.Select(s => s.Value))</td>
-									<td>@item.RatePerHour</td>
-									<td>@item.Markup</td>
+									<td>@item.RatePerHour.ToString("0.00")</td>
+									<td>@item.Markup.ToString("0.00")%</td>
 									<td>
 										<button onclick="editButtonClick(this)" class="btn btn-info my-1 btn-sm" data-bs-toggle="modal" data-bs-target="#matrixModal" data-id="@item.Id"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</button>
 										<button class="btn btn-danger btn-sm my-1" onclick="deletePrice(@item.Id)" data-id="@item.Id"><i class="fad fa-trash"></i>&nbsp;@Common["Delete"]</button>
