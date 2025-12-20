@@ -51,6 +51,7 @@ namespace Workshop.Core.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 25;
         public string? Chassis { get; set; }
+        public int? ChassisId { get; set; }
 
 
     }

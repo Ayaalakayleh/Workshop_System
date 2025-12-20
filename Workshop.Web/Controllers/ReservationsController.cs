@@ -224,7 +224,26 @@ namespace Workshop.Web.Controllers
         {
             try
             {
+                var cacheKey = string.Format(CacheKeys.Users, CompanyId);
+
+                if (!cache.TryGetValue(cacheKey, out List<User> users))
+                {
+                    users = await _eRPApiClient.Get_UsersByCompanyId(CompanyId);
+
+                    cache.Set(
+                        cacheKey,
+                        users,
+                        TimeSpan.FromHours(24)
+                    );
+                }
+
                 var reservations = await _workshopapiClient.GetAllReservationsAsync(reservationFilter);
+                foreach (var r in reservations)
+                {
+                    r.UserName = users
+                        .FirstOrDefault(u => u.UserID == r.CreatedBy)
+                        ?.Name;
+                }
                 return PartialView("_ReservationsTablePartial", reservations);
             }
             catch (Exception ex)
