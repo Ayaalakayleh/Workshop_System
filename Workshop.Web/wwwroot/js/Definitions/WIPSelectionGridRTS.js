@@ -156,6 +156,7 @@ function getRateAmount(RTSId) {
             const grid = $('#mainRTSGrid').dxDataGrid('instance');
             const rowIndex = grid.getRowIndexByKey(model.RTSId);
             if (rowIndex >= 0) {
+                grid.cellValue(rowIndex, "BaseRate", result);
                 grid.cellValue(rowIndex, "Rate", result);
 
                 const rowData = grid.getVisibleRows()[rowIndex].data;

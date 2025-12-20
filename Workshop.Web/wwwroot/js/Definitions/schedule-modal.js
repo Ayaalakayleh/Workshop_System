@@ -39,6 +39,175 @@
         document.head.appendChild(style);
     }
 
+    // ==================== jQuery DateTimePicker (xdsoft) for schStart ====================
+    function ensureJQDateTimePicker() {
+        return new Promise((resolve, reject) => {
+            if ($.fn && typeof $.fn.datetimepicker === "function") return resolve();
+
+            const cssId = "jq-dtp-css";
+            if (!document.getElementById(cssId)) {
+                const link = document.createElement("link");
+                link.id = cssId;
+                link.rel = "stylesheet";
+                link.href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.21/jquery.datetimepicker.min.css";
+                document.head.appendChild(link);
+            }
+
+            const jsId = "jq-dtp-js";
+            if (document.getElementById(jsId)) {
+                const el = document.getElementById(jsId);
+                el.addEventListener("load", () => resolve());
+                el.addEventListener("error", reject);
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.id = jsId;
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.21/jquery.datetimepicker.full.min.js";
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = (e) => reject(e);
+            document.body.appendChild(script);
+        });
+    }
+
+    function ensureJQDateTimePickerZIndexPatch() {
+        if (document.getElementById("jq-dtp-zindex-patch")) return;
+        const style = document.createElement("style");
+        style.id = "jq-dtp-zindex-patch";
+        style.textContent = `.xdsoft_datetimepicker { z-index: 200000 !important; }`;
+        document.head.appendChild(style);
+    }
+
+    // Base allowed times (optional). If you later load business-hours times from API, set this array.
+    let schStartBaseAllowedTimes = [];
+
+    // optional: allowedTimes like ["08:00","08:05",...]
+    // Updated: hides all times before current time ONLY if selected date is today
+    function initSchStartTimepicker(allowedTimes = [], defaultTime = null) {
+        const $schStart = $("#schStart");
+        if (!$schStart.length) return;
+        if (!($.fn && typeof $.fn.datetimepicker === "function")) return;
+
+        // keep base times for dynamic filtering when "today"
+        schStartBaseAllowedTimes = Array.isArray(allowedTimes) ? allowedTimes.slice() : [];
+
+        // destroy previous instance if any
+        try { $schStart.datetimepicker("destroy"); } catch (e) { }
+
+        // always re-enable on init (in case we disabled it because no times left)
+        $schStart.prop('disabled', false);
+
+        const step = 5;
+
+        const opts = {
+            datepicker: false,
+            format: "H:i",
+            step: step,
+            scrollInput: false,
+            closeOnTimeSelect: true,
+            onSelectTime: function () {
+                recomputeEndTime();
+                $schStart.trigger("change");
+            },
+            onChangeDateTime: function () {
+                recomputeEndTime();
+            }
+        };
+
+        // ---------- helpers for "today" filtering (kept inside to avoid side-effects elsewhere) ----------
+        function localISODate(d = new Date()) {
+            return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+        }
+
+        function selectedDateISO() {
+            const raw = ($('#schDate').val() || state.date || '').toString().trim();
+            return formatDateISO(raw);
+        }
+
+        function isSelectedDateToday() {
+            const sel = selectedDateISO();
+            return !!sel && sel === localISODate();
+        }
+
+        function roundUpToStepMinutes(totalMinutes, stepMinutes) {
+            return Math.ceil(totalMinutes / stepMinutes) * stepMinutes;
+        }
+
+        function nowRoundedHHMM(stepMinutes) {
+            const d = new Date();
+            const nowMins = d.getHours() * 60 + d.getMinutes();
+            const rounded = roundUpToStepMinutes(nowMins, stepMinutes);
+            return minutesToHHMM(rounded);
+        }
+
+        function buildTimesFromMinutes(startMinutes, stepMinutes) {
+            const out = [];
+            const last = 24 * 60 - stepMinutes; // 23:55 for step=5
+            for (let m = startMinutes; m <= last; m += stepMinutes) out.push(minutesToHHMM(m));
+            return out;
+        }
+
+        function computeAllowedTimesForToday() {
+            const minHHMM = nowRoundedHHMM(step);
+            const minMins = toMinutes(minHHMM);
+
+            let times = [];
+            if (Array.isArray(schStartBaseAllowedTimes) && schStartBaseAllowedTimes.length > 0) {
+                times = schStartBaseAllowedTimes.filter(t => toMinutes(t) >= minMins);
+            } else {
+                times = buildTimesFromMinutes(minMins, step);
+            }
+
+            return { minHHMM, times };
+        }
+        // ---------------------------------------------------------------------------------------------
+
+        const isToday = isSelectedDateToday();
+
+        if (isToday) {
+            const { minHHMM, times } = computeAllowedTimesForToday();
+
+            // no times left today => disable the field safely
+            if (!times.length) {
+                $schStart.val('').prop('disabled', true);
+                recomputeEndTime();
+                return;
+            }
+
+            // key behavior: use allowTimes so earlier times are HIDDEN (not just disabled)
+            opts.allowTimes = times;
+            opts.minTime = minHHMM;
+
+            // keep it accurate as time moves forward
+            opts.onShow = function () {
+                if (!isSelectedDateToday()) return;
+                const { minHHMM: min2, times: times2 } = computeAllowedTimesForToday();
+                this.setOptions({ minTime: min2, allowTimes: times2 });
+            };
+        } else {
+            // future date: keep original behavior (unless you passed a fixed allowedTimes list)
+            if (Array.isArray(schStartBaseAllowedTimes) && schStartBaseAllowedTimes.length > 0) {
+                opts.allowTimes = schStartBaseAllowedTimes;
+            }
+        }
+
+        $schStart.datetimepicker(opts);
+
+        // Choose a safe value
+        const currentVal = $schStart.val();
+        let val = defaultTime || currentVal || (schStartBaseAllowedTimes && schStartBaseAllowedTimes[0]) || "08:00";
+
+        if (isToday && Array.isArray(opts.allowTimes) && opts.allowTimes.length > 0) {
+            // if the chosen value is not allowed anymore, pick the first allowed
+            if (!val || !opts.allowTimes.includes(val)) val = opts.allowTimes[0];
+        }
+
+        $schStart.val(val);
+        recomputeEndTime();
+    }
+    // ================================================================================
+
     function callApi({ url, type = 'GET', data = null, isFormData = false, onSuccess = null, onError = null }) {
         const ajaxOptions = {
             url, type, dataType: 'json',
@@ -247,6 +416,10 @@
     function handleDateChange() {
         state.date = $(this).val() || null;
         if (!state.dateTo) state.dateTo = state.date;
+
+        // Re-init timepicker so past times are hidden only for "today"
+        // Safe: initSchStartTimepicker() no-ops if the plugin isn't loaded yet.
+        initSchStartTimepicker(schStartBaseAllowedTimes, $('#schStart').val() || null);
     }
 
     function handleVehicleTypeChange() {
@@ -497,18 +670,43 @@
             console.error('flatpickr failed to load', e);
         }
 
+        // init schStart timepicker (same library as your other code)
+        try {
+            await ensureJQDateTimePicker();
+            ensureJQDateTimePickerZIndexPatch();
+
+            // keep your existing behavior: no base time list, default "08:00"
+            initSchStartTimepicker([], $('#schStart').val() || "08:00");
+        } catch (e) {
+            console.warn("jQuery DateTimePicker failed to load", e);
+        }
+
         state.duration = normalizeDurationToMinutes($('#schDuration').val());
         recomputeEndTime();
 
         bindSaveHandlerOnce();
     });
 
+    // optional cleanup when modal closes
+    $(document).on('hidden.bs.modal', '#scheduleModal', function () {
+        const $schStart = $("#schStart");
+        try { $schStart.datetimepicker("destroy"); } catch (e) { }
+    });
+
     $(document).ready(async function () {
         ensureFlatpickrZIndexPatch();
+        ensureJQDateTimePickerZIndexPatch();
+
         try {
             await ensureFlatpickr();
         } catch (e) {
             console.warn('flatpickr not available yet', e);
+        }
+
+        try {
+            await ensureJQDateTimePicker();
+        } catch (e) {
+            console.warn("jQuery DateTimePicker not available yet", e);
         }
     });
 })();

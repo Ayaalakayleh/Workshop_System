@@ -128,12 +128,6 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                //var user = await _erpApiClient.GetUserInfoById(UserId);
-
-                //var first = user?.FirstName?.Trim();
-                //var last = user?.LastName?.Trim();
-
-                //string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
 
                 var isCompanyCenterialized = 1;
                 WIPDTO dto = new WIPDTO();
@@ -148,6 +142,26 @@ namespace Workshop.Web.Controllers
                         dto.MovementId = (int)movementId;
                     }
                 }
+
+                if (dto.MovementId > 0)
+                {
+                    movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
+                    if (movement != null)
+                    {
+                        var user = await _erpApiClient.GetUserInfoById((int)movement.CreatedBy);
+
+                        var first = user?.FirstName?.Trim();
+                        var last = user?.LastName?.Trim();
+
+                        string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                        ViewBag.CreatingOperator = userFullName;
+                        ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
+
+                        ViewBag.DueOutDate = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+
+                    }
+                }
+
 
                 if (id.HasValue && id.Value > 0)
                 {
@@ -170,11 +184,12 @@ namespace Workshop.Web.Controllers
 
                             string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
                             ViewBag.CreatingOperator = userFullName;
-                            ViewBag.DueInDate = movement.CreatedAt?.ToString("dd-MM-yyyy");
-                        }
-                    }
+                            ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
 
-         
+                        }
+                            var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
+                            ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                    }
 
                     // Get vehicle documents - handle nulls
                     try
@@ -374,21 +389,7 @@ namespace Workshop.Web.Controllers
                     ViewBag.Status = new List<SelectListItem>();
                 }
 
-                // Get customers
-                try
-                {
-                    var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
-                    ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
-                    {
-                        Value = c.Id.ToString(),
-                        Text = c.CustomerName
-                    }).ToList() ?? new List<SelectListItem>();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error fetching customers");
-                    ViewBag.Customers = new List<SelectListItem>();
-                }
+                
 
                 // Get units
                 try
@@ -492,25 +493,48 @@ namespace Workshop.Web.Controllers
                     ViewBag.IsWaitingInvoiced = true;
                 }
 
+                int? selectedCustomerId = null;
+
                 // Get customer agreements for vehicle
                 try
                 {
                     if (dto.VehicleId > 0)
                     {
-                        var customerAgreements = await _vehicleApiClient.GetAgreementbyVehicleId(dto.VehicleId);
-                        if (customerAgreements != null && customerAgreements.Count > 0)
-                        {
-                            ViewBag.Customers = customerAgreements.Select(s => new SelectListItem
-                            {
-                                Value = s.LeaseCustomerId.ToString(),
-                                Text = s.CustomerName
-                            }).ToList();
-                        }
+                        
+                        var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
+
+                        selectedCustomerId = activeAgreement?.CustomerId;
+                        var status = (activeAgreement?.AgreementId > 0) ? "Open" : "No Agreement";
+
+
+                        ViewBag.AgreementStatus = status;
+                        if (activeAgreement.AgreementId != null && activeAgreement.AgreementId > 0)
+                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
                     }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Error fetching customer agreements for vehicle {VehicleId}", dto.VehicleId);
+                }
+
+                // Get customers
+                try
+                {
+                    var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+                    ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.CustomerName
+                        //Selected = selectedCustomerId.HasValue && c.Id == selectedCustomerId.Value
+                    }).ToList() ?? new List<SelectListItem>();
+
+                    //if (selectedCustomerId.HasValue)
+                    //    dto.AccountDetails.CustomerId = selectedCustomerId.Value;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error fetching customers");
+                    ViewBag.Customers = new List<SelectListItem>();
                 }
 
 
@@ -1023,7 +1047,7 @@ namespace Workshop.Web.Controllers
             dto = await _apiClient.GetWIPByIdAsync((int)filter.WIPId);
             var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_Find(dto.VehicleId);
             filter.Make = vehicleDetails.ManufacturerId;
-            if(filter.TechnicianId != null)
+            if (filter.TechnicianId != null)
             {
                 var tech = await _apiClient.GetTechnicianByIdAsync((int)filter.TechnicianId);
                 filter.Skills = tech.FK_SkillId;

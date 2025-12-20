@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Linq;
 using Workshop.Core.DTOs;
 using Workshop.Domain.Enum;
 using Workshop.Web.Models;
@@ -55,15 +56,14 @@ namespace Workshop.Web.Controllers
             try
             {
                 var Obj = await _apiclient.WIP_GetServicesById(Id, lang);
-                Obj = Obj.Where(x => x.Status == 23).ToList();
+                Obj = Obj.Where(x => x?.Status == 23).ToList();
                 var scObj = await _apiclient.WIP_SChedule_GetAll();
-                var objWipIds = Obj.Where(s => s?.Status == 23).Select(x => x?.WIPId).ToHashSet();
+                var objWipIds = scObj.Select(x => x?.WIPId).ToHashSet();
+                var notInScObj = Obj
+                .Where(o => !objWipIds.Contains(o?.WIPId))
+                .ToList();
 
-                //var result = Obj
-                //.Where(o => !scObj.Any(sc => sc.WIPId == o?.WIPId))
-                //.ToList();
-
-                return Ok(Obj);
+                return Ok(notInScObj);
             }
             catch (Exception ex)
             {

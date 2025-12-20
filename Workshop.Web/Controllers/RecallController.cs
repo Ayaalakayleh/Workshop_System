@@ -179,14 +179,21 @@ namespace Workshop.Web.Controllers
 
         private async Task<List<VehicleNams>> GetChasses()
         {
-            var models = await _vehicleApiClient.GetVehiclesDDL(lang, 0);
+            var models = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
 
             return models.Select(m => new VehicleNams
             {
                 id = m.id,
                 ChassisNo = m.ChassisNo,
-                ModelName = m.ModelName
+                ManufacturerName = m.ManufacturerName,
+                ModelName = m.ModelName,
+
             }).ToList();
+        }
+        public async Task<VehicleDefinitions> GetVehicleById(int Id)
+        {
+            var models = await _vehicleApiClient.GetVehicleDetails(Id, lang);
+            return models;
         }
 
 

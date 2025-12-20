@@ -122,6 +122,46 @@ function shiftISO(iso, days) {
     return dt.toISOString().slice(0, 10);
 }
 
+// ====== TIMEPICKER LOADER (jQuery DateTimePicker / xdsoft) ======
+function ensureJQDateTimePicker() {
+    return new Promise((resolve, reject) => {
+        if ($.fn && typeof $.fn.datetimepicker === "function") return resolve();
+
+        const cssId = "jq-dtp-css";
+        if (!document.getElementById(cssId)) {
+            const link = document.createElement("link");
+            link.id = cssId;
+            link.rel = "stylesheet";
+            link.href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.21/jquery.datetimepicker.min.css";
+            document.head.appendChild(link);
+        }
+
+        const jsId = "jq-dtp-js";
+        if (document.getElementById(jsId)) {
+            const el = document.getElementById(jsId);
+            el.addEventListener("load", () => resolve());
+            el.addEventListener("error", reject);
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.id = jsId;
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.21/jquery.datetimepicker.full.min.js";
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = (e) => reject(e);
+        document.body.appendChild(script);
+    });
+}
+
+function ensureJQDateTimePickerZIndexPatch() {
+    if (document.getElementById("jq-dtp-zindex-patch")) return;
+    const style = document.createElement("style");
+    style.id = "jq-dtp-zindex-patch";
+    style.textContent = `.xdsoft_datetimepicker{ z-index: 200000 !important; }`;
+    document.head.appendChild(style);
+}
+
 // ====== HEADER RENDERING ======
 function renderHeaderHours() {
     const hours = document.getElementById("hoursHeader");
@@ -624,12 +664,14 @@ function destroyStartPicker($start) {
     try { $start.datetimepicker('destroy'); } catch { }
 }
 
-function initStartTimePicker($start, allowedTimes, defaultTime) {
+// ✅ UPDATED: actually applies the timepicker to #schedStart safely
+function initStartTimePicker($start, allowedTimes, defaultTime, onPicked) {
     destroyStartPicker($start);
 
-    // if plugin not loaded -> fallback
+    // if plugin not loaded -> fallback (no crash)
     if (typeof $start.datetimepicker !== "function") {
         $start.val(defaultTime || SHIFT_START);
+        if (typeof onPicked === "function") onPicked();
         return;
     }
 
@@ -637,7 +679,17 @@ function initStartTimePicker($start, allowedTimes, defaultTime) {
         datepicker: false,
         format: 'H:i',
         step: 5,
-        scrollInput: false
+        scrollInput: false,
+        closeOnTimeSelect: true,
+        onSelectTime: function () {
+            // trigger change so your existing step logic + ends calc runs
+            $start.trigger("change");
+            if (typeof onPicked === "function") onPicked();
+        },
+        onChangeDateTime: function () {
+            $start.trigger("change");
+            if (typeof onPicked === "function") onPicked();
+        }
     };
 
     if (Array.isArray(allowedTimes) && allowedTimes.length) {
@@ -734,7 +786,12 @@ function initModal2() {
         const allowedTimes = computeAllowedStartTimes(freeIntervals, durationMin, 5);
 
         // init timepicker (restricted if allowedTimes exists)
-        initStartTimePicker($(els.start), allowedTimes, allowedTimes[0] || SHIFT_START);
+        initStartTimePicker(
+            $(els.start),
+            allowedTimes,
+            allowedTimes[0] || SHIFT_START,
+            () => schedule2UpdateEnds(els)
+        );
 
         // IMPORTANT: don't auto-advance to next step here.
         // user must change/pick start time -> then we enable next fields.
@@ -1086,7 +1143,7 @@ function GetServicesById(id, lang) {
                 rts: value.code,
                 duration: value.standardHours * 60,
                 title: value.description,
-                allowed: value.allowed,
+                allowed: value.standardHours,
                 wipid: value.wipId,
                 rtsid: value.id
             });
@@ -1110,7 +1167,7 @@ function FetchServicesByIdReturnArray(id, lang) {
                 rts: value.code,
                 duration: value.standardHours * 60,
                 title: value.description,
-                allowed: value.allowed,
+                allowed: value.standardHours,
                 wipid: value.wipId,
                 rtsid: value.id
             });
@@ -1284,9 +1341,9 @@ function renderJobsInGroupModal(jobs) {
         left.innerHTML = `
       <div class="fw-semibold">${job.ro} — <span class="text-info">${job.rts}</span></div>
       <div class="small text-muted">${job.title}</div>
-      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${(job.allowed ?? 0)}m</div>
+      <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${(job.allowed ?? 0)}h</div>
     `;
-
+  
         const btns = document.createElement("div");
         btns.className = "d-flex gap-2";
 
@@ -1337,6 +1394,10 @@ function convertDateFormat(dateStr) {
 
 // ====== BOOTSTRAP ======
 document.addEventListener("DOMContentLoaded", async () => {
+    // ✅ make sure timepicker is available + above modals
+    ensureJQDateTimePickerZIndexPatch();
+    try { await ensureJQDateTimePicker(); } catch (e) { console.warn("[sched2] timepicker failed to load", e); }
+
     const today = ymd(new Date());
 
     await Promise.all([

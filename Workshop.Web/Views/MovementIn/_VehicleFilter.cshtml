@@ -24,7 +24,7 @@
             <div class="form-group">
                 <label>@Common["Label_Status"]</label>
                 <select class="select2" id="VehicleStatusId">
-                    <option value="" selected>@Common["Label_Select"]</option>
+                    @* <option value="" selected>@Common["Label_Select"]</option> *@
                     <option value="2">@Common["Label_Maintenance"]</option>
                     <option value="3">@Common["Label_Rented"]</option>
                     <option value="12">@Common["Label_StaffService"]</option>
@@ -91,6 +91,9 @@
     $(document).ready(function () {
         loadVehicles();
         GetBranches();
+            $('#OpenAddVehicleModal').on('shown.bs.modal', function () {
+      $(this).find('.select2').select2({ dropdownParent: $(this),theme: 'bootstrap-5',width: '100%' });
+    });
 
         $('#ManufacturerId').on('change', function () {
             var manufacturerId = $('#ManufacturerId').val();

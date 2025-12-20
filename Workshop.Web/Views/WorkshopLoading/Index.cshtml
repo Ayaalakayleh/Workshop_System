@@ -3,6 +3,11 @@
 @using System.Text.Json
 @inject IStringLocalizer<Common> Common
 
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
+
 <div class="row">
     <div class="col-12">
         <div id="panel-1" class="panel">
@@ -97,7 +102,7 @@
 
                     <div class="col-lg-4">
                         <label class="form-label">@Common["Label_Date"]</label>
-                        <input type="date" id="schedDate" class="form-control flat-picker" />
+                        <input type="date" id="schedDate" class="form-control flat-picker-future" />
                     </div>
 
                     <div class="col-lg-4">
