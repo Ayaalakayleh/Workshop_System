@@ -508,7 +508,7 @@ namespace Workshop.Web.Controllers
 
 
                         ViewBag.AgreementStatus = status;
-                        if (activeAgreement != null)
+                        if (activeAgreement.AgreementId != null && activeAgreement.AgreementId > 0)
                             ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
                     }
                 }
