@@ -189,6 +189,7 @@ namespace Workshop.Core.DTOs.Vehicle
             ColVehicleColors = new List<M_VehicleColor>();
             ColVehicleModels = new List<VehicleModel>();
             ColManufacturers = new List<Manufacturers>();
+            ColClasses = new List<VehicleClass>();
         }
         public int Id { get; set; }
         public int ManufacturerId { get; set; }
@@ -209,6 +210,8 @@ namespace Workshop.Core.DTOs.Vehicle
         public List<M_VehicleColor> ColVehicleColors { set; get; }
         public List<VehicleModel> ColVehicleModels { get; set; }
         public List<Manufacturers> ColManufacturers { get; set; }
+        public List<VehicleClass> ColClasses { get; set; }
+        public int? VehicleClassId { get; set; }
     }
 
     public class VehicleNams

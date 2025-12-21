@@ -552,7 +552,7 @@ namespace Workshop.Web.Controllers
                         }
                     }
                 }
-                if ((main.Technicians == null))
+                if ((main?.Technicians == null))
                 {
                     var defaultTechnicianID = HttpContext.Session.GetInt32("TechnicianID") ?? 0;
                     if (defaultTechnicianID != 0)

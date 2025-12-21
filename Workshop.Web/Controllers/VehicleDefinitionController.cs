@@ -157,6 +157,7 @@ namespace Workshop.Controllers
             var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
             ViewBag.Customers = allCustomers;
             vehicle.ColVehicleModels = await _vehicleApiClient.GetAllVehicleModel(vehicle.ManufacturerId, lang);
+            vehicle.ColClasses = await _vehicleApiClient.GetAllVehicleClass(lang);
             //ToDo : Caching
             //if (cache.Get(string.Format(CacheKeys.VehicleColors)) != null)
             //{
@@ -181,7 +182,7 @@ namespace Workshop.Controllers
 
             try
             {
-
+                vehicle.BranchId = BranchId;
                 var dataResult = await _vehicleApiClient.InsertExternalVehicle(vehicle);
 
                 if (dataResult == 1)
