@@ -815,7 +815,6 @@ function initModal2() {
     $(els.saveBtn).off(".sched2").on("click.sched2", async function () {
         const idx = Number(els.jobIndex.value);
         const job = unscheduled[idx];
-        console.log(job);
         if (!job) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
             return;
@@ -846,8 +845,7 @@ function initModal2() {
             EndTime: `${end24}:00`,
             KeyId: job.KeyId,
         };
-        console.log("WIPSCheduleObject");
-        console.log(WIPSCheduleObject);
+
         const request = await SaveSchedule(WIPSCheduleObject);
         if (!request?.success) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
