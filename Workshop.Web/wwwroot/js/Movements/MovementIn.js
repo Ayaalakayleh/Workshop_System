@@ -1,13 +1,14 @@
 ﻿/* ==================================================
-   MovementIn.js (FULL UPDATED)
-   Fixes:
-   - ✅ Restore AJAX Save (Swal + redirect) and prevent normal POST navigation
+   MovementIn.js (FULL UPDATED) — jQuery version
+   Fixes kept:
+   - ✅ AJAX Save (Swal + redirect) and prevent normal POST navigation
    - ✅ Modal opens on page load
    - FilePond preview fixes (safe init + plugin registration)
    - Time restriction:
      If GregorianMovementDate == today => ReceivedTime allowed only from (now - 3h) .. now
+   - ✅ .validate() initialized inside $(document).ready
 ================================================== */
-(function () {
+(function ($) {
     'use strict';
 
     /* ==================================================
@@ -28,19 +29,6 @@
     /* ==================================================
        Small utilities
     ================================================== */
-    function domReady(fn) {
-        if (document.readyState === 'loading')
-        {
-            document.addEventListener('DOMContentLoaded', fn);
-
-            const incomingVehicle = Number($("#VehicleFromReservation").val() || 0);
-            if (incomingVehicle == 0) {
-                OpenChangeCarModal();
-            }
-        }
-        else fn();
-    }
-
     function waitForGlobal(name, cb, maxTries, delayMs) {
         maxTries = maxTries || 60;
         delayMs = delayMs || 100;
@@ -100,29 +88,26 @@
     }
 
     function getSelectedMovementDate() {
-        var el = document.getElementById('GregorianMovementDate');
-        if (!el) return null;
-        return parseYMD(el.value);
+        var $el = $('#GregorianMovementDate');
+        if (!$el.length) return null;
+        return parseYMD($el.val());
     }
 
     function applyTimeWindowConstraint() {
-        var dateEl = document.getElementById('GregorianMovementDate');
-        var timeEl = document.getElementById('ReceivedTime');
-        if (!dateEl || !timeEl) return;
+        var $dateEl = $('#GregorianMovementDate');
+        var $timeEl = $('#ReceivedTime');
+        if (!$dateEl.length || !$timeEl.length) return;
 
         var selected = getSelectedMovementDate();
         var now = new Date();
 
         if (!selected) {
-            timeEl.removeAttribute('min');
-            timeEl.removeAttribute('max');
+            $timeEl.removeAttr('min').removeAttr('max');
             return;
         }
 
         if (!sameDay(selected, now)) {
-            timeEl.removeAttribute('min');
-            timeEl.removeAttribute('max');
-            timeEl.classList.remove('is-invalid');
+            $timeEl.removeAttr('min').removeAttr('max').removeClass('is-invalid');
             return;
         }
 
@@ -132,37 +117,30 @@
         var minStr = minutesToTimeStr(minMins);
         var maxStr = minutesToTimeStr(nowMins);
 
-        timeEl.setAttribute('min', minStr);
-        timeEl.setAttribute('max', maxStr);
+        $timeEl.attr('min', minStr).attr('max', maxStr);
 
-        var curMins = timeStrToMinutes(timeEl.value);
+        var curMins = timeStrToMinutes($timeEl.val());
         if (curMins == null) {
-            timeEl.value = maxStr;
-            timeEl.classList.remove('is-invalid');
+            $timeEl.val(maxStr).removeClass('is-invalid');
             return;
         }
 
         if (curMins < minMins) {
-            timeEl.value = minStr;
-            timeEl.classList.add('is-invalid');
+            $timeEl.val(minStr).addClass('is-invalid');
         } else if (curMins > nowMins) {
-            timeEl.value = maxStr;
-            timeEl.classList.add('is-invalid');
+            $timeEl.val(maxStr).addClass('is-invalid');
         } else {
-            timeEl.classList.remove('is-invalid');
+            $timeEl.removeClass('is-invalid');
         }
     }
 
     function initializeDateTimeRestrictionHandlers() {
-        var dateEl = document.getElementById('GregorianMovementDate');
-        var timeEl = document.getElementById('ReceivedTime');
-        if (!dateEl || !timeEl) return;
+        var $dateEl = $('#GregorianMovementDate');
+        var $timeEl = $('#ReceivedTime');
+        if (!$dateEl.length || !$timeEl.length) return;
 
-        dateEl.addEventListener('change', applyTimeWindowConstraint);
-        dateEl.addEventListener('input', applyTimeWindowConstraint);
-
-        timeEl.addEventListener('change', applyTimeWindowConstraint);
-        timeEl.addEventListener('input', applyTimeWindowConstraint);
+        $dateEl.on('change input', applyTimeWindowConstraint);
+        $timeEl.on('change input', applyTimeWindowConstraint);
 
         applyTimeWindowConstraint();
     }
@@ -213,7 +191,7 @@
             onremovefile: function () { isLoadingCheck(); }
         };
 
-        var el1 = document.querySelector('#Uploadfile');
+        var el1 = $('#Uploadfile')[0];
         if (el1) {
             if (!el1._pondInstance) {
                 cuspond = FilePond.create(el1, baseOptions);
@@ -225,7 +203,7 @@
             console.error('[FilePond] #Uploadfile not found');
         }
 
-        var el2 = document.querySelector('#Uploadfile99');
+        var el2 = $('#Uploadfile99')[0];
         if (el2) {
             if (!el2._pondInstance) {
                 cuspondVehicle = FilePond.create(el2, baseOptions);
@@ -235,41 +213,6 @@
             }
         }
     }
-
-    /* ==================================================
-       Boot
-    ================================================== */
-    domReady(function () {
-        initializeDateTimeRestrictionHandlers();
-
-        waitForGlobal('FilePond', function (ok) {
-            if (!ok) {
-                console.error('[FilePond] core not found. Check script order / CSP / network.');
-                return;
-            }
-            initializeFilePond();
-        });
-
-        waitForGlobal('jQuery', function (jqOk) {
-            if (!jqOk) {
-                console.error('[jQuery] not found. Page logic (except FilePond + time constraints) will not run.');
-                return;
-            }
-
-            $(function () {
-                initializeComponents();
-                initializeScratches();
-                initializejSignature();
-                initializeEventHandlers();
-                initializeValidation();
-
-                // ✅ always open modal on page load
-                const incomingVehicle = Number($("#VehicleFromReservation").val() || 0);
-                if (incomingVehicle == 0) {
-                    OpenChangeCarModal();
-                }            });
-        });
-    });
 
     /* ==================================================
        Components
@@ -320,21 +263,17 @@
             console.error('DynaMeter plugin not loaded');
         }
 
-        var sliderEl = document.getElementById('fuelSlider');
-        var sliderValEl = document.getElementById('fuelSliderValue');
-        if (sliderEl) {
-            sliderEl.addEventListener('input', function (e) {
-                var val = Number(e.target.value);
-                if (sliderValEl) sliderValEl.textContent = String(val);
-                if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
-                    $myFuelMeter.changeValue(val.toFixed(1));
-                } else {
-                    try {
-                        $("div#fuelMeterDiv").dynameter && $("div#fuelMeterDiv").dynameter('setValue', val);
-                    } catch (_) { }
-                }
-            });
-        }
+        $('#fuelSlider').on('input', function () {
+            var val = Number($(this).val());
+            $('#fuelSliderValue').text(String(val));
+            if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
+                $myFuelMeter.changeValue(val.toFixed(1));
+            } else {
+                try {
+                    $("div#fuelMeterDiv").dynameter && $("div#fuelMeterDiv").dynameter('setValue', val);
+                } catch (_) { }
+            }
+        });
     }
 
     /* ==================================================
@@ -368,12 +307,12 @@
                 .addClass(cursorClass);
         }
 
-        $('#DeepScratch-btn').click(function () { setMode('deep-scratch', 'DeepScratch', 'deep-scratch-cursor'); });
-        $('#SmallScratch-btn').click(function () { setMode('small-scratch', 'SmallScratch', 'small-scratch-cursor'); });
-        $('#VeryDeepScratch-btn').click(function () { setMode('very-deep-scratch', 'VeryDeepScratch', 'very-deep-cursor'); });
-        $('#BendInBody-btn').click(function () { setMode('bend-in-body', 'BendInBody', 'bend-body-cursor'); });
+        $('#DeepScratch-btn').on('click', function () { setMode('deep-scratch', 'DeepScratch', 'deep-scratch-cursor'); });
+        $('#SmallScratch-btn').on('click', function () { setMode('small-scratch', 'SmallScratch', 'small-scratch-cursor'); });
+        $('#VeryDeepScratch-btn').on('click', function () { setMode('very-deep-scratch', 'VeryDeepScratch', 'very-deep-cursor'); });
+        $('#BendInBody-btn').on('click', function () { setMode('bend-in-body', 'BendInBody', 'bend-body-cursor'); });
 
-        $('#panel').click(function (e) {
+        $('#panel').on('click', function (e) {
             if (!shapeType) return;
 
             var id = ++shapeCount;
@@ -403,7 +342,8 @@
             $('#strikes').val(JSON.stringify(shapesJson));
         });
 
-        $(document).on("contextmenu", ".shape", function () {
+        $(document).on("contextmenu", ".shape", function (e) {
+            e.preventDefault();
             $(this).remove();
             return false;
         });
@@ -415,9 +355,9 @@
     function initializeEventHandlers() {
         $(document).on('DOMSubtreeModified', ".dm-valueP", function () { ChangeFuelSliderColor(); });
 
-        $("#AddRow").click(function () { AddWorkOrderRow(); });
+        $("#AddRow").on('click', function () { AddWorkOrderRow(); });
 
-        $("#SelectVehicle").click(function () { OpenChangeCarModal(); });
+        $("#SelectVehicle").on('click', function () { OpenChangeCarModal(); });
         $(document).on('vehicleSelected', function (event, vehicleId) { SelectVehicle(vehicleId); });
 
         $("input:radio[name=group1]:first").prop('checked', true).trigger('change');
@@ -430,7 +370,7 @@
             $(this).closest('.card-overlay').addClass('card-overlay-active');
         });
 
-        $("#btnAddNewVC").click(function () { AddNewCustomerAndVehicle(); });
+        $("#btnAddNewVC").on('click', function () { AddNewCustomerAndVehicle(); });
 
         $(document).on('change', '.WorkOrderSelect', function () {
             var selectedId = $(this).val();
@@ -463,6 +403,7 @@
 
     /* ==================================================
        Validation (adds time window validation too)
+       ✅ .validate() is initialized in $(document).ready below
     ================================================== */
     function initializeValidation() {
         if (!$.validator) return;
@@ -536,8 +477,8 @@
             }
         });
 
-        // NOTE: no submitHandler here — our form submit handler above always AJAX-submits.
-        $('form[id="movements"]').validate({
+        // ✅ Initialize validate on the form
+        $('form#movements').validate({
             ignore: ':hidden:not(.select2-hidden-accessible)',
             rules: {
                 ReceivedBranchId: { valueNotEquals: "0" },
@@ -888,4 +829,34 @@
         });
     }
 
-})();
+    /* ==================================================
+       BOOT (jQuery ready)
+       ✅ validate() is initialized here via initializeValidation()
+    ================================================== */
+    $(document).ready(function () {
+        initializeDateTimeRestrictionHandlers();
+
+        waitForGlobal('FilePond', function (ok) {
+            if (!ok) {
+                console.error('[FilePond] core not found. Check script order / CSP / network.');
+                return;
+            }
+            initializeFilePond();
+        });
+
+        initializeComponents();
+        initializeScratches();
+        initializejSignature();
+        initializeEventHandlers();
+
+        // ✅ .validate() on document ready
+        initializeValidation();
+
+        // ✅ always open modal on page load
+        var incomingVehicle = Number($("#VehicleFromReservation").val() || 0);
+        if (incomingVehicle === 0) {
+            OpenChangeCarModal();
+        }
+    });
+
+})(jQuery);
