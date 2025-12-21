@@ -660,7 +660,10 @@
         $('.MaintenanceDesc').val("");
         $('#WorkOrderId').html("");
         $('input[name="MaintenanceDesc"]').val("");
-        Etype = $("#VehicleTypeId").val();
+        let reservationType = Number($("#VehicleTypeFromReservation").val() || 0);
+        Etype = reservationType > 0
+            ? reservationType
+            : Number($("#VehicleTypeId").val());
 
         if (Etype == 2) { $('input[type="radio"][value="option2"][id="Type"]').prop('disabled', true); }
 
