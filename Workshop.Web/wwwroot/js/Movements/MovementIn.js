@@ -29,7 +29,15 @@
        Small utilities
     ================================================== */
     function domReady(fn) {
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+        if (document.readyState === 'loading')
+        {
+            document.addEventListener('DOMContentLoaded', fn);
+
+            const incomingVehicle = Number($("#VehicleFromReservation").val() || 0);
+            if (incomingVehicle == 0) {
+                OpenChangeCarModal();
+            }
+        }
         else fn();
     }
 
@@ -256,8 +264,10 @@
                 initializeValidation();
 
                 // ✅ always open modal on page load
-                OpenChangeCarModal();
-            });
+                const incomingVehicle = Number($("#VehicleFromReservation").val() || 0);
+                if (incomingVehicle == 0) {
+                    OpenChangeCarModal();
+                }            });
         });
     });
 
