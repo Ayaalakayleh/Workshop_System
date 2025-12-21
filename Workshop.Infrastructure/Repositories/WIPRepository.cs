@@ -232,6 +232,7 @@ namespace Workshop.Infrastructure.Repositories
         {
             var table = new DataTable();
             table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("KeyId", typeof(int));
             table.Columns.Add("WIPId", typeof(int));
             table.Columns.Add("Code", typeof(string));
             table.Columns.Add("Description", typeof(string));
@@ -247,7 +248,7 @@ namespace Workshop.Infrastructure.Repositories
 
             foreach (var item in Services)
             {
-                table.Rows.Add(item.Id, item.WIPId, item.Code, item.Description, item.LongDescription, item.StandardHours,
+                table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.Code, item.Description, item.LongDescription, item.StandardHours,
                                item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.Total, item.Status, item.AccountType);
             }
 
@@ -432,6 +433,7 @@ namespace Workshop.Infrastructure.Repositories
             {
                 WIPId = dto.WIPId,
                 RTSId = dto.RTSId,
+                KeyId = dto.KeyId,
                 TechnicianId = dto.TechnicianId,
                 Date = dto.Date,
                 StartTime = dto.StartTime,
@@ -482,6 +484,7 @@ namespace Workshop.Infrastructure.Repositories
                 var parameters = new DynamicParameters();
                 parameters.Add("WIPId", dto.WIPId);
                 parameters.Add("RTSId", dto.RTSId);
+                parameters.Add("KeyId", dto.KeyId);
                 parameters.Add("Status", dto.Status);
                 return await _database.ExecuteUpdateProcedure<int>("UpdateServiceStatus", parameters);
             }

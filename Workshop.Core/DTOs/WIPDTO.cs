@@ -132,6 +132,7 @@ namespace Workshop.Core.DTOs
         public string? StatusText { get; set; }
         public string? StatusPrimaryName { get; set; }
         public string? StatusSecondaryName { get; set; }
+        public int? KeyId { get; set; }
         public int? tableId { get; set; }// The actual Id in WIP_Service table
         public bool IsExternal { get; set; }
         public bool IsFixed { get; set; } = false;
@@ -208,6 +209,7 @@ namespace Workshop.Core.DTOs
         public int Id { get; set; }
         public int WIPId { get; set; }
         public int RTSId { get; set; }
+        public int? KeyId { get; set; }
         public int TechnicianId { get; set; }
         public DateTime Date { get; set; }
         public TimeSpan StartTime { get; set; }
@@ -220,6 +222,7 @@ namespace Workshop.Core.DTOs
     {
         public int WIPId { get; set; }
         public int RTSId { get; set; }
+        public int? KeyId { get; set; }
         public int Status { get; set; }
 
     }

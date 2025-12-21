@@ -5,7 +5,7 @@ function initialize_RTSGrid() {
         dataSource: {
             store: {
                 type: "array",
-                key: "Id",
+                key: "id",
                 data: []
             }
         },
@@ -56,93 +56,58 @@ function initialize_RTSGrid() {
         }
     });
 }
-
+let mainGridRowCounter = 0;
 function injectMainGrid(count) {
     const btn = $("#selectBtn");
     btn.off("click");
     if (count > 0) {
-        //btn.on("click", function () {
-        //    const sourceGrid = $("#rtsSelection").dxDataGrid("instance");
-        //    const targetGrid = $("#mainRTSGrid").dxDataGrid("instance");
-
-        //    const selectedRows = sourceGrid.getSelectedRowsData();
-        //    if (selectedRows.length > 0) {
-        //        const transformedData = selectedRows.map(item => ({
-        //            Id: item.id,
-        //            ItemId: item.id,
-        //            Code: item.code,
-        //            Description: lang == "en" ? item.primaryDescription : item.secondaryDescription,
-        //            StandardHours: item.hours,
-        //            //Allowed: item.Hours,
-        //            Rate: 0,
-        //            TimeTaken: 0,
-        //            Status: LabourLineEnum[1].value,
-        //            StatusText: LabourLineEnum[1].text,
-        //            Total:0
-
-        //        }));
-        //        const existing = targetGrid.option("dataSource") || [];
-        //        const newData = existing.concat(transformedData);
-        //        $("#addRtsModal").modal("hide");
-        //        targetGrid.option("dataSource", newData);
-        //    }
-        //});
         btn.on("click", function () {
             const sourceGrid = $("#rtsSelection").dxDataGrid("instance");
             const targetGrid = $("#mainRTSGrid").dxDataGrid("instance");
 
             const selectedRows = sourceGrid.getSelectedRowsData();
             if (selectedRows.length > 0) {
-
                 const existingRows = targetGrid.option("dataSource") || [];
-
                 const newItems = [];
 
                 selectedRows.forEach(item => {
-                    const exists = existingRows.some(x => x.Id === item.id);
-
-                    if (!exists) {
-                        newItems.push({
-                            Id: item.id,
-                            ItemId: item.id,
-                            Code: item.code,
-                            Description: lang == "en" ? item.primaryName : item.secondaryName,
-                            LongDescription: lang == "en" ? item.primaryDescription : item.secondaryDescription,
-                            StandardHours: item.hours,
-                            Rate: getRateAmount(item.id),
-                            TimeTaken: 0,
-                            Status: LabourLineEnum[1].value,
-                            StatusText: LabourLineEnum[1].text,
-                            Total: 0
-                        });
-                    }
+                    mainGridRowCounter++; 
+                    newItems.push({
+                        KeyId: mainGridRowCounter,
+                        Id: item.id,
+                        ItemId: item.id,
+                        Code: item.code,
+                        Description: lang == "en" ? item.primaryName : item.secondaryName,
+                        LongDescription: lang == "en" ? item.primaryDescription : item.secondaryDescription,
+                        StandardHours: item.hours,
+                        Rate: 0,
+                        BaseRate: 0,
+                        Total: 0,
+                        Status: LabourLineEnum[1].value,
+                        StatusText: LabourLineEnum[1].text
+                    });
                 });
 
                 if (newItems.length > 0) {
                     const updated = existingRows.concat(newItems);
                     targetGrid.option("dataSource", updated);
-                }
 
-                $("#addRtsModal").modal("hide");
+                    newItems.forEach(item => getRateAmount(item.KeyId, item.Id));
+
+                    $("#addRtsModal").modal("hide");
+                }
             }
         });
-
     }
 }
 
-function getRateAmount(RTSId) {
-    var id = $('#Id').val();
-    var CustomerId = $('#CustomerId').val();
-    var AccountType = $('#AccountType').val();
-    var SalesType = $('#SalesType').val();
-    debugger
+function getRateAmount(keyId, RTSId) {
     var model = {
-        //TechnicianId: parseInt(TechnicianId),
-        CustomerId: parseInt(CustomerId),
+        CustomerId: parseInt($('#CustomerId').val()),
         RTSId: parseInt(RTSId),
-        WIPId: id,
-        AccountType: parseInt(AccountType),
-        SalesType: parseInt(SalesType)
+        WIPId: $('#Id').val(),
+        AccountType: parseInt($('#AccountType').val()),
+        SalesType: parseInt($('#SalesType').val())
     };
 
     $.ajax({
@@ -152,36 +117,73 @@ function getRateAmount(RTSId) {
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(model)
     }).done(function (result) {
-        if (result) {
-            const grid = $('#mainRTSGrid').dxDataGrid('instance');
-            const rowIndex = grid.getRowIndexByKey(model.RTSId);
-            if (rowIndex >= 0) {
-                grid.cellValue(rowIndex, "BaseRate", result);
-                grid.cellValue(rowIndex, "Rate", result);
+        if (result == null) return;
+        debugger
+        const grid = $('#mainRTSGrid').dxDataGrid('instance');
+        const data = grid.option("dataSource") || [];
+        const target = data.find(r => r.KeyId === keyId); 
 
-                const rowData = grid.getVisibleRows()[rowIndex].data;
-                const total = (parseFloat(result) || 0) * (parseFloat(rowData.StandardHours) || 1);
-                grid.cellValue(rowIndex, "Total", total);
+        if (!target) return;
 
-                var data = grid.option("dataSource");
-                if (Array.isArray(data)) {
-                    const target = data.find(x => x.Id === model.RTSId);
-                    if (target) {
-                        target.Rate = result;
-                        target.Total = total;
-                    }
-                }
+        const hours = parseFloat(target.StandardHours) || 0;
+        const total = +(result * hours).toFixed(2);
 
-                grid.saveEditData();
-                updateTotalLabourFieldsFromGrid();
+        target.BaseRate = result;
+        target.Rate = result;
+        target.Total = total;
 
-            }
-
+        const rowIndex = grid.getRowIndexByKey(keyId);
+        if (rowIndex >= 0) {
+            grid.cellValue(rowIndex, "BaseRate", target.BaseRate);
+            grid.cellValue(rowIndex, "Rate", target.Rate);
+            grid.cellValue(rowIndex, "Total", target.Total);
         }
-    }).fail(function (xhr, status, error) {
-        console.error("Error:", error);
+
+        updateTotalLabourFieldsFromGrid();
     });
 }
+
+
+
+//function getRateAmount(RTSId, rowIndex) {
+
+//    var model = {
+//        CustomerId: parseInt($('#CustomerId').val()),
+//        RTSId: parseInt(RTSId),
+//        WIPId: $('#Id').val(),
+//        AccountType: parseInt($('#AccountType').val()),
+//        SalesType: parseInt($('#SalesType').val())
+//    };
+
+//    $.ajax({
+//        type: 'POST',
+//        url: window.RazorVars.getLabourRateUrl,
+//        dataType: 'json',
+//        contentType: 'application/json; charset=utf-8',
+//        data: JSON.stringify(model)
+//    }).done(function (result) {
+
+//        if (result == null) return;
+
+//        const grid = $('#mainRTSGrid').dxDataGrid('instance');
+//        const row = grid.getVisibleRows()[rowIndex];
+
+//        if (!row) return;
+
+//        const hours = parseFloat(row.data.StandardHours) || 0;
+//        const total = +(result * hours).toFixed(2);
+
+//        grid.cellValue(rowIndex, "BaseRate", result);
+//        grid.cellValue(rowIndex, "Rate", result);
+//        grid.cellValue(rowIndex, "Total", total);
+
+//        row.data.Rate = result;
+//        row.data.Total = total;
+
+//        grid.saveEditData();
+//        updateTotalLabourFieldsFromGrid();
+//    });
+//}
 
 function showModal(type) {
     //initialize_RTSGrid();

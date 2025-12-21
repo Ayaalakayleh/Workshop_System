@@ -54,10 +54,19 @@ $(function () {
         }
     }).dxPopup("instance");
 
+    function generateUniqueKeyId() {
+        if (!window.nextKeyId) window.nextKeyId = 1;
+        return window.nextKeyId++;
+
+    }
+
+    ServicesData.forEach(row => {
+        if (!row.KeyId) row.KeyId = generateUniqueKeyId();
+    });
 
     $("#mainRTSGrid").dxDataGrid({
         dataSource: ServicesData,
-        keyExpr: "Id",
+        keyExpr: "KeyId",
         noDataText: resources.NoDataInTable,
         showBorders: true,
         validateOnValueChange: false,
@@ -67,6 +76,7 @@ $(function () {
             paging: true
         },
         columns: [
+            { dataField: "KeyId", caption: "KeyId", visible: false },
             { dataField: "Id", caption: "ID", visible: false },
             {
                 dataField: "WIPId", caption: "WIPId", dataType: "number", visible: false,
@@ -257,7 +267,6 @@ $(function () {
                         hint: "Delete",
                         icon: "fad fa-trash",
                         visible: function (e) {
-                            debugger
                             return !(wipStatus === Gone || wipStatus === Invoiced) &&
                                 parseInt(e.row.data.Status) !== 19 &&
                                 parseInt(e.row.data.Status) !== 25;
@@ -399,12 +408,14 @@ function openScheduleModal(e) {
     console.log("// End ////////////////////");
     const $tr = $(this).closest('tr');
     const rtsId = e.Id;
+    const KeyId = e.KeyId;
     const wipId = e.WIPId;
 
     scheduledStartHHMM = null;
 
     // reset fields
-    $('#schDate, #schTech, #schStart, #schDuration, #schEnd').val('');
+    $('#schDate, #schTech, #schStart, #schDuration, #schEnd, #KeyId').val('');
+    $("#KeyId").val(KeyId);
 
     // default date = today
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -591,17 +602,18 @@ $('#btnSaveSchedule').on('click', function () {
     $('#scheduleModal').modal('hide');
 });
 
-$("#btnSaveSchedule").on("click", function () {
+$("#btnSaveSchedule").on("click", function (e) {
     var WIPSChedule = {
         WIPId: parseInt($('#Id').val()),
         RTSId: parseInt($('#RTSId').val()),
+        KeyId: parseInt($('#KeyId').val()),
         TechnicianId: parseInt($('#schTech').val()),
         Date: new Date($('#schDate').val()),
         StartTime: $('#schStart').val() + ":00",
         Duration: parseFloat($('#schDuration').val()),
         EndTime: $('#schEnd').val() + ":00"
     };
-
+    debugger
     $.ajax({
         type: 'POST',
         url: window.RazorVars.wipScheduleUrl,
@@ -611,10 +623,10 @@ $("#btnSaveSchedule").on("click", function () {
     }).done(function (result) {
         if (result && result.success) {
             const grid = $('#mainRTSGrid').dxDataGrid('instance');
-            const rowIndex = grid.getRowIndexByKey(result.rtsId);
+            const rowIndex = grid.getRowIndexByKey(result.keyId);
             if (rowIndex >= 0) {
                 var data = grid.option("dataSource");
-                const target = data.find(x => x.Id === result.rtsId);
+                const target = data.find(x => x.KeyId === result.keyId);
                 if (target) {
                     target.Status = result.status;
                     target.StatusText = "Booked";
@@ -771,19 +783,19 @@ function computeStartOptionsEnumerate(freeIntervals, durationMin, stepMin = 5) {
 
 //----------------------------------------------------------
 
-function updateStatusInGrid(RTSId, newStatus, statusText) {
+function updateStatusInGrid(KeyId, newStatus, statusText) {
     const grid = $('#mainRTSGrid').dxDataGrid('instance');
 
     var data = grid.option("dataSource");
     if (Array.isArray(data)) {
-        const target = data.find(x => x.Id === RTSId);
+        const target = data.find(x => x.Id === KeyId);
         if (target) {
             target.Status = newStatus;
             target.StatusText = statusText;
         }
     }
 
-    const rowIndex = grid.getRowIndexByKey(RTSId);
+    const rowIndex = grid.getRowIndexByKey(KeyId);
     if (rowIndex >= 0) {
         grid.cellValue(rowIndex, "Status", newStatus);
         grid.cellValue(rowIndex, "StatusText", statusText);
@@ -851,7 +863,7 @@ function ensureDiscountedRate(rowData) {
 $("#Vat").on("change", function () {
     const grid = $("#mainRTSGrid").dxDataGrid("instance");
     if (!grid) return;
-    debugger
+     
     const vatId = $("#Vat").val();
     const vatValue = parseFloat(GetVatValueById(vatId)) || 0;
     const vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;

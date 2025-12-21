@@ -687,32 +687,21 @@ $("#SalesType").on("change", function () {
     if (!grid) return;
 
     grid.saveEditData();
-    const items = grid.getDataSource().items() || [];
 
+    const items = grid.getDataSource().items() || [];
     items.forEach(function (row) {
 
-        const rtsId = row.RTSId || row.Id;
-
-        if (rtsId) {
-            getRateAmount(rtsId);
-        }
+        getRateAmount(row.KeyId, row.Id);
     });
 });
 
-
-function getRateAmount(RTSId) {
-    var id = $('#Id').val();
-    var CustomerId = $('#CustomerId').val();
-    var AccountType = $('#AccountType').val();
-    var SalesType = $('#SalesType').val();
-    debugger
-    var model = {
-        //TechnicianId: parseInt(TechnicianId),
-        CustomerId: parseInt(CustomerId),
+function getRateAmount(keyId, RTSId) {
+    const model = {
+        CustomerId: parseInt($('#CustomerId').val()),
         RTSId: parseInt(RTSId),
-        WIPId: id,
-        AccountType: parseInt(AccountType),
-        SalesType: parseInt(SalesType)
+        WIPId: $('#Id').val(),
+        AccountType: parseInt($('#AccountType').val()),
+        SalesType: parseInt($('#SalesType').val())
     };
 
     $.ajax({
@@ -722,38 +711,33 @@ function getRateAmount(RTSId) {
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(model)
     }).done(function (result) {
-        if (result !== undefined && result !== null) {
-            const grid = $('#mainRTSGrid').dxDataGrid('instance');
-            const rowIndex = grid.getRowIndexByKey(model.RTSId);
-            if (rowIndex >= 0) {
-                grid.cellValue(rowIndex, "Rate", result);
+        if (result == null) return;
 
-                const rowData = grid.getVisibleRows()[rowIndex].data;
-                const total = (parseFloat(result) || 0) * (parseFloat(rowData.StandardHours) || 1);
-                grid.cellValue(rowIndex, "Total", total);
+        const grid = $('#mainRTSGrid').dxDataGrid('instance');
+        const rowIndex = grid.getRowIndexByKey(keyId); 
+        if (rowIndex < 0) return;
 
-                var data = grid.option("dataSource");
-                if (Array.isArray(data)) {
-                    const target = data.find(x => x.Id === model.RTSId);
-                    if (target) {
-                        target.Rate = result;
-                        target.Total = total;
-                    }
-                }
+        const rowData = grid.getVisibleRows()[rowIndex].data;
+        const hours = parseFloat(rowData.StandardHours) || 1;
+        const total = +(result * hours).toFixed(2);
 
-                //grid.saveEditData();
-                //updateTotalLabourFieldsFromGrid();
-                grid.saveEditData();
-                grid.refresh().done(function () {
-                    updateTotalLabourFieldsFromGrid();
-                });
-            }
+        grid.cellValue(rowIndex, "Rate", result);
+        grid.cellValue(rowIndex, "Total", total);
 
+        const data = grid.option("dataSource");
+        const target = data.find(x => x.KeyId === keyId);
+        if (target) {
+            target.Rate = result;
+            target.Total = total;
         }
+
+        grid.saveEditData();
+        grid.refresh().done(() => updateTotalLabourFieldsFromGrid());
     }).fail(function (xhr, status, error) {
         console.error("Error:", error);
     });
 }
+
 
 $(document).ready(function () {
 

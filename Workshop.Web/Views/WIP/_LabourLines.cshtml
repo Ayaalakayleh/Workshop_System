@@ -104,6 +104,7 @@
                         m => m.TechnicianId, new SelectList(new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "schTech" }) 
                     </div>
                     @Html.HiddenFor(model => model.RTSId)
+                    @Html.Hidden("KeyId")
                     <div class="col-lg-4"><label class="form-label">@Common["Label_Start"]</label><input type="text" class="form-control" id="schStart"  value="08:00"></div>
                     <div class="col-lg-4"><label class="form-label">@Common["Label_DurationMins"]</label><input type="number" class="form-control" id="schDuration" min="1"  value="30"></div>
                     <div class="col-lg-4"><label class="form-label">@Common["Label_Ends"]</label><input type="time" class="form-control" id="schEnd"  readonly></div>

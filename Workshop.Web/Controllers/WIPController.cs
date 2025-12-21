@@ -899,16 +899,17 @@ namespace Workshop.Web.Controllers
                 {
                     WIPId = oWIPSChedule.WIPId,
                     RTSId = oWIPSChedule.RTSId,
+                    KeyId = oWIPSChedule.KeyId,
                     Status = (int)LabourLineEnum.Booked
                 };
-                //await UpdateServiceStatus(updateService);
-                //return Json(updateService);
+              
                 var updateResult = await UpdateServiceStatus(updateService);
 
                 return Json(new
                 {
                     success = true,
                     RTSId = updateService.RTSId,
+                    KeyId = updateService.KeyId,
                     Status = updateService.Status
                 });
             }
