@@ -11,7 +11,7 @@ namespace Workshop.Web.Models
         public IEnumerable<WIPDTO>? WIPS { get; set; }
 
         public IEnumerable<CreateWIPServiceDTO>? Labourlines { get; set; }
-        public IEnumerable<RTSCodeDTO>? RTSCodes { get; set; }
+        public IEnumerable<GetClockingFilter>? RTSCodes { get; set; }
 
         public List<SelectListItem>? TechniciansSelectList { get; set; }
 
