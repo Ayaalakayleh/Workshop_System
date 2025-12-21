@@ -56,11 +56,14 @@ namespace Workshop.Core.DTOs
         public int? WIPId { get; set; }
         public int? TechnicianId { get; set; }
         public int? RTSId { get; set; }
-
+        public int? KeyId { get; set; }
         public string? PrimaryTechniciansName { get; set; }
         public string? SecondaryTechniciansName { get; set; }
         public string? RTSPrimaryName { get; set; }
         public string? RTSSecondaryName { get; set; }
+        public string? RTSPrimaryDescription { get; set; }
+        public string? RTSSecondaryDescription { get; set; }
+        public decimal? StandardHours { get; set; }
     }
 
 }

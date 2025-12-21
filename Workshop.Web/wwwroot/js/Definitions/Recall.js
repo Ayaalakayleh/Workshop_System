@@ -79,7 +79,7 @@ $(function () {
                 dataField: "Chassis",
                 caption: LABELS.Chassis || "Chassis",
                 allowEditing: true,
-                validationRules: [{ type: "required", message: VALIDATION.Required || "Required" }],
+
                 setCellValue(rowData, value) {
                     rowData.Chassis = value;
                     if (value && typeof Chasses !== "undefined" && Chasses) {
@@ -260,7 +260,7 @@ $(function () {
         }
 
         const badRow = gridData.find(r =>
-            !r || r.MakeID == null || r.ModelID == null || (r.Chassis == null || r.Chassis === '')
+            !r || r.MakeID == null || r.ModelID == null
         );
         if (badRow) {
             if (window.Swal) {

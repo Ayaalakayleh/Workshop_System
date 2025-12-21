@@ -942,7 +942,7 @@ async function openScheduleModal(jobIndex) {
 
     // tags (fix undefined)
     if (els.jobTag) els.jobTag.textContent = `${window.i18n.label_job}: ${job.rts} — ${job.title}`;
-    if (els.allowedTag) els.allowedTag.textContent = `${window.i18n.label_allowed}: ${(job.allowed ?? 0)}m`;
+    if (els.allowedTag) els.allowedTag.textContent = `${window.i18n.label_allowed}: ${(job.allowed ?? 0)}h`;
     if (els.overdue) els.overdue.classList.add("d-none");
 
     // set fields
