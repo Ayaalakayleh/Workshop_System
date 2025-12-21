@@ -815,6 +815,7 @@ function initModal2() {
     $(els.saveBtn).off(".sched2").on("click.sched2", async function () {
         const idx = Number(els.jobIndex.value);
         const job = unscheduled[idx];
+        console.log(job);
         if (!job) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
             return;
@@ -843,8 +844,10 @@ function initModal2() {
             StartTime: `${start24}:00`,
             Duration: durationMins,
             EndTime: `${end24}:00`,
+            KeyId: job.KeyId,
         };
-
+        console.log("WIPSCheduleObject");
+        console.log(WIPSCheduleObject);
         const request = await SaveSchedule(WIPSCheduleObject);
         if (!request?.success) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });
@@ -1145,7 +1148,8 @@ function GetServicesById(id, lang) {
                 title: value.description,
                 allowed: value.standardHours,
                 wipid: value.wipId,
-                rtsid: value.id
+                rtsid: value.id,
+                KeyId: value.keyId
             });
         });
     }).catch(function () { });
@@ -1169,7 +1173,8 @@ function FetchServicesByIdReturnArray(id, lang) {
                 title: value.description,
                 allowed: value.standardHours,
                 wipid: value.wipId,
-                rtsid: value.id
+                rtsid: value.id,
+                KeyId: value.keyId,
             });
         });
         return result;

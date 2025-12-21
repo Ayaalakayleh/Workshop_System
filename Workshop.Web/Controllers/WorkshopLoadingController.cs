@@ -104,6 +104,8 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.WorkshopLoading.Create)]
         public async Task<JsonResult> WIPSChedule([FromBody] WIPSChedule oWIPSChedule)
         {
+            oWIPSChedule.CompanyId = CompanyId;
+            
             try
             {
                 var scheduleList = await _apiclient.WIPSCheduleInsert(oWIPSChedule);
@@ -113,6 +115,7 @@ namespace Workshop.Web.Controllers
                     {
                         WIPId = oWIPSChedule.WIPId,
                         RTSId = oWIPSChedule.RTSId,
+                        KeyId = oWIPSChedule.KeyId,
                         Status = (int)LabourLineEnum.Booked
                     };
                     await UpdateServiceStatus(updateService);
