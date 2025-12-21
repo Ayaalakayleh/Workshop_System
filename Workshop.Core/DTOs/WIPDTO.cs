@@ -68,7 +68,7 @@ namespace Workshop.Core.DTOs
         public int? PartialCustomerId { get; set; }
         public int? PartialCurrencyId { get; set; }
         public int? PartialTermsId { get; set; }
-        public decimal? PartialVat { get; set; }
+        public int? PartialVat { get; set; }
     }
 
     public class CreateWIPDTO : WIPBaseDTO
@@ -363,6 +363,7 @@ namespace Workshop.Core.DTOs
         public string StartTime { get; set; } = "";
         public decimal DurationMinutes { get; set; }
         public string EndTime { get; set; } = "";
+        public bool isWorking { get; set; } = false;
     }
     public sealed class ReservationHoursDTO
     {

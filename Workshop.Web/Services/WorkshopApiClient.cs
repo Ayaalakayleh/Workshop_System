@@ -1925,9 +1925,9 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<CreateWIPServiceDTO>>($"api/WIP/GetWIPServices?Id={id}&lang={lang}");
         }
 
-        public async Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId)
+        public async Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId, int KeyId)
         {
-            return await _httpClient.GetFromJsonAsync<WIPSChedule>($"api/WIP/WIPSCheduleGet?RTSId={RTSId}&WIPId={WIPId}");
+            return await _httpClient.GetFromJsonAsync<WIPSChedule>($"api/WIP/WIPSCheduleGet?RTSId={RTSId}&WIPId={WIPId}&KeyId={KeyId}");
         }
 
         public async Task<IEnumerable<WIPSChedule>> WIP_SChedule_GetAll()

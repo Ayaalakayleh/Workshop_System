@@ -59,11 +59,11 @@ namespace Workshop.Web.Controllers
                 Obj = Obj.Where(x => x?.Status == 23).ToList();
                 var scObj = await _apiclient.WIP_SChedule_GetAll();
                 var objWipIds = scObj.Select(x => x?.WIPId).ToHashSet();
-                var notInScObj = Obj
-                .Where(o => !objWipIds.Contains(o?.WIPId))
-                .ToList();
+                //var notInScObj = Obj
+                //.Where(o => !objWipIds.Contains(o?.WIPId))
+                //.ToList();
 
-                return Ok(notInScObj);
+                return Ok(Obj);
             }
             catch (Exception ex)
             {
@@ -104,6 +104,8 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.WorkshopLoading.Create)]
         public async Task<JsonResult> WIPSChedule([FromBody] WIPSChedule oWIPSChedule)
         {
+            oWIPSChedule.CompanyId = CompanyId;
+            
             try
             {
                 var scheduleList = await _apiclient.WIPSCheduleInsert(oWIPSChedule);
@@ -113,6 +115,7 @@ namespace Workshop.Web.Controllers
                     {
                         WIPId = oWIPSChedule.WIPId,
                         RTSId = oWIPSChedule.RTSId,
+                        KeyId = oWIPSChedule.KeyId,
                         Status = (int)LabourLineEnum.Booked
                     };
                     await UpdateServiceStatus(updateService);

@@ -443,9 +443,9 @@ namespace Workshop.Infrastructure.Repositories
             return await _database.ExecuteAddStoredProcedure<int>("WIP_SChedule_Insert", parameters);
         }
 
-        public async Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId)
+        public async Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId, int KeyId)
         {
-            var parameters = new { RTSId = RTSId, WIPId = WIPId };
+            var parameters = new { RTSId = RTSId, WIPId = WIPId, KeyId = KeyId };
 
             return await _database.ExecuteGetByIdProcedure<WIPSChedule>("WIP_SChedule_Get", parameters);
         }

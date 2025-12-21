@@ -54,7 +54,9 @@ namespace Workshop.Web.Controllers
             ViewBag.SubStatuses = await GetSubStatuses();
             ViewBag.FromReservationVehicleId = vehicleId ?? 0;
             ViewBag.FromReservationVehicleTypeId = vehicleTypeId ?? 0;
-            return View(new VehicleMovement());
+            var obj = new VehicleMovement();
+            obj.GregorianMovementDate = DateTime.Now;
+            return View(obj);
 
         }
 

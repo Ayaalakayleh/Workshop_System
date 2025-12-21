@@ -197,9 +197,9 @@ namespace Workshop.API.Controllers
         }
 
         [HttpGet("WIPSCheduleGet")]
-        public async Task<ActionResult<WIPSChedule?>> WIP_SChedule_Get([FromQuery] int RTSId, int WIPId)
+        public async Task<ActionResult<WIPSChedule?>> WIP_SChedule_Get([FromQuery] int RTSId, int WIPId, int KeyId)
         {
-            var result = await _service.WIP_SChedule_Get(RTSId, WIPId);
+            var result = await _service.WIP_SChedule_Get(RTSId, WIPId, KeyId);
             if (result == null) return new WIPSChedule();
             return Ok(result);
         }

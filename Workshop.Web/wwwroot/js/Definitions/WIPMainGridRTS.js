@@ -410,7 +410,7 @@ function openScheduleModal(e) {
     const rtsId = e.Id;
     const KeyId = e.KeyId;
     const wipId = e.WIPId;
-
+    const keyId = e.KeyId;
     scheduledStartHHMM = null;
 
     // reset fields
@@ -427,7 +427,7 @@ function openScheduleModal(e) {
     $('table tr').removeClass('selected-row');
     $tr.addClass('selected-row');
 
-    $.get(window.RazorVars.scheduleGetByIdUrl, { RTSId: rtsId, WIPId: wipId }, function (data) {
+    $.get(window.RazorVars.scheduleGetByIdUrl, { RTSId: rtsId, WIPId: wipId, KeyId:keyId }, function (data) {
         if (data) {
             // handle date, ignore 0001-01-01T00:00:00
             if (data.date && !data.date.startsWith("0001-01-01")) {
@@ -466,13 +466,13 @@ function openScheduleModal(e) {
     }
     recompute();
 
-    const rts = ($tr.children().eq(0).text() || '').trim();
-    const desc = ($tr.children().eq(1).text() || '').trim();
+    const rts = e.Id;/*($tr.children().eq(0).text() || '').trim();*/
+    const desc = e.Description;/* ($tr.children().eq(1).text() || '').trim();*/
     const allowTxt = ($tr.children().eq(2).text() || '').trim();
-    const allowed = parseInt((allowTxt.match(/(\d+)\s*m/i) || [])[1] || '0', 10);
+    const allowed = e.StandardHours;//parseInt((allowTxt.match(/(\d+)\s*m/i) || [])[1] || '0', 10);
 
     $schJobChip.text((resources.job || 'Job') + ': ' + rts + ' — ' + desc);
-    $schAllowedChip.text((resources.allowed || 'Allowed') + ': ' + (allowed || 0) + 'm');
+    $schAllowedChip.text((resources.allowed || 'Allowed') + ': ' + (allowed || 0) + 'h');
 
     const modal = new bootstrap.Modal('#scheduleModal');
     const order = [
