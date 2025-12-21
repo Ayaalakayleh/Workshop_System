@@ -1664,7 +1664,7 @@ namespace Workshop.Web.Controllers
             var oAccountSalesDetails = new AccountSalesDetails();
             AccountSales oAccountSales = new AccountSales();
             var VehicleDetails = _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang).Result;
-            var taxClass = _accountingApiClient.GetTaxClassificationById(1).Result;
+            var taxClass = _accountingApiClient.GetTaxClassificationById(oWIPDTO.AccountDetails.Vat??1).Result;
             //oWIPDTO.AccountDetails.TaxClassificationId ?? oWIPDTO.AccountDetails.PartialVat
             var items = new List<Workshop.Core.DTOs.AccountingDTOs.Item>();
             items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);

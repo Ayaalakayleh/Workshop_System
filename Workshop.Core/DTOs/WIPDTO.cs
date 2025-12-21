@@ -363,6 +363,7 @@ namespace Workshop.Core.DTOs
         public string StartTime { get; set; } = "";
         public decimal DurationMinutes { get; set; }
         public string EndTime { get; set; } = "";
+        public bool isWorking { get; set; } = false;
     }
     public sealed class ReservationHoursDTO
     {
