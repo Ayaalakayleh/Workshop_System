@@ -68,7 +68,7 @@ namespace Workshop.Core.DTOs
         public int? PartialCustomerId { get; set; }
         public int? PartialCurrencyId { get; set; }
         public int? PartialTermsId { get; set; }
-        public decimal? PartialVat { get; set; }
+        public int? PartialVat { get; set; }
     }
 
     public class CreateWIPDTO : WIPBaseDTO

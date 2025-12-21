@@ -68,12 +68,22 @@ function injectMainGrid(count) {
             const selectedRows = sourceGrid.getSelectedRowsData();
             if (selectedRows.length > 0) {
                 const existingRows = targetGrid.option("dataSource") || [];
+
+                let nextKeyId = 1;
+                if (existingRows.length > 0) {
+                    const maxKeyId = Math.max(
+                        ...existingRows.map(r => parseInt(r.KeyId, 10) || 0)
+                    );
+                    nextKeyId = maxKeyId + 1;
+                }
+
+
+
                 const newItems = [];
 
                 selectedRows.forEach(item => {
-                    mainGridRowCounter++; 
                     newItems.push({
-                        KeyId: mainGridRowCounter,
+                        KeyId: nextKeyId++, 
                         Id: item.id,
                         ItemId: item.id,
                         Code: item.code,
@@ -91,7 +101,9 @@ function injectMainGrid(count) {
                 if (newItems.length > 0) {
                     const updated = existingRows.concat(newItems);
                     targetGrid.option("dataSource", updated);
-
+                    targetGrid.getDataSource().reload();
+                    targetGrid.refresh(true);
+                    targetGrid.saveEditData();
                     newItems.forEach(item => getRateAmount(item.KeyId, item.Id));
 
                     $("#addRtsModal").modal("hide");
@@ -138,8 +150,10 @@ function getRateAmount(keyId, RTSId) {
             grid.cellValue(rowIndex, "Rate", target.Rate);
             grid.cellValue(rowIndex, "Total", target.Total);
         }
-
-        updateTotalLabourFieldsFromGrid();
+        grid.getDataSource().reload();
+        grid.refresh(true);
+        grid.saveEditData();
+        //updateTotalLabourFieldsFromGrid();
     });
 }
 
