@@ -111,9 +111,9 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIPSChedule_Insert(dto);
         }
-        public async Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId)
+        public async Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId, int KeyId)
         {
-            return await _repository.WIP_SChedule_Get(RTSId, WIPId);
+            return await _repository.WIP_SChedule_Get(RTSId, WIPId, KeyId);
         }
 
         public async Task<int> UpdateServiceStatus(UpdateService dto)

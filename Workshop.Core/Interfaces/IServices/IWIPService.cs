@@ -26,7 +26,7 @@ namespace Workshop.Core.Interfaces.IServices
         Task<AccountDTO?> WIP_GetAccountById(int id);
         Task<VehicleTabDTO?> WIP_GetVehicleDetailsById(int id);
         Task<int> WIPSChedule_Insert(WIPSChedule dto);
-        Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId);
+        Task<WIPSChedule?> WIP_SChedule_Get(int RTSId, int WIPId, int KeyId);
         Task<int> UpdateServiceStatus(UpdateService dto);
         Task<IEnumerable<WIPDTO>> GetAllDDLAsync();
 
