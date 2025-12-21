@@ -59,11 +59,11 @@ namespace Workshop.Web.Controllers
                 Obj = Obj.Where(x => x?.Status == 23).ToList();
                 var scObj = await _apiclient.WIP_SChedule_GetAll();
                 var objWipIds = scObj.Select(x => x?.WIPId).ToHashSet();
-                var notInScObj = Obj
-                .Where(o => !objWipIds.Contains(o?.WIPId))
-                .ToList();
+                //var notInScObj = Obj
+                //.Where(o => !objWipIds.Contains(o?.WIPId))
+                //.ToList();
 
-                return Ok(notInScObj);
+                return Ok(Obj);
             }
             catch (Exception ex)
             {
