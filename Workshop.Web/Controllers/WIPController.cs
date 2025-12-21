@@ -916,10 +916,10 @@ namespace Workshop.Web.Controllers
             return Json(new { success = false });
         }
 
-        public async Task<JsonResult> ScheduleGetById(int RTSId, int WIPId)
+        public async Task<JsonResult> ScheduleGetById(int RTSId, int WIPId, int KeyId)
         {
             WIPSChedule model = null;
-            model = await _apiClient.WIP_SChedule_Get(RTSId, WIPId);
+            model = await _apiClient.WIP_SChedule_Get(RTSId, WIPId, KeyId);
             return Json(model);
         }
 
