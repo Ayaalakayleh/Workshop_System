@@ -107,9 +107,12 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>@Common["Label_Chassis"]</label>
-                            <input type="text" class="form-control" id="filterChassis" maxlength="200" autocomplete="off" />
+                            <select id="filterChassis" class="form-control">
+                                <option value="">@Common["Select"]</option>
+                            </select>
                         </div>
                     </div>
+
 
                 </div>
                 <div class="text-center mt-3">
@@ -183,13 +186,13 @@
             const dateFrom = $('#filterFromDate').val();
             const dateTo = $('#filterToDate').val();
             const vehicleId = $('#filterPlateNumber').val();
-            const chassis = $('#filterChassis').val();
+            const chassisId = $('#filterChassis').val();
 
             const filter = {
                 DateFrom: dateFrom || null,
                 DateTo: dateTo || null,
                 VehicleId: vehicleId ? parseInt(vehicleId) : null,
-                Chassis: chassis ? chassis : null
+                chassisId: chassisId ? chassisId : null
             };
 
             if (page !== undefined && page !== null) {
@@ -390,7 +393,60 @@
             vehicles.forEach(v => {
                 vehicleDropdown.append(`<option value="${v.id}">${v.vehicleName}</option>`);
             });
+                const chassisDropdown = $('#filterChassis');
+                    chassisDropdown.empty().append('<option value="">@Common["Select"]</option>');
+
+                    $.get(
+                        '@Url.Action("GetChassisByVehicleType", "Reservations")',
+                        { vehicleTypeId: type },
+                        function (data) {
+                            data.forEach(c => {
+                                chassisDropdown.append(`<option value="${c.id}">${c.text}</option>`);
+                            });
+        }
+    );
         });
+       let isSyncing = false;
+
+    $('#filterPlateNumber').on('change', function () {
+        if (isSyncing) return;
+
+        const id = $(this).val();
+        if (!id) return;
+
+        isSyncing = true;
+
+        $.get(window.API_BASE.getVehicleDefentionById, { id }, function (res) {
+            if (res.success && res.data) {
+                $('#filterChassis')
+                    .val(res.data.vehicle?.id)
+                    .trigger('change');
+            }
+            isSyncing = false;
+        });
+    });
+
+    $('#filterChassis').on('change', function () {
+        if (isSyncing) return;
+
+        const id = $(this).val();
+        if (!id) return;
+
+        isSyncing = true;
+
+        $.get(window.API_BASE.getVehicleDefentionById, { id }, function (res) {
+            if (res.success && res.data) {
+                $('#filterPlateNumber')
+                    .val(id)
+                    .trigger('change');
+            }
+            isSyncing = false;
+        });
+    });
+
+
+
+
     });
 </script>
 

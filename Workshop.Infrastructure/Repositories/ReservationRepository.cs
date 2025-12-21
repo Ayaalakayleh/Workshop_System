@@ -28,7 +28,7 @@ namespace Workshop.Infrastructure.Repositories
                 DateTo = filterDTO.DateTo,
                 PageNumber = filterDTO.PageNumber,
                 PageSize = filterDTO.PageSize,
-                Chassis = filterDTO.Chassis
+                ChassisId = filterDTO.ChassisId
             };
 
             var result = await _database.ExecuteGetAllStoredProcedure<ReservationListItemDTO>("M_Reservations_GetFiltered", parameters);
