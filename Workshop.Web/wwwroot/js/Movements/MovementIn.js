@@ -29,6 +29,18 @@
     /* ==================================================
        Small utilities
     ================================================== */
+    function formatYMD(dt) {
+        return dt.getFullYear() + '-' + pad2(dt.getMonth() + 1) + '-' + pad2(dt.getDate());
+    }
+
+    function clampDateToAllowedRange(dateObj, minDate, maxDate) {
+        if (!dateObj) return null;
+        var t = dateObj.getTime();
+        if (t < minDate.getTime()) return new Date(minDate.getTime());
+        if (t > maxDate.getTime()) return new Date(maxDate.getTime());
+        return dateObj;
+    }
+
     function waitForGlobal(name, cb, maxTries, delayMs) {
         maxTries = maxTries || 60;
         delayMs = delayMs || 100;
@@ -217,6 +229,64 @@
     /* ==================================================
        Components
     ================================================== */
+    function initializeMovementDatePicker() {
+        var $el = $('#GregorianMovementDate');
+        if (!$el.length) return;
+
+        // Permission flag coming from Razor
+        var canBackTime = !!(window.RazorVars && RazorVars.canMovementInBackTime);
+
+        // Today (start-of-day)
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Allowed range
+        var maxDate = new Date(today.getTime()); // today
+        var minDate = canBackTime
+            ? new Date(today.getTime() - (2 * 24 * 60 * 60 * 1000)) // today - 2 days (last 3 days inclusive)
+            : new Date(today.getTime()); // today only
+
+        // If there is already a value, clamp it; otherwise default to today
+        var current = parseYMD($el.val());
+        current = current ? clampDateToAllowedRange(current, minDate, maxDate) : maxDate;
+        $el.val(formatYMD(current));
+
+        // If flatpickr exists, use it
+        if (window.flatpickr) {
+            // If already initialized, destroy to avoid duplicate instances
+            if ($el[0]._flatpickr) {
+                try { $el[0]._flatpickr.destroy(); } catch (_) { }
+            }
+
+            window.flatpickr($el[0], {
+                dateFormat: "Y-m-d",
+                defaultDate: current,
+                minDate: minDate,
+                maxDate: maxDate,
+                allowInput: false,
+                disableMobile: true,
+
+                onReady: function () {
+                    // make sure time rule applies immediately
+                    $el.trigger('change');
+                },
+                onChange: function () {
+                    $el.trigger('change');
+                }
+            });
+
+            return;
+        }
+
+        // Fallback (if flatpickr is not loaded): enforce by resetting invalid input
+        $el.on('change input', function () {
+            var d = parseYMD($el.val());
+            d = d ? clampDateToAllowedRange(d, minDate, maxDate) : maxDate;
+            $el.val(formatYMD(d));
+            $el.trigger('change');
+        });
+    }
+
     function initializeComponents() {
         var d = new Date(), h = d.getHours(), m = d.getMinutes();
         if (h < 10) h = '0' + h;
@@ -834,7 +904,8 @@
        ✅ validate() is initialized here via initializeValidation()
     ================================================== */
     $(document).ready(function () {
-        initializeDateTimeRestrictionHandlers();
+        initializeMovementDatePicker();          // ✅ set allowed date range first
+        initializeDateTimeRestrictionHandlers(); // ✅ then bind time restriction rules
 
         waitForGlobal('FilePond', function (ok) {
             if (!ok) {
@@ -848,15 +919,13 @@
         initializeScratches();
         initializejSignature();
         initializeEventHandlers();
-
-        // ✅ .validate() on document ready
         initializeValidation();
 
-        // ✅ always open modal on page load
         var incomingVehicle = Number($("#VehicleFromReservation").val() || 0);
         if (incomingVehicle === 0) {
             OpenChangeCarModal();
         }
     });
+
 
 })(jQuery);
