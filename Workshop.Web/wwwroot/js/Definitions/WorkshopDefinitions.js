@@ -68,7 +68,7 @@
                 normalizer: function (value) { return $.trim(value); }
             },
             CityId: { required: true },
-            InsuranceCompanyIds: { required: true },
+            InsuranceCompanyIds: { required: false },
             VatClassificationId: { required: true },
             SupplierId: { required: true }
         },
@@ -79,7 +79,6 @@
             PrimaryAddress: { required: resources.required_field },
             GoogleURL: { required: resources.required_field },
             CityId: { required: resources.required_field },
-            InsuranceCompanyIds: { required: resources.required_field },
             VatClassificationId: { required: resources.required_field },
             SupplierId: { required: resources.required_field }
         },

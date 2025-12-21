@@ -89,6 +89,7 @@ namespace Workshop.Controllers
             else
             {
                 workshop = new WorkShopDefinitionDTO();
+                workshop.IsActive = true;
             }
 
             if (Id != null && workshop == null)

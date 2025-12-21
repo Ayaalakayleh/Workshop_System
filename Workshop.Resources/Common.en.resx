@@ -514,7 +514,7 @@
     <value>Parent</value>
   </data>
   <data name="Label_GoogleURL" xml:space="preserve">
-    <value>Google URL</value>
+    <value>Google Map URL</value>
   </data>
   <data name="Label_CityId" xml:space="preserve">
     <value>City</value>

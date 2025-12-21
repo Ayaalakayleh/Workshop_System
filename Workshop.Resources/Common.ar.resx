@@ -514,7 +514,7 @@
     <value>الورشة الرئيسية</value>
   </data>
   <data name="Label_GoogleURL" xml:space="preserve">
-    <value>رابط جوجل</value>
+    <value>رابط خرائط جوجل</value>
   </data>
   <data name="Label_CityId" xml:space="preserve">
     <value>رقم المدينة</value>
