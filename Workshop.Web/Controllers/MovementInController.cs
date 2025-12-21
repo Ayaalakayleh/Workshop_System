@@ -160,7 +160,7 @@ namespace Workshop.Web.Controllers
                         if (lastMovement.GregorianMovementDate > movement.GregorianMovementDate.Value.Date.Add(movement.ReceivedTime.Value) || lastMovement.MovementIN.Value)
                         {
                             resultJson.IsSuccess = false;
-                            resultJson.Message = "CannotmakeInbeforelastmovementoperation" + " " + lastMovement.GregorianMovementDate;
+                            resultJson.Message = "Cannot Make In Before Last Movement Operation" + " " + lastMovement.GregorianMovementDate;
                             return Json(resultJson);
                         }
                     }
