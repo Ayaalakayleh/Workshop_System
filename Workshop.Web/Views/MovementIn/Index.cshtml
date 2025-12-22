@@ -7,6 +7,9 @@
 @{
     Layout = "_Layout";
 }
+@{
+    var canMovementInBackTime = User.HasClaim("Permission", Permissions.MovementIn.BackTime.ToString());
+}
 
 <link href="~/js/literallycanvas/_assets/literallycanvas.css" rel="stylesheet" />
 <link href="~/smartadmin-5-styles/plugins/dynameter/css/jquery.dynameter.css" rel="stylesheet" />
@@ -448,7 +451,8 @@
         hijri: '@Common["Label_Hijri"]',
         gregorian: '@Common["Label_Gregorian"]',
         filepondDragDrop: '@Common["filepondDragDrop"]',
-        vehicleSubStatusesUrl: '@Url.Action("VehicleSubStatuses", "VehicleDefinition")'
+        vehicleSubStatusesUrl: '@Url.Action("VehicleSubStatuses", "VehicleDefinition")',
+        canMovementInBackTime: @(canMovementInBackTime.ToString().ToLower()),
     };
 </script>
 <script src="~/js/Movements/MovementIn.js"></script>
