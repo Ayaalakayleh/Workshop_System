@@ -1075,11 +1075,14 @@ html[dir="rtl"] .toggle-pin {
 }
 
     .wl-bg.working {
-        background: rgba(46, 204, 113, 0.35); /* green */
+        background: rgba(46, 204, 113, 0.35);
     }
 
     .wl-bg.reserved {
-        background: rgba(231, 76, 60, 0.55); /* red */
+        background: rgba(231, 76, 60, 0.55);
+    }
+    .wl-bg.busy {
+        background: rgba(251, 192, 53, 0.68);
     }
 
 /* Job pill (actual scheduled work) */

@@ -292,12 +292,26 @@ function subtractIntervals(base, subtract) {
     return result.filter(x => x.end > x.start);
 }
 
-function computeVisibleWorking(working, reserved) {
+function computeVisibleWorkingByStatus(working, reserved) {
+    // keep isWorking flag while clipping
     let baseWorking = Array.isArray(working)
-        ? working.map(clipIntervalToShift).filter(Boolean)
+        ? working.map(i => {
+            const clipped = clipIntervalToShift(i);
+            if (!clipped) return null;
+            return { ...clipped, isWorking: !!i.isWorking };
+        }).filter(Boolean)
         : [];
 
-    baseWorking = mergeIntervals(baseWorking);
+    const busyBase = baseWorking.filter(x => x.isWorking).map(({ start, end }) => ({ start, end }));
+    const workBase = baseWorking.filter(x => !x.isWorking).map(({ start, end }) => ({ start, end }));
+
+    const busyMerged = mergeIntervals(busyBase);
+    let workMerged = mergeIntervals(workBase);
+
+    // avoid double painting: remove busy time from normal working time
+    if (busyMerged.length && workMerged.length) {
+        workMerged = subtractIntervals(workMerged, busyMerged);
+    }
 
     const reservedClipped = (Array.isArray(reserved) ? reserved : [])
         .map(clipIntervalToShift)
@@ -305,12 +319,12 @@ function computeVisibleWorking(working, reserved) {
 
     const reservedMerged = mergeIntervals(reservedClipped);
 
-    const visibleWorking = baseWorking.length
-        ? subtractIntervals(baseWorking, reservedMerged)
-        : [];
+    const visibleBusy = busyMerged.length ? subtractIntervals(busyMerged, reservedMerged) : [];
+    const visibleWorking = workMerged.length ? subtractIntervals(workMerged, reservedMerged) : [];
 
-    return { visibleWorking, reservedMerged };
+    return { visibleWorking, visibleBusy, reservedMerged };
 }
+
 
 // ====== BUILD MAPS ======
 function buildIntervalMaps() {
@@ -335,7 +349,7 @@ function buildIntervalMaps() {
             if (!working.has(dISO)) working.set(dISO, new Map());
             const m = working.get(dISO);
             if (!m.has(id)) m.set(id, []);
-            m.get(id).push({ start: s, end: e });
+            m.get(id).push({ start: s, end: e, isWorking: !!w.isWorking });
         });
 
         rList.forEach(r => {
@@ -401,8 +415,10 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
     const rawWorking = maps.working.get(dayISO)?.get(techId) || [];
     const rawReserved = maps.reserved.get(dayISO)?.get(techId) || [];
 
-    const { visibleWorking, reservedMerged } = computeVisibleWorking(rawWorking, rawReserved);
+    const { visibleWorking, visibleBusy, reservedMerged } =
+        computeVisibleWorkingByStatus(rawWorking, rawReserved);
 
+    // Normal working (default)
     visibleWorking.forEach(w => {
         const div = document.createElement("div");
         div.className = "wl-bg working";
@@ -419,6 +435,24 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         lane.appendChild(div);
     });
 
+    // Busy (when isWorking === true)
+    visibleBusy.forEach(b => {
+        const div = document.createElement("div");
+        div.className = "wl-bg busy";
+        div.style.position = "absolute";
+        div.style.top = "0";
+        div.style.bottom = "0";
+        div.style.pointerEvents = "none";
+        div.style.zIndex = "1"; // same layer, but appended after -> appears on top of working
+
+        const pos = lanePosFromMinutes(b.start, b.end);
+        div.style.left = pos.left;
+        div.style.width = pos.width;
+        div.title = `${tech.name} • Busy ${fromMinutes(b.start)}–${fromMinutes(b.end)}`;
+        lane.appendChild(div);
+    });
+
+    // Reserved stays above everything
     reservedMerged.forEach(r => {
         const div = document.createElement("div");
         div.className = "wl-bg reserved";
@@ -435,6 +469,7 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         lane.appendChild(div);
     });
 }
+
 
 function makePeriodElement(e) {
     const el = document.createElement("div");
@@ -1080,11 +1115,15 @@ function GetAllTechnicians(Date) {
             }
 
             const normW = (workingHoursList || []).map(w => ({
-                date: apiDateISO(w.date),
-                startTime: (w.startTime || '').toString(),
-                endTime: (w.endTime || '').toString(),
-                durationMinutes: w.durationMinutes ?? null
+                date: apiDateISO(w.date ?? w.Date),
+                // API may send firstTime instead of startTime
+                startTime: (w.startTime ?? w.firstTime ?? w.FirstTime ?? "").toString(),
+                endTime: (w.endTime ?? w.EndTime ?? "").toString(),
+                durationMinutes: w.durationMinutes ?? w.DurationMinutes ?? null,
+                // NEW
+                isWorking: !!(w.isWorking ?? w.IsWorking)
             })).filter(x => x.date && x.startTime && (x.endTime || Number.isFinite(x.durationMinutes)));
+
 
             const normR = (reservationsList || []).map(r => ({
                 date: apiDateISO(r.date),
