@@ -19,4 +19,15 @@ public class ExternalWorkshopInvoiceService : IExternalWorkshopInvoiceService
     {
         return await _repository.GetInvoiceDetailsAsync(filter);
     }
+	public async Task<IEnumerable<WorkshopInvoice>> M_WorkshopInvoice_GetWorkshop(DateTime? fromDate, DateTime? toDate, int? customerId, int? vehicleId, int? projectId, int? companyId)
+	{
+		try
+		{
+			return await _repository.M_WorkshopInvoice_GetWorkshop(fromDate, toDate, customerId, vehicleId, projectId, companyId);
+		}
+		catch (Exception ex)
+		{
+			throw new Exception("Error in M_WorkshopInvoice_GetWorkshop", ex);
+		}
+	}
 }

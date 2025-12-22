@@ -258,12 +258,66 @@ namespace Workshop.Infrastructure.Repositories
             var result = await _database.ExecuteGetByIdProcedure<string>("D_WorkshopVehicleMovement_GetStrike", parameters);
             return result;
         }
+		public async Task<VehicleMovementDTO> WorkshopMovement_GetFirstAgreementMovementByVehicleId(int vehicleId)
+		{
+			var parameters = new
+			{
+				VehicleId = vehicleId
+			};
 
-        #endregion
+			var result = await _database.ExecuteGetByIdProcedure<VehicleMovementDTO>(
+				"D_WorkshopMovement_GetFirstAgreementMovementByVehicleId",
+				parameters
+			);
 
-        #region MovementOut
+			return result;
+		}
+		public async Task<string> MovementStrikes_GetAsync(int movementId)
+		{
+			var parameters = new
+			{
+				MovementId = movementId
+			};
 
-        public async Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
+			var result = await _database.ExecuteGetByIdProcedure<string>(
+				"D_WorkshopVehicleMovement_GetStrike",
+				parameters
+			);
+
+			return result ?? "";
+		}
+
+		public async Task UpdateMovementReplacementAsync(int movementId)
+		{
+			var parameters = new
+			{
+				MovementId = movementId
+			};
+
+			await _database.ExecuteNonReturnProcedure(
+				"D_WorkshopMovement_UpdateMovementReplacement",
+				parameters
+			);
+		}
+		public async Task<VehicleMovement> VehicleMovement_GetLastMovementOutByWorkOrderIdAsync(int workOrderId)
+		{
+			var parameters = new
+			{
+				WorkOrderId = workOrderId
+			};
+
+			var result = await _database.ExecuteGetByIdProcedure<VehicleMovement>(
+				"D_WorkshopMovement_GetLastMovementOutByWorkOrderId",
+				parameters
+			);
+
+			return result;
+		}
+		#endregion
+
+		#region MovementOut
+
+		public async Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
         {
             var parameters = new
             {

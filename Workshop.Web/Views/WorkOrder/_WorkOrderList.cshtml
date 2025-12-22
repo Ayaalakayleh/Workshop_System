@@ -45,10 +45,10 @@
 										? item.FkVehicleMovementId.ToString()
 										: "-"))
 			</td>
-			<td>@(item.IsFix?.ToString() ?? "")</td>
+			<td>@(item.IsFix.ToString() ?? "")</td>
 			<td>@(item.WorkOrderStatusName != null ? (item.WorkOrderStatusName).ToString() : "")</td>
 			<td>@(item.InvoicingStatus != null && item.InvoicingStatus != 0 ? ((InvoicingStatus)item.InvoicingStatus).ToString() : "-")</td>
-			<td>@(item.AccidentTime.HasValue? item.AccidentTime.Value.ToString(@"hh\:mm") : "")</td>
+			<td>@(item.AccidentTime.ToString(@"hh\:mm"))</td>
 
 					<td>
 						<button class="btn btn-info btn-sm" onclick="loadEditModal(@item.Id)" data-bs-toggle="modal" data-bs-target="#workOrderModal">
