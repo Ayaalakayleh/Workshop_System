@@ -162,7 +162,7 @@ namespace Workshop.Web.Controllers
 
                         var oNotification = new Notification()
                         {
-                            BranchId = workOrder.BranchId.Value,
+                            BranchId = workOrder.BranchId,
                             Type = 8,
                             RelatedItemId = movement.VehicleID,
                             CreatedBy = UserId,//SessionManager.GetSessionUserInfo.UserID,
@@ -220,12 +220,12 @@ namespace Workshop.Web.Controllers
                     oInsuranceClaimHistory.WorkOrderId = workOrder.Id;
                     oInsuranceClaimHistory.PathId = 3;
                     oInsuranceClaimHistory.Status = 24;
-                    oInsuranceClaimHistory.CreatedBy = workOrder.CreatedBy.Value;
-                    oInsuranceClaimHistory.CompanyId = workOrder.CompanyId.Value;
-                    oInsuranceClaimHistory.CreatedBy = workOrder.CreatedBy.Value;
-                    oInsuranceClaimHistory.BranchId = workOrder.BranchId.Value;
+                    oInsuranceClaimHistory.CreatedBy = workOrder.CreatedBy;
+                    oInsuranceClaimHistory.CompanyId = workOrder.CompanyId;
+                    oInsuranceClaimHistory.CreatedBy = workOrder.CreatedBy;
+                    oInsuranceClaimHistory.BranchId = workOrder.BranchId;
                     oInsuranceClaimHistory.vehicleName = workOrder.VehicleName;
-                    oInsuranceClaimHistory.vehicleId = workOrder.VehicleId.Value;
+                    oInsuranceClaimHistory.vehicleId = workOrder.VehicleId;
                     await _workshopApiClient.UpdateMAccidentStatusAsync(oInsuranceClaimHistory);
                 }
                 #endregion
@@ -246,7 +246,7 @@ namespace Workshop.Web.Controllers
                 {
                     var oNotification = new Notification()
                     {
-                        BranchId = workOrder.BranchId ?? BranchId,
+                        BranchId = workOrder.BranchId ,
                         Type = 8,
                         RelatedItemId = movement.VehicleID,
                         CreatedBy = UserId,//SessionManager.GetSessionUserInfo.UserID,

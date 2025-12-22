@@ -765,6 +765,7 @@
             });
 
             if (Data.VehicleStatusId == 2 && Etype == 1) {
+                getVehicleWorkOrders($("#VehicleID").val(), 1, Etype);
                 $.ajax({
                     type: "GET",
                     url: RazorVars.getLastOutMaintenanceUrl + '?vehicleId=' + $("#VehicleID").val(),

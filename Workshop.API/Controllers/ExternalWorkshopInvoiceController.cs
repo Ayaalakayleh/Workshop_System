@@ -26,4 +26,30 @@ public class ExternalWorkshopInvoiceController : ControllerBase
         var result = await _service.GetInvoiceDetailsAsync(filter);
         return Ok(result);
     }
+	[HttpGet("WorkshopInvoice_GetWorkshop")]
+	public async Task<ActionResult<IEnumerable<WorkshopInvoice>>> M_WorkshopInvoice_GetWorkshop([FromQuery] int companyId, [FromQuery] string fromDate, [FromQuery] string toDate, [FromQuery] int? customerId, [FromQuery] int? projectId,
+	[FromQuery] int? vehicleId)
+	{
+		try
+		{
+			var result = await _service.M_WorkshopInvoice_GetWorkshop(
+				DateTime.Parse(fromDate),
+				DateTime.Parse(toDate),
+				customerId,
+				vehicleId,
+				projectId,
+				companyId
+			);
+			return Ok(result);
+		}
+		catch (ArgumentException ex)
+		{
+			return BadRequest(ex.Message);
+		}
+		catch (Exception ex)
+		{
+			return StatusCode(500, ex.Message);
+		}
+	}
+
 }
