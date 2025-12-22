@@ -648,7 +648,6 @@
 
     $(document).on('shown.bs.modal', '#scheduleModal', async function () {
         bindEvents();
-        debugger;
         $('#schStart, #schDuration')
             .prop('disabled', false)
             .prop('readonly', false);
