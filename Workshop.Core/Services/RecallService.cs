@@ -33,8 +33,11 @@ namespace Workshop.Core.Services
 		{
 			return await _repository.GetByIdAsync(id);
 		}
-
-		public async Task<int> UpdateAsync(UpdateRecallDTO dto)
+        public async Task<ActiveRecallsByChassisResponseDto> GetActiveRecallsByChassisAsync(string chassisNo)
+        {
+            return await _repository.GetActiveRecallsByChassisAsync(chassisNo);
+        }
+        public async Task<int> UpdateAsync(UpdateRecallDTO dto)
 		{
 			return await _repository.UpdateAsync(dto);
 		}

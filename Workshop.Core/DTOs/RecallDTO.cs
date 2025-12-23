@@ -58,4 +58,29 @@ namespace Workshop.Core.DTOs
         public int? ModelID { get; set; }
         public string? Chassis { get; set; }
     }
+
+    public class ActiveRecallDto
+    {
+        public int RecallId { get; set; }
+        public string Code { get; set; } = default!;
+        public string Title { get; set; } = default!;
+        public string? Description { get; set; }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public int? UpdatedBy { get; set; }
+    }
+
+    public class ActiveRecallsByChassisResponseDto
+    {
+        public string ChassisNo { get; set; } = default!;
+        public bool HasActiveRecall => Recalls != null && Recalls.Count > 0;
+        public List<ActiveRecallDto> Recalls { get; set; } = new();
+    }
 }
