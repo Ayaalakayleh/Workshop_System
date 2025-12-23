@@ -67,6 +67,10 @@ namespace Workshop.Web.Controllers
             }
             ViewBag.Reservaions = reservations;
 
+            var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
+            ViewData["vehicleCustomers"] = vehicleCustomers;
+
+
 
             var internalVehicles = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
             var externalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
@@ -134,6 +138,9 @@ namespace Workshop.Web.Controllers
                  Value = ((int)v).ToString() // "1", "2", "3"
              })
              .ToList();
+            var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
+            ViewData["vehicleCustomers"] = vehicleCustomers;
+
 
 
             var model = new WIPSChedule();
@@ -293,6 +300,27 @@ namespace Workshop.Web.Controllers
                 var isCompanyCenterialized = 1;
                 var result = await _workshopapiClient.GetReservationsByIdsAsync(ids);
 
+                var internalVehicles = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+                var externalVehicles =  await _vehicleApiClient.GetChassiDDL(CompanyId,2);
+
+                foreach (var res in result) {
+                if(res.CustomerId != null)
+                    {
+                        var customerinfo = await _vehicleApiClient.GetCustomerData(res.CustomerId ?? 0);
+                        res.CustomerName = customerinfo.CustomerPrimaryName;
+                    }
+                if(res.vehicleTypeId == 1) // => Internal :)
+                    {
+                        res.Chassis = internalVehicles.FirstOrDefault(x => x.id == res.VehicleId).ChassisNo;
+                    }
+                    else
+                    {
+                        res.Chassis = externalVehicles.FirstOrDefault(x => x.Id == res.VehicleId).ChassisNo;
+
+                    }
+
+                }
+
                 return Json(new
                 {
                     isSuccess = true,
@@ -406,6 +434,37 @@ namespace Workshop.Web.Controllers
             catch (Exception ex)
             {
                 return Json(new { isSuccess = false, message = ex.Message });
+            }
+        }
+
+        public async Task<JsonResult> GetOpenAgreementInfoByCustomerIdOrVehicleId(int? customerId, int? vehicleId)
+        {   
+            if (!customerId.HasValue && !vehicleId.HasValue)
+            {
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = "CustomerId or VehicleId is required"
+                });
+            }
+
+            try
+            {
+                    var data = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(customerId, vehicleId);
+
+                    return Json(new
+                {
+                    isSuccess = true,
+                    data
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = ex.Message
+                });
             }
         }
 

@@ -1,4 +1,4 @@
-﻿@page
+﻿@using Workshop.Core.DTOs.AccountingDTOs
 @using Workshop.Resources
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
@@ -6,6 +6,7 @@
 @model ReservationDTO
 @{
     var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+    var customers = ViewData["vehicleCustomers"] as List<CustomerInformation>;
 }
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -112,6 +113,32 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Customer <span class="text-danger"></span></label>
+                            <select id="filterCustomerId"
+                                    name="CustomerId"
+                                    class="form-control">
+                                <option value="">@Common["Select"]</option>
+
+                                @if (customers != null)
+                                {
+                                    foreach (var c in customers)
+                                    {
+                                        var displayText =
+                                        $"{c.CustomerPrimaryName} {c.CustomerSecondaryname} - {c.CustomerPhoneNumber}";
+
+                                        <option value="@c.Id"
+                                                data-name="@displayText">
+                                            @displayText
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+
 
 
                 </div>
@@ -187,12 +214,14 @@
             const dateTo = $('#filterToDate').val();
             const vehicleId = $('#filterPlateNumber').val();
             const chassisId = $('#filterChassis').val();
+            const customerId = $('#filterCustomerId').val();
 
             const filter = {
                 DateFrom: dateFrom || null,
                 DateTo: dateTo || null,
                 VehicleId: vehicleId ? parseInt(vehicleId) : null,
-                chassisId: chassisId ? chassisId : null
+                chassisId: chassisId ? chassisId : null,
+                customerId: customerId ? parseInt(customerId): null
             };
 
             if (page !== undefined && page !== null) {
@@ -218,6 +247,7 @@
         $("#filterToDate").val("");
         $("#filterPlateNumber").val("");
         $("#filterChassis").val("");
+        $("#filterCustomerId").val("");
 
         getReservations();
     });

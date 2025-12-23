@@ -14,5 +14,6 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<int> AddAsync(CreateRecallDTO dto);
         Task<int> UpdateAsync(UpdateRecallDTO dto);
         Task<int> DeleteAsync(DeleteRecallDTO dto);
+        Task<ActiveRecallsByChassisResponseDto> GetActiveRecallsByChassisAsync(string chassisNo);
     }
 }
