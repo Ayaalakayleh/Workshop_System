@@ -267,6 +267,11 @@
         #endregion
 
 
-
+        #region Layout
+        public static class Layout
+        {
+            public const int ViewMenu = 542;
+        }
+        #endregion
     }
 }

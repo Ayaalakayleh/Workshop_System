@@ -11,5 +11,8 @@ namespace Workshop.Core.Interfaces.IServices
         Task<int> UpdateWorkshopAsync(UpdateWorkShopDTO updateDto);
         Task<int> DeleteWorkshopAsync(DeleteWorkShopDTO deleteDto);
         Task<IEnumerable<ParentWorkshopSimpleDTO>> GetAllSipmleParentsWorkshop(int companyId, string language);
-    }
+		Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_RootWorkshop(int companyId);
+		Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_GetByCompanyIdAndBranchId(int companyId);
+	}
+
 }

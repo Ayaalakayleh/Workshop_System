@@ -63,5 +63,22 @@ namespace Workshop.Infrastructure.Repositories
 
             return result?.ToList() ?? new List<ExternalWorkshopInvoiceDetailsDTO>();
         }
-    }
+		public async Task<IEnumerable<WorkshopInvoice>> M_WorkshopInvoice_GetWorkshop(DateTime? fromDate, DateTime? toDate, int? customerId, int? vehicleId, int? projectId, int? companyId)
+		{
+			var parameters = new
+			{
+				FromDate = fromDate,
+				ToDate = toDate,
+				CustomerId = customerId ?? (object)DBNull.Value,
+				VehicleId = vehicleId ?? (object)DBNull.Value,
+				ProjectId = projectId ?? (object)DBNull.Value,
+				CompanyId = companyId ?? (object)DBNull.Value
+			};
+
+			return await _database.ExecuteGetAllStoredProcedure<WorkshopInvoice>(
+				"M_WorkshopInvoice_GetWorkshop",
+				parameters
+			);
+		}
+	}
 }

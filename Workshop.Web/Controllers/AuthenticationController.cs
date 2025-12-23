@@ -158,7 +158,7 @@ namespace Workshop.Web.Controllers
                 HttpContext.Session.SetString("Permission", permissionData.Permissions);
                 HttpContext.Session.SetString("UserGroupId", permissionData.Groups);
 
-                var primaryMenu = _erpapicient.GetUserMenu("en", user.UserID, "3", companyId, branch);
+                var primaryMenu =await _erpapicient.GetUserMenu("en", user.UserID, "3", companyId, branch);
                 HttpContext.Session.SetString("PrimaryMenuList", System.Text.Json.JsonSerializer.Serialize(primaryMenu));
 
                 // If deep link exists

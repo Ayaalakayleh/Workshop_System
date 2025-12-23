@@ -30,7 +30,9 @@ namespace Workshop.Infrastructure
 			services.AddScoped<IWIPRepository, WIPRepository>();
             services.AddScoped<IMWorkOrderRepository, MWorkOrderRepository>();
             services.AddScoped<IClockingRepository, ClockingRepository>();
-            services.AddScoped<IWorkshopLoadingRepository, WorkshopLoadingRepository>();
+			services.AddScoped<IClaimReportRepository, ClaimReportRepository>();
+			services.AddScoped<IMaintenanceHistoryRepository, MaintenanceHistoryRepository>();
+			services.AddScoped<IWorkshopLoadingRepository, WorkshopLoadingRepository>();
             services.AddScoped<IRTSCodeRepository>(provider =>
 			{
 				var context = provider.GetRequiredService<DapperContext>();

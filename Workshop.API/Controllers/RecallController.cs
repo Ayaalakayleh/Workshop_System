@@ -30,7 +30,19 @@ namespace Workshop.API.Controllers
 			return Ok(result);
 		}
 
-		[HttpPost("Add")]
+        [HttpGet("GetActiveRecallsByChassis/{chassisNo}")]
+        public async Task<ActionResult<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassis(string chassisNo)
+        {
+            if (string.IsNullOrWhiteSpace(chassisNo))
+            {
+                return BadRequest("Chassis number is required.");
+            }
+
+            var result = await _service.GetActiveRecallsByChassisAsync(chassisNo);
+            return Ok(result);
+        }
+
+        [HttpPost("Add")]
 		public async Task<ActionResult> Add([FromBody] CreateRecallDTO dto)
 		{
 			var id = await _service.AddAsync(dto);

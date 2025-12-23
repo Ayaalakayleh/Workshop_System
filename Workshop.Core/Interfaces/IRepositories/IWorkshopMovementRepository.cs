@@ -19,6 +19,10 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<string> GetVehicleMovementStrikeAsync(int movementId);
         Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId);
         Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovementDDL(WorkshopMovementFilter filter);
+		Task<VehicleMovementDTO> WorkshopMovement_GetFirstAgreementMovementByVehicleId(int vehicleId);
+		Task<string> MovementStrikes_GetAsync(int movementId);
+		Task UpdateMovementReplacementAsync(int movementId);
+		Task<VehicleMovement> VehicleMovement_GetLastMovementOutByWorkOrderIdAsync(int workOrderId);
 
-    }
+	}
 }

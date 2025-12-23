@@ -847,7 +847,6 @@
 
     $(document).on('shown.bs.modal', '#scheduleModal', async function () {
         bindEvents();
-
         $('#schStart, #schDuration')
             .prop('disabled', false)
             .prop('readonly', false);
@@ -870,13 +869,19 @@
             console.error('flatpickr failed to load', e);
         }
 
-        // init schStart timepicker (same library as your other code)
+        // init schStart timepicker with current time as default
         try {
             await ensureJQDateTimePicker();
             ensureJQDateTimePickerZIndexPatch();
 
-            // keep your existing behavior: no base time list, default "08:00"
-            initSchStartTimepicker([], $('#schStart').val() || "08:00");
+            // Get current time rounded up to next 5-minute interval as default
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const roundedMinutes = Math.ceil(currentMinutes / 5) * 5;
+            const currentTimeDefault = minutesToHHMM(roundedMinutes);
+
+            // Initialize with current time as default
+            initSchStartTimepicker([], currentTimeDefault);
         } catch (e) {
             console.warn("jQuery DateTimePicker failed to load", e);
         }

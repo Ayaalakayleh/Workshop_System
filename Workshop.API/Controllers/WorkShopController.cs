@@ -141,5 +141,39 @@ namespace Workshop.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    }
+		[HttpGet("GetRootWorkshops")]
+		public async Task<ActionResult<IEnumerable<WorkShopDefinitionDTO>>> GetRootWorkshops([FromQuery] int companyId)
+		{
+			try
+			{
+				var workshops = await _workShopService.D_Workshop_RootWorkshop(companyId);
+				return Ok(workshops);
+			}
+			catch (ArgumentException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
+		[HttpGet("GetInternalByCompany")]
+		public async Task<ActionResult<IEnumerable<WorkShopDefinitionDTO>>> GetInternalByCompany([FromQuery] int companyId)
+		{
+			try
+			{
+				var workshops = await _workShopService.D_Workshop_GetByCompanyIdAndBranchId(companyId);
+				return Ok(workshops);
+			}
+			catch (ArgumentException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
+	}
 }

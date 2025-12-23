@@ -252,23 +252,24 @@
                 Options: optionsTab
             };
 
-            //$.ajax({
-            //    type: 'POST',
-            //    url: window.URLs.editPostUrl,
-            //    dataType: 'json',
-            //    data: model
-            //}).done(function (result) {
-            //    if (result) {
-            //        Swal.fire(
-            //            "Success",
-            //            'WIP Saved Successfully!'
-            //        ).then(() => {
-            //            window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-            //        });
-            //    }
-            //}).fail(function (xhr, status, error) {
-            //    console.error("Error:", error);
-            //});
+            var grid = $("#mainRTSGrid").dxDataGrid("instance");
+            var items = grid.getDataSource().items();
+
+            var hasInvalidStandardHours = items.some(function (row) {
+                var v = row.StandardHours;
+                if (v === null || v === undefined || String(v).trim() === "") return true;
+                return Number.isNaN(Number(v));
+            });
+
+            if (hasInvalidStandardHours) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "Service Standard Hours is required"
+                });
+                return;
+            }
+
             $.ajax({
                 type: 'POST',
                 url: window.URLs.editPostUrl,

@@ -182,7 +182,7 @@ namespace Workshop.Web.Controllers
                     {
                         workOrder = new MWorkOrderDTO
                         {
-                            VehicleId = movement.VehicleID,
+                            VehicleId = (int)movement.VehicleID,
                             WorkOrderType = 2,
                             GregorianDamageDate = movement.GregorianMovementDate,
                             Description = movement.Complaint,
