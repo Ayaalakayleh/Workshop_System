@@ -43,12 +43,16 @@
 
                     $('#contentPager').pagination('destroy');
                     $('#contentPager').pagination({
-                        items: $("#total_pages").val(), // same usage as Technicians
+                        items: $("#total_pages").val(),
                         itemOnPage: 25,
                         currentPage: page,
                         prevText: '&laquo;',
                         nextText: '&raquo;',
-                        onPageClick: function (pageNumber) { FilterWIP(pageNumber); }
+                        onPageClick: function (pageNumber, event) {
+                            event.preventDefault();
+                            FilterWIP(pageNumber);
+                        },
+                        hrefTextPrefix: 'javascript:void(0)'
                     });
 
                     $('#contentPager ul').addClass('pagination');
