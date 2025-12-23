@@ -12,5 +12,7 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<int> UpdateAsync(UpdateWorkShopDTO updateDto);
         Task<int> DeleteAsync(DeleteWorkShopDTO deleteDto);
         Task<IEnumerable<T>> GetAllParentsAsync<T>(int companyId);
-    }
+		Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_RootWorkshop(int companyId);
+		Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_GetByCompanyIdAndBranchId(int companyId);
+	}
 }

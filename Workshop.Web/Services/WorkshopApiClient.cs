@@ -2484,7 +2484,7 @@ namespace Workshop.Web.Services
 
         public async Task<IEnumerable<TechnicianScheduleDTO>> GetTechniciansSchedule(DateTime Date, int branchId)
         {
-            var dateString = Date.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture);
+            var dateString = Date.ToString("o", CultureInfo.InvariantCulture);
             var obj = await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianScheduleDTO>>($"api/WorkshopLoading/GetTechniciansSchedule?Date={Uri.EscapeDataString(dateString)}&branchId={branchId}");
             return obj;
         }

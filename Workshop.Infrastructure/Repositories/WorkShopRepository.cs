@@ -224,6 +224,44 @@ namespace Workshop.Infrastructure.Repositories
                 throw;
             }
         }
+		public async Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_RootWorkshop(int companyId)
+		{
+			try
+			{
+				var parameters = new
+				{
+					CompanyId = companyId
+				};
 
-    }
+				return await _database.ExecuteGetAllStoredProcedure<WorkShopDefinitionDTO>(
+					"D_Workshop_RootWorkshop",
+					parameters
+				);
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+		public async Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_GetByCompanyIdAndBranchId(int companyId)
+		{
+			try
+			{
+				var parameters = new
+				{
+					CompanyId = companyId
+				};
+
+				return await _database.ExecuteGetAllStoredProcedure<WorkShopDefinitionDTO>(
+					"D_Workshop_GetByCompanyIdAndBranchId",
+					parameters
+				);
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+	}
 }

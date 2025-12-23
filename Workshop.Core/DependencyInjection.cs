@@ -34,10 +34,11 @@ namespace Workshop.Core
             services.AddScoped<IWorkshopLoadingService, WorkshopLoadingService>();
             services.AddScoped<IMaintenanceCardService, MaintenanceCardService>();
             services.AddScoped<IJobCardService, JobCardService>();
-            //services.AddScoped<IServiceReminderService, ServiceReminderService>();
-
+			//services.AddScoped<IServiceReminderService, ServiceReminderService>();
+			services.AddScoped<IClaimReportService, ClaimReportService>();
+			services.AddScoped<IMaintenanceHistoryService, MaintenanceHistoryService>();
 			//services.AddScoped<IDRTSCodeService, DRTSCodeService>();
-            services.AddScoped<IMaintenanceCardService, MaintenanceCardService>();
+			services.AddScoped<IMaintenanceCardService, MaintenanceCardService>();
             services.AddScoped<IJobCardService, JobCardService>();
             services.AddScoped<IServiceReminderService, ServiceReminderService>();
             services.AddScoped<IWorkshopLoadingService, WorkshopLoadingService>();

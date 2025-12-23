@@ -72,6 +72,27 @@ namespace Workshop.Core.Services
         {
             return await _workShopRepository.GetAllParentsAsync<ParentWorkshopSimpleDTO>(companyId);
         }
-
-    }
+		public async Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_RootWorkshop(int companyId)
+		{
+			try
+			{
+				return await _workShopRepository.D_Workshop_RootWorkshop(companyId);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error in D_Workshop_RootWorkshop", ex);
+			}
+		}
+		public async Task<IEnumerable<WorkShopDefinitionDTO>> D_Workshop_GetByCompanyIdAndBranchId(int companyId)
+		{
+			try
+			{
+				return await _workShopRepository.D_Workshop_GetByCompanyIdAndBranchId(companyId);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error in D_Workshop_GetByCompanyIdAndBranchId", ex);
+			}
+		}
+	}
 }
