@@ -2388,4 +2388,91 @@
   <data name="Label_IsFix" xml:space="preserve">
     <value>Is Fix</value>
   </data>
+	<data name="Label_InspectionChecklist" xml:space="preserve">
+  <value>قائمة التحقق للفحص</value>
+</data>
+	<data name="Label_Item" xml:space="preserve">
+  <value>البند</value>
+</data>
+	<data name="Label_Passed" xml:space="preserve">
+  <value>ناجح</value>
+</data>
+	<data name="Label_NotPassed_Remarks" xml:space="preserve">
+  <value>غير ناجح / ملاحظات</value>
+</data>
+	<data name="Label_Remarks" xml:space="preserve">
+  <value>ملاحظات</value>
+</data>
+
+	<data name="Label_EngineStartsIdlesProperly" xml:space="preserve">
+  <value>تشغيل المحرك والخمول بشكل صحيح</value>
+</data>
+	<data name="Label_CheckAllIndicatorLights" xml:space="preserve">
+  <value>فحص جميع لمبات المؤشرات</value>
+</data>
+	<data name="Label_AirbagsSeatBelts" xml:space="preserve">
+  <value>الوسائد الهوائية وأحزمة الأمان</value>
+</data>
+	<data name="Label_EngineOilLevel" xml:space="preserve">
+  <value>مستوى زيت المحرك</value>
+</data>
+	<data name="Label_CoolantLevel" xml:space="preserve">
+  <value>مستوى سائل التبريد</value>
+</data>
+	<data name="Label_BrakeFluidLevel" xml:space="preserve">
+  <value>مستوى سائل الفرامل</value>
+</data>
+	<data name="Label_CheckAllExteriorLights" xml:space="preserve">
+  <value>فحص جميع الأنوار الخارجية</value>
+</data>
+	<data name="Label_EngineTemperature" xml:space="preserve">
+  <value>درجة حرارة المحرك</value>
+</data>
+	<data name="Label_ACPerformance" xml:space="preserve">
+  <value>أداء المكيف</value>
+</data>
+	<data name="Label_InteriorUpholstery" xml:space="preserve">
+  <value>المقصورة والفرش</value>
+</data>
+	<data name="Label_FireExtinguisher" xml:space="preserve">
+  <value>طفاية حريق</value>
+</data>
+	<data name="Label_WarningDevice" xml:space="preserve">
+  <value>جهاز التحذير</value>
+</data>
+	<data name="Label_SpareWheel" xml:space="preserve">
+  <value>الإطار الاحتياطي</value>
+</data>
+	<data name="Label_JackAndTireWrench" xml:space="preserve">
+  <value>الرافعة ومفتاح العجل</value>
+</data>
+
+	<data name="Label_Tires" xml:space="preserve">
+  <value>الإطارات</value>
+</data>
+	<data name="Label_Brand" xml:space="preserve">
+  <value>الماركة</value>
+</data>
+	<data name="Label_DOT" xml:space="preserve">
+  <value>DOT</value>
+</data>
+	<data name="Label_WearLevel" xml:space="preserve">
+  <value>مستوى التآكل</value>
+</data>
+	<data name="Label_FrontRH" xml:space="preserve">
+  <value>أمامي يمين</value>
+</data>
+	<data name="Label_FrontLH" xml:space="preserve">
+  <value>أمامي يسار</value>
+</data>
+	<data name="Label_RearRH" xml:space="preserve">
+  <value>خلفي يمين</value>
+</data>
+	<data name="Label_RearLH" xml:space="preserve">
+  <value>خلفي يسار</value>
+</data>
+	<data name="Label_RemarksForTires" xml:space="preserve">
+  <value>ملاحظات الإطارات:</value>
+</data>
+
 </root>

@@ -26,58 +26,81 @@
         position: relative;
         min-height: 280px;
         /* optionally show a car silhouette behind */
-        /* background: url('@Url.Content("~/images/tajeer-car-assets/car-body.png")') no-repeat center center;
-           background-size: contain; */
-        background-color: #f5f5f5;
+        /* background: url('@Url.Content("~/images/tajeer-car-assets/car-body.png") ') no-repeat center center; background-size: contain; */ background-color: #f5f5f5;
         border-radius: .5rem;
         border: 1px dashed #ccc;
     }
 
-    /* cursor while marking deep / small / very deep / bend */
-    #panel.deep-scratch-cursor {
-        cursor: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")') 16 16, auto;
+        /* cursor while marking deep / small / very deep / bend */
+        #panel.deep-scratch-cursor {
+            cursor: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")') 16 16, auto;
+        }
+
+        #panel.small-scratch-cursor {
+            cursor: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")') 16 16, auto;
+        }
+
+        #panel.very-deep-cursor {
+            cursor: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")') 16 16, auto;
+        }
+
+        #panel.bend-body-cursor {
+            cursor: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")') 16 16, auto;
+        }
+
+        /* generic sprite (marker) */
+        #panel .shape {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            transform: translate(-50%, -50%); /* center on click position */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            z-index: 10;
+            pointer-events: auto; /* so contextmenu works */
+        }
+
+            /* icon per data-type */
+            #panel .shape[data-type="deep-scratch"] {
+                background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
+            }
+
+            #panel .shape[data-type="small-scratch"] {
+                background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
+            }
+
+            #panel .shape[data-type="very-deep-scratch"] {
+                background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
+            }
+
+            #panel .shape[data-type="bend-in-body"] {
+                background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
+            }
+
+    /* === BOOTSTRAP CARD TWEAKS FOR INSPECTION/TIRES === */
+    .inspection-card-fixed {
+        height: 520px; /* adjust as you like */
     }
 
-    #panel.small-scratch-cursor {
-        cursor: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")') 16 16, auto;
+        .inspection-card-fixed .card-body {
+            overflow-y: auto;
+        }
+
+    .card-header h5 {
+        margin: 0;
+        font-weight: 700;
     }
 
-    #panel.very-deep-cursor {
-        cursor: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")') 16 16, auto;
-    }
-
-    #panel.bend-body-cursor {
-        cursor: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")') 16 16, auto;
-    }
-
-    /* generic sprite (marker) */
-    #panel .shape {
-        position: absolute;
-        width: 32px;
-        height: 32px;
-        transform: translate(-50%, -50%); /* center on click position */
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-        z-index: 10;
-        pointer-events: auto; /* so contextmenu works */
-    }
-
-    /* icon per data-type */
-    #panel .shape[data-type="deep-scratch"] {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
-    }
-
-    #panel .shape[data-type="small-scratch"] {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
-    }
-
-    #panel .shape[data-type="very-deep-scratch"] {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
-    }
-
-    #panel .shape[data-type="bend-in-body"] {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
+    .tire-thumb {
+        width: 100%;
+        min-height: 90px;
+        border: 1px dashed #ddd;
+        border-radius: .5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
     }
 </style>
 
@@ -215,7 +238,8 @@
                                         model => model.VehicleSubStatusId,
                                                                         (IEnumerable<SelectListItem>)(ViewBag.SubStatuses ?? new List<SelectListItem>()),
                                                                         @Common["Label_Select"],
-                                                                        new { @class = "form-control", id = "VehicleSubStatusId" } )
+                                                                        new { @class = "form-control", id = "VehicleSubStatusId" }
+                                                                        )
                                 </div>
                             </div>
 
@@ -278,12 +302,11 @@
                     </fieldset>
 
                     <fieldset class="my-3 ui-fieldset">
-                        @* <legend>@Common["Label_MaintenanceTypes"]</legend> *@
                         <div class="table-wrap">
                             <table class="table table-bordered table-hover text-center align-middle" id="tblMainteneance">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th> Complaint </th>
+                                        <th>@Common["Label_Complaint"]</th>
                                         <th>@Common["Label_Note"]</th>
                                         <th>@Common["Label_MaintenanceTypes"]</th>
                                     </tr>
@@ -291,10 +314,10 @@
                                 <tbody id="tblData">
                                     <tr>
                                         <td>
-                                            <textarea type="text" id="Complaint" name="Complaint" class="form-control "></textarea>
+                                            <textarea type="text" id="Complaint" name="Complaint" class="form-control"></textarea>
                                         </td>
                                         <td>
-                                            <textarea type="text" id="ComplaintNote" name="ComplaintNote" class="form-control "></textarea>
+                                            <textarea type="text" id="ComplaintNote" name="ComplaintNote" class="form-control"></textarea>
                                         </td>
                                         <td>
                                             <label class="Status m-0"></label>
@@ -313,9 +336,10 @@
                                     <label class="form-check-label" for="customSwitch2">@Common["Label_IsMechanicCheck"]</label>
                                 </div>
 
-                                <!-- Scratches -->
-                                <div class="row mark-scratces-section">
-                                    <div class="col-12">
+                                <!-- Scratches + Right inspection section -->
+                                <div class="row mark-scratces-section g-3">
+                                    <!-- LEFT: Scratch controls + canvas -->
+                                    <div class="col-lg-9 col-12 m-auto">
                                         <div class="text-center mb-2 scratch-controls">
                                             <button type="button" class="btn btn-outline-primary btn-sm btn-w-m workOrder-btn" id="DeepScratch-btn">
                                                 <img src="~/images/tajeer-car-assets/DeepScratch.png" />&nbsp;@Common["Label_DeepScratch"]
@@ -336,12 +360,227 @@
                                         </div>
 
                                         <div class="text-center mt-3">
-                                            <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button"><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
-                                            <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button"><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
+                                            <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button">
+                                                <i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]
+                                            </button>
+                                            <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button">
+                                                <i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]
+                                            </button>
                                         </div>
 
                                         <div id="coordinates" class="d-none"></div>
                                     </div>
+
+                                    <!-- RIGHT: Checklist -->
+                                    <div class="col-lg-6 col-12">
+                                        <div class="card shadow-sm inspection-card-fixed">
+                                            <div class="card-header">
+                                                <h5>@Common["Label_InspectionChecklist"]</h5>
+                                            </div>
+
+                                            <div class="card-body p-2">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-hover align-middle text-start mb-0" id="tblInspectionChecklist">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th style="width:48%;">@Common["Label_Item"]</th>
+                                                                <th class="text-center" style="width:12%;">@Common["Label_Passed"]</th>
+                                                                <th style="width:40%;">@Common["Label_NotPassed_Remarks"]</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>@Common["Label_EngineStartsIdlesProperly"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_engine_starts" name="Inspection.EngineStartsIdles.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_engine_starts" name="Inspection.EngineStartsIdles.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_CheckAllIndicatorLights"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_indicator_lights" name="Inspection.IndicatorLights.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_indicator_lights" name="Inspection.IndicatorLights.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_AirbagsSeatBelts"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_airbags" name="Inspection.AirbagsSeatBelts.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_airbags" name="Inspection.AirbagsSeatBelts.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_EngineOilLevel"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_engine_oil" name="Inspection.EngineOilLevel.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_engine_oil" name="Inspection.EngineOilLevel.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_CoolantLevel"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_coolant" name="Inspection.CoolantLevel.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_coolant" name="Inspection.CoolantLevel.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_BrakeFluidLevel"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_brake_fluid" name="Inspection.BrakeFluidLevel.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_brake_fluid" name="Inspection.BrakeFluidLevel.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_CheckAllExteriorLights"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_exterior_lights" name="Inspection.ExteriorLights.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_exterior_lights" name="Inspection.ExteriorLights.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_EngineTemperature"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_engine_temp" name="Inspection.EngineTemperature.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_engine_temp" name="Inspection.EngineTemperature.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_ACPerformance"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_ac" name="Inspection.ACPerformance.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_ac" name="Inspection.ACPerformance.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_InteriorUpholstery"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_interior" name="Inspection.InteriorUpholstery.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_interior" name="Inspection.InteriorUpholstery.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_FireExtinguisher"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_extinguisher" name="Inspection.FireExtinguisher.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_extinguisher" name="Inspection.FireExtinguisher.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_WarningDevice"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_warning_device" name="Inspection.WarningDevice.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_warning_device" name="Inspection.WarningDevice.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_SpareWheel"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_spare" name="Inspection.SpareWheel.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_spare" name="Inspection.SpareWheel.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>@Common["Label_JackAndTireWrench"]</td>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="form-check-input" id="chk_jack" name="Inspection.JackAndWrench.Passed" value="true" />
+                                                                </td>
+                                                                <td>
+                                                                    <textarea class="form-control" id="rmk_jack" name="Inspection.JackAndWrench.Remarks" rows="1" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- RIGHT: Tires -->
+                                    <div class="col-lg-6 col-12">
+                                        <div class="card shadow-sm">
+                                            <div class="card-header">
+                                                <h5>@Common["Label_Tires"]</h5>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="tire-thumb mb-2">
+                                                    <i class="fal fa-tire fa-3x"></i>
+                                                </div>
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-hover align-middle text-center mb-0" id="tblTires">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th style="width:28%"></th>
+                                                                <th style="width:24%">@Common["Label_Brand"]</th>
+                                                                <th style="width:24%">@Common["Label_DOT"]</th>
+                                                                <th style="width:24%">@Common["Label_WearLevel"]</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th class="text-start">@Common["Label_FrontRH"]</th>
+                                                                <td><input type="text" class="form-control" id="tire_front_rh_brand" name="Tires.FrontRH.Brand" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_front_rh_dot" name="Tires.FrontRH.DOT" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_front_rh_wear" name="Tires.FrontRH.WearLevel" /></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-start">@Common["Label_FrontLH"]</th>
+                                                                <td><input type="text" class="form-control" id="tire_front_lh_brand" name="Tires.FrontLH.Brand" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_front_lh_dot" name="Tires.FrontLH.DOT" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_front_lh_wear" name="Tires.FrontLH.WearLevel" /></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-start">@Common["Label_RearRH"]</th>
+                                                                <td><input type="text" class="form-control" id="tire_rear_rh_brand" name="Tires.RearRH.Brand" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_rear_rh_dot" name="Tires.RearRH.DOT" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_rear_rh_wear" name="Tires.RearRH.WearLevel" /></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-start">@Common["Label_RearLH"]</th>
+                                                                <td><input type="text" class="form-control" id="tire_rear_lh_brand" name="Tires.RearLH.Brand" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_rear_lh_dot" name="Tires.RearLH.DOT" /></td>
+                                                                <td><input type="text" class="form-control" id="tire_rear_lh_wear" name="Tires.RearLH.WearLevel" /></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="form-group mt-2">
+                                                    <label for="TireRemarks">@Common["Label_RemarksForTires"]</label>
+                                                    <textarea type="text" id="TireRemarks" name="Tires.Remarks" class="form-control" rows="3" placeholder="@Common["Label_Remarks"]"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </fieldset>
                         </div>
@@ -371,6 +610,7 @@
                     </div>
 
                 </div>
+
             </div>
         </div>
     </div>
@@ -391,6 +631,7 @@
     </div>
 </div>
 }
+
 <input type="hidden" id="VehicleFromReservation" value="@ViewBag.FromReservationVehicleId" />
 <input type="hidden" id="VehicleTypeFromReservation"
        value="@ViewBag.FromReservationVehicleTypeId" />

@@ -1166,126 +1166,113 @@
     <script src="~/js/signature/plugins/jsignature.compressorbase30.js"></script>
     <script src="~/js/signature/plugins/jsignature.undobutton.js"></script>
     <script src="~/js/signature/plugins/signhere/jsignature.signhere.js"></script>
-    <!-- Define Resources variables -->
-    <script>
-
-        function switchLanguage(culture) {
-            // Show loading indicator
-            Swal.fire({
-                title: culture === 'ar' ? 'جاري تغيير اللغة...' : 'Changing Language...',
-                text: culture === 'ar' ? 'يرجى الانتظار' : 'Please wait...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Send request to change language
-            $.ajax({
-                url: '@Url.Action("SetLanguage", "Language")',
-                type: 'POST',
-                data: {
-                    culture: culture,
-                    returnUrl: window.location.pathname + window.location.search
-                },
-                success: function () {
-                    location.reload();
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: culture === 'ar' ? 'خطأ!' : 'Error!',
-                        text: culture === 'ar' ? 'حدث خطأ أثناء تغيير اللغة' : 'An error occurred while changing the language',
-                        confirmButtonText: culture === 'ar' ? 'حسناً' : 'OK'
-                    });
-                }
-            });
-        }
-
-        // Initialize RTL/LTR on page load
-        $(document).ready(function () {
-            const currentCulture = document.documentElement.lang;
-            document.documentElement.dir = currentCulture === 'ar' ? 'rtl' : 'ltr';
-        });
-        var resources = {
-            select: '@Html.Raw(CommonLocalizer["Select"])',
-            description: '@Html.Raw(CommonLocalizer["Description"])',
-            drag_drop_files: '@Html.Raw(CommonLocalizer["DragDropFiles"])',
-            EmptyData: '@Html.Raw(CommonLocalizer["EmptyData"])',
-            areYouSure: '@Html.Raw(MessagesLocalizer["SwalDeleteTitle"])',
-            yes: '@Html.Raw(MessagesLocalizer["Yes"])',
-            no: '@Html.Raw(MessagesLocalizer["No"])',
-            success: '@Html.Raw(MessagesLocalizer["Success"])',
-            failed: '@Html.Raw(MessagesLocalizer["Failed"])',
-            all_required_fields: '@Html.Raw(MessagesLocalizer["AllRequiredFields"])',
-            required_field: '@Html.Raw(MessagesLocalizer["RequiredField"])',
-            valid_email: '@Html.Raw(MessagesLocalizer["ValidEmail"])',
-            error: '@Html.Raw(MessagesLocalizer["Error"])',
-            error_msg: '@Html.Raw(MessagesLocalizer["ErrorMessage"])',
-            success_msg: '@Html.Raw(MessagesLocalizer["SuccessMessage"])',
-            deleted_success: '@Html.Raw(MessagesLocalizer["DeletedSuccess"])',
-            ok: '@Html.Raw(MessagesLocalizer["Ok"])',
-            letters_numbers: '@Html.Raw(MessagesLocalizer["LettersNumbers"])',
-            already_exists: '@Html.Raw(MessagesLocalizer["AlreadyExists"])',
-            delete_not_allowed: '@Html.Raw(MessagesLocalizer["DeleteNotAllowed"])',
-            NoDataInTable: '@Html.Raw(CommonLocalizer["NoDataInTable"])',
-            filepondDragDrop: '@Html.Raw(CommonLocalizer["filepondDragDrop"])',
-        };
-        $(document).ready(function () {
-            $(".link-item a").on("click", function (e) {
-                let targetUrl = $(this).attr("href");
-                if (targetUrl && targetUrl !== "#") {
-                    window.location.href = targetUrl;
-                }
-            });
-        });
-        $(function () {
-            $(".plate-mask").inputmask("9999 - A A A", {
-                definitions: {
-                    'A': {
-                        validator: "[A-Za-z]",
-                        casing: "upper"
-                    }
-                },
-                placeholder: "_"
-            });
+<!-- Define Resources variables -->
+<script>
+    function switchLanguage(culture) {
+        Swal.fire({
+            title: culture === 'ar' ? 'جاري تغيير اللغة...' : 'Changing Language...',
+            text: culture === 'ar' ? 'يرجى الانتظار' : 'Please wait...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
         });
 
-                <script>
-        (() => {
-          const themeBase = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
-          const themeLink = document.getElementById('theme-style');
+        $.ajax({
+            url: '@Url.Action("SetLanguage", "Language")',
+            type: 'POST',
+            data: {
+                culture: culture,
+                returnUrl: window.location.pathname + window.location.search
+            },
+            success: function () {
+                location.reload();
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: culture === 'ar' ? 'خطأ!' : 'Error!',
+                    text: culture === 'ar' ? 'حدث خطأ أثناء تغيير اللغة' : 'An error occurred while changing the language',
+                    confirmButtonText: culture === 'ar' ? 'حسناً' : 'OK'
+                });
+            }
+        });
+    }
 
-          // Pick a key name and stick to it (your choice)
-          const storageKey = 'sa-theme-style';
-          const defaultTheme = 'earth';
+    // safer: serialize as real JSON so quotes/newlines won't break your JS
+    const resources = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+        select = CommonLocalizer["Select"].Value,
+        description = CommonLocalizer["Description"].Value,
+        drag_drop_files = CommonLocalizer["DragDropFiles"].Value,
+        EmptyData = CommonLocalizer["EmptyData"].Value,
+        areYouSure = MessagesLocalizer["SwalDeleteTitle"].Value,
+        yes = MessagesLocalizer["Yes"].Value,
+        no = MessagesLocalizer["No"].Value,
+        success = MessagesLocalizer["Success"].Value,
+        failed = MessagesLocalizer["Failed"].Value,
+        all_required_fields = MessagesLocalizer["AllRequiredFields"].Value,
+        required_field = MessagesLocalizer["RequiredField"].Value,
+        valid_email = MessagesLocalizer["ValidEmail"].Value,
+        error = MessagesLocalizer["Error"].Value,
+        error_msg = MessagesLocalizer["ErrorMessage"].Value,
+        success_msg = MessagesLocalizer["SuccessMessage"].Value,
+        deleted_success = MessagesLocalizer["DeletedSuccess"].Value,
+        ok = MessagesLocalizer["Ok"].Value,
+        letters_numbers = MessagesLocalizer["LettersNumbers"].Value,
+        already_exists = MessagesLocalizer["AlreadyExists"].Value,
+        delete_not_allowed = MessagesLocalizer["DeleteNotAllowed"].Value,
+        NoDataInTable = CommonLocalizer["NoDataInTable"].Value,
+        filepondDragDrop = CommonLocalizer["filepondDragDrop"].Value,
+    }));
 
-          function applyTheme(theme) {
+    $(document).ready(function () {
+        const currentCulture = document.documentElement.lang;
+        document.documentElement.dir = currentCulture === 'ar' ? 'rtl' : 'ltr';
+
+        $(".link-item a").on("click", function () {
+            const targetUrl = $(this).attr("href");
+            if (targetUrl && targetUrl !== "#") window.location.href = targetUrl;
+        });
+
+        $(".plate-mask").inputmask("9999 - A A A", {
+            definitions: {
+                'A': { validator: "[A-Za-z]", casing: "upper" }
+            },
+            placeholder: "_"
+        });
+    });
+</script>
+
+<script>
+    (() => {
+        const themeBase = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
+        const themeLink = document.getElementById('theme-style');
+
+        const storageKey = 'sa-theme-style';
+        const defaultTheme = 'earth';
+
+        function applyTheme(theme) {
             const t = (theme || defaultTheme).toLowerCase();
             themeLink.href = `${themeBase}${t}.css`;
             localStorage.setItem(storageKey, t);
 
-            // Sync radio UI
             document.querySelectorAll('input[data-action="theme-style"]').forEach(r => {
-              r.checked = ((r.dataset.themeStyle || '').toLowerCase() === t);
+                r.checked = ((r.dataset.themeStyle || '').toLowerCase() === t);
             });
-          }
+        }
 
-          // Apply saved theme (or Earth if none saved)
-          applyTheme(localStorage.getItem(storageKey));
+        applyTheme(localStorage.getItem(storageKey));
 
-          // Handle user changes (capture phase to beat any template handler)
-          document.addEventListener('change', (e) => {
+        document.addEventListener('change', (e) => {
             const el = e.target;
             if (el && el.matches('input[data-action="theme-style"]')) {
-              e.stopImmediatePropagation();
-              applyTheme(el.dataset.themeStyle);
+                e.stopImmediatePropagation();
+                applyTheme(el.dataset.themeStyle);
             }
-          }, true);
-        })();
-    </script>
+        }, true);
+    })();
+</script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync("Scripts", required: false)
+
 
 </body>
 </html>

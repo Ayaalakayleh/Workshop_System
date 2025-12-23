@@ -58,14 +58,23 @@
 				</div>
 				<div>
                     <div>
-                        @Model.VehicleTab.PlateNumber / @Model.VehicleTab.ChassisNo &nbsp; @ViewBag.AgreementEndDate</div>
+                        @Model.VehicleTab.PlateNumber / @Model.VehicleTab.ChassisNo</div>
 					</div>
 				<div class="statusContainer">
-					<label>
-						Agreement:
-					</label>
-					<div class="agreementStatus">@ViewBag.AgreementStatus</div>
+					@if (ViewBag.AgreementStatus != "")
+					{
+						<label>
+							Agreement:
+						</label>
+
+						<div class="agreementStatus">@ViewBag.AgreementStatus</div>
+					}
+
+
+					<h5>@ViewBag.AgreementEndDate</h5>
 				</div>
+
+
 			</div>
 
 		</div>

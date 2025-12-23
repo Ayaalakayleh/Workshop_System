@@ -1321,7 +1321,7 @@
     <value>External Workshop Template</value>
   </data>
   <data name="ExternalInvoices" xml:space="preserve">
-    <value>External Invoices</value>
+    <value>Sublet</value>
   </data>
   <data name="ExternalWorkshopMaintenanceInvoice" xml:space="preserve">
     <value>External Workshop Maintenance Invoices</value>
@@ -2387,5 +2387,86 @@
   </data>
   <data name="Label_IsFix" xml:space="preserve">
     <value>Is Fix</value>
+  </data>
+  <data name="Label_InspectionChecklist" xml:space="preserve">
+    <value>Inspection Checklist</value>
+  </data>
+  <data name="Label_Passed" xml:space="preserve">
+    <value>PASSED</value>
+  </data>
+  <data name="Label_NotPassed_Remarks" xml:space="preserve">
+    <value>NOT PASSED / REMARKS</value>
+  </data>
+  <data name="Label_Remarks" xml:space="preserve">
+    <value>Remarks</value>
+  </data>
+  <data name="Label_EngineStartsIdlesProperly" xml:space="preserve">
+    <value>ENGINE STARTS &amp; IDLES PROPERLY</value>
+  </data>
+  <data name="Label_CheckAllIndicatorLights" xml:space="preserve">
+    <value>CHECK ALL INDICATOR LIGHTS</value>
+  </data>
+  <data name="Label_AirbagsSeatBelts" xml:space="preserve">
+    <value>AIRBAGS &amp; SEAT BELTS</value>
+  </data>
+  <data name="Label_EngineOilLevel" xml:space="preserve">
+    <value>ENGINE OIL LEVEL</value>
+  </data>
+  <data name="Label_CoolantLevel" xml:space="preserve">
+    <value>COOLANT LEVEL</value>
+  </data>
+  <data name="Label_BrakeFluidLevel" xml:space="preserve">
+    <value>BRAKE FLUID LEVEL</value>
+  </data>
+  <data name="Label_CheckAllExteriorLights" xml:space="preserve">
+    <value>CHECK ALL EXTERIOR LIGHTS</value>
+  </data>
+  <data name="Label_EngineTemperature" xml:space="preserve">
+    <value>ENGINE TEMPERATURE</value>
+  </data>
+  <data name="Label_ACPerformance" xml:space="preserve">
+    <value>A/C PERFORMANCE</value>
+  </data>
+  <data name="Label_InteriorUpholstery" xml:space="preserve">
+    <value>INTERIOR &amp; UPHOLSTERY</value>
+  </data>
+  <data name="Label_FireExtinguisher" xml:space="preserve">
+    <value>FIRE EXTINGUISHER</value>
+  </data>
+  <data name="Label_WarningDevice" xml:space="preserve">
+    <value>WARNING DEVICE</value>
+  </data>
+  <data name="Label_SpareWheel" xml:space="preserve">
+    <value>SPARE WHEEL</value>
+  </data>
+  <data name="Label_JackAndTireWrench" xml:space="preserve">
+    <value>JACK &amp; TIRE WRENCH</value>
+  </data>
+  <data name="Label_Tires" xml:space="preserve">
+    <value>Tires</value>
+  </data>
+  <data name="Label_Brand" xml:space="preserve">
+    <value>BRAND</value>
+  </data>
+  <data name="Label_DOT" xml:space="preserve">
+    <value>DOT</value>
+  </data>
+  <data name="Label_WearLevel" xml:space="preserve">
+    <value>WEAR LEVEL</value>
+  </data>
+  <data name="Label_FrontRH" xml:space="preserve">
+    <value>FRONT RH</value>
+  </data>
+  <data name="Label_FrontLH" xml:space="preserve">
+    <value>FRONT LH</value>
+  </data>
+  <data name="Label_RearRH" xml:space="preserve">
+    <value>REAR RH</value>
+  </data>
+  <data name="Label_RearLH" xml:space="preserve">
+    <value>REAR LH</value>
+  </data>
+  <data name="Label_RemarksForTires" xml:space="preserve">
+    <value>REMARKS FOR TIRES:</value>
   </data>
 </root>
