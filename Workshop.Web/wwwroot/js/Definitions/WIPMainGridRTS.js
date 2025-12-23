@@ -76,7 +76,7 @@ $(function () {
             paging: true
         },
         columns: [
-            { dataField: "KeyId", caption: "KeyId", visible: false },
+            { dataField: "KeyId", caption: "KeyId", visible: true, allowEditing: false },
             { dataField: "Id", caption: "ID", visible: false },
             {
                 dataField: "WIPId", caption: "WIPId", dataType: "number", visible: false,

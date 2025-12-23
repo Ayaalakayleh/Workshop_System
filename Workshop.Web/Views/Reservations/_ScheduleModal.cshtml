@@ -1,10 +1,13 @@
-﻿@using Workshop.Resources
+﻿@using Workshop.Core.DTOs.AccountingDTOs
+@using Workshop.Resources
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
 @model Workshop.Core.DTOs.WIPSChedule
 
 @{
     var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+    var customers = ViewData["vehicleCustomers"] as List<CustomerInformation>;
+
 }
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" />
@@ -60,17 +63,36 @@
                         </div>
                     </div>
 
+                    @{
+                        var customers = ViewData["vehicleCustomers"] as List<CustomerInformation>;
+                    }
+
                     <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label>Customer <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   id="CustomerName"
-                                   name="CustomerName"
-                                   class="form-control"
-                                   placeholder="Customer"
-                                   required />
+                            <select id="CustomerId"
+                                    name="CustomerId"
+                                    class="form-control"
+                                    required>
+                                <option value="">@Common["Select"]</option>
+
+                                @if (customers != null)
+                                {
+                                    foreach (var c in customers)
+                                    {
+                                        var displayText =
+                                        $"{c.CustomerPrimaryName} {c.CustomerSecondaryname} - {c.CustomerPhoneNumber}";
+
+                                        <option value="@c.Id"
+                                                data-name="@displayText">
+                                            @displayText
+                                        </option>
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
+
 
                     <div class="col-md-4 col-sm-12">
                         <label>
@@ -153,6 +175,7 @@
         vehicleListUrl: '@Url.Action("VehicleList", "Reservations")',
         getChassisByVehicleTypeUrl: '@Url.Action("GetChassisByVehicleType", "Reservations")',
         updateReservation: '@Url.Action("UpdateReservation", "Reservations")',
+        getOpenAgreementInfoUrl: '@Url.Action("GetOpenAgreementInfoByCustomerIdOrVehicleId", "Reservations")',
 
         reservationInserted: '@Html.Raw(Common["Booked_Reservation"])',
         reservationAlreadyExist: '@Html.Raw(Common["ActiveReservationExists"])',
