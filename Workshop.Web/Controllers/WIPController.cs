@@ -330,10 +330,10 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.Color = vehicleDetails?.Color;
                             dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
                             dto.VehicleTab.ChassisNo = vehicleDetails?.ChassisNo;
-                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
 
                         }
                         else
@@ -346,10 +346,10 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.Color = vehicleDetails.Color;
                             dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
                             dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
-                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
 
                         }
                     }
