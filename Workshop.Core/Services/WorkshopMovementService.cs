@@ -54,10 +54,43 @@ namespace Workshop.Core.Services
 		{
 			await _workshopMovementRepository.InsertMovementDocumentAsync(movmentDoc);
 		}
-		#endregion
 
-		#region Movements
-		public async Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovement(WorkshopMovementFilter filter)
+        public async Task<IEnumerable<VehicleChecklistLookup>> GetVehicleChecklistLookup()
+		{
+			return await _workshopMovementRepository.GetVehicleChecklistLookup();
+		}
+        public async Task<IEnumerable<VehicleChecklistLookup>> GetTyresChecklistLookup()
+		{
+            return await _workshopMovementRepository.GetTyresChecklistLookup();
+        }
+        public async Task<IEnumerable<VehicleChecklist>> GetVehicleChecklistByMovementId(int? movementId)
+		{
+            return await _workshopMovementRepository.GetVehicleChecklistByMovementId(movementId);
+        }
+        public async Task<IEnumerable<TyreChecklist>> GetTyresChecklistByMovementId(int? movementId)
+		{
+            return await _workshopMovementRepository.GetTyresChecklistByMovementId(movementId);
+        }
+        public async Task<int> InsertVehicleChecklist(VehicleChecklist vehicleChecklist)
+		{
+            return await _workshopMovementRepository.InsertVehicleChecklist(vehicleChecklist);
+        }
+        public async Task<int> InsertTyreChecklist(TyreChecklist tyreChecklist)
+		{
+            return await _workshopMovementRepository.InsertTyreChecklist(tyreChecklist);
+        }
+        public async Task<int> UpdateVehicleChecklist(VehicleChecklist vehicleChecklist)
+		{
+            return await _workshopMovementRepository.UpdateVehicleChecklist(vehicleChecklist);
+        }
+        public async Task<int> UpdateTyreChecklist(TyreChecklist tyreChecklist)
+		{
+            return await _workshopMovementRepository.UpdateTyreChecklist(tyreChecklist);
+        }
+        #endregion
+
+        #region Movements
+        public async Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovement(WorkshopMovementFilter filter)
 		{
 			return await _workshopMovementRepository.GetAllDWorkshopVehicleMovement(filter);
 		}
