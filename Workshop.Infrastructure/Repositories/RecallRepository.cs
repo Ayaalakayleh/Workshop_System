@@ -56,7 +56,24 @@ namespace Workshop.Infrastructure.Repositories
 
             return recall;
         }
+        public async Task<ActiveRecallsByChassisResponseDto> GetActiveRecallsByChassisAsync(string chassisNo)
+        {
+            using var connection = _context.CreateConnection();
 
+            var parameters = new DynamicParameters();
+            parameters.Add("@ChassisNo", chassisNo, DbType.String);
+
+            var activeRecalls = await connection.QueryAsync<ActiveRecallDto>(
+                "GetActiveRecallsByChassis",
+                parameters,
+                commandType: CommandType.StoredProcedure);
+
+            return new ActiveRecallsByChassisResponseDto
+            {
+                ChassisNo = chassisNo,
+                Recalls = activeRecalls.ToList()
+            };
+        }
         public async Task<int> AddAsync(CreateRecallDTO dto)
         {
             using var connection = _context.CreateConnection();
@@ -130,7 +147,6 @@ namespace Workshop.Infrastructure.Repositories
 
             return result;
         }
-
         public async Task<int> DeleteAsync(DeleteRecallDTO dto)
         {
             using var connection = _context.CreateConnection();
