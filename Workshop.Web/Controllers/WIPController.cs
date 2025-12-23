@@ -309,6 +309,8 @@ namespace Workshop.Web.Controllers
                     workOrderFilterDTO.VehicleID = dto.VehicleId;
                     workOrderFilterDTO.CompanyId = CompanyId;
                     //workOrderFilterDTO.BranchId = BranchId;
+                    var allManufacturers = await GetMakes();
+                    var allModels = await GetModels();
                     var workOrder = (await _apiClient.GetMWorkOrdersAsync(workOrderFilterDTO));
                     dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id) ?? new VehicleTabDTO();
                     dto.WorkOrderId = dto.WorkOrderId ?? workOrder?.FirstOrDefault()?.Id;
@@ -320,7 +322,6 @@ namespace Workshop.Web.Controllers
                         if (workorder?.VehicleType == (int)VehicleTypeId.Internal)
                         {
                             var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_Find(dto.VehicleId)) ?? new VehicleDefinitions();
-                            
                             dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
                             dto.VehicleTab.ModelId = vehicleDetails?.VehicleModelId;
                             dto.VehicleTab.ClassId = vehicleDetails?.VehicleClassId;
@@ -329,6 +330,10 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.Color = vehicleDetails?.Color;
                             dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
                             dto.VehicleTab.ChassisNo = vehicleDetails?.ChassisNo;
+                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
 
                         }
                         else
@@ -341,11 +346,15 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.Color = vehicleDetails.Color;
                             dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
                             dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
+                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
+                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
 
                         }
                     }
-                    ViewBag.Makes = await GetMakes();
-                    ViewBag.Models = await GetModels(dto.VehicleTab.ManufacturerId ?? 0);
+                    ViewBag.Makes = await GetMakesList();
+                    ViewBag.Models = await GetModelsList(dto.VehicleTab.ManufacturerId ?? 0);
                     ViewBag.Classes = await GetClasses();
                     ViewBag.Colors = await GetColors();
 
@@ -674,7 +683,7 @@ namespace Workshop.Web.Controllers
             return Json(accountInfo);
         }
 
-        private async Task<List<SelectListItem>> GetMakes()
+        private async Task<List<SelectListItem>> GetMakesList()
         {
 
             var makes = await _vehicleApiClient.GetAllManufacturers(lang);
@@ -686,7 +695,7 @@ namespace Workshop.Web.Controllers
             }).ToList();
         }
 
-        private async Task<List<SelectListItem>> GetModels(int manufacturerId = 0)
+        private async Task<List<SelectListItem>> GetModelsList(int manufacturerId = 0)
         {
 
             var models = await _vehicleApiClient.GetAllVehicleModel(manufacturerId, lang);
@@ -696,6 +705,19 @@ namespace Workshop.Web.Controllers
                 Value = m.Id.ToString(),
                 Text = lang == "en" ? m.VehicleModelPrimaryName : m.VehicleModelSecondaryName
             }).ToList();
+        }
+
+
+        private async Task<List<Manufacturers>> GetMakes()
+        {
+            var makes = await _vehicleApiClient.GetAllManufacturers(lang);
+            return makes;
+        }
+
+        private async Task<List<VehicleModel>> GetModels(int manufacturerId = 0)
+        {
+            var models = await _vehicleApiClient.GetAllVehicleModel(manufacturerId, lang);
+            return models;
         }
 
         private async Task<List<SelectListItem>> GetClasses()
