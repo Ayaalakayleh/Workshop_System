@@ -76,6 +76,15 @@ namespace Workshop.Web.Controllers
                 Selected = t.Id == dto.InvoiceTypeId
             }).ToList();
 
+            var directExpenseTypes = (await _accountingApiClient.ExpenseType_Get(CompanyId))
+                .Where(x => x.FK_TypeOfExpenseId == 1)
+                .ToList();
+            ViewBag.directExpenseTypes = directExpenseTypes.Select(t => new SelectListItem
+            {
+                Text = lang == "en" ? t.PrimaryName : t.SecondaryName,
+                Value = t.Id.ToString(),
+                Selected = t.Id == dto.PettyCashExpenseTypeId
+            }).ToList();
 
             var TransTypeTable = await _accountingApiClient.TransactionType(companyId, branchId, lang);
             var _TransTypeTable = TransTypeTable.Where(x => x.IsAutoCreated == true && x.VoucherType == 1 && !new long[] { 6, 7, 8, 9, 10, 11, 12, 13, 3120, 3121, 3122 }.Contains(x.ID)).ToList();
@@ -98,12 +107,12 @@ namespace Workshop.Web.Controllers
 
             if(dto.Id == 0)
             {
-                dto.CreatedBy = UserId; // to be replaced
+                dto.CreatedBy = UserId; 
                 success = await _apiClient.AddAccountDefinitionAsync(dto)??0;
             }
             else
             {
-                dto.UpdatedBy = UserId; // to be replaced
+                dto.UpdatedBy = UserId; 
                 success = await _apiClient.UpdateAccountDefinitionAsync(dto)??0;
             }
             if (success > 0)
