@@ -43,6 +43,11 @@
 		border-radius: 25px;
 		padding: 5px;
 	}
+
+	#btnSave.is-busy {
+		pointer-events: none;
+		opacity: .65;
+	}
 </style>
 
 <div class="row">
@@ -231,7 +236,10 @@
 					<div class="text-center">
 						@if (Model.Status != (int)WIPStatusEnum.Invoiced) //&& Model.Status != (int)WIPStatusEnum.G)
 						{
-							<button type="button" class="btn btn-primary" id="btnSave2"><i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]</button>
+							<button type="button" class="btn btn-primary" id="btnSave2">
+								<span id="saveSpinner" class="spinner-border spinner-border-sm me-2" style="display:none;"></span>
+								<i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
+							</button>
 						}
 						<a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]</a>
 

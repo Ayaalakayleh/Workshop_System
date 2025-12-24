@@ -299,10 +299,11 @@
         }
 
         /* ------- Submit ------- */
-        $("#btnSave2").on("click", function () {
+        $("#btnSave2").on("click", function (e) {
             //if (validateAccountTab()) {
             //    saveData();
             //}
+            e.preventDefault();
             if (!validateAccountTab()) {
                 return;
             }

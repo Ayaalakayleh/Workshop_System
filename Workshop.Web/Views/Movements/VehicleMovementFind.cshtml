@@ -13,6 +13,7 @@
     var heroImgSrc = (Model?.VehicleMovementDocuments != null && Model.VehicleMovementDocuments.Any())
         ? Url.Action("GetImage", "Base", new { Name = Model.VehicleMovementDocuments.First().FileName, D = 3, BasePath = Model.VehicleMovementDocuments.First().FilePath })
         : Url.Content("~/images/vehicle-placeholder.png");
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 
 <style>
@@ -326,24 +327,12 @@
         display: none
     }
 
-    .the-movements .mark-scratces-section #panel,
-    .the-movements .mark-scratces-section #panel-edit,
-    .the-movements #panel-canvas {
+    #panel.scratch-inner, #panel {
         position: relative;
-        width: 100%;
-        max-width: 1000px;
-        height: 500px;
-        margin: 0 auto;
-        border: 1px solid #ced4da;
-        border-radius: 12px;
-        background: #f8fafc;
-        background-image: url('../images/tajeer-car-assets/tajeer-car.jpeg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        padding: 45px;
-        background-origin: content-box;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+        min-height: 280px;
+        background-color: #f5f5f5;
+        border-radius: .5rem;
+        border: 1px dashed #ccc;
     }
 
     .the-movements .mark-scratces-section .shape {
@@ -378,6 +367,96 @@
     .the-movements #bend-in-body {
         background-image: url('../images/tajeer-car-assets/CurvatureStructure.png');
     }
+
+    /* ==========================================================
+           COMPACT + LIGHTWEIGHT UI ONLY INSIDE mark-scratces-section
+           - smaller sizes
+           - remove uppercase
+           - table-sm
+           ========================================================== */
+    .the-movements .mark-scratces-section {
+        font-size: .82rem;
+        line-height: 1.25;
+    }
+
+        .the-movements .mark-scratces-section,
+        .the-movements .mark-scratces-section * {
+            letter-spacing: normal !important;
+            text-transform: none !important;
+        }
+
+            .the-movements .mark-scratces-section .card {
+                border-radius: .6rem;
+            }
+
+            .the-movements .mark-scratces-section .card-header {
+                padding: .45rem .7rem;
+            }
+
+                .the-movements .mark-scratces-section .card-header h5 {
+                    font-size: .9rem;
+                    font-weight: 500;
+                    margin: 0;
+                }
+
+            .the-movements .mark-scratces-section .scratch-controls .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: .35rem;
+                padding: .2rem .45rem;
+                font-size: .78rem;
+                font-weight: 400;
+                line-height: 1.1;
+            }
+
+            .the-movements .mark-scratces-section .table {
+                font-size: .8rem;
+                margin-bottom: 0;
+            }
+
+                .the-movements .mark-scratces-section .table th,
+                .the-movements .mark-scratces-section .table td {
+                    padding: .32rem .45rem;
+                    vertical-align: middle;
+                }
+
+                .the-movements .mark-scratces-section .table th {
+                    font-weight: 500;
+                }
+
+            .the-movements .mark-scratces-section .form-control,
+            .the-movements .mark-scratces-section .form-select {
+                font-size: .82rem;
+            }
+
+            .the-movements .mark-scratces-section .form-check-input {
+                width: 1rem;
+                height: 1rem;
+                margin-top: .15rem;
+            }
+
+    .the-movements .inspection-card-fixed {
+        height: 520px;
+    }
+
+        .the-movements .inspection-card-fixed .card-body {
+            overflow-y: auto;
+        }
+
+    .the-movements .tire-thumb {
+        width: 100%;
+        min-height: 70px;
+        border: 1px dashed #ddd;
+        border-radius: .5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+    }
+
+        .the-movements .tire-thumb i {
+            font-size: 2rem;
+        }
 </style>
 
 <input type="hidden" id="GettingVehicleId" value="@Model.VehicleID" />
@@ -486,7 +565,6 @@
                                                 }
                                                 else
                                                 {
-
                                                     @Common["Label_Insurance"]
                                                 }
                                             </div>
@@ -567,7 +645,6 @@
 
                                                             <td><textarea class="form-control" rows="3" disabled>@Model.WorkOrders.FirstOrDefault().Description</textarea></td>
 
-
                                                             <td>
                                                                 <div class="custom-control custom-switch custom-control-inline my-1">
                                                                     @if (item.status.HasValue && item.status.Value)
@@ -582,6 +659,7 @@
                                                                 </div>
                                                             </td>
                                                         </tr>
+                                                        count++;
                                                     }
                                                 </tbody>
                                             </table>
@@ -628,29 +706,159 @@
                             }
                         </div>
 
-                        <!-- scratches -->
+                        <!-- scratches + checklist + tires (ALL compact ONLY here) -->
                         <div class="row mt-3">
                             <div class="col-12">
                                 <fieldset class="text-start">
-                                    <div class="row mark-scratces-section">
-                                        <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 border-left mx-auto">
-                                            <div class="text-center">
-                                                <button type="button" class="btn btn-outline-primary btn-sm btn-w-m" id="DeepScratch-btn" disabled><img src="~/images/tajeer-car-assets/DeepScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_DeepScratch"]</button>
-                                                <button type="button" class="btn btn-outline-warning btn-sm btn-w-m" id="SmallScratch-btn" disabled><img src="~/images/tajeer-car-assets/MinorScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_SmallScratch"]</button>
-                                                <button type="button" class="btn btn-outline-danger btn-sm btn-w-m" id="VeryDeepScratch-btn" disabled><img src="~/images/tajeer-car-assets/VeryDeepScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_VeryDeepScratch"]</button>
-                                                <button type="button" class="btn btn-outline-brown btn-sm btn-w-m" id="BendInBody-btn" disabled><img src="~/images/tajeer-car-assets/CurvatureStructure.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_BendInBody"]</button>
+                                    <div class="row mark-scratces-section g-3">
+
+                                        <!-- LEFT: Scratch controls + canvas -->
+                                        <div class="col-lg-5 col-12 m-auto">
+                                            <div class="text-center mb-2 scratch-controls">
+                                                <button type="button" class="btn btn-outline-primary btn-sm btn-w-m" id="DeepScratch-btn" disabled>
+                                                    <img src="~/images/tajeer-car-assets/DeepScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_DeepScratch"]
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning btn-sm btn-w-m" id="SmallScratch-btn" disabled>
+                                                    <img src="~/images/tajeer-car-assets/MinorScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_SmallScratch"]
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger btn-sm btn-w-m" id="VeryDeepScratch-btn" disabled>
+                                                    <img src="~/images/tajeer-car-assets/VeryDeepScratch.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_VeryDeepScratch"]
+                                                </button>
+                                                <button type="button" class="btn btn-outline-brown btn-sm btn-w-m" id="BendInBody-btn" disabled>
+                                                    <img src="~/images/tajeer-car-assets/CurvatureStructure.png" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;" />&nbsp;@Common["Label_BendInBody"]
+                                                </button>
                                             </div>
 
-                                            <div class="scratches-container">
+@*                                             <div class="scratches-container">
                                                 <div id="panel" class="mt-3"></div>
+                                            </div> *@
+                                            <div class="scratch-wrap">
+                                                <div id="panel" class="scratch-inner"></div>
                                             </div>
-
                                             <div class="text-center mt-3">
-                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button"><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
-                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button"><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
+                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button" disabled><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
+                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button" disabled><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
                                             </div>
                                             <div id="coordinates" class="d-none"></div>
                                         </div>
+
+                                        <!-- RIGHT: Inspection Checklist (added) -->
+                                        <div class="col-lg-4 col-12">
+                                            <div class="card shadow-sm inspection-card-fixed">
+                                                <div class="card-header">
+                                                    <h5>@Common["Label_InspectionChecklist"]</h5>
+                                                </div>
+
+                                                <div class="card-body p-2">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-bordered table-hover align-middle text-start mb-0" id="tblInspectionChecklist">
+                                                            <thead class="thead-light">
+                                                                <tr>
+                                                                    <th style="width:48%;">@Common["Label_Item"]</th>
+                                                                    <th class="text-center" style="width:12%;">@Common["Label_Passed"]</th>
+                                                                    <th style="width:40%;">@Common["Label_NotPassed_Remarks"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (int i = 0; i < (Model?.VehicleCkecklist?.Count ?? 0); i++)
+                                                                {
+                                                                    <tr>
+                                                                        @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
+                                                                        <td>
+                                                                            @(
+                                                                                                                                                    lang == "en"
+                                                                                                                                                    ? Model.VehicleCkecklist[i].LookupPrimaryDescription
+                                                                                                                                                    : Model.VehicleCkecklist[i].LookupSecondaryDescription
+                                                                                                                                                    )
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        @Html.CheckBoxFor(
+                                                                                                                                                m => m.VehicleCkecklist[i].Pass,
+                                                                                                                                                new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" }
+                                                                                                                                                )
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.TextAreaFor(
+                                                                                                                                                m => m.VehicleCkecklist[i].Description,
+                                                                                                                                                new
+                                                                                                                                                {
+                                                                                                                                                    @class = "form-control form-control-sm",
+                                                                                                                                                    rows = 1,
+                                                                                                                                                    placeholder = Common["Label_Remarks"],
+                                                                                                                                                    id = $"rmk_{i}",
+                                                                                                                                                    disabled = "disabled"
+                                                                                                                                                }
+                                                                                                                                                )
+                                                                    </td>
+                                                                </tr>
+                                                                                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- RIGHT: Tires (added) -->
+                                        <div class="col-lg-3 col-12">
+                                            <div class="card shadow-sm">
+                                                <div class="card-header">
+                                                    <h5>@Common["Label_Tires"]</h5>
+                                                </div>
+
+                                                <div class="card-body">
+                                                    <div class="tire-thumb mb-2">
+                                                        <i class="fal fa-tire"></i>
+                                                    </div>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-bordered table-hover align-middle text-center mb-0" id="tblTires">
+                                                            <thead class="thead-light">
+                                                                <tr>
+                                                                    <th style="width:28%"></th>
+                                                                    <th style="width:24%">@Common["Label_Brand"]</th>
+                                                                    <th style="width:24%">@Common["Label_DOT"]</th>
+                                                                    <th style="width:24%">@Common["Label_WearLevel"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (int i = 0; i < (Model?.TyreCkecklist?.Count ?? 0); i++)
+                                                                {
+                                                                    <tr>
+                                                                        @Html.HiddenFor(m => m.TyreCkecklist[i].LookupId)
+                                                                        <th class="text-start">
+                                                                            @(
+                                                                               lang == "en"
+                                                                                   ? Model.TyreCkecklist[i].LookupPrimaryDescription
+                                                                                     : Model.TyreCkecklist[i].LookupSecondaryDescription
+                                                                                 )
+                                                                    </th>
+
+                                                                        <td>
+                                                                            @Html.EditorFor(m => m.TyreCkecklist[i].Brand, new { htmlAttributes = new { @class = "form-control form-control-sm", disabled = "disabled" } })
+                                                                        </td>
+
+                                                                        <td>
+                                                                            @Html.EditorFor(m => m.TyreCkecklist[i].DOT, new { htmlAttributes = new { @class = "form-control form-control-sm", disabled = "disabled" } })
+                                                                        </td>
+
+                                                                        <td>
+                                                                            @Html.EditorFor(m => m.TyreCkecklist[i].WearLevel, new { htmlAttributes = new { @class = "form-control form-control-sm", disabled = "disabled" } })
+                                                                        </td>
+                                                                    </tr>
+                                                                                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="form-group mt-2">
+                                                        <label for="TireRemarks">@Common["Label_RemarksForTires"]</label>
+                                                        <textarea type="text" id="TireRemarks" name="Tires.Remarks" class="form-control form-control-sm" rows="3" placeholder="@Common["Label_Remarks"]" disabled></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </fieldset>
                             </div>
@@ -663,12 +871,7 @@
                                 {
                                     if (true && Model.IsExternal == false)
                                     {
-                                        @* <button class="btn btn-primary btn-w-m" data-toggle="modal" data-target="#Compare" data-added="0">
-                                            <i class="fa fa-balance-scale-right"></i>&nbsp; @Common["Label_Compare"]
-                                        </button>
-                                        <button class="btn btn-primary btn-w-m" data-toggle="modal" data-target="#Transfer" data-added="0">
-                                            <i class="fa fa-globe-europe"></i>&nbsp; @Common["Label_TransferVehicle"]
-                                        </button> *@
+                                        @* buttons were commented *@
                                     }
                                     if (true && Model.LastMovementDetails.HasWorkorder == 0)
                                     {
@@ -798,11 +1001,11 @@
 
         @foreach (var item in Model.MovementInvoice)
         {
-                        <text>
-                            var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
-                            var fi = { "source": source, options: { type: 'local' } };
-                            file.files.push(fi);
-                        </text>
+                <text>
+                    var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
+                    var fi = { "source": source, options: { type: 'local' } };
+                    file.files.push(fi);
+                </text>
         }
 
         cuspond = FilePond.create(inputElement, {

@@ -3,69 +3,14 @@
         var copyValue = $(this).val();
         $(".pasteInput").val(copyValue);
     });
-    $(function () {
 
-        function initSelect2($scope, $dropdownParent) {
-            if (!$.fn.select2) return;
-
-            $scope.find('select').each(function () {
-                var $s = $(this);
-
-                // Optional: only apply select2 to selects that opt-in
-                // (recommended to avoid breaking other selects)
-                // if (!$s.hasClass('select2')) return;
-
-                // If Select2 already initialized, destroy first (prevents blank/duplicate UI)
-                if ($s.hasClass('select2-hidden-accessible')) {
-                    $s.select2('destroy');
-                }
-
-                // Placeholder must be a STRING (not a function)
-                var placeholder = $s.data('placeholder');
-
-                var opts = {
-                    theme: 'bootstrap-5',
-                    width: '100%'
-                };
-
-                // Only set placeholder if you actually want it
-                // (and ideally if there is an empty option)
-                if (placeholder) {
-                    opts.placeholder = placeholder;
-                } else if ($s.find('option[value=""]').length) {
-                    opts.placeholder = 'Select an option';
-                }
-
-                // If inside a modal/tab container, force dropdownParent so it doesn't render hidden
-                if ($dropdownParent && $dropdownParent.length) {
-                    opts.dropdownParent = $dropdownParent;
-                } else {
-                    var $modal = $s.closest('.modal');
-                    if ($modal.length) opts.dropdownParent = $modal;
-                }
-
-                $s.select2(opts);
-
-                // Force a refresh so selected value renders (fixes “looks empty” cases)
-                $s.trigger('change.select2');
-            });
+    $('select').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: function () {
+            return $(this).data('placeholder') || 'Select an option';
         }
-
-        // ✅ Init selects that are visible on page load (NOT inside modals)
-        initSelect2($(document.body).find('select').not('.modal select'));
-
-        // ✅ Init (or re-init) selects when a modal becomes visible
-        $(document).on('shown.bs.modal', '.modal', function () {
-            initSelect2($(this), $(this));
-        });
-
-        // ✅ If you have tabs/collapses, Select2 can be initialized while hidden → blank width
-        $(document).on('shown.bs.tab shown.bs.collapse', function (e) {
-            initSelect2($(e.target));
-        });
-
     });
-
     $('.main-table').DataTable({
         responsive: true,
         pageLength: 10,
