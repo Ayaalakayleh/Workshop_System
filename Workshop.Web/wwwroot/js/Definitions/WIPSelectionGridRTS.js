@@ -113,7 +113,38 @@ function injectMainGrid(count) {
     }
 }
 
+let pendingRateCalls = 0;
+
+function setSaveBusy(isBusy) {
+    const $btn = $("#btnSave2");
+    $("#saveSpinner").toggle(isBusy);
+    $btn.prop("disabled", isBusy).attr("aria-disabled", isBusy);
+    $btn.toggleClass("is-busy", isBusy);
+}
+
+function waitForGridIdle(grid, timeoutMs = 10000) {
+    const d = $.Deferred();
+    const start = Date.now();
+
+    (function tick() {
+        const ds = grid.getDataSource();
+        const stillEditing = grid.hasEditData && grid.hasEditData();
+        const stillLoading = ds && ds.isLoading && ds.isLoading();
+
+        if (!stillEditing && !stillLoading) return d.resolve();
+        if (Date.now() - start > timeoutMs) return d.resolve(); 
+
+        setTimeout(tick, 50);
+    })();
+
+    return d.promise();
+}
+
 function getRateAmount(keyId, RTSId) {
+    pendingRateCalls++;
+    setSaveBusy(true);
+
+    const grid = $('#mainRTSGrid').dxDataGrid('instance');
     var model = {
         CustomerId: parseInt($('#CustomerId').val()),
         RTSId: parseInt(RTSId),
@@ -128,10 +159,9 @@ function getRateAmount(keyId, RTSId) {
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(model)
-    }).done(function (result) {
+    }).then(function (result) {
         if (result == null) return;
-        debugger
-        const grid = $('#mainRTSGrid').dxDataGrid('instance');
+
         const data = grid.option("dataSource") || [];
         const target = data.find(r => r.KeyId === keyId); 
 
@@ -145,59 +175,35 @@ function getRateAmount(keyId, RTSId) {
         target.Total = total;
 
         const rowIndex = grid.getRowIndexByKey(keyId);
-        if (rowIndex >= 0) {
-            grid.cellValue(rowIndex, "BaseRate", target.BaseRate);
-            grid.cellValue(rowIndex, "Rate", target.Rate);
-            grid.cellValue(rowIndex, "Total", target.Total);
+        grid.beginUpdate();
+        try {
+            if (rowIndex >= 0) {
+                grid.cellValue(rowIndex, "BaseRate", target.BaseRate);
+                grid.cellValue(rowIndex, "Rate", target.Rate);
+                grid.cellValue(rowIndex, "Total", target.Total);
+            }
+        } finally {
+            grid.endUpdate();
         }
-        grid.getDataSource().reload();
-        grid.refresh(true);
-        grid.saveEditData();
-        //updateTotalLabourFieldsFromGrid();
+
+        const ds = grid.getDataSource();
+        const reloadPromise = ds ? ds.reload() : $.Deferred().resolve().promise();
+
+        return reloadPromise
+            .then(() => grid.saveEditData())
+            .then(() => grid.refresh(true))
+            .then(() => waitForGridIdle(grid));
+       
+
+    }).always(function () {
+        pendingRateCalls--;
+
+        if (pendingRateCalls <= 0) {
+            pendingRateCalls = 0;
+            setSaveBusy(false);
+        }
     });
 }
-
-
-
-//function getRateAmount(RTSId, rowIndex) {
-
-//    var model = {
-//        CustomerId: parseInt($('#CustomerId').val()),
-//        RTSId: parseInt(RTSId),
-//        WIPId: $('#Id').val(),
-//        AccountType: parseInt($('#AccountType').val()),
-//        SalesType: parseInt($('#SalesType').val())
-//    };
-
-//    $.ajax({
-//        type: 'POST',
-//        url: window.RazorVars.getLabourRateUrl,
-//        dataType: 'json',
-//        contentType: 'application/json; charset=utf-8',
-//        data: JSON.stringify(model)
-//    }).done(function (result) {
-
-//        if (result == null) return;
-
-//        const grid = $('#mainRTSGrid').dxDataGrid('instance');
-//        const row = grid.getVisibleRows()[rowIndex];
-
-//        if (!row) return;
-
-//        const hours = parseFloat(row.data.StandardHours) || 0;
-//        const total = +(result * hours).toFixed(2);
-
-//        grid.cellValue(rowIndex, "BaseRate", result);
-//        grid.cellValue(rowIndex, "Rate", result);
-//        grid.cellValue(rowIndex, "Total", total);
-
-//        row.data.Rate = result;
-//        row.data.Total = total;
-
-//        grid.saveEditData();
-//        updateTotalLabourFieldsFromGrid();
-//    });
-//}
 
 function showModal(type) {
     //initialize_RTSGrid();
