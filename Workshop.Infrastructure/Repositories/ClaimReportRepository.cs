@@ -16,14 +16,21 @@ namespace Workshop.Infrastructure.Repositories
 		}
 		public async Task<IEnumerable<ClaimReportDTO>> GetWorkshopClaimReportDataAsync()
 		{
-			using var connection = _context.CreateConnection();
+			try
+			{
+				using var connection = _context.CreateConnection();
 
-			var result = await connection.QueryAsync<ClaimReportDTO>(
-				"GetWorkshopClaimsReportData",
-				commandType: CommandType.StoredProcedure
-			);
+				var result = await connection.QueryAsync<ClaimReportDTO>(
+					"GetWorkshopClaimsReportData",
+					commandType: CommandType.StoredProcedure
+				);
+				return result;
 
-			return result;
+			}
+			catch(Exception ex)
+			{
+				throw ex;
+			}
 		}
 	}
 }

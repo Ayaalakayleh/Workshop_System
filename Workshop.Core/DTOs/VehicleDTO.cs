@@ -370,7 +370,9 @@ namespace Workshop.Core.DTOs.Vehicle
 		public List<int>? ServicesIds { get; set; }
 		public List<CreateWIPServiceDTO>? WIPServices { get; set; }
 		public bool isPart { get; set; } = false;
-	}
+		public List<VehicleChecklist>? VehicleCkecklist {get;set;}
+        public List<TyreChecklist>? TyreCkecklist { get; set; }
+    }
 
 	public class VehicleMovementDocument
 	{
@@ -523,4 +525,38 @@ namespace Workshop.Core.DTOs.Vehicle
 		public string WorkOrderTitle { get; set; }
 		public int? BranchId { get; set; }
 	}
+
+    public class VehicleChecklistLookup
+    {
+        public int? Id { get; set; }
+        public string? PrimaryDescription { get; set; }
+        public string? SecondaryDescription { get; set; }
+    }
+    public class TyreChecklistLookup
+    {
+        public int? Id { get; set; }
+        public string? PrimaryDescription { get; set; }
+        public string? SecondaryDescription { get; set; }
+    }
+    public class VehicleChecklist
+	{
+		public int Id { get; set; }
+		public int LookupId { get; set; }
+        public string? LookupPrimaryDescription { get; set; }
+        public string? LookupSecondaryDescription { get; set; }
+        public int MovementId { get; set; }
+		public bool Pass { get; set; }
+		public string? Description { get; set; }
+	}
+    public class TyreChecklist
+    {
+        public int Id { get; set; }
+        public int LookupId { get; set; }
+        public string? LookupPrimaryDescription { get; set; }
+        public string? LookupSecondaryDescription { get; set; }
+        public int MovementId { get; set; }
+        public string?  Brand { get; set; }
+        public string? DOT { get; set; }
+        public decimal? WearLevel { get; set; }
+    }
 }

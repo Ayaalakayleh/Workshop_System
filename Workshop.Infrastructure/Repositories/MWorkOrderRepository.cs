@@ -632,22 +632,29 @@ namespace Workshop.Infrastructure.Repositories
 
 		public async Task<List<WorkshopWorkOrderStatusReportDTO>> GetWorkshopWorkOrdersStatus(int? vehicleId, DateTime? fromDate, DateTime? toDate, int? externalVehicleId)
 		{
-			using var connection = _context.CreateConnection();
+			try
+			{
+				using var connection = _context.CreateConnection();
 
 
-			var result = await connection.QueryAsync<WorkshopWorkOrderStatusReportDTO>(
-				"GetWorkshopWorkOrdersStatus",
-				new
-				{
-					vehicleId,
-					fromDate,
-					toDate,
-					ExternalVehicleId = externalVehicleId
-				},
-				commandType: CommandType.StoredProcedure
-			);
+				var result = await connection.QueryAsync<WorkshopWorkOrderStatusReportDTO>(
+					"GetWorkshopWorkOrdersStatus",
+					new
+					{
+						vehicleId,
+						fromDate,
+						toDate,
+						ExternalVehicleId = externalVehicleId
+					},
+					commandType: CommandType.StoredProcedure
+				);
 
-			return result.ToList();
+				return result.ToList();
+			}
+			catch(Exception ex)
+			{
+				throw ex;
+			}
 
 		}
 

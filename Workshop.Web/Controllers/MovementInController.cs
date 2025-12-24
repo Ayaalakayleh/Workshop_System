@@ -56,6 +56,29 @@ namespace Workshop.Web.Controllers
             ViewBag.FromReservationVehicleTypeId = vehicleTypeId ?? 0;
             var obj = new VehicleMovement();
             obj.GregorianMovementDate = DateTime.Now;
+            var vLookups = await _apiClient.GetVehicleChecklistLookup();
+            var tLookups = await _apiClient.GetTyreChecklistLookup();
+            List<VehicleChecklist> vChecklists = new List<VehicleChecklist>();
+            List<TyreChecklist> tChecklists = new List<TyreChecklist>();
+            foreach (var v in vLookups){
+                vChecklists.Add(new VehicleChecklist
+                {
+                    LookupId = v.Id ?? 0,
+                    LookupPrimaryDescription = v.PrimaryDescription,
+                    LookupSecondaryDescription = v.SecondaryDescription
+                });
+            }
+            foreach (var v in tLookups)
+            {
+                tChecklists.Add(new TyreChecklist
+                {
+                    LookupId = v.Id ?? 0,
+                    LookupPrimaryDescription = v.PrimaryDescription,
+                    LookupSecondaryDescription = v.SecondaryDescription
+                });
+            }
+            obj.VehicleCkecklist = vChecklists;
+            obj.TyreCkecklist = tChecklists;
             return View(obj);
 
         }
@@ -306,6 +329,16 @@ namespace Workshop.Web.Controllers
                             };
                             checkpoint = "Notification_Insert";
                             await _erpApiClient.Notification_Insert(oNotification);
+                        }
+                        foreach (var item in movement?.VehicleCkecklist)
+                        {
+                            item.MovementId = newMovement.MovementId ?? 0;
+                            await _apiClient.InsertVehicleChecklist(item);
+                        }
+                        foreach (var item in movement?.TyreCkecklist)
+                        {
+                            item.MovementId = newMovement.MovementId ?? 0;
+                            await _apiClient.InsertTyreChecklist(item);
                         }
 
                         return Json(resultJson);
