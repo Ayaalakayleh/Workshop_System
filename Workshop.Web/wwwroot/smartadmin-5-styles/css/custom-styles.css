@@ -1790,12 +1790,6 @@ html[dir="rtl"] .toggle-pin {
     margin: 0;
 }
 
-/* scratches (bigger control buttons; responsive canvas) */
-.the-movements .scratch-controls .btn {
-    padding: .55rem .85rem;
-    font-size: .9rem;
-}
-
 .the-movements .scratch-controls img {
     width: 20px;
     height: 20px;

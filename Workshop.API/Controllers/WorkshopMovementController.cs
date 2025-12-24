@@ -75,10 +75,63 @@ namespace Workshop.API.Controllers
 			await _workshopMovementService.InsertMovementDocumentAsync(movmentDoc);
 			return Ok(new { IsSuccess = true, Message = "Document inserted successfully" });
 		}
-		#endregion
 
-		#region Movements
-		[HttpPost("GetAllDWorkshopVehicleMovement")]
+
+        [HttpGet("GetVehicleChecklistLookup")]
+        public async Task<IActionResult> GetVehicleChecklistLookup()
+        {
+            var result = await _workshopMovementService.GetVehicleChecklistLookup();
+            return Ok(result);
+        }
+        [HttpGet("GetTyreChecklistLookup")]
+        public async Task<IActionResult> GetTyreChecklistLookup()
+        {
+            var result = await _workshopMovementService.GetTyresChecklistLookup();
+            return Ok(result);
+        }
+        [HttpPost("GetVehicleChecklistByMovementId")]
+        public async Task<IActionResult> GetVehicleChecklistByMovementId([FromBody] int? movementId)
+        {
+            var result = await _workshopMovementService.GetVehicleChecklistByMovementId(movementId);
+            return Ok(result);
+        }
+        [HttpPost("GetTyresChecklistByMovementId")]
+        public async Task<IActionResult> GetTyresChecklistByMovementId([FromBody] int? movementId)
+        {
+            var result = await _workshopMovementService.GetTyresChecklistByMovementId(movementId);
+            return Ok(result);
+        }
+
+        [HttpPost("InsertVehicleChecklist")]
+        public async Task<IActionResult> InsertVehicleChecklist([FromBody] VehicleChecklist vehicleChecklist)
+        {
+            var result = await _workshopMovementService.InsertVehicleChecklist(vehicleChecklist);
+            return Ok(result);
+        }
+        [HttpPost("InsertTyreChecklist")]
+        public async Task<IActionResult> InsertTyreChecklist([FromBody] TyreChecklist tyreChecklist)
+        {
+            var result = await _workshopMovementService.InsertTyreChecklist(tyreChecklist);
+            return Ok(result);
+        }
+        
+        [HttpPost("UpdateVehicleChecklist")]
+        public async Task<IActionResult> UpdateVehicleChecklist([FromBody] VehicleChecklist vehicleChecklist)
+        {
+            var result = await _workshopMovementService.UpdateVehicleChecklist(vehicleChecklist);
+            return Ok(result);
+        }
+        [HttpPost("UpdateTyreChecklist")]
+        public async Task<IActionResult> UpdateTyreChecklist([FromBody] TyreChecklist tyreChecklist)
+        {
+            var result = await _workshopMovementService.UpdateTyreChecklist(tyreChecklist);
+            return Ok(result);
+        }
+        
+        #endregion
+
+        #region Movements
+        [HttpPost("GetAllDWorkshopVehicleMovement")]
 		public async Task<IActionResult> GetAllDWorkshopVehicleMovement([FromBody] WorkshopMovementFilter filter)
 		{
 			var result = await _workshopMovementService.GetAllDWorkshopVehicleMovement(filter);

@@ -165,6 +165,99 @@ namespace Workshop.Infrastructure.Repositories
                 "M_InsertMovementDocument",
                 parameters);
         }
+
+
+        public async Task<IEnumerable<VehicleChecklistLookup>> GetVehicleChecklistLookup()
+        {
+            var parameters = new
+            {
+            };
+            var result = await _database.ExecuteGetAllStoredProcedure<VehicleChecklistLookup>("LKP_Movement_VehicleChecklist_Get", parameters);
+            return result;
+        }
+        public async Task<IEnumerable<VehicleChecklistLookup>> GetTyresChecklistLookup()
+        {
+            var parameters = new
+            {
+            };
+            var result = await _database.ExecuteGetAllStoredProcedure<VehicleChecklistLookup>("LKP_Movement_TyresChecklist_Get", parameters);
+            return result;
+        }
+
+        public async Task<IEnumerable<VehicleChecklist>> GetVehicleChecklistByMovementId(int? movementId)
+        {
+            var parameters = new
+            {
+                MovementId = movementId
+            };
+            var result = await _database.ExecuteGetAllStoredProcedure<VehicleChecklist>("Movement_VehicleChecklist_Get", parameters);
+            return result;
+        }
+        public async Task<IEnumerable<TyreChecklist>> GetTyresChecklistByMovementId(int? movementId)
+        {
+            var parameters = new
+            {
+                MovementId = movementId
+            };
+            var result = await _database.ExecuteGetAllStoredProcedure<TyreChecklist>("Movement_TyreChecklist_Get", parameters);
+            return result;
+        }
+        public async Task<int> InsertVehicleChecklist(VehicleChecklist vehicleChecklist)
+        {
+            var parameters = new
+            {
+                MovementId = vehicleChecklist.MovementId,
+                LookupId = vehicleChecklist.LookupId,
+                Pass = vehicleChecklist.Pass,
+                Description = vehicleChecklist.Description
+
+            };
+            var result = await _database.ExecuteAddStoredProcedure<int>("Movement_VehicleChecklist_Insert", parameters);
+            return result;
+        }
+        public async Task<int> InsertTyreChecklist(TyreChecklist tyreChecklist)
+        {
+            var parameters = new
+            {
+                MovementId = tyreChecklist.MovementId,
+                LookupId = tyreChecklist.LookupId,
+                Brand = tyreChecklist.Brand,
+                DOT = tyreChecklist.DOT,
+                WearLevel = tyreChecklist.WearLevel
+
+            };
+            var result = await _database.ExecuteAddStoredProcedure<int>("Movement_TyreChecklist_Insert", parameters);
+            return result;
+        }
+        public async Task<int> UpdateVehicleChecklist(VehicleChecklist vehicleChecklist)
+        {
+            var parameters = new
+            {
+                Id = vehicleChecklist.Id,
+                MovementId = vehicleChecklist.MovementId,
+                LookupId = vehicleChecklist.LookupId,
+                Pass = vehicleChecklist.Pass,
+                Description = vehicleChecklist.Description
+
+            };
+            var result = await _database.ExecuteUpdateProcedure<int>("Movement_VehicleChecklist_Update", parameters);
+            return result;
+        }
+        public async Task<int> UpdateTyreChecklist(TyreChecklist tyreChecklist)
+        {
+            var parameters = new
+            {
+                Id = tyreChecklist.Id,
+                MovementId = tyreChecklist.MovementId,
+                LookupId = tyreChecklist.LookupId,
+                Brand = tyreChecklist.Brand,
+                WearLevel = tyreChecklist.WearLevel
+
+            };
+            var result = await _database.ExecuteUpdateProcedure<int>("Movement_TyreChecklist_Update", parameters);
+            return result;
+        }
+
         #endregion
 
         #region Movements

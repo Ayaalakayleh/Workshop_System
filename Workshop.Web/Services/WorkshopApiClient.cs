@@ -799,6 +799,21 @@ namespace Workshop.Web.Services
         }
 
 
+        public async Task<IEnumerable<VehicleChecklistLookup>> GetVehicleChecklistLookup()
+        {
+            var response = await _httpClient.GetAsync($"api/workshopmovement/GetVehicleChecklistLookup");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<VehicleChecklistLookup>>();
+        }
+        public async Task<IEnumerable<TyreChecklistLookup>> GetTyreChecklistLookup()
+        {
+            var response = await _httpClient.GetAsync($"api/workshopmovement/GetTyreChecklistLookup");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<TyreChecklistLookup>>();
+        }
+
         //Movements
 
         public async Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovementAsync(WorkshopMovementFilter filter)
@@ -855,6 +870,43 @@ namespace Workshop.Web.Services
             {
                 throw new Exception(e.Message);
             }
+        }
+        public async Task<VehicleChecklist> GetVehicleChecklistByMovementId(int? movementId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/GetVehicleChecklistByMovementId", movementId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<VehicleChecklist>();
+        }
+
+        public async Task<TyreChecklist> GetTyresChecklistByMovementId(int? movementId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/GetTyresChecklistByMovementId", movementId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<TyreChecklist>();
+        }
+        public async Task<int> InsertVehicleChecklist(VehicleChecklist vehicleChecklist)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/InsertVehicleChecklist", vehicleChecklist);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<int>();
+        }
+        public async Task<int> InsertTyreChecklist(TyreChecklist tyreChecklist)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/InsertTyreChecklist", tyreChecklist);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<int>();
+        }
+        public async Task<int> UpdateVehicleChecklist(VehicleChecklist vehicleChecklist)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/UpdateVehicleChecklist", vehicleChecklist);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<int>();
+        }
+        public async Task<int> UpdateTyreChecklist(VehicleChecklist vehicleChecklist)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/UpdateTyreChecklist", vehicleChecklist);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<int>();
         }
 
         public async Task<List<MovementInvoice>> GetWorkshopInvoiceByMovementId(int movementId)

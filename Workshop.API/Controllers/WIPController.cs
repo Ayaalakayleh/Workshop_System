@@ -21,9 +21,15 @@ namespace Workshop.API.Controllers
         [HttpPost("GetAll")]
         public async Task<ActionResult<IEnumerable<WIPDTO>>> GetAll(FilterWIPDTO oFilter)
         {
-            var result = await _service.GetAllAsync(oFilter);
-            return Ok(result);
-        }
+            try {
+                var result = await _service.GetAllAsync(oFilter);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            }
 
         [HttpPost("GetAllInternalLabourLineAsync")]
         public async Task<ActionResult<IEnumerable<CreateWIPServiceDTO>>> GetAllInternalLabourLineAsync([FromBody]int WIPId)
