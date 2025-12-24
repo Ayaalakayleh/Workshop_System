@@ -210,6 +210,23 @@ namespace Workshop.Web.Controllers
             }
 
             movement.LastMovementDetails = await _workshopapiClient.GetLastVehicleMovementByVehicleIdAsync(movement.VehicleID.Value);
+
+            var vChecklists = await _workshopapiClient.GetVehicleChecklistByMovementId(movementId);
+            var vLookupChecklist = await _workshopapiClient.GetVehicleChecklistLookup();
+            var tChecklist = await _workshopapiClient.GetTyresChecklistByMovementId(movementId);
+            var tLookupChecklist = await _workshopapiClient.GetTyreChecklistLookup();
+            foreach (var item in vChecklists)
+            {
+                item.LookupPrimaryDescription = vLookupChecklist?.Where(i => i.Id == item.LookupId)?.Select(i=>i.PrimaryDescription)?.FirstOrDefault();
+                item.LookupSecondaryDescription = vLookupChecklist?.Where(i => i.Id == item.LookupId)?.Select(i => i.SecondaryDescription)?.FirstOrDefault();
+            }
+            foreach(var item in tChecklist)
+            {
+                item.LookupPrimaryDescription = tLookupChecklist?.Where(i => i.Id == item.LookupId)?.Select(i => i.PrimaryDescription)?.FirstOrDefault();
+                item.LookupSecondaryDescription = tLookupChecklist?.Where(i => i.Id == item.LookupId)?.Select(i => i.SecondaryDescription)?.FirstOrDefault();
+            }
+            movement.VehicleCkecklist = vChecklists?.ToList();
+            movement.TyreCkecklist = tChecklist?.ToList();
             return View(movement);
         }
 

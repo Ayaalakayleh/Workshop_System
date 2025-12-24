@@ -40,10 +40,10 @@ namespace Workshop.Domain.Enum
         WIP = 20, //WIP technician clock-in
         P = 21, //Waiting For Parts
         Approval = 22, //Approval
-        L = 23, //Waiting for Labour
-        QA = 24, //QA
+        WaitingForLabour = 23, //Waiting for Labour
+        Tranfer = 24, // Transfer
         Completed = 25, //Completed
-        Invoiced = 26, //Invoiced
+        TranferCompleted = 26, //TranferCompleted 
     }
     
     public enum PartsLineEnum  // the number as it in DB >> LKP_Def_Lookup_Details

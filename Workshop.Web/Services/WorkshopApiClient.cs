@@ -871,18 +871,18 @@ namespace Workshop.Web.Services
                 throw new Exception(e.Message);
             }
         }
-        public async Task<VehicleChecklist> GetVehicleChecklistByMovementId(int? movementId)
+        public async Task<IEnumerable<VehicleChecklist>> GetVehicleChecklistByMovementId(int? movementId)
         {
             var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/GetVehicleChecklistByMovementId", movementId);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<VehicleChecklist>();
+            return await response.Content.ReadFromJsonAsync <IEnumerable<VehicleChecklist>>();
         }
 
-        public async Task<TyreChecklist> GetTyresChecklistByMovementId(int? movementId)
+        public async Task<IEnumerable<TyreChecklist>> GetTyresChecklistByMovementId(int? movementId)
         {
             var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/GetTyresChecklistByMovementId", movementId);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TyreChecklist>();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<TyreChecklist>>();
         }
         public async Task<int> InsertVehicleChecklist(VehicleChecklist vehicleChecklist)
         {

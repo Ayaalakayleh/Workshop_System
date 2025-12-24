@@ -301,7 +301,7 @@ namespace Workshop.Web.Controllers
                 var externalVehicles =  await _vehicleApiClient.GetChassiDDL(CompanyId,2);
 
                 foreach (var res in result) {
-                if(res.CustomerId != null)
+                if(res.CustomerId > 0)
                     {
                         var customerinfo = await _vehicleApiClient.GetCustomerData(res.CustomerId ?? 0);
                         res.CustomerName = customerinfo.CustomerPrimaryName;
