@@ -464,9 +464,7 @@
             url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&lang=en`,
             onSuccess: (res) => {
                 if (res?.success && res.data) {
-                    $('#CompanyId').val(res.data.vehicle?.companyId).trigger('change');
 
-                    // Store the customer from vehicle data
                     const vehicleCustomerId = res.data.customerId;
 
                     // Now get agreement info

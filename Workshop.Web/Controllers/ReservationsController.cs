@@ -154,15 +154,12 @@ namespace Workshop.Web.Controllers
                    try
                    {
                        var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(id);
-                       var agreements = await _vehicleApiClient.GetAgreementbyVehicleId(id);
-                string customerName = agreements?.FirstOrDefault()?.CustomerName ?? "";
                 return Json(new
                        {
                            success = true,
                            data = new
                            {
                                Vehicle = vehicle,
-                               CustomerName = customerName
                            }
                 });
                    }
