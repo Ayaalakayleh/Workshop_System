@@ -142,6 +142,12 @@ namespace Workshop.Web.Services
             return await SendRequest<List<TransTypeTable>>(url, HttpMethod.Get);
         }
 
+        public async Task<List<ExpenseType>> ExpenseType_Get(int companyId)
+        {
+            string url = $"/ExpenseType/ExpenseType_Get?CompanyId={companyId}";
+            return await SendRequest<List<ExpenseType>>(url, HttpMethod.Get);
+        }
+
         //=====================================================================================================
         public async Task<TransactionMaster?> SaveTransaction(VehicleDefinitions vehicle,List<AccountTable> accountDTO,AccountDefinitionDTO accountDefinitionDTO,int companyId,int branchId,int userId,
             int tranTypeNo,

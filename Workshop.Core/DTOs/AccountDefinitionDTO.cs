@@ -22,6 +22,7 @@ namespace Workshop.Core.DTOs
         public int InternalRevenuePartId { get; set; }
         public int InternalRevenueLabourId { get; set; }
         public int InvoiceTypeId { get; set; }
+        public int PettyCashExpenseTypeId { get; set; }
         public int CompanyId { get; set; }
     }
 

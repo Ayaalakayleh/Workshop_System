@@ -48,6 +48,7 @@ namespace Workshop.Infrastructure.Repositories
                 InternalRevenuePartId = dto.InternalRevenuePartId,
                 InternalRevenueLabourId = dto.InternalRevenueLabourId,
                 InvoiceTypeId = dto.InvoiceTypeId,
+                PettyCashExpenseTypeId = dto.PettyCashExpenseTypeId,
                 CompanyId = dto.CompanyId,
                 CreatedBy = dto.CreatedBy
             };
@@ -73,6 +74,7 @@ namespace Workshop.Infrastructure.Repositories
                 InternalRevenuePartId = dto.InternalRevenuePartId,
                 InternalRevenueLabourId = dto.InternalRevenueLabourId,
                 InvoiceTypeId = dto.InvoiceTypeId,
+                PettyCashExpenseTypeId = dto.PettyCashExpenseTypeId,
                 UpdatedBy = dto.UpdatedBy
             };
 
