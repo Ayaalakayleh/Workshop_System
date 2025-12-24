@@ -2472,4 +2472,10 @@
   <data name="Label_External" xml:space="preserve">
     <value>خارجي</value>
   </data>
+  <data name="Label_Complaint" xml:space="preserve">
+    <value>شكوى</value>
+  </data>
+  <data name="Button_More" xml:space="preserve">
+    <value>المزيد</value>
+  </data>
 </root>

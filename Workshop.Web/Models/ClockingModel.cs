@@ -28,5 +28,6 @@ namespace Workshop.Web.Models
         public int? LogIndex { get; set; }
         public int? PageNumber { get; set; }
         public int? PageSize { get; set; }
+        public int? SelectedTechnician { get; set; }
     }
 }

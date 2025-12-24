@@ -8,7 +8,7 @@
     var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
 }
 
-<table class="table main-table table-borderless">
+<table class="table main-table table-striped">
     <thead>
         <tr class="text-muted">
             <th>@Common["Label_Date"]</th>
@@ -36,45 +36,60 @@
                         @{
                             var hasAction = false;
                         }
-                        <button class="btn btn-sm btn-info btn-edit-reservation my-1" data-id="@item.Id">
-                            <i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
-                        </button>
-                        @* Book *@
-                        @if (item.Status == (int)ReservationStatus.New)
-                        {
-                            hasAction = true;
-                            <button class="btn btn-sm btn-primary btn-book reservations-button my-1"
-                                    title="@Common["Button_Book"]"
-                                    data-reservationid="@item.Id"
-                                    data-statusid="@((int)ReservationStatus.Booked)">
-                                <i class="fad fa-check-circle"></i>&nbsp;@Common["Label_Confirm"]
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary dropdown-toggle bg-trans-gradient border-0 btn-sm" data-bs-toggle="dropdown" aria-expanded="false" data-bs-animation="false">
+                                @Common["Button_More"]
                             </button>
-                        }
-                        @* Create Workorder *@
-                        else if (item.Status == (int)ReservationStatus.Booked)
-                        {
-                            hasAction = true;
-                            <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId, vehicleTypeId = item.vehicleTypeId })"
-                               class="btn btn-sm btn-success reservations-button my-1"
-                               title="@Common["Label_MovementIn"]">
-                                <i class="fad fa-clipboard-list"></i>&nbsp;@Common["Label_MovementIn"]
-                            </a>
-                        }
+                            <div class="dropdown-menu fadeup">
+                                <div class="dropdown-item p-2">
+                                    <button class="btn btn-sm btn-outline-primary w-100" data-id="@item.Id">
+                                        <i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
+                                    </button>
+                                </div>
+                                @* Book *@
+                                @if (item.Status == (int)ReservationStatus.New)
+                                {
+                                    hasAction = true;
+                                    <div class="dropdown-item p-2">
+                                        <button class="btn btn-sm btn-outline-primary btn-book reservations-button w-100"
+                                                title="@Common["Button_Book"]"
+                                                data-reservationid="@item.Id"
+                                                data-statusid="@((int)ReservationStatus.Booked)">
+                                            <i class="fad fa-check-circle"></i>&nbsp;@Common["Label_Confirm"]
+                                        </button>
+                                    </div>
+                                }
+                                @* Create Workorder *@
+                                else if (item.Status == (int)ReservationStatus.Booked)
+                                {
+                                    hasAction = true;
+                                    <div class="dropdown-item p-2">
+                                        <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId, vehicleTypeId = item.vehicleTypeId })"
+                                           class="btn btn-sm btn-outline-primary reservations-button w-100"
+                                           title="@Common["Label_MovementIn"]">
+                                            <i class="fad fa-clipboard-list"></i>&nbsp;@Common["Label_MovementIn"]
+                                        </a>
+                                    </div>
 
-                        @* Cancel (hide for Completed/Canceled) *@
-                        @if (item.Status != (int)ReservationStatus.Completed && item.Status != (int)ReservationStatus.Canceled)
-                        {
-                            hasAction = true;
-                            <button class="btn btn-sm btn-danger btn-cancel reservations-button my-1"
-                                    title="@Common["Button_Cancel"]"
-                                    data-reservationid="@item.Id"
-                                    data-statusid="@((int)ReservationStatus.Canceled)">
-                                <i class="fad fa-times-circle"></i>&nbsp;@Common["Button_Cancel"]
-                            </button>
-                        }
+                                }
 
+                                @* Cancel (hide for Completed/Canceled) *@
+                                @if (item.Status != (int)ReservationStatus.Completed && item.Status != (int)ReservationStatus.Canceled)
+                                {
+                                    hasAction = true;
+                                    <div class="dropdown-item p-2">
+                                        <button class="btn btn-sm btn-outline-secondary btn-cancel reservations-button w-100"
+                                                title="@Common["Button_Cancel"]"
+                                                data-reservationid="@item.Id"
+                                                data-statusid="@((int)ReservationStatus.Canceled)">
+                                            <i class="fad fa-times-circle"></i>&nbsp;@Common["Button_Cancel"]
+                                        </button>
+                                    </div>
 
-                        @* If no actions were rendered, drop a placeholder to equalize row height *@
+                                }
+
+                            </div>
+                        </div>
                         @if (!hasAction)
                         {
                             <span class="action-placeholder"></span>
