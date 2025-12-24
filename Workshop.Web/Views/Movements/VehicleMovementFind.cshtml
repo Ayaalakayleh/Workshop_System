@@ -13,6 +13,7 @@
     var heroImgSrc = (Model?.VehicleMovementDocuments != null && Model.VehicleMovementDocuments.Any())
         ? Url.Action("GetImage", "Base", new { Name = Model.VehicleMovementDocuments.First().FileName, D = 3, BasePath = Model.VehicleMovementDocuments.First().FilePath })
         : Url.Content("~/images/vehicle-placeholder.png");
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 
 <style>
@@ -765,7 +766,7 @@
                                                                         @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
                                                                         <td>
                                                                             @(
-                                                                                                                                                    System.Globalization.CultureInfo.CurrentUICulture.Name == "en"
+                                                                                                                                                    lang == "en"
                                                                                                                                                     ? Model.VehicleCkecklist[i].LookupPrimaryDescription
                                                                                                                                                     : Model.VehicleCkecklist[i].LookupSecondaryDescription
                                                                                                                                                     )
@@ -827,10 +828,10 @@
                                                                         @Html.HiddenFor(m => m.TyreCkecklist[i].LookupId)
                                                                         <th class="text-start">
                                                                             @(
-                                                                                                                                                    System.Globalization.CultureInfo.CurrentUICulture.Name == "en"
-                                                                                                                                                    ? Model.TyreCkecklist[i].LookupPrimaryDescription
-                                                                                                                                                    : Model.TyreCkecklist[i].LookupSecondaryDescription
-                                                                                                                                                    )
+                                                                               lang == "en"
+                                                                                   ? Model.TyreCkecklist[i].LookupPrimaryDescription
+                                                                                     : Model.TyreCkecklist[i].LookupSecondaryDescription
+                                                                                 )
                                                                     </th>
 
                                                                         <td>
