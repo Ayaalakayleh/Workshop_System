@@ -2469,4 +2469,7 @@
   <data name="Label_RemarksForTires" xml:space="preserve">
     <value>REMARKS FOR TIRES:</value>
   </data>
+  <data name="Label_External" xml:space="preserve">
+    <value>External</value>
+  </data>
 </root>
