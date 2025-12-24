@@ -62,19 +62,21 @@
 						 (@Model?.VehicleTab?.ManufacturingYear) / @Model?.VehicleTab?.PlateNumber / @Model?.VehicleTab?.ChassisNo
 					</div>
 
-				<div class="statusContainer">
-					@if (ViewBag.AgreementStatus != "")
-					{
-						<label>
-							Agreement:
-						</label>
+					<div class="d-flex flex-column">
+					<div class="statusContainer">
+						@if (ViewBag.AgreementStatus != "")
+						{
+							<label>
+								@Common["Agreement"]:
+							</label>
 
-						<div class="agreementStatus">@ViewBag.AgreementStatus</div>
-					}
+							<div class="agreementStatus">@ViewBag.AgreementStatus</div>
+						}
 
 
-					<h5>@ViewBag.AgreementEndDate</h5>
-				</div>
+					</div>
+					<h6 class="mx-4 my-2 text-end">@ViewBag.AgreementEndDate</h6>
+					</div>
 					</div>
 
 
