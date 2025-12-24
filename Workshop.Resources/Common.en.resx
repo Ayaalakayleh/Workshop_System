@@ -2472,4 +2472,10 @@
   <data name="Label_External" xml:space="preserve">
     <value>External</value>
   </data>
+  <data name="Label_Complaint" xml:space="preserve">
+    <value>Complaint</value>
+  </data>
+  <data name="Button_More" xml:space="preserve">
+    <value>More</value>
+  </data>
 </root>
