@@ -256,7 +256,7 @@ namespace Workshop.Web.Services
         }
         public async Task<CustomerInformation> GetCustomerData(int customerId)
         {
-            string url = $"CustomerInformation/GetCustomerData?id={customerId}";
+            string url = $"/CustomerInformation/GetCustomerData?id={customerId}";
             var result = await SendRequest<CustomerInformation>(url, HttpMethod.Get);
             return result;
         }

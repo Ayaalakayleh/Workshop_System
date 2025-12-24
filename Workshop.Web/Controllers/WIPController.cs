@@ -1116,10 +1116,10 @@ namespace Workshop.Web.Controllers
 
                 var services = await _apiClient.WIP_GetServicesById(WIP_Id);
 
-                ViewBag.Services = services.Select(s => new
+                ViewBag.Services = services.Where(x => x.Status == (int)LabourLineEnum.WaitingForLabour).Select(s => new
                 {
                     Value = s.tableId.Value.ToString(),
-                    Text = $"{s.Code} - {s.Description}"
+                    Text = $"{s.Code} - {s.Description} - {s.KeyId}"
                 }).ToList();
 
                 return PartialView("_TransferMovement", movement);
@@ -1191,6 +1191,7 @@ namespace Workshop.Web.Controllers
 
         [HttpGet]
         public async Task<IActionResult> TransferMovements()
+
         {
 
             try
@@ -1202,6 +1203,7 @@ namespace Workshop.Web.Controllers
                 ovehicleMovement.ColMovements = await _apiClient.GetAllVehicleTransferMovementAsync(null, 1, BranchId);
 
                 ovehicleMovement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+                var externalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
                 ovehicleMovement.ColBranches = await _erpApiClient.GetActiveBranchesByCompanyId(CompanyId);
                 ovehicleMovement.workshops = (await _apiClient.WorkshopGetAllAsync(CompanyId, null, null, lang))?.ToList();
 
