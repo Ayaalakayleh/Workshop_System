@@ -1085,9 +1085,7 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-
                 VehicleMovement movement = new VehicleMovement();
-
                 //ToDo: Caching
                 //if (cache.Get(string.Format(CacheKeys.ExternalWorkshop)) != null)
                 //{
@@ -1318,208 +1316,230 @@ namespace Workshop.Web.Controllers
                     await _apiClient.UpdateWIPServicesIsFixedAsync(FixedServiceIds);
                 }
 
-                //MovementInvoice invoice = new MovementInvoice();
+                MovementInvoice invoice = new MovementInvoice();
+                if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
+                {
+                    invoice.MovementId = movements.MovementId.Value;
+                    invoice.MasterId = movement.MasterId.Value;
+                    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
+                    invoice.InvoiceNo = movement.InvoceNo;
+                    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
+                    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
+                    invoice.DeductibleAmount = movement.DeductibleAmount ?? 0m;
+                    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts ?? 0m;
+                    invoice.Vat = movement.Vat ?? 0;
+                    invoice.PartsCost = movement.PartsCost.Value;
+                    invoice.LaborCost = movement.LaborCost.Value;
+                    invoice.Invoice_Date = DateTime.Now;
 
-                // List<HttpPostedFileBase> files = Request.Files["DamageReport"];
-                //for (int i = 0; i < file.Length; i++)
-                //{
-                //    var validationResult = _fileValidationService.CheckFileTypeAndSize(file);
-
-                //    //Logic should be implemented 
-                //    //if (Request.Files.GetKey(i) == "ExternalWorkshopInvoice")
-                //    if (validationResult.IsSuccess)
-                //    {
-                //        var (filePath, fileName) = await _fileService.SaveFileAsync(file, "ExternalWorkshopInvoice");
-
-                //        invoice.FileName = fileName;
-                //        invoice.FilePath = filePath;
-                //        invoice.MovementId = movements.MovementId.Value;
-                //        invoice.Invoice_Date = DateTime.Now;
-                //        await _apiClient.DExternalWorkshopInvoiceInsertAsync(invoice);
-                //    }
-                //    else
-                //    {
-                //        await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
-
-                //    }
-                //}
+                    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
+                }
 
 
-                //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
-                //{
-                //    invoice.MovementId = movements.MovementId.Value;
-                //    invoice.MasterId = movement.MasterId.Value;
-                //    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
-                //    invoice.InvoiceNo = movement.InvoceNo;
-                //    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
-                //    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
-                //    invoice.DeductibleAmount = movement.DeductibleAmount.Value;
-                //    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts.Value;
-                //    invoice.Vat = movement.Vat ?? 0;// من لفيو اذا مش تاكسبل ابعتها صفر 
-                //    invoice.PartsCost = movement.PartsCost.Value;
-                //    invoice.LaborCost = movement.LaborCost.Value;
-
-                //    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
-                //    AccountSales oAccountSales = new AccountSales();
-                //    oAccountSales.AccountSalesDetails = new List<AccountSalesDetails>();
-                //    oAccountSales.AccountSalesMaster = new AccountSalesMaster();
-
-                //    var oAccountSalesDetails = new AccountSalesDetails();
-                //    var Supplier = await _accountingApiClient.Supplier_Find(ExternalWorkshop.SupplierId.Value);
-                //    var VehicleDetails = new VehicleDefinitions();
-                //    var items = new List<Item>();
-                //    items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
-                //    var InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetById((int)movement.InvoiceTypeId);
 
 
-                //    oAccountSales.AccountSalesMaster = new AccountSalesMaster()
-                //    {
 
-                //        Total = invoice.LaborCost + invoice.PartsCost,
-                //        Net = invoice.TotalInvoice,
-                //        Final = invoice.LaborCost + invoice.PartsCost,
-                //        Tax = invoice.Vat,
-                //        AccSalesTypeNo = 8,
-                //        AccSalesDate = DateTime.Now,
-                //        InvoiceType = 2,
-                //        TypeSalesPurchasesID = (int)movement.InvoiceTypeId,
-                //        Notes = "Maintenance",
-                //        SupplierInvoiceNo = invoice.InvoiceNo,
-                //        CustomerId = (int)Supplier.Id,
-                //        Customer_DimensionsId = Supplier.Customer_DimensionsId,
-                //        Vendor_DimensionsId = Supplier.Vendor_DimensionsId,
-                //        LOB_DimensionsId = Supplier.LOB_DimensionsId,
-                //        Regions_DimensionsId = Supplier.Regions_DimensionsId,
-                //        Locations_DimensionsId = Supplier.Locations_DimensionsId,
-                //        Item_DimensionsId = Supplier.Item_DimensionsId,
-                //        Worker_DimensionsId = Supplier.Worker_DimensionsId,
-                //        FixedAsset_DimensionsId = Supplier.FixedAsset_DimensionsId,
-                //        Department_DimensionsId = Supplier.Department_DimensionsId,
-                //        Contract_CC_DimensionsId = Supplier.Contract_CC_DimensionsId,
-                //        City_DimensionsId = Supplier.City_DimensionsId,
-                //        D1_DimensionsId = Supplier.D1_DimensionsId,
-                //        D2_DimensionsId = Supplier.D2_DimensionsId,
-                //        D3_DimensionsId = Supplier.D3_DimensionsId,
-                //        D4_DimensionsId = Supplier.D4_DimensionsId,
-                //        CustomerAccountNo = AccountList.Where(x => x.ID == Supplier.AccountNoPayableId).FirstOrDefault().AccountNo,
-                //    };
+                    //MovementInvoice invoice = new MovementInvoice();
 
-                //    VehicleDetails = await _vehicleApiClient.GetVehicleDetails(movement.VehicleID.Value, lang);
+                    // List<HttpPostedFileBase> files = Request.Files["DamageReport"];
+                    //for (int i = 0; i < file.Length; i++)
+                    //{
+                    //    var validationResult = _fileValidationService.CheckFileTypeAndSize(file);
 
-                //    if (invoice.PartsCost > 0)
-                //    {
-                //        accountId = items.Where(a => a.ItemNumber == -1).FirstOrDefault()?.ItemSalesAccountId;
-                //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
-                //        accountTable = new AccountTable();
-                //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
-                //        oAccountSalesDetails = new AccountSalesDetails()
-                //        {
-                //            ItemNumber = items.Where(a => a.ItemNumber == -1).FirstOrDefault().ItemId,
-                //            UnitId = items.Where(a => a.ItemNumber == -1).FirstOrDefault().UnitId,
-                //            Discount = 0,
-                //            Description = "Maintenance Parts " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة قطع غيار ",
-                //            Quantity = 1,
-                //            UnitQuantity = 1,
-                //            Price = invoice.PartsCost,
-                //            Total = invoice.PartsCost,
-                //            TaxValue = movement.Vat == 0 ? 0 : invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100),///اذا فوق صفر ياخدها صفر
-                //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -1).FirstOrDefault().TaxClassificationNo,
-                //            Final = invoice.PartsCost + (invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100)),
-                //            CostsCentersNo = VehicleDetails.CostCenter,
-                //            Reference = VehicleDetails.PlateNumber,
-                //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
-                //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
-                //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
-                //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
-                //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
-                //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
-                //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
-                //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
-                //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
-                //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
-                //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
-                //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
-                //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
-                //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
-                //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
-                //        };
-                //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
+                    //    //Logic should be implemented 
+                    //    //if (Request.Files.GetKey(i) == "ExternalWorkshopInvoice")
+                    //    if (validationResult.IsSuccess)
+                    //    {
+                    //        var (filePath, fileName) = await _fileService.SaveFileAsync(file, "ExternalWorkshopInvoice");
 
-                //    }
-                //    if (invoice.LaborCost > 0)
-                //    {
-                //        accountId = items.Where(a => a.ItemNumber == -2).FirstOrDefault()?.ItemSalesAccountId;
-                //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
-                //        accountTable = new AccountTable();
-                //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
-                //        oAccountSalesDetails = new AccountSalesDetails()
-                //        {
-                //            ItemNumber = items.Where(a => a.ItemNumber == -2).FirstOrDefault().ItemId,
-                //            UnitId = items.Where(a => a.ItemNumber == -2).FirstOrDefault().UnitId,
-                //            Discount = 0,
-                //            Description = "Maintenance Labor " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة عمالة",
-                //            Quantity = 1,
-                //            UnitQuantity = 1,
-                //            Price = invoice.LaborCost,
-                //            Total = invoice.LaborCost,
-                //            TaxValue = movement.Vat == 0 ? 0 : invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100), //??
-                //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -2).FirstOrDefault().TaxClassificationNo,
-                //            Final = invoice.LaborCost + (invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100)),
-                //            CostsCentersNo = VehicleDetails.CostCenter,
-                //            Reference = VehicleDetails.PlateNumber,
-                //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
-                //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
-                //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
-                //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
-                //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
-                //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
-                //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
-                //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
-                //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
-                //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
-                //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
-                //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
-                //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
-                //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
-                //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
-                //        };
-                //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
-
-                //    }
-
-                //    oAccountSales.AccountSalesMaster.UserId = userID.ToString();
-                //    //ToDo Important
-                //    oAccountSales.AccountSalesMaster.CurrencyID = 1;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
-                //    oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
-                //    oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
-                //    oAccountSales.CompanyId = CompanyId;
-                //    oAccountSales.BranchId = BranchId;
-                //    oAccountSales.AccountSalesMaster.InventoryAccountId = InvoiceType.AccountId;
-                //    //ToDo Important
-                //    oAccountSales.CompanyType = 1; // ((CompanyInfo)Session["CompanyInfo"]).CompanyType;
-                //    await _accountingApiClient.AccountSalesMaster_Insert(oAccountSales);
-                //}
-
-                //Posible to return to this logic
-                //await _apiClient.UpdateDMaintenanceCardAsync(Movement.Card);
-                //foreach (var item in Movement.ColMaintenanceCard)
-                //{
-                //    await _apiClient.FixDamage(Convert.ToInt32(item.WorkOrderId), item.status);
-                //}
-                //bool isUpated = await _apiClient.VehicleMovement_Status(Movement);
-
-                //Overriddn
-                //await _apiClient.UpdateDMaintenanceCardAsync(movement.Card);
-
-                //foreach (var item in movement.ColMaintenanceCard)
-                //{
-                //    await _apiClient.FixWorkOrderAsync(item.WorkOrderId.Value, item.status.Value);
-                //}
-                //await _apiClient.UpdateVehicleMovementStatusAync(movement.MoveInWorkshopId.Value, movement.MasterId.Value);
+                    //        invoice.FileName = fileName;
+                    //        invoice.FilePath = filePath;
+                    //        invoice.MovementId = movements.MovementId.Value;
+                    //        invoice.Invoice_Date = DateTime.Now;
+                    //        await _apiClient.DExternalWorkshopInvoiceInsertAsync(invoice);
+                    //    }
+                    //    else
+                    //    {
+                    //        await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
+                    //    }
+                    //}
 
 
-                //Mark fixed services as fixed/not fixed (WIP_Service) this will be on IsFixed column
-                resultJson.IsSuccess = true;
+                    //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
+                    //{
+                    //    invoice.MovementId = movements.MovementId.Value;
+                    //    invoice.MasterId = movement.MasterId.Value;
+                    //    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
+                    //    invoice.InvoiceNo = movement.InvoceNo;
+                    //    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
+                    //    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
+                    //    invoice.DeductibleAmount = movement.DeductibleAmount.Value;
+                    //    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts.Value;
+                    //    invoice.Vat = movement.Vat ?? 0;// من لفيو اذا مش تاكسبل ابعتها صفر 
+                    //    invoice.PartsCost = movement.PartsCost.Value;
+                    //    invoice.LaborCost = movement.LaborCost.Value;
+
+                    //    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
+                    //    AccountSales oAccountSales = new AccountSales();
+                    //    oAccountSales.AccountSalesDetails = new List<AccountSalesDetails>();
+                    //    oAccountSales.AccountSalesMaster = new AccountSalesMaster();
+
+                    //    var oAccountSalesDetails = new AccountSalesDetails();
+                    //    var Supplier = await _accountingApiClient.Supplier_Find(ExternalWorkshop.SupplierId.Value);
+                    //    var VehicleDetails = new VehicleDefinitions();
+                    //    var items = new List<Item>();
+                    //    items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
+                    //    var InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetById((int)movement.InvoiceTypeId);
+
+
+                    //    oAccountSales.AccountSalesMaster = new AccountSalesMaster()
+                    //    {
+
+                    //        Total = invoice.LaborCost + invoice.PartsCost,
+                    //        Net = invoice.TotalInvoice,
+                    //        Final = invoice.LaborCost + invoice.PartsCost,
+                    //        Tax = invoice.Vat,
+                    //        AccSalesTypeNo = 8,
+                    //        AccSalesDate = DateTime.Now,
+                    //        InvoiceType = 2,
+                    //        TypeSalesPurchasesID = (int)movement.InvoiceTypeId,
+                    //        Notes = "Maintenance",
+                    //        SupplierInvoiceNo = invoice.InvoiceNo,
+                    //        CustomerId = (int)Supplier.Id,
+                    //        Customer_DimensionsId = Supplier.Customer_DimensionsId,
+                    //        Vendor_DimensionsId = Supplier.Vendor_DimensionsId,
+                    //        LOB_DimensionsId = Supplier.LOB_DimensionsId,
+                    //        Regions_DimensionsId = Supplier.Regions_DimensionsId,
+                    //        Locations_DimensionsId = Supplier.Locations_DimensionsId,
+                    //        Item_DimensionsId = Supplier.Item_DimensionsId,
+                    //        Worker_DimensionsId = Supplier.Worker_DimensionsId,
+                    //        FixedAsset_DimensionsId = Supplier.FixedAsset_DimensionsId,
+                    //        Department_DimensionsId = Supplier.Department_DimensionsId,
+                    //        Contract_CC_DimensionsId = Supplier.Contract_CC_DimensionsId,
+                    //        City_DimensionsId = Supplier.City_DimensionsId,
+                    //        D1_DimensionsId = Supplier.D1_DimensionsId,
+                    //        D2_DimensionsId = Supplier.D2_DimensionsId,
+                    //        D3_DimensionsId = Supplier.D3_DimensionsId,
+                    //        D4_DimensionsId = Supplier.D4_DimensionsId,
+                    //        CustomerAccountNo = AccountList.Where(x => x.ID == Supplier.AccountNoPayableId).FirstOrDefault().AccountNo,
+                    //    };
+
+                    //    VehicleDetails = await _vehicleApiClient.GetVehicleDetails(movement.VehicleID.Value, lang);
+
+                    //    if (invoice.PartsCost > 0)
+                    //    {
+                    //        accountId = items.Where(a => a.ItemNumber == -1).FirstOrDefault()?.ItemSalesAccountId;
+                    //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
+                    //        accountTable = new AccountTable();
+                    //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
+                    //        oAccountSalesDetails = new AccountSalesDetails()
+                    //        {
+                    //            ItemNumber = items.Where(a => a.ItemNumber == -1).FirstOrDefault().ItemId,
+                    //            UnitId = items.Where(a => a.ItemNumber == -1).FirstOrDefault().UnitId,
+                    //            Discount = 0,
+                    //            Description = "Maintenance Parts " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة قطع غيار ",
+                    //            Quantity = 1,
+                    //            UnitQuantity = 1,
+                    //            Price = invoice.PartsCost,
+                    //            Total = invoice.PartsCost,
+                    //            TaxValue = movement.Vat == 0 ? 0 : invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100),///اذا فوق صفر ياخدها صفر
+                    //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -1).FirstOrDefault().TaxClassificationNo,
+                    //            Final = invoice.PartsCost + (invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100)),
+                    //            CostsCentersNo = VehicleDetails.CostCenter,
+                    //            Reference = VehicleDetails.PlateNumber,
+                    //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
+                    //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
+                    //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
+                    //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
+                    //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
+                    //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
+                    //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
+                    //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
+                    //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
+                    //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
+                    //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
+                    //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
+                    //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
+                    //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
+                    //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
+                    //        };
+                    //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
+
+                    //    }
+                    //    if (invoice.LaborCost > 0)
+                    //    {
+                    //        accountId = items.Where(a => a.ItemNumber == -2).FirstOrDefault()?.ItemSalesAccountId;
+                    //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
+                    //        accountTable = new AccountTable();
+                    //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
+                    //        oAccountSalesDetails = new AccountSalesDetails()
+                    //        {
+                    //            ItemNumber = items.Where(a => a.ItemNumber == -2).FirstOrDefault().ItemId,
+                    //            UnitId = items.Where(a => a.ItemNumber == -2).FirstOrDefault().UnitId,
+                    //            Discount = 0,
+                    //            Description = "Maintenance Labor " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة عمالة",
+                    //            Quantity = 1,
+                    //            UnitQuantity = 1,
+                    //            Price = invoice.LaborCost,
+                    //            Total = invoice.LaborCost,
+                    //            TaxValue = movement.Vat == 0 ? 0 : invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100), //??
+                    //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -2).FirstOrDefault().TaxClassificationNo,
+                    //            Final = invoice.LaborCost + (invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100)),
+                    //            CostsCentersNo = VehicleDetails.CostCenter,
+                    //            Reference = VehicleDetails.PlateNumber,
+                    //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
+                    //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
+                    //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
+                    //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
+                    //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
+                    //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
+                    //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
+                    //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
+                    //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
+                    //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
+                    //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
+                    //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
+                    //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
+                    //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
+                    //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
+                    //        };
+                    //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
+
+                    //    }
+
+                    //    oAccountSales.AccountSalesMaster.UserId = userID.ToString();
+                    //    //ToDo Important
+                    //    oAccountSales.AccountSalesMaster.CurrencyID = 1;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
+                    //    oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
+                    //    oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
+                    //    oAccountSales.CompanyId = CompanyId;
+                    //    oAccountSales.BranchId = BranchId;
+                    //    oAccountSales.AccountSalesMaster.InventoryAccountId = InvoiceType.AccountId;
+                    //    //ToDo Important
+                    //    oAccountSales.CompanyType = 1; // ((CompanyInfo)Session["CompanyInfo"]).CompanyType;
+                    //    await _accountingApiClient.AccountSalesMaster_Insert(oAccountSales);
+                    //}
+
+                    //Posible to return to this logic
+                    //await _apiClient.UpdateDMaintenanceCardAsync(Movement.Card);
+                    //foreach (var item in Movement.ColMaintenanceCard)
+                    //{
+                    //    await _apiClient.FixDamage(Convert.ToInt32(item.WorkOrderId), item.status);
+                    //}
+                    //bool isUpated = await _apiClient.VehicleMovement_Status(Movement);
+
+                    //Overriddn
+                    //await _apiClient.UpdateDMaintenanceCardAsync(movement.Card);
+
+                    //foreach (var item in movement.ColMaintenanceCard)
+                    //{
+                    //    await _apiClient.FixWorkOrderAsync(item.WorkOrderId.Value, item.status.Value);
+                    //}
+                    //await _apiClient.UpdateVehicleMovementStatusAync(movement.MoveInWorkshopId.Value, movement.MasterId.Value);
+
+
+                    //Mark fixed services as fixed/not fixed (WIP_Service) this will be on IsFixed column
+                    resultJson.IsSuccess = true;
                 resultJson.Type = "success";
                 return Json(resultJson);
 
