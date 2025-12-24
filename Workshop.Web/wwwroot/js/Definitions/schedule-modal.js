@@ -235,6 +235,10 @@
         endTime: null,
         isSaving: false
     };
+    let allVehicleOptionsCache = [];
+    let isVehicleChassisSyncing = false;
+    let isCustomerSource = false;
+
 
     const pad2 = (n) => n.toString().padStart(2, '0');
 
@@ -351,65 +355,251 @@
         $('#schDate').off('change').on('change', handleDateChange);
         $('#schStart').off('change').on('change', recomputeEndTime);
         $('#schDuration').off('input change').on('input change', recomputeEndTime);
+        $('#CustomerId').off('change').on('change', handleCustomerChange);
+    }
+
+    function populateChassisForCurrentVehicleType(vehicleTypeId, selectedVehicleId) {
+        const $chassis = $('#chassisDropdown');
+        $chassis.empty().append('<option value="">Select</option>');
+
+        if (!vehicleTypeId || !selectedVehicleId) return;
+
+        $.ajax({
+            type: 'GET',
+            url: window.RazorVars.getChassisByVehicleTypeUrl,
+            data: { vehicleTypeId },
+            dataType: 'json',
+            success: function (data) {
+                if (!Array.isArray(data)) return;
+
+                data
+                    .filter(x => Number(x.id) === Number(selectedVehicleId))
+                    .forEach(item => {
+                        $chassis.append(`<option value="${item.id}">${item.text}</option>`);
+                    });
+
+
+                // 🔑 select chassis = vehicleId
+                $chassis
+                    .val(String(selectedVehicleId))
+                    .trigger('change.select2')
+                    .trigger('change');
+            }
+        });
     }
 
     function handleVehicleChange() {
+        if (isVehicleChassisSyncing) return;
+
         const vehicleId = $(this).val();
-        const vehicleName = $(this).find('option:selected').text();
         if (!vehicleId) return;
+
+        const vehicleName = $(this).find('option:selected').text();
 
         state.vehicleId = vehicleId;
         state.plate = vehicleName;
 
+        isVehicleChassisSyncing = true;
+
+        // 1️⃣ Vehicle → chassis
         callApi({
             url: `${window.API_BASE.getVehicleDefentionById}?id=${vehicleId}&lang=en`,
             onSuccess: (res) => {
-                if (res.success && res.data) {
-                    const data = res.data;
-                    $('#chassisDropdown').val(data.vehicle?.id).trigger('change.select2');
-                    state.chassisId = Number(data.vehicle?.id);
+                if (res?.success && res.data?.vehicle?.id) {
+                    const chassisId = res.data.vehicle.id;
 
-                    if (data.customerName && String(data.customerName).trim().length) {
-                        $('#CustomerName').val(data.customerName);
-                    }
-                    $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
-                } else {
-                    console.warn('Failed to load vehicle details:', res.message);
+                    $('#chassisDropdown')
+                        .val(String(chassisId))
+                        .trigger('change.select2'); // ❌ NO trigger('change')
+
+                    state.chassisId = Number(chassisId);
+                    $('#CompanyId').val(res.data.vehicle.companyId).trigger('change');
                 }
+
+                isVehicleChassisSyncing = false;
             },
-            onError: () => Swal.fire('Error', 'Failed to load vehicle details.', 'error')
+            onError: () => {
+                isVehicleChassisSyncing = false;
+            }
         });
+
+        callApi({
+            url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${vehicleId}`,
+            onSuccess: (res) => {
+                if (isCustomerSource) return;
+
+                if (!res?.isSuccess || !Array.isArray(res.data) || !res.data.length) {
+                    $('#CustomerId').val(null).trigger('change.select2');
+                    return;
+                }
+
+                const customerId = res.data[0]?.customerId;
+                if (customerId) {
+                    $('#CustomerId')
+                        .val(String(customerId))
+                        .trigger('change.select2');
+                }
+            }
+        });
+
     }
 
     function handleChassisChange() {
+        if (isVehicleChassisSyncing) return;
+
         const chassisId = $(this).val();
-        state.chassisId = Number(chassisId);
         if (!chassisId) return;
 
-        state.vehicleId = chassisId;
+        state.chassisId = Number(chassisId);
+        state.vehicleId = Number(chassisId);
 
+        isVehicleChassisSyncing = true;
+
+        $('#vehicleDropdown')
+            .val(String(chassisId))
+            .trigger('change.select2');
+
+        // Get vehicle info first
         callApi({
             url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&lang=en`,
             onSuccess: (res) => {
-                if (res.success && res.data) {
-                    const data = res.data;
+                if (res?.success && res.data) {
+                    $('#CompanyId').val(res.data.vehicle?.companyId).trigger('change');
 
-                    $("#vehicleDropdown").val(chassisId).trigger("change.select2").trigger("change");
+                    // Store the customer from vehicle data
+                    const vehicleCustomerId = res.data.customerId;
 
-                    if (data.customerName && String(data.customerName).trim().length) {
-                        $('#CustomerName').val(data.customerName);
-                    }
-                    $('#CompanyId').val(data.vehicle?.companyId).trigger('change');
+                    // Now get agreement info
+                    callApi({
+                        url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${chassisId}`,
+                        onSuccess: (agreementRes) => {
+                            if (isCustomerSource) return;
 
-                    const vehicleOptionText = $("#vehicleDropdown").find('option:selected').text();
-                    state.plate = (vehicleOptionText && vehicleOptionText.trim())
-                        ? vehicleOptionText
-                        : (data.vehicle?.plateNumber || '');
-                } else {
-                    console.warn("Failed to load chassis vehicle details:", res.message);
+                            // Priority: agreement customer > vehicle customer
+                            let finalCustomerId = null;
+
+                            if (agreementRes?.isSuccess && Array.isArray(agreementRes.data) && agreementRes.data.length) {
+                                finalCustomerId = agreementRes.data[0]?.customerId;
+                            } else if (vehicleCustomerId) {
+                                finalCustomerId = vehicleCustomerId;
+                            }
+
+                            // Single customer update
+                            if (finalCustomerId) {
+                                $('#CustomerId').val(String(finalCustomerId)).trigger('change.select2');
+                            } else {
+                                $('#CustomerId').val(null).trigger('change.select2');
+                            }
+                        },
+                        onError: () => {
+                            // If agreement call fails, use vehicle customer
+                            if (!isCustomerSource && vehicleCustomerId) {
+                                $('#CustomerId').val(String(vehicleCustomerId)).trigger('change.select2');
+                            }
+                        }
+                    });
                 }
+
+                isVehicleChassisSyncing = false;
             },
-            onError: () => Swal.fire("Error", "Failed to load vehicle data from chassis.", "error")
+            onError: () => {
+                isVehicleChassisSyncing = false;
+            }
+        });
+    }
+    function handleCustomerChange() {
+        const customerId = $('#CustomerId').val();
+        state.customerId = toNumber(customerId);
+
+        isCustomerSource = true;
+
+        const $vehicle = $('#vehicleDropdown');
+        const $chassis = $('#chassisDropdown');
+
+        $vehicle.empty().append('<option value="">Select</option>');
+        $chassis.empty().append('<option value="">Select</option>').trigger('change.select2');
+
+        if (!customerId) {
+            isCustomerSource = false;
+
+            allVehicleOptionsCache.forEach(o => {
+                if (o.value) {
+                    $vehicle.append(`<option value="${o.value}">${o.text}</option>`);
+                }
+            });
+
+            $vehicle.trigger('change.select2');
+
+            $.ajax({
+                type: 'GET',
+                url: window.RazorVars.getChassisByVehicleTypeUrl,
+                data: { vehicleTypeId: state.vehicleType },
+                dataType: 'json',
+                success: function (data) {
+                    $chassis.empty().append('<option value="">Select</option>');
+                    if (Array.isArray(data)) {
+                        data.forEach(item => {
+                            $chassis.append(`<option value="${item.id}">${item.text}</option>`);
+                        });
+                    }
+                    $chassis.trigger('change.select2');
+                }
+            });
+
+            return;
+        }
+
+        callApi({
+            url: `${window.RazorVars.getOpenAgreementInfoUrl}?customerId=${customerId}`,
+            onSuccess: (res) => {
+                if (!res?.isSuccess || !Array.isArray(res.data)) return;
+
+                const allowedVehicleIds = new Set(
+                    res.data.map(x => Number(x.vehicleDefinitionId)).filter(Boolean)
+                );
+
+                let firstVehicleId = null;
+
+                // Populate vehicle dropdown
+                allVehicleOptionsCache.forEach(o => {
+                    if (allowedVehicleIds.has(Number(o.value))) {
+                        $vehicle.append(`<option value="${o.value}">${o.text}</option>`);
+                        if (!firstVehicleId) firstVehicleId = o.value;
+                    }
+                });
+
+                $vehicle.trigger('change.select2');
+
+                // ✅ FIX: Populate chassis dropdown with ALL customer vehicles
+                if (state.vehicleType && allowedVehicleIds.size > 0) {
+                    $.ajax({
+                        type: 'GET',
+                        url: window.RazorVars.getChassisByVehicleTypeUrl,
+                        data: { vehicleTypeId: state.vehicleType },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (!Array.isArray(data)) return;
+
+                            // ✅ Filter to show only chassis matching customer's vehicles
+                            data
+                                .filter(item => allowedVehicleIds.has(Number(item.id)))
+                                .forEach(item => {
+                                    $chassis.append(`<option value="${item.id}">${item.text}</option>`);
+                                });
+
+                            $chassis.trigger('change.select2');
+
+                            // Set first vehicle as selected
+                            if (firstVehicleId) {
+                                isVehicleChassisSyncing = true;
+                                $vehicle.val(firstVehicleId).trigger('change.select2');
+                                $chassis.val(firstVehicleId).trigger('change.select2');
+                                isVehicleChassisSyncing = false;
+                            }
+                        }
+                    });
+                }
+            }
         });
     }
 
@@ -430,7 +620,7 @@
         const $chassis = $('#chassisDropdown');
 
         const existingCustomer = ($('#CustomerName').val() || '').toString().trim();
-
+        allVehicleOptionsCache = [];
         $vehicle.empty().append('<option value="">Select</option>').trigger('change');
         $chassis.empty().append('<option value="">Select</option>').trigger('change');
 
@@ -447,6 +637,10 @@
                 if (Array.isArray(data)) {
                     data.forEach(item => {
                         $vehicle.append(`<option value="${item.value}">${item.text}</option>`);
+                        allVehicleOptionsCache.push({
+                            value: String(item.value),
+                            text: item.text
+                        });
                     });
                     $vehicle.trigger('change.select2');
                 }
@@ -508,7 +702,7 @@
                 Date: { required: true },
                 VehicleTypeId: { required: true },
                 VehicleId: { required: true },
-                CustomerName: { required: true },
+                CustomerId: { required: false },
                 ChassisId: { required: true },
                 Start_Time: { required: true },
                 Duration: { required: true, min: 1 },
@@ -586,20 +780,25 @@
             }
 
             const scheduleData = {
-                Date: formatDateISO(state.date),
-                DateTo: formatDateISO(state.dateTo || state.date),
-                VehicleId: toNumber(state.vehicleId),
-                PlateNumber: state.plate ?? '',
-                Start_Time: ensureTimeWithSeconds(state.startTime),
-                End_Time: ensureTimeWithSeconds(state.endTime),
+                Date: formatDateISO($('#schDate').val()),
+                DateTo: formatDateISO($('#schDate').val()),
+
+                VehicleTypeId: toNumber($('#vehicleTypeDropdown').val()),
+                VehicleId: toNumber($('#vehicleDropdown').val()),
+                ChassisId: toNumber($('#chassisDropdown').val()),
+                CustomerId: toNumber($('#CustomerId').val()),
+
+                PlateNumber: $('#vehicleDropdown').find(':selected').text()?.trim() || '',
+
+                Start_Time: ensureTimeWithSeconds($('#schStart').val()),
+                End_Time: ensureTimeWithSeconds($('#schEnd').val()),
                 Duration: toNumber($('#schDuration').val()),
+
                 Description: $('#descriptionInput').val() ?? '',
-                Chassis: $('#chassisDropdown option:selected').text() || null,
-                Status: 44,
-                CustomerName: $('#CustomerName').val() ?? '',
-                VehicleTypeId: toNumber(state.vehicleType),
-                ChassisId: toNumber(state.chassisId),
+                Status: 44
             };
+            debugger;
+
 
             const isEdit = $('#scheduleModal').data('mode') === 'edit';
             const reservationId = $('#scheduleModal').data('reservationId');
@@ -659,6 +858,7 @@
         initSelect2($('#vehicleDropdown'));
         initSelect2($('#chassisDropdown'));
         initSelect2($('#vehicleTypeDropdown'));
+        initSelect2($('#CustomerId'));
 
         initValidation();
 

@@ -1802,15 +1802,6 @@ html[dir="rtl"] .toggle-pin {
     vertical-align: -3px;
 }
 
-.the-movements .scratch-wrap {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    background: #f8fafc;
-    border: 1px solid #ced4da;
-    border-radius: 12px;
-}
-
 .the-movements .scratch-inner {
     position: relative;
     width: 100%;

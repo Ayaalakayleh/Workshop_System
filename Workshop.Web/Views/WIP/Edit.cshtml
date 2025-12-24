@@ -56,24 +56,33 @@
 						@userInfo?.FirstName @userInfo?.LastName
 					</div>
 				</div>
-				<div>
                     <div>
 						 @(lang =="en"?  @Model?.VehicleTab?.ManufacturerPrimaryName : @Model?.VehicleTab?.ManufacturerSecondaryName)
 						 @(lang == "en" ? @Model?.VehicleTab?.VehicleModelPrimaryName : @Model?.VehicleTab?.VehicleModelSecondaryName)
-						 (@Model?.VehicleTab?.ManufacturingYear) / @Model?.VehicleTab?.PlateNumber / @Model?.VehicleTab?.ChassisNo &nbsp; @ViewBag.AgreementEndDate
+						 (@Model?.VehicleTab?.ManufacturingYear) / @Model?.VehicleTab?.PlateNumber / @Model?.VehicleTab?.ChassisNo
 					</div>
-					</div>
+
 				<div class="statusContainer">
-					<label>
-						Agreement:
-					</label>
-					<div class="agreementStatus">@ViewBag.AgreementStatus</div>
+					@if (ViewBag.AgreementStatus != "")
+					{
+						<label>
+							Agreement:
+						</label>
+
+						<div class="agreementStatus">@ViewBag.AgreementStatus</div>
+					}
+
+
+					<h5>@ViewBag.AgreementEndDate</h5>
 				</div>
+					</div>
+
+
+
 			</div>
 
 		</div>
 	</div>
-</div>
 
 
 <div class="row">

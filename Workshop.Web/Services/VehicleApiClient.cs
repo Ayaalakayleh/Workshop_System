@@ -241,5 +241,24 @@ namespace Workshop.Web.Services
             var result = await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
             return result;
         }
+        public async Task<List<CustomerInformation>> Get_CustomerInformation(int BranchId, string Language, string search = null)
+        {
+            string url = $"/CustomerInformation/Get_CustomerInformation?BranchId={BranchId}&Language={Language}&search={search}";
+            var result = await SendRequest<List<CustomerInformation>>(url, HttpMethod.Get);
+            return result;
+        }
+        
+        public async Task<List<OpenAgreementInfo>> M_GetOpenAgreementByVehicleOrCustomer(int? customerId, int? vehicleId)
+        {
+            string url = $"/CustomerInformation/GetOpenAgreementByVehicleOrCustomer?customerId={customerId}&vehicleId={vehicleId}";
+            var result = await SendRequest<List<OpenAgreementInfo>>(url, HttpMethod.Get);
+            return result;
+        }
+        public async Task<CustomerInformation> GetCustomerData(int customerId)
+        {
+            string url = $"CustomerInformation/GetCustomerData?id={customerId}";
+            var result = await SendRequest<CustomerInformation>(url, HttpMethod.Get);
+            return result;
+        }
     }
 }

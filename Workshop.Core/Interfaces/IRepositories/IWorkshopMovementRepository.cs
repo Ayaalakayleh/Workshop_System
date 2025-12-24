@@ -23,6 +23,14 @@ namespace Workshop.Core.Interfaces.IRepositories
 		Task<string> MovementStrikes_GetAsync(int movementId);
 		Task UpdateMovementReplacementAsync(int movementId);
 		Task<VehicleMovement> VehicleMovement_GetLastMovementOutByWorkOrderIdAsync(int workOrderId);
+        Task<IEnumerable<VehicleChecklistLookup>> GetVehicleChecklistLookup();
+        Task<IEnumerable<VehicleChecklistLookup>> GetTyresChecklistLookup();
+        Task<IEnumerable<VehicleChecklist>> GetVehicleChecklistByMovementId(int? movementId);
+        Task<IEnumerable<TyreChecklist>> GetTyresChecklistByMovementId(int? movementId);
+        Task<int> InsertVehicleChecklist(VehicleChecklist vehicleChecklist);
+        Task<int> InsertTyreChecklist(TyreChecklist tyreChecklist);
+        Task<int> UpdateVehicleChecklist(VehicleChecklist vehicleChecklist);
+        Task<int> UpdateTyreChecklist(TyreChecklist tyreChecklist);
 
-	}
+    }
 }

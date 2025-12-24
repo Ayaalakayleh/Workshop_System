@@ -28,7 +28,8 @@ namespace Workshop.Infrastructure.Repositories
                 DateTo = filterDTO.DateTo,
                 PageNumber = filterDTO.PageNumber,
                 PageSize = filterDTO.PageSize,
-                ChassisId = filterDTO.ChassisId
+                ChassisId = filterDTO.ChassisId,
+                CustomerId = filterDTO.CustomerId
             };
 
             var result = await _database.ExecuteGetAllStoredProcedure<ReservationListItemDTO>("M_Reservations_GetFiltered", parameters);
@@ -52,7 +53,8 @@ namespace Workshop.Infrastructure.Repositories
                 CompanyId = reservationDTO.CompanyId,
                 CustomerName = reservationDTO.CustomerName,
                 ChassisId = reservationDTO.ChassisId,
-                VehicleTypeId = reservationDTO.vehicleTypeId
+                VehicleTypeId = reservationDTO.vehicleTypeId,
+                customerId = reservationDTO.CustomerId
 
             };
 

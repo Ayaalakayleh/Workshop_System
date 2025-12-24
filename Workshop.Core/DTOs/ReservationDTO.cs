@@ -13,7 +13,7 @@ namespace Workshop.Core.DTOs
         public int VehicleId { get; set; }
         public string PlateNumber { get; set; }
         public string Description { get; set; }
-        public string Chassis { get; set; }
+        public string? Chassis { get; set; }
         public int CompanyId { get; set; }
 
         public TimeSpan Start_Time { get; set; }
@@ -24,9 +24,10 @@ namespace Workshop.Core.DTOs
 
         public int? Status { get; set; }
         //public List<TechnicianDTO> Tech { get; set; }
-        public string CustomerName { get; set; }
+        public string? CustomerName { get; set; }
         public int ChassisId { get; set; }
         public int vehicleTypeId { get; set; }
+        public int? CustomerId { get; set; }
 
     }
     public class ReservationDTO: BaseReservationDTO
@@ -52,6 +53,7 @@ namespace Workshop.Core.DTOs
         public int PageSize { get; set; } = 25;
         public string? Chassis { get; set; }
         public int? ChassisId { get; set; }
+        public int? CustomerId { get; set; }
 
 
     }
@@ -78,6 +80,7 @@ namespace Workshop.Core.DTOs
         public int ChassisId { get; set; }
         public int vehicleTypeId { get; set; }
         public string? UserName { get; set; }
+        public int? CustomerId { get; set; }
 
 
 
