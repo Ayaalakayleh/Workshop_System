@@ -25,16 +25,22 @@ namespace Workshop.Infrastructure.Repositories
 
         public async Task<IEnumerable<WIPDTO>> GetAllAsync(FilterWIPDTO oFilter)
         {
-            var parameters = new
+            try {
+                var parameters = new
+                {
+                    WIPNo = oFilter.WIPNo,
+                    Status = oFilter.Status,
+                    CustomerId = oFilter.CustomerId,
+                    PageNumber = oFilter.PageNumber,
+                    WorkshopId = oFilter.WorkshopId
+                };
+                return await _database.ExecuteGetAllStoredProcedure<WIPDTO>("WIP_GetAll", parameters);
+            }
+            catch(Exception ex)
             {
-                WIPNo = oFilter.WIPNo,
-                Status = oFilter.Status,
-                CustomerId = oFilter.CustomerId,
-                PageNumber = oFilter.PageNumber,
-                WorkshopId = oFilter.WorkshopId
-            };
-            return await _database.ExecuteGetAllStoredProcedure<WIPDTO>("WIP_GetAll", parameters);
-        }
+                throw ex;
+            }
+            }
 
         public async Task<IEnumerable<CreateWIPServiceDTO>> GetAllInternalLabourLineAsync(int WIPId)
         {
