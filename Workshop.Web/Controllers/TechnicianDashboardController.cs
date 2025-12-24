@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Quartz;
 using Quartz.Impl;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text.Json;
 using Workshop.Core.DTOs;
 using Workshop.Web.Models;
@@ -266,12 +267,14 @@ namespace Workshop.Web.Controllers
             var WIPSchedules = await _apiClient.GetClockingFilter();
 
             var bServiceIds = services
-                .Where(s => s?.Status == 19)
-                .Select(s => s?.KeyId).ToHashSet();
+      .Where(s => s?.Status == 19)
+      .Select(s => (KeyId: s?.KeyId ?? 0, Id: s?.Id))
+      .ToHashSet();
+
 
 
             var serviceList = WIPSchedules?
-                .Where(s => s.WIPId == WIPId && bServiceIds.Contains(s.KeyId ?? 0))
+                .Where(s => s.WIPId == WIPId && bServiceIds.Contains((s.KeyId ?? 0, s.RTSId ?? 0)) && s.TechnicianId == main.SelectedTechnician)
                 .Select(x => new { x.KeyId, Text = lang == "en" ? x.RTSPrimaryName + " - " + x.KeyId : x.RTSSecondaryName + " - " + x.KeyId })
                 .Distinct()
                 .Select(x => new SelectListItem { Value = x.KeyId.ToString(), Text = x.Text })
@@ -296,6 +299,7 @@ namespace Workshop.Web.Controllers
                 .ToList() ?? new List<SelectListItem>();
             
             main.WIPSSelectList = serviceList;
+            main.SelectedTechnician = TechnicianID;
             SaveMainModel(main);
             return serviceList;
         }
@@ -312,6 +316,7 @@ namespace Workshop.Web.Controllers
                 .ToList() ?? new List<SelectListItem>();
 
             main.WIPSSelectList = serviceList;
+            main.SelectedTechnician = TechnicianID;
             SaveMainModel(main);
         }
 
