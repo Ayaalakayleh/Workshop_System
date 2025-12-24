@@ -269,7 +269,9 @@ $(function () {
                         visible: function (e) {
                             return !(wipStatus === Gone || wipStatus === Invoiced) &&
                                 parseInt(e.row.data.Status) !== 19 &&
-                                parseInt(e.row.data.Status) !== 25;
+                                parseInt(e.row.data.Status) !== 24 &&
+                                parseInt(e.row.data.Status) !== 25 &&
+                                parseInt(e.row.data.Status) !== 26;
                         },
                         onClick: function (e) {
                             var grid = e.component;

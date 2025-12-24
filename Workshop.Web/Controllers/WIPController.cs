@@ -158,7 +158,7 @@ namespace Workshop.Web.Controllers
                         ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
 
                         ViewBag.DueOutDate = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-
+                        ViewBag.ReceivedMeter = movement.ReceivedMeter;
                     }
                 }
 
