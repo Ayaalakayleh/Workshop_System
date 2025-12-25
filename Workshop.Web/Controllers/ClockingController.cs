@@ -20,7 +20,7 @@ namespace Workshop.Web.Controllers
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
-        [CustomAuthorize(Permissions.Clocking.View)]
+       // [CustomAuthorize(Permissions.Clocking.View)]
         public async Task<IActionResult> Index()
         {
             try

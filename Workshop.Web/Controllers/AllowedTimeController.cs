@@ -25,7 +25,7 @@ namespace Workshop.Web.Controllers
 
         }
 
-        [CustomAuthorize(Permissions.AllowedTime.View)]
+       // [CustomAuthorize(Permissions.AllowedTime.View)]
         public async Task<IActionResult> Index([FromQuery] AllowedTimeFilterDTO? filter)
         {
             filter ??= new AllowedTimeFilterDTO();
@@ -46,7 +46,7 @@ namespace Workshop.Web.Controllers
             return View(data);
         }
 
-        [CustomAuthorize(Permissions.AllowedTime.Edit)]
+        //[CustomAuthorize(Permissions.AllowedTime.Edit)]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -80,7 +80,7 @@ namespace Workshop.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [CustomAuthorize(Permissions.AllowedTime.Create)]
+        //[CustomAuthorize(Permissions.AllowedTime.Create)]
         public async Task<IActionResult> Edit(AllowedTimeDTO dto)
         {
             try
@@ -124,7 +124,7 @@ namespace Workshop.Web.Controllers
         }
 
         [HttpPost]
-        [CustomAuthorize(Permissions.AllowedTime.Delete)]
+        //[CustomAuthorize(Permissions.AllowedTime.Delete)]
         public async Task<IActionResult> Delete(int id)
         {
             try
