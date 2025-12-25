@@ -463,28 +463,44 @@
                 Options: optionsTab
             };
 
-            $.ajax({
-                type: 'POST',
-                url: window.URLs.closeWipUrl,
-                dataType: 'json',
-                data: close
-            }).done(function (result) {
-                if (result.success) {
-                    Swal.fire(
-                        "Success",
-                        "WIP has been closed successfully."
-                    ).then(() => {
-                        window.location.href = window.URLs.indexUrl;
+            hasExternalPendingInvoice(WIPId)
+                .done(function (res) {
+
+                    if (!res.success) {
+                        Swal.fire({ icon: "error", title: "Error", text: res.error || "Failed to check pending invoices." });
+                        return;
+                    }
+
+                    if (res.hasPending) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Pending Invoices",
+                            text: "There are external pending invoice for this WIP"
+                        });
+                        return; 
+                    }
+
+                    $.ajax({
+                        type: 'POST',
+                        url: window.URLs.closeWipUrl,
+                        dataType: 'json',
+                        data: close
+                    }).done(function (result) {
+                        if (result.success) {
+                            Swal.fire("Success", "WIP has been closed successfully.").then(() => {
+                                window.location.href = window.URLs.indexUrl;
+                            });
+                        } else {
+                            Swal.fire("Error", result.message || "An unknown error occurred.");
+                        }
+                    }).fail(function (xhr, status, error) {
+                        console.error("Error:", error);
                     });
-                } else {
-                    Swal.fire(
-                        "Error",
-                        result.message || "An unknown error occurred."
-                    );
-                }
-            }).fail(function (xhr, status, error) {
-                console.error("Error:", error);
-            });
+
+                })
+                .fail(function () {
+                    Swal.fire({ icon: "error", title: "Error", text: "An error occurred while checking for pending invoices." });
+                });
         });
 
 
