@@ -31,7 +31,7 @@ namespace Workshop.Web.Controllers
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
-        [CustomAuthorize(Permissions.WorkSchedule.View)]
+      //  [CustomAuthorize(Permissions.WorkSchedule.View)]
         public async Task<IActionResult> Index([FromQuery] FilterTechnicianWorkScheduleDTO? oFilter)
         {
            
@@ -47,7 +47,7 @@ namespace Workshop.Web.Controllers
             return View(data);
         }
 
-        [CustomAuthorize(Permissions.WorkSchedule.Edit)]
+       // [CustomAuthorize(Permissions.WorkSchedule.Edit)]
         public async Task<IActionResult> Edit(int? id)
         {
            
@@ -91,7 +91,7 @@ namespace Workshop.Web.Controllers
         }
 
         [HttpPost]
-        [CustomAuthorize(Permissions.WorkSchedule.Edit)]
+      //  [CustomAuthorize(Permissions.WorkSchedule.Edit)]
         public async Task<IActionResult> Edit(TechnicianWorkScheduleDTO dto)
         {
             dto.WorkshopId = BranchId;
