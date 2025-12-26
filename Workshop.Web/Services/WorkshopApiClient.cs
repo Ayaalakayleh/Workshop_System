@@ -964,6 +964,13 @@ namespace Workshop.Web.Services
                 throw new Exception(e.Message);
             }
         }
+        public async Task<List<MovementInvoice>> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+        {
+            var response = await _httpClient.GetAsync($"api/workshopmovement/GetWorkshopInvoiceByWorkOrderId/{workOrderId}");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<List<MovementInvoice>>();
+        }
         #endregion
 
         #region WorkOrder

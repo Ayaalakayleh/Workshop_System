@@ -168,13 +168,18 @@ namespace Workshop.Core.Services
 				throw new Exception("Error in VehicleMovement_GetLastMovementOutByWorkOrderIdAsync", ex);
 			}
 		}
+        public async Task<List<MovementInvoice>> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+		{
+			return await _workshopMovementRepository.GetWorkshopInvoiceByWorkOrderId(workOrderId);
 
-		#endregion
+        }
 
-		#region MovementOut
+        #endregion
+
+        #region MovementOut
 
 
-		public async Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
+        public async Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
 		{
 			await _workshopMovementRepository.UpdateVehicleMovementStatusAync(workshopId, masterId);
 		}

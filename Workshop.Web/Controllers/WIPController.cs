@@ -171,6 +171,22 @@ namespace Workshop.Web.Controllers
                         _logger.LogWarning($"WIP with ID {id.Value} not found.");
                         return NotFound();
                     }
+                    var externalInvoices = await _apiClient.GetWorkshopInvoiceByWorkOrderId(dto.WorkOrderId ?? 0);
+                    if (externalInvoices != null && externalInvoices.Any())
+                    {
+                        ViewBag.HasExternalInvoices = true;
+
+                        ViewBag.TransferLabourCost = externalInvoices.Sum(x => x.LaborCost);
+                        ViewBag.TransferPartsCost = externalInvoices.Sum(x => x.PartsCost);
+                        ViewBag.TransferTotalInvoice = externalInvoices.Sum(x => x.TotalAmount);
+                        ViewBag.TransferTotalInvoiceWithoutVat = externalInvoices.Sum(x => x.TotalAmount - x.Vat);
+                        ViewBag.TransferVatAmount = externalInvoices.Sum(x => x.Vat);
+
+                    }
+                    else
+                    {
+                        ViewBag.HasExternalInvoices = false;
+                    }
 
                     if (dto.MovementId > 0)
                     {
@@ -1154,6 +1170,7 @@ namespace Workshop.Web.Controllers
 
                 movement.CompanyId = CompanyId;
                 movement.CreatedBy = UserId;
+               // movement.MoveOutWorkshopId = movement.MoveInWorkshopId; need some attention here :)
                 movement.MoveOutWorkshopId = BranchId;
                 movement.MovementOut = true;
                 movement.WorkshopId = BranchId;

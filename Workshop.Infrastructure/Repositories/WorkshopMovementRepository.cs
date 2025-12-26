@@ -406,11 +406,26 @@ namespace Workshop.Infrastructure.Repositories
 
 			return result;
 		}
-		#endregion
+        public async Task<List<MovementInvoice>> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+        {
+            var parameters = new
+            {
+                WorkOrderId = workOrderId
+            };
 
-		#region MovementOut
+            var result = await _database.ExecuteGetAllStoredProcedure<MovementInvoice>(
+                "D_WorkshopInvoice_GetByWorkOrderId",
+                parameters
+            );
 
-		public async Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
+            return result?.ToList();
+        }
+
+        #endregion
+
+        #region MovementOut
+
+        public async Task UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
         {
             var parameters = new
             {

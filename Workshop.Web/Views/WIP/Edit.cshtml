@@ -208,6 +208,26 @@
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>@Common["Label_Parts"]</span><strong id="totParts" data-value="0"></strong>
                                     </div>
+									@if (ViewBag.HasExternalInvoices == true)
+									{
+										<hr class="my-2" />
+										<div class="d-flex justify-content-between mb-2">
+											<span>@Common["TransferLabourCost"]</span>
+											<strong>@ViewBag.TransferLabourCost</strong>
+										</div>
+
+										<div class="d-flex justify-content-between mb-2">
+											<span>@Common["TransferPartsCost"]</span>
+											<strong>@ViewBag.TransferPartsCost</strong>
+										</div>
+
+										<hr class="my-2" />
+										<div class="d-flex justify-content-between">
+											<span class="fw-bold">@Common["TransferTotalInvoice"]</span>
+											<strong class="fw-bold">@ViewBag.TransferTotalInvoiceWithoutVat</strong>
+										</div>
+									}
+
                                     <hr class="my-2" />
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>@Common["Label_Subtotal"]</span><strong id="totSubtotal" data-value="0"></strong>
@@ -425,7 +445,15 @@
 			// URLs - History
 			// ============================
 		 getServiceHistoryUrl: '@Url.Action("GetWIPServiceHistory", "WIP")',
-		 getWIPDetailsUrl: '@Url.Action("GetWIPDetails", "WIP")'
+		 getWIPDetailsUrl: '@Url.Action("GetWIPDetails", "WIP")',
+
+
+	// ============================
+	// Transfer Totals (External Invoices)
+	// ============================
+	transferSubtotal: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoiceWithoutVat : 0),
+	transferVatAmount: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferVatAmount : 0),
+	transferTotal: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoice : 0)
 	  };
 		const internalMatches = @Html.Raw(Json.Serialize(ViewBag.InternalMatches));
 	  const externalMatches = @Html.Raw(Json.Serialize(ViewBag.ExternalMatches));

@@ -31,6 +31,7 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<int> InsertTyreChecklist(TyreChecklist tyreChecklist);
         Task<int> UpdateVehicleChecklist(VehicleChecklist vehicleChecklist);
         Task<int> UpdateTyreChecklist(TyreChecklist tyreChecklist);
+        Task<List<MovementInvoice>> GetWorkshopInvoiceByWorkOrderId(int workOrderId);
 
     }
 }
