@@ -26,6 +26,14 @@ public class ExternalWorkshopInvoiceController : ControllerBase
         var result = await _service.GetInvoiceDetailsAsync(filter);
         return Ok(result);
     }
+
+    [HttpGet("GetInvoiceDetailsByWIPId")]
+    public async Task<ActionResult<List<ExternalWorkshopInvoiceDetailsDTO>>> GetInvoiceDetailsByWIPId(int? WIPId)
+    {
+        var result = await _service.GetInvoiceDetailsByWIPId(WIPId);
+        return Ok(result);
+    }
+
 	[HttpGet("WorkshopInvoice_GetWorkshop")]
 	public async Task<ActionResult<IEnumerable<WorkshopInvoice>>> M_WorkshopInvoice_GetWorkshop([FromQuery] int companyId, [FromQuery] string fromDate, [FromQuery] string toDate, [FromQuery] int? customerId, [FromQuery] int? projectId,
 	[FromQuery] int? vehicleId)

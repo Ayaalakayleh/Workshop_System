@@ -1,4 +1,5 @@
-﻿using Workshop.Core.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.WorkshopDTOs;
 
 namespace Workshop.Infrastructure.Repositories
@@ -63,6 +64,29 @@ namespace Workshop.Infrastructure.Repositories
 
             return result?.ToList() ?? new List<ExternalWorkshopInvoiceDetailsDTO>();
         }
+        public async Task<List<ExternalWorkshopInvoiceDetailsDTO>> GetInvoiceDetailsByWIPId(int? WIPId)
+        {
+            var parameters = new
+            {
+                WIPId = WIPId
+            };
+
+            var result = await _database.ExecuteGetAllStoredProcedure<ExternalWorkshopInvoiceDetailsDTO>(
+                "M_ExternalWorkshopInvoiceDetails_GetDetailsByWIPId",
+                parameters);
+
+            // Apply computed WorkOrderTitle
+            if (result != null)
+            {
+                foreach (var detail in result)
+                {
+                    detail.WorkOrderTitle = $"{detail.BranchId}{detail.WorkOrderNo:D3}";
+                }
+            }
+
+            return result?.ToList() ?? new List<ExternalWorkshopInvoiceDetailsDTO>();
+        }
+
 		public async Task<IEnumerable<WorkshopInvoice>> M_WorkshopInvoice_GetWorkshop(DateTime? fromDate, DateTime? toDate, int? customerId, int? vehicleId, int? projectId, int? companyId)
 		{
             try

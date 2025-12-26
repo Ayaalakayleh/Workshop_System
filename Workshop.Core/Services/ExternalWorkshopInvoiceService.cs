@@ -1,4 +1,5 @@
-﻿using Workshop.Core.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.WorkshopDTOs;
 
 public class ExternalWorkshopInvoiceService : IExternalWorkshopInvoiceService
@@ -18,6 +19,11 @@ public class ExternalWorkshopInvoiceService : IExternalWorkshopInvoiceService
     public async Task<List<ExternalWorkshopInvoiceDetailsDTO>> GetInvoiceDetailsAsync(ExternalWorkshopInvoiceDetailsFilterDTO filter)
     {
         return await _repository.GetInvoiceDetailsAsync(filter);
+    }
+
+    public async Task<List<ExternalWorkshopInvoiceDetailsDTO>> GetInvoiceDetailsByWIPId(int? WIPId)
+    {
+        return await _repository.GetInvoiceDetailsByWIPId(WIPId);
     }
 	public async Task<IEnumerable<WorkshopInvoice>> M_WorkshopInvoice_GetWorkshop(DateTime? fromDate, DateTime? toDate, int? customerId, int? vehicleId, int? projectId, int? companyId)
 	{
