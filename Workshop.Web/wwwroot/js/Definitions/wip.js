@@ -315,6 +315,16 @@
             saveData();
         });
 
+        /* ------- Check if has External Pending invoice WIP ------- */
+        function hasExternalPendingInvoice(WIPId) {
+            return $.ajax({
+                type: 'GET',
+                url: window.URLs.hasExternalPendingInvoice,
+                dataType: 'json',
+                data: { WIPId: WIPId }
+            });
+        }
+
         /* ------- Close WIP ------- */
         $("#closeBTN").on("click", function () {
 
@@ -335,8 +345,7 @@
 
             debugger
             var notCompletedService = Services_Items.filter(function (row) {
-
-                return parseInt(row.Status) !== 25;
+                return parseInt(row.Status) !== 25 && parseInt(row.Status) !== 26;
             });
             if (notCompletedService.length > 0) {
                 Swal.fire({
