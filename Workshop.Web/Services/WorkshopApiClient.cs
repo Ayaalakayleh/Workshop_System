@@ -964,6 +964,13 @@ namespace Workshop.Web.Services
                 throw new Exception(e.Message);
             }
         }
+        public async Task<List<MovementInvoice>> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+        {
+            var response = await _httpClient.GetAsync($"api/workshopmovement/GetWorkshopInvoiceByWorkOrderId/{workOrderId}");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<List<MovementInvoice>>();
+        }
         #endregion
 
         #region WorkOrder
@@ -1468,10 +1475,24 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<List<ExternalWorkshopInvoiceDetailsDTO>>(url);
         }
 
+        public async Task<List<ExternalWorkshopInvoiceDetailsDTO>?> GetInvoiceDetailsByWIPIdAsync(int? WIPId)
+        {
+            var url = $"api/ExternalWorkshopInvoice/GetInvoiceDetailsByWIPId?WIPId={WIPId}";
+
+            var response = await _httpClient.GetAsync(url);
+            var body = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"API failed: {(int)response.StatusCode} {response.ReasonPhrase} | Body: {body}");
+
+            return await response.Content.ReadFromJsonAsync<List<ExternalWorkshopInvoiceDetailsDTO>>();
+        }
+
+
         #endregion
 
         #region MaintenanceCard
-        
+
         public async Task InsertDMaintenanceCardAsync(MaintenanceCardDTO maintenanceCard)
         {
             var response = await _httpClient.PostAsJsonAsync("api/MaintenanceCard/InsertDMaintenanceCard", maintenanceCard);
@@ -2294,8 +2315,12 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<RecallDTO>?>();
             return result;
         }
+        public async Task<IEnumerable<RecallDTO>?> GetAllRecallsDDLAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<IEnumerable<RecallDTO>?>($"api/Recall/GetAllDDL");
+        }
 
-		public async Task<RecallDTO?> GetRecallByIdAsync(int id)
+        public async Task<RecallDTO?> GetRecallByIdAsync(int id)
 		{
 			return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetById/{id}");
 		}

@@ -2478,4 +2478,19 @@
   <data name="Button_More" xml:space="preserve">
     <value>المزيد</value>
   </data>
+  <data name="TransferLabourCost" xml:space="preserve">
+    <value>تكلفة العمالة المحوّلة</value>
+  </data>
+  <data name="TransferPartsCost" xml:space="preserve">
+    <value>تكلفة القطع المحوّلة</value>
+  </data>
+  <data name="TransferSubtotal" xml:space="preserve">
+    <value>الإجمالي قبل الضريبة (محول)</value>
+  </data>
+  <data name="TransferVatAmount" xml:space="preserve">
+    <value>ضريبة القيمة المضافة (محولة)</value>
+  </data>
+  <data name="TransferTotalInvoice" xml:space="preserve">
+    <value>إجمالي الفاتورة المحوّلة</value>
+  </data>
 </root>

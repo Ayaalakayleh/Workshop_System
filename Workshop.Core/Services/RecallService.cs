@@ -28,8 +28,13 @@ namespace Workshop.Core.Services
 		{
 			return await _repository.GetAllAsync(filterRecallDTO);
 		}
+        public async Task<IEnumerable<RecallDTO>> GetAllDDLAsync()
+		{
+            return await _repository.GetAllDDLAsync();
+        }
 
-		public async Task<RecallDTO?> GetByIdAsync(int id)
+
+        public async Task<RecallDTO?> GetByIdAsync(int id)
 		{
 			return await _repository.GetByIdAsync(id);
 		}

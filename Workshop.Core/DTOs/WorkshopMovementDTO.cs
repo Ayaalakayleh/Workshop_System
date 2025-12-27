@@ -39,6 +39,7 @@ namespace Workshop.Core.DTOs.WorkshopMovement
         public decimal PartsCost { get; set; }
         public decimal LaborCost { get; set; }
         public DateTime? Invoice_Date { get; set; }
+        public decimal TotalAmount { get; set; }
 
     }
     public class VehicleMovementStatusDTO

@@ -2478,4 +2478,19 @@
   <data name="Button_More" xml:space="preserve">
     <value>More</value>
   </data>
+  <data name="TransferLabourCost" xml:space="preserve">
+    <value>Transfer Labour Cost</value>
+  </data>
+  <data name="TransferPartsCost" xml:space="preserve">
+    <value>Transfer Parts Cost</value>
+  </data>
+  <data name="TransferSubtotal" xml:space="preserve">
+    <value>Transfer Subtotal (Excl. VAT)</value>
+  </data>
+  <data name="TransferVatAmount" xml:space="preserve">
+    <value>Transfer VAT</value>
+  </data>
+  <data name="TransferTotalInvoice" xml:space="preserve">
+    <value>Transfer Total Invoice</value>
+  </data>
 </root>

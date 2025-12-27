@@ -31,6 +31,39 @@ namespace Workshop.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<IEnumerable<RecallDTO>> GetAllDDLAsync()
+        {
+            using var connection = _context.CreateConnection();
+
+            using var multi = await connection.QueryMultipleAsync(
+                "Recall_GetAllDDL",
+                commandType: CommandType.StoredProcedure
+            );
+
+            var recalls = (await multi.ReadAsync<RecallDTO>()).ToList();
+            var vehicles = (await multi.ReadAsync<VehicleRecallDTO>()).ToList();
+
+            var vehicleLookup = vehicles
+                .Where(v => v.RecallID.HasValue)
+                .GroupBy(v => v.RecallID!.Value)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var recall in recalls)
+            {
+
+                recall.Vehicles ??= new List<VehicleRecallDTO>();
+
+                if (vehicleLookup.TryGetValue(recall.Id, out var recallVehicles))
+                {
+                    recall.Vehicles.AddRange(recallVehicles);
+                }
+            }
+
+            return recalls;
+        }
+
+
+
         public async Task<RecallDTO?> GetByIdAsync(int id)
         {
             using var connection = _context.CreateConnection();
