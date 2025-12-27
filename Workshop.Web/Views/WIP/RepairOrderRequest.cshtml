@@ -1,1 +1,1084 @@
-﻿
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OPL Forms</title>
+
+    <style>
+        /* ========= GLOBAL / PRINT ========= */
+        @@page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "Tahoma","Arial","Noto Naskh Arabic",sans-serif;
+            background: #eaf2f8;
+            color: #111;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+        }
+
+        .doc {
+            width: 100%;
+            padding: 8mm 0;
+            box-sizing: border-box;
+        }
+
+        .sheet {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 8mm auto;
+            box-sizing: border-box;
+            padding: 10mm 10mm;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            position: relative;
+            page-break-after: always;
+        }
+
+            .sheet:last-child {
+                page-break-after: auto;
+            }
+
+        @@media print {
+            body {
+                background: #fff;
+            }
+
+            .doc {
+                padding: 0;
+            }
+
+            .sheet {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                width: 210mm;
+                min-height: 297mm;
+            }
+        }
+
+        /* ========= UTILS ========= */
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .muted {
+            color: #333;
+        }
+
+        .thin {
+            font-weight: 400;
+        }
+
+        .b {
+            font-weight: 700;
+        }
+
+        .u {
+            text-decoration: underline;
+        }
+
+        .box {
+            border: 2px solid #000;
+            padding: 0;
+        }
+
+        .line {
+            display: inline-block;
+            border-bottom: 2px solid #000;
+            height: 6mm;
+            vertical-align: bottom;
+        }
+
+            .line.thin {
+                border-bottom-width: 1px;
+            }
+
+        /* --- shared car diagram image (NEW) --- */
+        .carimg-wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        img.carimg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* IMPORTANT: no cropping */
+            display: block;
+        }
+
+        /* ========= FORM 1 (OPL Repair Order Request) ========= */
+        .opl-headerbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #111;
+            color: #fff;
+            padding: 2.2mm 3mm;
+            font-size: 12px;
+            letter-spacing: .2px;
+        }
+
+            .opl-headerbar .left {
+                font-weight: 700;
+            }
+
+            .opl-headerbar .right {
+                font-weight: 700;
+            }
+
+        .opl-seal {
+            width: 18mm;
+            height: 18mm;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 8px;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .opl-title {
+            text-align: center;
+            margin: 6mm 0 4mm;
+        }
+
+            .opl-title .t1 {
+                font-size: 20px;
+                font-weight: 800;
+            }
+
+            .opl-title .t2 {
+                font-size: 18px;
+                font-weight: 800;
+                margin-top: 1mm;
+            }
+
+        .opl-topmeta {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8mm;
+            font-size: 12px;
+            margin-top: -2mm;
+            margin-bottom: 2mm;
+        }
+
+            .opl-topmeta .meta {
+                white-space: nowrap;
+            }
+
+                .opl-topmeta .meta .line {
+                    width: 55mm;
+                }
+
+        .opl-info {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+            .opl-info td {
+                border: 2px solid #000;
+                padding: 2.2mm 2.2mm;
+                vertical-align: middle;
+            }
+
+            .opl-info .lbl {
+                width: 34mm;
+                font-weight: 700;
+            }
+
+            .opl-info .fill {
+                width: 70mm;
+            }
+
+                .opl-info .fill .line {
+                    width: 100%;
+                    height: 7mm;
+                }
+
+            .opl-info .lblR {
+                width: 44mm;
+                font-weight: 700;
+            }
+
+            .opl-info .fillR {
+                width: 52mm;
+            }
+
+                .opl-info .fillR .line {
+                    width: 100%;
+                    height: 7mm;
+                }
+
+        .opl-multiline {
+            border-left: 2px solid #000;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            padding: 0;
+        }
+
+            .opl-multiline .row {
+                display: flex;
+                border-top: 2px solid #000;
+                min-height: 26mm;
+            }
+
+                .opl-multiline .row:first-child {
+                    border-top: 2px solid #000;
+                }
+
+                .opl-multiline .row .lbl {
+                    width: 60mm;
+                    padding: 2mm 2mm;
+                    font-weight: 800;
+                    border-right: 2px solid #000;
+                }
+
+                .opl-multiline .row .lines {
+                    flex: 1;
+                    padding: 2mm 4mm;
+                }
+
+            .opl-multiline .lines .write {
+                display: block;
+                border-bottom: 2px solid #000;
+                height: 7mm;
+                margin: 4mm 0 0;
+            }
+
+        .opl-bottomgrid {
+            display: grid;
+            grid-template-columns: 1fr 1.25fr 1fr; /* diagrams | checklist | tires */
+            gap: 3mm;
+            border-left: 2px solid #000;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            padding: 3mm;
+        }
+
+        .opl-panel {
+            border: 2px solid #000;
+            min-height: 92mm;
+            padding: 2mm;
+        }
+
+        /* Checklist table */
+        .opl-check {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+            .opl-check th, .opl-check td {
+                border: 1px solid #000;
+                padding: 1.5mm 1.5mm;
+                vertical-align: middle;
+            }
+
+            .opl-check thead th {
+                font-weight: 800;
+                text-align: center;
+            }
+
+            .opl-check .item {
+                width: 58%;
+                font-weight: 700;
+            }
+
+            .opl-check .pass {
+                width: 12%;
+                text-align: center;
+            }
+
+            .opl-check .remark {
+                width: 30%;
+            }
+
+        .tickbox {
+            width: 6mm;
+            height: 6mm;
+            border: 2px solid #000;
+            display: inline-block;
+        }
+
+        .remarkline {
+            display: block;
+            border-bottom: 1px solid #000;
+            height: 6mm;
+        }
+
+        /* Tires block */
+        .opl-tires .photo {
+            width: 42mm;
+            height: 42mm;
+            border: 2px solid #000;
+            margin: 0 auto 2mm;
+            display: grid;
+            place-items: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .opl-tires .hdr {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2mm;
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2mm;
+        }
+
+        .opl-tires .trow {
+            display: grid;
+            grid-template-columns: 24mm 1fr 1fr 1fr;
+            gap: 2mm;
+            align-items: end;
+            font-size: 11px;
+            margin: 2mm 0;
+        }
+
+            .opl-tires .trow .pos {
+                font-weight: 800;
+            }
+
+            .opl-tires .trow .line {
+                width: 100%;
+                height: 6mm;
+                border-bottom-width: 1px;
+            }
+
+        .opl-tires .remarks {
+            margin-top: 4mm;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+            .opl-tires .remarks .write {
+                display: block;
+                border-bottom: 2px solid #000;
+                height: 7mm;
+                margin-top: 2mm;
+            }
+
+        .opl-note {
+            border-left: 2px solid #000;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            padding: 4mm 6mm;
+            text-align: center;
+            font-weight: 900;
+            font-style: italic;
+            letter-spacing: .2px;
+        }
+
+        .opl-sign {
+            border-left: 2px solid #000;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            padding: 6mm 6mm 4mm;
+        }
+
+            .opl-sign .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18mm;
+                font-size: 13px;
+                font-weight: 800;
+            }
+
+            .opl-sign .field {
+                display: grid;
+                grid-template-columns: 42mm 1fr;
+                gap: 4mm;
+                align-items: end;
+                margin: 4mm 0;
+            }
+
+                .opl-sign .field .line {
+                    width: 100%;
+                }
+
+        /* ========= FORM 2 (Job Card) ========= */
+        .jc-header {
+            text-align: center;
+            margin-bottom: 2mm;
+            font-size: 11px;
+        }
+
+            .jc-header .company {
+                font-weight: 800;
+                letter-spacing: .2px;
+            }
+
+        .jc-idrow {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 2mm;
+        }
+
+            .jc-idrow td {
+                border-bottom: 2px solid #000;
+                padding: 2mm 2mm;
+                vertical-align: middle;
+                font-weight: 800;
+            }
+
+            .jc-idrow .rightTitle {
+                text-align: right;
+                font-size: 18px;
+            }
+
+            .jc-idrow .mid {
+                text-align: center;
+            }
+
+            .jc-idrow .leftTitle {
+                font-size: 20px;
+            }
+
+        .jc-contacts {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2mm;
+            font-size: 12px;
+        }
+
+            .jc-contacts td {
+                border-bottom: 2px solid #000;
+                padding: 2mm 2mm 3mm;
+                vertical-align: top;
+            }
+
+            .jc-contacts .hdr {
+                font-weight: 900;
+                display: flex;
+                justify-content: space-between;
+                gap: 6mm;
+            }
+
+            .jc-contacts .val {
+                margin-top: 1mm;
+                font-weight: 700;
+            }
+
+            .jc-contacts .note {
+                font-weight: 900;
+            }
+
+        .jc-main {
+            border: 2px solid #000;
+            margin-top: 3mm;
+        }
+
+            .jc-main .grid {
+                display: grid;
+                grid-template-columns: 1.25fr 1fr;
+            }
+
+        .jc-block {
+            border-right: 2px solid #000;
+        }
+
+            .jc-block:last-child {
+                border-right: none;
+            }
+
+        .jc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+            .jc-table td {
+                border-bottom: 1px solid #000;
+                padding: 1.6mm 1.8mm;
+                vertical-align: middle;
+            }
+
+            .jc-table .lbl {
+                width: 32mm;
+                font-weight: 900;
+            }
+
+            .jc-table .val {
+                font-weight: 800;
+            }
+
+            .jc-table .bigval {
+                font-size: 18px;
+                letter-spacing: .3px;
+            }
+
+        .jc-bottomrow {
+            border-top: 2px solid #000;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr 1.2fr;
+            font-size: 12px;
+        }
+
+            .jc-bottomrow .cell {
+                border-right: 1px solid #000;
+                padding: 2mm 2mm;
+            }
+
+                .jc-bottomrow .cell:last-child {
+                    border-right: none;
+                }
+
+            .jc-bottomrow .k {
+                font-weight: 900;
+            }
+
+            .jc-bottomrow .v {
+                font-weight: 900;
+                font-size: 14px;
+                margin-top: 1mm;
+            }
+
+        .jc-minirow {
+            border-top: 2px solid #000;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            font-size: 12px;
+        }
+
+            .jc-minirow .cell {
+                border-right: 1px solid #000;
+                padding: 2mm 2mm;
+            }
+
+                .jc-minirow .cell:last-child {
+                    border-right: none;
+                }
+
+            .jc-minirow .k {
+                font-weight: 900;
+            }
+
+            .jc-minirow .v {
+                font-weight: 900;
+                font-size: 14px;
+                margin-top: 1mm;
+            }
+
+        .jc-services {
+            border: 2px solid #000;
+            border-top: none;
+            padding: 0;
+        }
+
+            .jc-services .hdr {
+                border-top: 2px solid #000;
+                padding: 2mm 2mm;
+                font-weight: 900;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .jc-services .body {
+                display: grid;
+                grid-template-columns: 1.35fr 1fr;
+                gap: 0;
+                border-top: 1px solid #000;
+                min-height: 120mm;
+            }
+
+            .jc-services .left {
+                border-right: 1px solid #000;
+                padding: 2mm 2mm;
+            }
+
+            .jc-services .right {
+                padding: 2mm 2mm;
+            }
+
+        .svc-free {
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 3mm;
+        }
+
+        .svc-lines {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 2mm;
+        }
+
+            .svc-lines td, .svc-lines th {
+                border-top: 1px solid #000;
+                padding: 1.6mm 1.6mm;
+                vertical-align: top;
+            }
+
+            .svc-lines th {
+                font-weight: 900;
+                text-align: left;
+            }
+
+            .svc-lines .code {
+                width: 40mm;
+                font-weight: 900;
+            }
+
+            .svc-lines .desc {
+                font-weight: 800;
+            }
+
+            .svc-lines .ln {
+                width: 18mm;
+                text-align: center;
+                font-weight: 900;
+            }
+
+            .svc-lines .qty {
+                width: 18mm;
+                text-align: center;
+                font-weight: 900;
+            }
+
+            .svc-lines .ref {
+                width: 40mm;
+                text-align: right;
+                font-weight: 900;
+            }
+
+        .jc-diagram {
+            border: 2px solid #000;
+            padding: 2mm;
+        }
+
+        .jc-faults {
+            margin-top: 3mm;
+            font-weight: 900;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .jc-signbox {
+            border: 2px solid #000;
+            margin-top: 4mm;
+            padding: 2mm;
+            min-height: 22mm;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        .jc-footnote {
+            margin-top: 4mm;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        .jc-brand {
+            margin-top: 10mm;
+            display: flex;
+            justify-content: center;
+            gap: 16mm;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="doc">
+
+        <!-- =========================================================
+             PAGE 1: OPERATIONAL LEASE - OPL / REPAIR ORDER REQUEST
+             ========================================================= -->
+        <section class="sheet" aria-label="OPL Repair Order Request">
+
+            <div class="opl-headerbar">
+                <div class="left">AL JAZIRAH VEHICLES AGENCIES CO. LTD.</div>
+                <div class="right rtl">شركة توكيل الجزيرة للسيارات المحدودة</div>
+                <div class="opl-seal">
+                    OFFICIAL<br />SEAL
+                </div>
+            </div>
+
+            <div class="opl-title">
+                <div class="t1">OPERATIONAL LEASE – OPL</div>
+                <div class="t2">REPAIR ORDER REQUEST</div>
+            </div>
+
+            <div class="opl-topmeta">
+                <div class="meta"><span class="b">DATE:</span> <span class="line thin"></span></div>
+                <div class="meta"><span class="b">TIME RECEIVED:</span> <span class="line thin"></span></div>
+            </div>
+
+            <table class="opl-info" aria-label="Vehicle Details">
+                <tr>
+                    <td class="lbl">VEHICLE BRAND / MAKE</td>
+                    <td class="fill"><span class="line"></span></td>
+                    <td class="lblR">MODEL YEAR:</td>
+                    <td class="fillR"><span class="line"></span></td>
+                </tr>
+                <tr>
+                    <td class="lbl">PLATE#:</td>
+                    <td class="fill"><span class="line"></span></td>
+                    <td class="lblR">MILEAGE:</td>
+                    <td class="fillR"><span class="line"></span></td>
+                </tr>
+                <tr>
+                    <td class="lbl">VIN #:</td>
+                    <td class="fill"><span class="line"></span></td>
+                    <td class="lblR">CONTRACT EXPIRY DATE:</td>
+                    <td class="fillR"><span class="line"></span></td>
+                </tr>
+                <tr>
+                    <td class="lbl">COMPANY NAME:</td>
+                    <td class="fill"><span class="line"></span></td>
+                    <td class="lblR">INSURANCE EXPIRATION DATE:</td>
+                    <td class="fillR"><span class="line"></span></td>
+                </tr>
+                <tr>
+                    <td class="lbl">CUSTOMER/USER NAME:</td>
+                    <td class="fill"><span class="line"></span></td>
+                    <td class="lblR">ESTIMARA EXPIRATION DATE:</td>
+                    <td class="fillR"><span class="line"></span></td>
+                </tr>
+                <tr>
+                    <td class="lbl">MOBILE NUMBER:</td>
+                    <td class="fill"><span class="line"></span></td>
+                    <td class="lblR">MVPI EXPIRATION DATE:</td>
+                    <td class="fillR"><span class="line"></span></td>
+                </tr>
+            </table>
+
+            <div class="opl-multiline" aria-label="Service and Recalls">
+                <div class="row">
+                    <div class="lbl">REQUIRED SERVICE / REPAIR:</div>
+                    <div class="lines">
+                        <span class="write"></span>
+                        <span class="write"></span>
+                        <span class="write"></span>
+                    </div>
+                </div>
+
+                <div class="row" style="min-height: 18mm;">
+                    <div class="lbl">OUTSTANDING RECALLS/FSA’S:</div>
+                    <div class="lines">
+                        <span class="write"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="opl-bottomgrid" aria-label="Inspection and Tires">
+
+                <!-- Left: Vehicle diagrams (UPDATED: use your attached image) -->
+                <div class="opl-panel" aria-label="Vehicle Condition Diagrams">
+                    <div class="carimg-wrap" style="min-height: 88mm;">
+                        <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
+                    </div>
+                </div>
+
+                <!-- Middle: Checklist -->
+                <div class="opl-panel" aria-label="Inspection Checklist">
+                    <table class="opl-check">
+                        <thead>
+                            <tr>
+                                <th class="item"></th>
+                                <th class="pass">PASSED</th>
+                                <th class="remark">NOT PASSED / REMARKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="item">ENGINE STARTS &amp; IDLES PROPERLY</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">CHECK ALL INDICATOR LIGHTS</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">AIRBAG &amp; SEAT BELTS</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">ENGINE OIL LEVEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">COOLANT LEVEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">BRAKE FLUID LEVEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">CHECK ALL EXTERIOR LIGHTS</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">ENGINE TEMPERATURE</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">A/C PERFORMANCE</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">INTERIOR &amp; UPHOLSTERY</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">FIRE EXTINGUISHER</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">WARNING DEVICE</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">SPARE WHEEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            <tr><td class="item">JACK &amp; TIRE WRENCH</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Right: Tires -->
+                <div class="opl-panel opl-tires" aria-label="Tires">
+                    <div class="photo">TIRE<br />PHOTO</div>
+
+                    <div class="hdr">
+                        <div>BRAND</div>
+                        <div>DOT</div>
+                        <div>WEAR LEVEL</div>
+                    </div>
+
+                    <div class="trow">
+                        <div class="pos">FRONT RH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+                    <div class="trow">
+                        <div class="pos">FRONT LH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+                    <div class="trow">
+                        <div class="pos">REAR RH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+                    <div class="trow">
+                        <div class="pos">REAR LH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+
+                    <div class="remarks">REMARKS FOR TIRES:</div>
+                    <span class="write"></span>
+                    <span class="write"></span>
+                    <span class="write"></span>
+                </div>
+            </div>
+
+            <div class="opl-note">
+                IMPORTANT NOTE: THE COMPANY IS NOT RESPONSIBLE FOR ANY MISSING BELONGINGS INSIDE THE VEHICLE.<br />
+                PLEASE MAKE SURE TO TAKE ALL VALUABLE ITEMS BEFORE LEAVING THE VEHICLE
+            </div>
+
+            <div class="opl-sign" aria-label="Signatures">
+                <div class="grid">
+                    <div>
+                        <div class="field">
+                            <div>CUSTOMER NAME:</div>
+                            <span class="line"></span>
+                        </div>
+                        <div class="field">
+                            <div>SIGNATURE:</div>
+                            <span class="line"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="field">
+                            <div>SERVICE ADVISOR:</div>
+                            <span class="line"></span>
+                        </div>
+                        <div class="field">
+                            <div>SIGNATURE</div>
+                            <span class="line"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================================================
+             PAGE 2: JOB CARD
+             ========================================================= -->
+        <section class="sheet" aria-label="Job Card">
+
+            <div class="jc-header">
+                <div class="company">AL JAZIRAH VEHICLES AGENCIES CO.</div>
+                <div class="rtl">شركة توكيل الجزيرة للسيارات المحدودة</div>
+            </div>
+
+            <table class="jc-idrow" aria-label="Job Card Header">
+                <tr>
+                    <td class="leftTitle">Job Card</td>
+                    <td class="mid">W.I.P No&nbsp;&nbsp;<span class="u">23054</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم مرجع العمل</span></td>
+                    <td class="mid">Job No&nbsp;&nbsp;<span class="u">80458132</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم العمل</span></td>
+                    <td class="mid">Page&nbsp;&nbsp;<span class="u">1</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">صفحة</span></td>
+                    <td class="rightTitle rtl">بطاقة عمل</td>
+                </tr>
+            </table>
+
+            <table class="jc-contacts" aria-label="Customer and Invoice Blocks">
+                <tr>
+                    <td>
+                        <div class="hdr">
+                            <span>Customer Name &amp; Address</span>
+                            <span class="rtl">اسم وعنوان العميل</span>
+                        </div>
+                        <div class="val">AUVA Monthly Leasing Vehicles Maint</div>
+                        <div class="note">****To be used only for Workshop****</div>
+                    </td>
+                    <td>
+                        <div class="hdr">
+                            <span>Other Contact Details</span>
+                            <span class="rtl">تفاصيل الاتصال الأخرى</span>
+                        </div>
+                        <div class="val muted rtl" style="line-height:1.6;">
+                            رقم المدير<br />
+                            رقم المشرف<br />
+                            الفاكس<br />
+                            البريد الالكتروني للعمل
+                        </div>
+                    </td>
+                    <td>
+                        <div class="hdr">
+                            <span>Invoice Name &amp; Address</span>
+                            <span class="rtl">اسم وعنوان الحساب</span>
+                        </div>
+                        <div class="val">AUVA Monthly Leasing Vehicles Maint</div>
+                        <div class="note">****To be used only for Workshop****</div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="jc-main" aria-label="Job Card Main Info">
+                <div class="grid">
+                    <!-- LEFT BLOCK (Vehicle info) -->
+                    <div class="jc-block">
+                        <table class="jc-table">
+                            <tr><td class="lbl">Preferred Contact No</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Vehicle</td><td class="val">Explorer XLT, Leather</td></tr>
+                            <tr><td class="lbl">Chassis No</td><td class="val bigval">1FMSK8DH1MGA09316</td></tr>
+                            <tr><td class="lbl">Engine No</td><td class="val bigval">MMGA09316</td></tr>
+                            <tr><td class="lbl">Colour</td><td class="val bigval">JS Iconic</td></tr>
+                            <tr><td class="lbl">Trim</td><td class="val bigval">SN Activex</td></tr>
+                            <tr><td class="lbl">Fuel Reading</td><td class="val">E &nbsp; 1/4 &nbsp; 1/2 &nbsp; 3/4 &nbsp; F</td></tr>
+                            <tr><td class="lbl">Vehicle No</td><td class="val bigval">705492</td></tr>
+                            <tr><td class="lbl">Registration Date</td><td class="val bigval">02/08/2021</td></tr>
+                            <tr><td class="lbl">Mileage</td><td class="val bigval">92625</td></tr>
+                        </table>
+                    </div>
+
+                    <!-- RIGHT BLOCK (Admin/status info) -->
+                    <div class="jc-block">
+                        <table class="jc-table">
+                            <tr><td class="lbl">Created by</td><td class="val">Shemim Sha shaji</td></tr>
+                            <tr><td class="lbl">Phone No.</td><td class="val">0507463231</td></tr>
+                            <tr><td class="lbl">Loan Car Required</td><td class="val">NO</td></tr>
+                            <tr><td class="lbl">Customer Waiting</td><td class="val">YES / 13.00</td></tr>
+                            <tr><td class="lbl">Return Parts</td><td class="val">NO</td></tr>
+                            <tr><td class="lbl">Created Date</td><td class="val">25/12/2025</td></tr>
+                            <tr><td class="lbl">Duplicate Copy</td><td class="val">NO</td></tr>
+                            <tr><td class="lbl">Repeat Repair</td><td class="val">NO</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="jc-bottomrow" aria-label="Dates and Account">
+                    <div class="cell"><div class="k">Date In<br /><span class="rtl">تاريخ الدخول</span></div><div class="v">25/12/2025</div></div>
+                    <div class="cell"><div class="k">Time In<br /><span class="rtl">وقت الدخول</span></div><div class="v">9.22</div></div>
+                    <div class="cell"><div class="k">Date Due Out<br /><span class="rtl">تاريخ الخروج</span></div><div class="v">27/12/2025</div></div>
+                    <div class="cell"><div class="k">Time Due Out<br /><span class="rtl">وقت الخروج</span></div><div class="v">18.00</div></div>
+                    <div class="cell"><div class="k">Account No<br /><span class="rtl">رقم الحساب</span></div><div class="v">R9051068</div></div>
+                    <div class="cell"><div class="k">Customer Order No<br /><span class="rtl">رقم طلب العميل</span></div><div class="v">MGA09316</div></div>
+                </div>
+
+                <div class="jc-minirow" aria-label="Service Summary">
+                    <div class="cell"><div class="k">Dept<br /><span class="rtl">القسم</span></div><div class="v">W</div></div>
+                    <div class="cell"><div class="k">Next Service Due<br /><span class="rtl">الخدمة القادمة</span></div><div class="v">11/09/2025</div></div>
+                    <div class="cell"><div class="k">Date Last Visit<br /><span class="rtl">تاريخ آخر زيارة</span></div><div class="v">26/08/2025</div></div>
+                </div>
+            </div>
+
+            <div class="jc-services" aria-label="Description of Goods and Services">
+                <div class="hdr">
+                    <span>Description of Goods / Services</span>
+                    <span class="rtl">وصف البضاعة / الخدمات</span>
+                </div>
+
+                <div class="body">
+                    <!-- LEFT: Service text + lines -->
+                    <div class="left">
+                        <div class="svc-free">
+                            LEASING 95000KM-Service<br />
+                            Change Engine Oil and Filter, Perform Multi-point inspection<br />
+                            Inspect tires for wear, Rotation, Replace Engine Air Filter<br />
+                            Replace A/C air filter if equipped. Fuel Filter if applicable<br />
+                            Replace PTU Oil if applicable or Transfer Case 4X4 fluid<br />
+                            Replace A/T Oil &amp; Filter. Timing belt (if applicable). Spark Plugs
+                        </div>
+
+                        <table class="svc-lines" aria-label="Service Line Items">
+                            <tr>
+                                <th class="code">Item Code</th>
+                                <th class="desc">Description</th>
+                                <th class="ln">Line No</th>
+                                <th class="qty">Qty</th>
+                                <th class="ref">Ref</th>
+                            </tr>
+                            <tr>
+                                <td class="code">P_OPLTIRE003</td>
+                                <td class="desc">Check Tires light on</td>
+                                <td class="ln">2</td>
+                                <td class="qty">1.00</td>
+                                <td class="ref">OPLTIRE003</td>
+                            </tr>
+                            <tr>
+                                <td class="code">P_OPLNVH049</td>
+                                <td class="desc">Check seat passenger 3row Headrest</td>
+                                <td class="ln">3</td>
+                                <td class="qty">1.00</td>
+                                <td class="ref">OPLNVH049</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- RIGHT: Damage diagram + faults + signature box -->
+                    <div class="right">
+                        <!-- UPDATED: use your attached image instead of the svg -->
+                        <div class="jc-diagram" aria-label="Damage Diagram">
+                            <div class="carimg-wrap" style="height: 210px;">
+                                <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
+                            </div>
+                        </div>
+
+                        <div class="jc-faults">
+                            <div>
+                                FAULT SYMBOLS:<br />
+                                D&nbsp;DENT<br />
+                                S&nbsp;SCRATCH
+                            </div>
+                            <div style="text-align:right;">
+                                C&nbsp;CHIP<br />
+                                R&nbsp;RUST
+                            </div>
+                        </div>
+
+                        <div class="jc-signbox">
+                            CUSTOMER/REPRESENTATIVE SIGNATURE<br />
+                            <span class="rtl">توقيع ممثل العميل</span>
+                        </div>
+
+                        <div class="jc-footnote">
+                            This is an Auto-generated Document. No need to stamp<br />
+                            <span class="rtl">هذا المستند تم إصداره تلقائياً ولا يحتاج لختم</span>
+                        </div>
+
+                        <div class="jc-brand" aria-label="Brand Footer">
+                            <div>FORD</div>
+                            <div>LINCOLN</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+</body>
+</html>
