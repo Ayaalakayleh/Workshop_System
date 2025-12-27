@@ -1287,7 +1287,7 @@ namespace Workshop.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> TransferMoveIn(
         [FromForm] VehicleMovement movement,
-        [FromForm] string FixedServiceIds,
+        [FromForm] List<Models.WipServiceFixDto> Services,
         [FromForm] IFormFile file)
         {
             var resultJson = new TempData();
@@ -1332,9 +1332,9 @@ namespace Workshop.Web.Controllers
                 //Check
                 //Movement.DamageId = Movement.ColMaintenanceCard[0].DamageId;
                 var movements = await _apiClient.InsertVehicleMovementAsync(movement);
-                if (!string.IsNullOrWhiteSpace(FixedServiceIds))
+                if (Services != null && Services.Any())
                 {
-                    await _apiClient.UpdateWIPServicesIsFixedAsync(FixedServiceIds);
+                    await _apiClient.UpdateWIPServicesExternalAndFixStatus(Services);
                 }
 
                 MovementInvoice invoice = new MovementInvoice();

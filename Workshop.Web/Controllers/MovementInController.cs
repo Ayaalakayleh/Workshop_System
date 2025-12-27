@@ -196,9 +196,6 @@ namespace Workshop.Web.Controllers
                     var vehicleNams = new List<VehicleNams>();
                     //var workOrder = new MWorkOrderDTO();
 
-
-
-
                     MWorkOrderDTO workOrder = null;
 
                     if (movement.WorkOrderId.HasValue)
@@ -346,16 +343,22 @@ namespace Workshop.Web.Controllers
                         }
                         if (movement.HasRecall)
                         {
-                            var vehicle = new VehicleDefinitions();
-                            if (movement?.IsExternal ?? false)
-                                vehicle = await _vehicleApiClient.GetExternalVehicleDetails(movement.VehicleID ?? 0, lang);
-                            else
-                            {
-                                vehicle = await _vehicleApiClient.GetVehicleDetails(movement?.VehicleID ?? 0, lang);
-                            }
+           
                             RecallDTO recall = new RecallDTO();
                             var currectRecall = await _apiClient.GetRecallByIdAsync(movement?.RecallId ?? 0);
-                            currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo});
+                            if (!movement?.IsExternal ?? false)
+                            {
+                                var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement?.VehicleID ?? 0);
+                                if(vehicle != null && vehicle.ChassisNo != null)
+                                    currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo });
+                            }
+                            else
+                            {
+                                var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement?.VehicleID ?? 0);
+                                if (vehicle != null && vehicle.ChassisNo != null)
+                                    currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo });
+                            }
+                           
 
                             UpdateRecallDTO updateRecall = new UpdateRecallDTO()
                             {

@@ -858,10 +858,25 @@
                                             </div>
                                         </div>
 
+
+
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
+
+                          
+                                            <div class="card shadow-sm">
+                                                <div class="card-header">
+                                                    <h5>@Common["Label_Recall"]</h5>
+                                                </div>
+                                                @Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
+
+                                                @Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id = "hasRecall", @disabled = true })
+
+                                             </div>
+
+                           
 
                         @if (Model.MaintenanceStatus != 3 || Model.MaintenanceStatus == null)
                         {
