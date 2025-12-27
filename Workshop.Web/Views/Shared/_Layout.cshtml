@@ -12,10 +12,11 @@
       lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
 
 @{
-        var CompanyInfo = System.Text.Json.JsonSerializer.Deserialize<CompanyInfo>(Context.Session.GetString("CompanyInfo"));
-        var BranchInfo = System.Text.Json.JsonSerializer.Deserialize<CompanyBranch>(Context.Session.GetString("BranchInfo"));
-        var userInfo = System.Text.Json.JsonSerializer.Deserialize<User>(Context.Session.GetString("UserInfo"));
-        var menus = System.Text.Json.JsonSerializer.Deserialize<List<Menu>>(Context.Session.GetString("PrimaryMenuList"));
+    var CompanyInfo = System.Text.Json.JsonSerializer.Deserialize<CompanyInfo>(Context.Session.GetString("CompanyInfo"));
+    var BranchInfo = System.Text.Json.JsonSerializer.Deserialize<CompanyBranch>(Context.Session.GetString("BranchInfo"));
+    var userInfo = System.Text.Json.JsonSerializer.Deserialize<User>(Context.Session.GetString("UserInfo"));
+    var menus = System.Text.Json.JsonSerializer.Deserialize<List<Menu>>(Context.Session.GetString("PrimaryMenuList"));
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 
 <head>
@@ -686,167 +687,54 @@
             <nav id="js-primary-nav" class="primary-nav flex-grow-1 custom-scroll">
                 <ul id="js-nav-menu" class="nav-menu">
 
-                    <!-- Definitions -->
-                    <li class="nav-item">
-                        <a href="#" title="Definitions">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-                            <span class="nav-link-text" data-i18n>@CommonLocalizer["Definitions"]</span>
-                        </a>
-                        <ul>
-                            <li><a href="@Url.Action("Index", "TechnicianProfileDefinition")"><span class="nav-link-text">@CommonLocalizer["Label_Technicians"]</span></a></li>
-                            <li><a href="@Url.Action("Index", "AccountDefinition")"><span class="nav-link-text">@CommonLocalizer["AccountDefinition"]</span></a></li>
-                            @*                             <li><a href="@Url.Action("Index", "WorkScheduleDefinition")"><span class="nav-link-text">Technician Work Schedule</span></a></li>
- *@                            <li><a href="@Url.Action("Index", "LookupManagement")"><span class="nav-link-text">@CommonLocalizer["LookupManagement"]</span></a></li>
-                            <li><a href="@Url.Action("Index", "Recall")"><span class="nav-link-text">@CommonLocalizer["Recall"]</span></a></li>
-                            @*                             <li><a href="@Url.Action("Index", "LabourRateManagement")"><span class="nav-link-text">Labour Rate Management</span></a></li>
- *@
-                            <!-- RTS Submenu -->
-                            <li>
-                                <a href="#" title="RTS">
-                                    <span class="nav-link-text">@CommonLocalizer["RTS"]</span>
-                                </a>
-                                <ul>
-                                    <li class="link-item"><a href="@Url.Action("Index", "RTSCode")"><span class="nav-link-text">@CommonLocalizer["RTSCodeDefinition"]</span></a></li>
-                                    <li class="link-item"><a href="@Url.Action("Index", "Menu")"><span class="nav-link-text">@CommonLocalizer["MenuRTS"]</span></a></li>
-                                </ul>
-                            </li>
+                    <!-- Definitions Menu -->
+                    @foreach (var i in menus.Where(a => a.ParentId == -1).ToList().OrderBy(c => c.Seq))
+                    {
+                        var link = "";
+                        if (string.IsNullOrEmpty(i.ControllerName))
+                        {
+                            link = "#";
+                        }
+                        else
+                        {
+                            link = Url.Action(i.MethodName, i.ControllerName);
+                        }
+                        <li class="nav-item">
+                            <a href="@link" title='@(lang == "en" ? i.PrimaryName : i.SecondarName)' data-filter-tags>
+                                <i class="@i.Icon"></i>
 
-                            <li><a href="@Url.Action("Index", "Teams")"><span class="nav-link-text">@CommonLocalizer["Teams"]</span></a></li>
-                            <li><a href="@Url.Action("Index", "Shifts")"><span class="nav-link-text">@CommonLocalizer["Shifts"]</span></a></li>
-                            @* <li><a href="@Url.Action("Index", "AllowedTime")"><span class="nav-link-text">@CommonLocalizer["AllowedTimes"]</span></a></li> *@
-                            <li><a href="@Url.Action("Index", "PriceMatrix")"><span class="nav-link-text">@CommonLocalizer["PriceMatrix"]</span></a></li>
-                            <li><a href="@Url.Action("Index", "ServiceReminder")"><span class="nav-link-text">@CommonLocalizer["ServiceReminder"]</span></a></li>
+                                <span class="nav-link-text" data-i18n>@(lang == "en" ? i.PrimaryName : i.SecondarName)</span>
+                            </a>
+                            <ul>
 
-                            @* <li><a href="@Url.Action("Index", "TechnicianDashboard")"><span class="nav-link-text">@CommonLocalizer["TechniciansDashboard"]</span></a></li> *@
-                            <li class="link-item"><a href="@Url.Action("Index", "WorkshopDefinitions")"><span class="nav-link-text">@CommonLocalizer["WorkshopDefinition"]</span></a></li>
-                            <li class="link-item"><a href="@Url.Action("Index", "VehicleDefinition")"><span class="nav-link-text">@CommonLocalizer["VehicleDefinition"]</span></a></li>
-                            @* <li class="link-item"><a href="@Url.Action("Index", "WorkshopLoading")"><span class="nav-link-text">@CommonLocalizer["Label_WorkshopLoading"]</span></a></li> *@
-                            @* <li class="link-item"><a href="@Url.Action("Index", "Reservations")"><span class="nav-link-text">@CommonLocalizer["Label_Reservations"]</span></a></li> *@
-                            @* <li><a href="@Url.Action("Index", "WorkOrder")"><span class="nav-link-text">@CommonLocalizer["WorkOrder"]</span></a></li> *@
-                        </ul>
-                    </li>
+                                @foreach (var j in menus.Where(a => a.ParentId == i.Id).ToList().OrderBy(c => c.Seq))
+                                {
+                                    var link1 = "";
+                                    if (string.IsNullOrEmpty(j.ControllerName))
+                                    {
+                                        link1 = "#";
+                                    }
+                                    else
+                                    {
+                                        link1 = Url.Action(j.MethodName, j.ControllerName);
+                                    }
+                                    <li>
+                                        <a href="@link1">
+                                            <i class="@j.Icon"></i>
+                                            <span class="nav-link-text" data-i18n>@(lang == "en" ? j.PrimaryName : j.SecondarName)</span>
+                                        </a>
+                                    </li>
+                                }
 
-                    <!-- Workshop Loading -->
 
-                    <li class="nav-item">
-                        <a href="@Url.Action("Index", "WorkshopLoading")">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
 
-                            <span class="nav-link-text">@CommonLocalizer["Label_WorkshopLoading"]</span>
-                        </a>
-                    </li>
-
-                    <!-- Work Order -->
-
-                    <li class="nav-item">
-                        <a href="@Url.Action("Index", "WorkOrder")">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-
-                            <span class="nav-link-text">@CommonLocalizer["WorkOrder"]</span>
-                        </a>
-                    </li>
-
-                    <!-- WIP -->
-
-                    <li class="nav-item">
-                        <a href="@Url.Action("Index", "WIP")">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-
-                            <span class="nav-link-text">@CommonLocalizer["Title_RepairOrdersWIP"]</span>
-                        </a>
-                    </li>
-
-                    <!-- Technician Dashboard -->
-
-                    <li class="nav-item">
-                        <a href="@Url.Action("Index", "TechnicianDashboard")">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-
-                            <span class="nav-link-text">@CommonLocalizer["TechniciansDashboard"]</span>
-                        </a>
-                    </li>
-
-                    <!-- Reservations -->
-
-                    <li class="nav-item">
-                        <a href="@Url.Action("Index", "Reservations")">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-
-                            <span class="nav-link-text">@CommonLocalizer["Label_Reservations"]</span>
-                        </a>
-                    </li>
-
-                    <!-- External -->
-                    <li class="nav-item">
-                        <a href="#" title="External">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-                            <span class="nav-link-text">@CommonLocalizer["ExternalWorkshop"]</span>
-                        </a>
-                        <ul>
-                            <!-- External Definition -->
-                            <li class="nav-item">
-                                <a href="#" title="Definition">
-                                    <span class="nav-link-text">@CommonLocalizer["Definitions"]</span>
-                                </a>
-                                <ul>
-                                    <li class="link-item"><a href="@Url.Action("CollectionMappingIndex", "CollectionMapping")"><span class="nav-link-text">@CommonLocalizer["ExternalWorkshopTemplate"]</span></a></li>
-                                </ul>
-                            </li>
-
-                            <!-- External Mapping -->
-                            <li class="nav-item">
-                                <a href="#" title="Mapping">
-                                    <span class="nav-link-text">@CommonLocalizer["ExternalInvoices"]</span>
-                                </a>
-                                <ul>
-                                    <li class="link-item"><a href="@Url.Action("Index", "Collection")"><span class="nav-link-text">@CommonLocalizer["ExternalWorkshopMaintenanceInvoice"]</span></a></li>
-                                    <li class="link-item"><a href="@Url.Action("Index", "ExternalWorkshopInvoice")"><span class="nav-link-text">@CommonLocalizer["ExternalWorkshopInvoice"]</span></a></li>
-                                </ul>
-                            </li>
-
-                            <!-- Externally Transported Vehicle -->
-                            <li class="nav-item">
-                                <a href="@Url.Action("TransferMovements", "WIP")"><span class="nav-link-text">@CommonLocalizer["ExternallyTransportedVehicle"]</span></a>
-                            </li>
-
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" title="External">
-                            <svg class="icon sa-icon">
-                                <use href="@Url.Content("~/smartadmin-5-styles/icons/sprite.svg#trello")"></use>
-                            </svg>
-                            <span class="nav-link-text">@CommonLocalizer["Movements"]</span>
-                        </a>
-                        <ul>
-                            <!-- External Definition -->
-                            <li class="nav-item">
-                                <a href="@Url.Action("Index", "MovementIn")" title="Definition">
-                                    <span class="nav-link-text">@CommonLocalizer["MovementIn"]</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="@Url.Action("Index", "Movements")" title="Definition">
-                                    <span class="nav-link-text">@CommonLocalizer["Movements"]</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    }
+  
                 </ul>
+
+               
 
                 <!-- No Results Message -->
                 <div class="no-results-msg pt-3 info-container">
