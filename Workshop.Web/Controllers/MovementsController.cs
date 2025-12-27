@@ -227,7 +227,32 @@ namespace Workshop.Web.Controllers
             }
             movement.VehicleCkecklist = vChecklists?.ToList();
             movement.TyreCkecklist = tChecklist?.ToList();
-            return View(movement);
+
+            var recalls = await _workshopapiClient.GetAllRecallsDDLAsync();
+
+            if (movement.IsExternal ?? false)
+            {
+                var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement.VehicleID ?? 0);
+                var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
+                movement.HasRecall = vRecall!= null && vRecall?.Id !=null && vRecall?.Id != 0; 
+                //    movement.HasRecall = recalls
+                //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
+                //        .Any(v => v.Chassis == vehicle.ChassisNo || (v.MakeID == vehicle.ManufacturerId && v.ModelID == vehicle.VehicleModelId));
+            }
+            else
+            {
+                var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement.VehicleID ?? 0); 
+                var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
+                movement.HasRecall = vRecall != null && vRecall?.Id != null && vRecall?.Id != 0;
+                //    movement.HasRecall = recalls
+                //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
+                //        .Any(v => v.Chassis == vehicle.ChassisNo || (v.MakeID == vehicle.ManufacturerId && v.ModelID == vehicle.VehicleModelId));
+                //}
+            }
+
+
+
+                return View(movement);
         }
 
         [HttpGet]
