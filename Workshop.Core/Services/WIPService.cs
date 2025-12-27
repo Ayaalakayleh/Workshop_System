@@ -289,6 +289,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_InvoiceDetails_GetByHeaderId(headerId);
         }
+        public async Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services)
+        {
+            return await _repository.UpdateWIPServicesExternalAndFixStatusAsync(services);
+        }
 
     }
 }

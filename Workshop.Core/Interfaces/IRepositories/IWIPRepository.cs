@@ -62,5 +62,6 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<IEnumerable<CreateItemDTO>> GetAllInternalPartsLineAsync(int WIPId);
         Task<int> UpdateWIPStatus(UpdateWIPStatusDTO dto);
         Task<IEnumerable<WipInvoiceDetailDTO>> WIP_InvoiceDetails_GetByHeaderId(int headerId);
+        Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services);
     }
 }
