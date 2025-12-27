@@ -2294,8 +2294,12 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<RecallDTO>?>();
             return result;
         }
+        public async Task<IEnumerable<RecallDTO>?> GetAllRecallsDDLAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<IEnumerable<RecallDTO>?>($"api/Recall/GetAllDDL");
+        }
 
-		public async Task<RecallDTO?> GetRecallByIdAsync(int id)
+        public async Task<RecallDTO?> GetRecallByIdAsync(int id)
 		{
 			return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetById/{id}");
 		}

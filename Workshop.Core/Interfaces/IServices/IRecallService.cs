@@ -10,7 +10,8 @@ namespace Workshop.Core.Interfaces.IServices
 	public interface  IRecallService
 	{
 		Task<IEnumerable<RecallDTO>> GetAllAsync(FilterRecallDTO filterRecallDTO);
-		Task<RecallDTO?> GetByIdAsync(int id);
+		Task<IEnumerable<RecallDTO>> GetAllDDLAsync();
+        Task<RecallDTO?> GetByIdAsync(int id);
 		Task<int> AddAsync(CreateRecallDTO dto);
 		Task<int> UpdateAsync(UpdateRecallDTO dto);
 		Task<int> DeleteAsync(DeleteRecallDTO dto);

@@ -469,6 +469,15 @@
             var $form = $('form#movements');
             if ($form.length) $form.trigger('submit');
         });
+
+        $("#hasRecall").on("change", function () {
+            if ($(this).is(":checked")) {
+                $("#recallList").prop('disabled', false);
+            } else {
+                $("#recallList").prop('disabled', true);
+            }
+        });
+        
     }
 
     /* ==================================================

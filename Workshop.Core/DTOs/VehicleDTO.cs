@@ -370,8 +370,10 @@ namespace Workshop.Core.DTOs.Vehicle
 		public List<int>? ServicesIds { get; set; }
 		public List<CreateWIPServiceDTO>? WIPServices { get; set; }
 		public bool isPart { get; set; } = false;
-		public List<VehicleChecklist>? VehicleCkecklist {get;set;}
-        public List<TyreChecklist>? TyreCkecklist { get; set; }
+		public List<VehicleChecklist>? VehicleCkecklist { get; set; }
+		public List<TyreChecklist>? TyreCkecklist { get; set; }
+		public bool HasRecall { get; set; }
+		public int? RecallId { get; set; }
     }
 
 	public class VehicleMovementDocument
