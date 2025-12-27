@@ -413,6 +413,14 @@
 						</fieldset>
 
 						<fieldset class="my-3 ui-fieldset">
+							@Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
+			
+							@Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id ="hasRecall" })
+
+							@Html.DropDownListFor(model => model.RecallId, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-check-input", @id= "recallList", @disabled= true })
+
+						</fieldset>
+						<fieldset class="my-3 ui-fieldset">
 							<div class="table-wrap">
 								<table class="table table-bordered table-hover text-center align-middle" id="tblMainteneance">
 									<thead class="thead-light">

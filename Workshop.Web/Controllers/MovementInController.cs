@@ -58,9 +58,11 @@ namespace Workshop.Web.Controllers
             obj.GregorianMovementDate = DateTime.Now;
             var vLookups = await _apiClient.GetVehicleChecklistLookup();
             var tLookups = await _apiClient.GetTyreChecklistLookup();
+
             List<VehicleChecklist> vChecklists = new List<VehicleChecklist>();
             List<TyreChecklist> tChecklists = new List<TyreChecklist>();
-            foreach (var v in vLookups){
+            foreach (var v in vLookups)
+            {
                 vChecklists.Add(new VehicleChecklist
                 {
                     LookupId = v.Id ?? 0,
@@ -79,6 +81,8 @@ namespace Workshop.Web.Controllers
             }
             obj.VehicleCkecklist = vChecklists;
             obj.TyreCkecklist = tChecklists;
+            var recalls = await _apiClient.GetAllRecallsDDLAsync();
+            ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code });
             return View(obj);
 
         }
@@ -192,9 +196,6 @@ namespace Workshop.Web.Controllers
                     var vehicleNams = new List<VehicleNams>();
                     //var workOrder = new MWorkOrderDTO();
 
-
-
-
                     MWorkOrderDTO workOrder = null;
 
                     if (movement.WorkOrderId.HasValue)
@@ -217,7 +218,7 @@ namespace Workshop.Web.Controllers
                             CompanyId = CompanyId,
                             BranchId = BranchId,
                             Wfstatus = (int)movement.VehicleSubStatusId,
-                            VehicleType = IsExternal ? 2: 1
+                            VehicleType = IsExternal ? 2 : 1
                         };
 
                         var createdWo = await _apiClient.InsertMWorkOrderAsync(workOrder);
@@ -234,11 +235,11 @@ namespace Workshop.Web.Controllers
                             bool IsUpdated = (await _vehicleApiClient.UpdateVehicleStatus(movement.VehicleID.Value, 10, movement.VehicleSubStatusId)).IsSuccess;
                         }
 
-                        
+
 
                         //VehicleMovement newMovement = await _workshopapiClient.InsertVehicleMovementAsync(movement);
 
-                        if (movement.WorkOrderId.HasValue && movement.WorkOrderId>0)
+                        if (movement.WorkOrderId.HasValue && movement.WorkOrderId > 0)
                         {
                             var card = new MaintenanceCardDTO
                             {
@@ -339,6 +340,33 @@ namespace Workshop.Web.Controllers
                         {
                             item.MovementId = newMovement.MovementId ?? 0;
                             await _apiClient.InsertTyreChecklist(item);
+                        }
+                        if (movement.HasRecall)
+                        {
+           
+                            RecallDTO recall = new RecallDTO();
+                            var currectRecall = await _apiClient.GetRecallByIdAsync(movement?.RecallId ?? 0);
+                            if (!movement?.IsExternal ?? false)
+                            {
+                                var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement?.VehicleID ?? 0);
+                                if(vehicle != null && vehicle.ChassisNo != null)
+                                    currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo });
+                            }
+                            else
+                            {
+                                var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement?.VehicleID ?? 0);
+                                if (vehicle != null && vehicle.ChassisNo != null)
+                                    currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo });
+                            }
+                           
+
+                            UpdateRecallDTO updateRecall = new UpdateRecallDTO()
+                            {
+                                Id = currectRecall.Id,
+                                Vehicles = currectRecall.Vehicles
+
+                            };
+                            await _apiClient.UpdateRecallAsync(updateRecall);
                         }
 
                         return Json(resultJson);

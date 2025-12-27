@@ -2330,8 +2330,12 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<RecallDTO>?>();
             return result;
         }
+        public async Task<IEnumerable<RecallDTO>?> GetAllRecallsDDLAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<IEnumerable<RecallDTO>?>($"api/Recall/GetAllDDL");
+        }
 
-		public async Task<RecallDTO?> GetRecallByIdAsync(int id)
+        public async Task<RecallDTO?> GetRecallByIdAsync(int id)
 		{
 			return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetById/{id}");
 		}
@@ -2377,6 +2381,10 @@ namespace Workshop.Web.Services
             }
             var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
             return result != null && result.ContainsKey("deleted") ? result["deleted"] : 0;
+        }
+        public async Task<RecallDTO?> GetActiveRecallsByChassis(string chassisNo)
+        {
+            return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
         }
 
         #endregion

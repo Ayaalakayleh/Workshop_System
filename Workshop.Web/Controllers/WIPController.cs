@@ -1170,7 +1170,7 @@ namespace Workshop.Web.Controllers
 
                 movement.CompanyId = CompanyId;
                 movement.CreatedBy = UserId;
-               // movement.MoveOutWorkshopId = movement.MoveInWorkshopId; need some attention here :)
+                // movement.MoveOutWorkshopId = movement.MoveInWorkshopId; need some attention here :)
                 movement.MoveOutWorkshopId = BranchId;
                 movement.MovementOut = true;
                 movement.WorkshopId = BranchId;
@@ -2285,10 +2285,25 @@ namespace Workshop.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new {success = false,error = ex.Message});
-                
+                return Json(new { success = false, error = ex.Message });
+
             }
         }
 
+        public async Task<IActionResult> RepairOrderRequestReport(int WIPId)
+        {
+            try
+            {
+                var Details = await _apiClient.GetWIPByIdAsync(WIPId);
+                RepairOrderRequestReportModel model = new RepairOrderRequestReportModel();
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "An error occurred in RepairOrderRequestReport");
+                throw;
+            }
+        }
     }
 }

@@ -21,8 +21,14 @@ namespace Workshop.API.Controllers
 			var result = await _service.GetAllAsync(filterRecallDTO);
 			return Ok(result);
 		}
+        [HttpGet("GetAllDDL")]
+        public async Task<ActionResult<IEnumerable<RecallDTO>>> GetAllDDL()
+        {
+            var result = await _service.GetAllDDLAsync();
+            return Ok(result);
+        }
 
-		[HttpGet("GetById/{id}")]
+        [HttpGet("GetById/{id}")]
 		public async Task<ActionResult<RecallDTO>> GetById(int id)
 		{
 			var result = await _service.GetByIdAsync(id);
