@@ -46,6 +46,11 @@
                            data-wip-id="@item.Id">
                             <i class="fad fa-folder-open"></i>&nbsp;@Common["Button_Open"]
                         </a>
+                        <a href="@Url.Action("RepairOrderRequest", "WIP", new { id = item.Id })"
+                           class="btn btn-info btn-sm btn-open-wip"
+                           data-wip-id="@item.Id" target="_blank" rel="noopener noreferrer">
+                            <i class="fad fa-folder-open"></i>&nbsp;Print
+                        </a>
                     </td>
                 </tr>
             }
