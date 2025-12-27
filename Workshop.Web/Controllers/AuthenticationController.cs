@@ -152,13 +152,13 @@ namespace Workshop.Web.Controllers
 
                 // Load user permission/menu
                 var permissionData = await _erpapicient.GetUserPermission(
-                    user.UserID, "3", companyId, branch
+                    user.UserID, "11", companyId, branch
                 );
 
                 HttpContext.Session.SetString("Permission", permissionData.Permissions);
                 HttpContext.Session.SetString("UserGroupId", permissionData.Groups);
 
-                var primaryMenu =await _erpapicient.GetUserMenu("en", user.UserID, "3", companyId, branch);
+                var primaryMenu =await _erpapicient.GetUserMenu("en", user.UserID, "11", companyId, branch);
                 HttpContext.Session.SetString("PrimaryMenuList", System.Text.Json.JsonSerializer.Serialize(primaryMenu));
 
                 // If deep link exists

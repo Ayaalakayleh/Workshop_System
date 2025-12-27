@@ -202,13 +202,19 @@ namespace Workshop.API.Controllers
 			var result = await _workshopMovementService.VehicleMovement_GetLastMovementOutByWorkOrderIdAsync(WorkOrderId);
 			return Ok(result);
 		}
+        [HttpGet("GetWorkshopInvoiceByWorkOrderId/{workOrderId}")]
+        public async Task<IActionResult> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+        {
+            var result = await _workshopMovementService.GetWorkshopInvoiceByWorkOrderId(workOrderId);
+            return Ok(result);
+        }
 
 
-		#endregion
+        #endregion
 
-		#region MovementOut
+        #region MovementOut
 
-		[HttpPut("UpdateVehicleMovementStatus")]
+        [HttpPut("UpdateVehicleMovementStatus")]
 		public async Task<IActionResult> UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
 		{
 			await _workshopMovementService.UpdateVehicleMovementStatusAync(workshopId, masterId);

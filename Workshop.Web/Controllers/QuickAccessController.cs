@@ -20,7 +20,6 @@ namespace Workshop.Web.Controllers
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
-        [CustomAuthorize(Permissions.QuickAccess.View)]
         public IActionResult Index()
         {
             return View();

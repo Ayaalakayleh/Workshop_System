@@ -44,7 +44,7 @@ namespace Workshop.Web.Controllers
 
         }
 
-        [CustomAuthorize(Permissions.MovementOut.View)]
+        [CustomAuthorize(Permissions.Movements.MovementOutCreate)]
         public async Task<IActionResult> MovementOut(int movementId)
         {
 
@@ -97,7 +97,7 @@ namespace Workshop.Web.Controllers
 
 
         [HttpPost]
-        [CustomAuthorize(Permissions.MovementOut.Create)]
+        [CustomAuthorize(Permissions.Movements.MovementOutCreate)]
         public async Task<IActionResult> MoveOut([FromBody] VehicleMovement movement)
         {
 
