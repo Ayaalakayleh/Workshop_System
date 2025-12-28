@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Threading.Tasks;
@@ -837,6 +838,21 @@ namespace Workshop.Infrastructure.Repositories
                 parameters
             );
         }
+        public async Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services)
+        {
+            var servicesJson = JsonConvert.SerializeObject(services);
+
+            var parameters = new
+            {
+                ServicesJson = servicesJson
+            };
+
+            return await _database.ExecuteUpdateProcedure<int>(
+                "UpdateWIPServicesExternalAndFixStatus",
+                parameters
+            );
+        }
+
 
     }
 }

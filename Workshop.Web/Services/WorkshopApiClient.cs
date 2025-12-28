@@ -2298,6 +2298,21 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<WipInvoiceDetailDTO>>($"api/WIP/WipInvoiceByHeaderId?headerId={headerId}");
 
         }
+        public async Task<int> UpdateWIPServicesExternalAndFixStatus(List<Models.WipServiceFixDto> services)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/WIP/UpdateWIPServicesExternalAndFixStatus", services);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return 0;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<int>();
+            return result;
+        }
         #endregion
 
 

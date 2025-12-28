@@ -1,12 +1,34 @@
-﻿@{
+﻿@using Workshop.Resources;
+@model Workshop.Web.Models.RepairOrderRequestReportModel;
+@using Microsoft.Extensions.Localization
+@using Workshop.Web.Interfaces.Services
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@{
     Layout = null;
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 
+<style>
+    .lineThin{
+        border: none;
+        width: 40px;
+        border-bottom: 1px solid #000;
+    }
+
+    .text-start{
+        font-size: 10px;
+    }
+
+   
+</style>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="~/smartadmin-5-styles/plugins/jquery/jquery.min.js"></script>
+
     <title>OPL Forms</title>
 
     <style>
@@ -734,21 +756,21 @@
             <table class="opl-info" aria-label="Vehicle Details">
                 <tr>
                     <td class="lbl">VEHICLE BRAND / MAKE</td>
-                    <td class="fill"><span class="line"></span></td>
+                    <td class="fill"><span class="line">@Model.VehicleInfo.Make</span></td>
                     <td class="lblR">MODEL YEAR:</td>
-                    <td class="fillR"><span class="line"></span></td>
+                    <td class="fillR"><span class="line">@Model.VehicleInfo.Year</span></td>
                 </tr>
                 <tr>
                     <td class="lbl">PLATE#:</td>
-                    <td class="fill"><span class="line"></span></td>
+                    <td class="fill"><span class="line">@Model.VehicleInfo.PlateNumber</span></td>
                     <td class="lblR">MILEAGE:</td>
-                    <td class="fillR"><span class="line"></span></td>
+                    <td class="fillR"><span class="line">@Model.VehicleInfo.Mileage</span></td>
                 </tr>
                 <tr>
                     <td class="lbl">VIN #:</td>
-                    <td class="fill"><span class="line"></span></td>
+                    <td class="fill"><span class="line">@Model.VehicleInfo.VIN</span></td>
                     <td class="lblR">CONTRACT EXPIRY DATE:</td>
-                    <td class="fillR"><span class="line"></span></td>
+                    <td class="fillR"><span class="line">@Model.ContractExpDate</span></td>
                 </tr>
                 <tr>
                     <td class="lbl">COMPANY NAME:</td>
@@ -758,7 +780,7 @@
                 </tr>
                 <tr>
                     <td class="lbl">CUSTOMER/USER NAME:</td>
-                    <td class="fill"><span class="line"></span></td>
+                    <td class="fill"><span class="line">@Model.CustomerName</span></td>
                     <td class="lblR">ESTIMARA EXPIRATION DATE:</td>
                     <td class="fillR"><span class="line"></span></td>
                 </tr>
@@ -774,9 +796,7 @@
                 <div class="row">
                     <div class="lbl">REQUIRED SERVICE / REPAIR:</div>
                     <div class="lines">
-                        <span class="write"></span>
-                        <span class="write"></span>
-                        <span class="write"></span>
+                        <span class="write">@Model.Complaint</span>
                     </div>
                 </div>
 
@@ -791,11 +811,11 @@
             <div class="opl-bottomgrid" aria-label="Inspection and Tires">
 
                 <!-- Left: Vehicle diagrams (UPDATED: use your attached image) -->
-                <div class="opl-panel" aria-label="Vehicle Condition Diagrams">
+                @* <div class="opl-panel" aria-label="Vehicle Condition Diagrams">
                     <div class="carimg-wrap" style="min-height: 88mm;">
                         <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
                     </div>
-                </div>
+                </div> *@
 
                 <!-- Middle: Checklist -->
                 <div class="opl-panel" aria-label="Inspection Checklist">
@@ -808,56 +828,131 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td class="item">ENGINE STARTS &amp; IDLES PROPERLY</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">CHECK ALL INDICATOR LIGHTS</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">AIRBAG &amp; SEAT BELTS</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">ENGINE OIL LEVEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">COOLANT LEVEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">BRAKE FLUID LEVEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">CHECK ALL EXTERIOR LIGHTS</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">ENGINE TEMPERATURE</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">A/C PERFORMANCE</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">INTERIOR &amp; UPHOLSTERY</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">FIRE EXTINGUISHER</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">WARNING DEVICE</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">SPARE WHEEL</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
-                            <tr><td class="item">JACK &amp; TIRE WRENCH</td><td class="pass"><span class="tickbox"></span></td><td><span class="remarkline"></span></td></tr>
+                            @for (int i = 0; i < (Model?.VehicleCkecklist?.Count ?? 0); i++)
+                            {
+                                <tr>
+                                    @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
+                                    <td>
+                                        @(lang == "en" ? Model.VehicleCkecklist[i].LookupPrimaryDescription
+                                                                            : Model.VehicleCkecklist[i].LookupSecondaryDescription)
+                                                                            
+                                </td>
+                                <td class="text-center">
+                                    @Html.CheckBoxFor( m => m.VehicleCkecklist[i].Pass,
+                                                                        new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" } )
+                                                                       
+                                </td>
+                                <td>
+                                    @Html.TextAreaFor( m => m.VehicleCkecklist[i].Description,
+                                                                        new
+                                                                        {
+                                                                            @class = "form-control form-control-sm",
+                                                                            rows = 1,
+                                                                            placeholder = Common["Label_Remarks"],
+                                                                            id = $"rmk_{i}",
+                                                                            disabled = "disabled"
+                                                                        } )
+                                                                       
+                                </td>
+                            </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Right: Tires -->
-                <div class="opl-panel opl-tires" aria-label="Tires">
-                    <div class="photo">TIRE<br />PHOTO</div>
+                @if (Model?.TyreCkecklist?.Count > 0)
+                {
+                    <div class="col-lg-3 col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5>@Common["Label_Tires"]</h5>
+                            </div>
 
-                    <div class="hdr">
-                        <div>BRAND</div>
-                        <div>DOT</div>
-                        <div>WEAR LEVEL</div>
-                    </div>
+                            <div class="card-body">
+                                <div class="tire-thumb mb-2">
+                                    <i class="fal fa-tire"></i>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered table-hover align-middle text-center mb-0" id="tblTires">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th style="width:28%"></th>
+                                                <th style="width:24%">@Common["Label_Brand"]</th>
+                                                <th style="width:24%">@Common["Label_DOT"]</th>
+                                                <th style="width:24%">@Common["Label_WearLevel"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (int i = 0; i < (Model?.TyreCkecklist?.Count ?? 0); i++)
+                                            {
+                                                <tr>
+                                                    @Html.HiddenFor(m => m.TyreCkecklist[i].LookupId)
+                                                    <th class="text-start">
+                                                        @(  lang == "en" ? Model.TyreCkecklist[i].LookupPrimaryDescription : Model.TyreCkecklist[i].LookupSecondaryDescription )
+                                                    </th>
 
-                    <div class="trow">
-                        <div class="pos">FRONT RH</div>
-                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                    </div>
-                    <div class="trow">
-                        <div class="pos">FRONT LH</div>
-                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                    </div>
-                    <div class="trow">
-                        <div class="pos">REAR RH</div>
-                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                    </div>
-                    <div class="trow">
-                        <div class="pos">REAR LH</div>
-                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                    </div>
+                                                    <td>
+                                                        @Html.EditorFor(m => m.TyreCkecklist[i].Brand, new { htmlAttributes = new { @class = "lineThin", disabled = "disabled" } })
+                                                    </td>
 
-                    <div class="remarks">REMARKS FOR TIRES:</div>
-                    <span class="write"></span>
-                    <span class="write"></span>
-                    <span class="write"></span>
-                </div>
+                                                    <td>
+                                                        @Html.EditorFor(m => m.TyreCkecklist[i].DOT, new { htmlAttributes = new { @class = "lineThin", disabled = "disabled" } })
+                                                    </td>
+
+                                                    <td>
+                                                        @Html.EditorFor(m => m.TyreCkecklist[i].WearLevel, new { htmlAttributes = new { @class = "lineThin", disabled = "disabled" } })
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @* <div class="form-group mt-2">
+                                    <label for="TireRemarks">@Common["Label_RemarksForTires"]</label>
+                                    <textarea type="text" id="TireRemarks" name="Tires.Remarks" class="form-control form-control-sm" rows="3" placeholder="@Common["Label_Remarks"]" disabled></textarea>
+                                </div> *@
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="opl-panel opl-tires" aria-label="Tires">
+                        @* <div class="photo">TIRE<br />PHOTO</div> *@
+
+                        <div class="hdr">
+                            <div>BRAND</div>
+                            <div>DOT</div>
+                            <div>WEAR LEVEL</div>
+                        </div>
+
+                        <div class="trow">
+                            <div class="pos">FRONT RH</div>
+                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                        </div>
+                        <div class="trow">
+                            <div class="pos">FRONT LH</div>
+                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                        </div>
+                        <div class="trow">
+                            <div class="pos">REAR RH</div>
+                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                        </div>
+                        <div class="trow">
+                            <div class="pos">REAR LH</div>
+                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                        </div>
+
+                        @* <div class="remarks">REMARKS FOR TIRES:</div>
+                        <span class="write"></span>
+                        <span class="write"></span>
+                        <span class="write"></span> *@
+                    </div>
+                }
+                
             </div>
 
             <div class="opl-note">
@@ -870,7 +965,7 @@
                     <div>
                         <div class="field">
                             <div>CUSTOMER NAME:</div>
-                            <span class="line"></span>
+                            <span class="line">@Model.CustomerName</span>
                         </div>
                         <div class="field">
                             <div>SIGNATURE:</div>
@@ -906,9 +1001,9 @@
             <table class="jc-idrow" aria-label="Job Card Header">
                 <tr>
                     <td class="leftTitle">Job Card</td>
-                    <td class="mid">W.I.P No&nbsp;&nbsp;<span class="u">23054</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم مرجع العمل</span></td>
-                    <td class="mid">Job No&nbsp;&nbsp;<span class="u">80458132</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم العمل</span></td>
-                    <td class="mid">Page&nbsp;&nbsp;<span class="u">1</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">صفحة</span></td>
+                    <td class="mid">W.I.P No&nbsp;&nbsp;<span class="u">@Model.WIPId</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم مرجع العمل</span></td>
+                    <td class="mid">Job No&nbsp;&nbsp;<span class="u">@Model.WIPId</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم العمل</span></td>
+                    @* <td class="mid">Page&nbsp;&nbsp;<span class="u">1</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">صفحة</span></td> *@
                     <td class="rightTitle rtl">بطاقة عمل</td>
                 </tr>
             </table>
@@ -920,8 +1015,8 @@
                             <span>Customer Name &amp; Address</span>
                             <span class="rtl">اسم وعنوان العميل</span>
                         </div>
-                        <div class="val">AUVA Monthly Leasing Vehicles Maint</div>
-                        <div class="note">****To be used only for Workshop****</div>
+                        <div class="val">@Model.CustomerName</div>
+                        @* <div class="note">****To be used only for Workshop****</div> *@
                     </td>
                     <td>
                         <div class="hdr">
@@ -940,8 +1035,8 @@
                             <span>Invoice Name &amp; Address</span>
                             <span class="rtl">اسم وعنوان الحساب</span>
                         </div>
-                        <div class="val">AUVA Monthly Leasing Vehicles Maint</div>
-                        <div class="note">****To be used only for Workshop****</div>
+                        <div class="val">@Model.CustomerName</div>
+                        @* <div class="note">****To be used only for Workshop****</div> *@
                     </td>
                 </tr>
             </table>
@@ -952,46 +1047,46 @@
                     <div class="jc-block">
                         <table class="jc-table">
                             <tr><td class="lbl">Preferred Contact No</td><td class="val"></td></tr>
-                            <tr><td class="lbl">Vehicle</td><td class="val">Explorer XLT, Leather</td></tr>
-                            <tr><td class="lbl">Chassis No</td><td class="val bigval">1FMSK8DH1MGA09316</td></tr>
-                            <tr><td class="lbl">Engine No</td><td class="val bigval">MMGA09316</td></tr>
-                            <tr><td class="lbl">Colour</td><td class="val bigval">JS Iconic</td></tr>
-                            <tr><td class="lbl">Trim</td><td class="val bigval">SN Activex</td></tr>
-                            <tr><td class="lbl">Fuel Reading</td><td class="val">E &nbsp; 1/4 &nbsp; 1/2 &nbsp; 3/4 &nbsp; F</td></tr>
-                            <tr><td class="lbl">Vehicle No</td><td class="val bigval">705492</td></tr>
-                            <tr><td class="lbl">Registration Date</td><td class="val bigval">02/08/2021</td></tr>
-                            <tr><td class="lbl">Mileage</td><td class="val bigval">92625</td></tr>
+                            <tr><td class="lbl">Vehicle</td><td class="val">@Model.VehicleInfo.Make &nbsp; @Model.VehicleInfo.Model</td></tr>
+                            <tr><td class="lbl">Chassis No</td><td class="val bigval">@Model.VehicleInfo.VIN</td></tr>
+                            <tr><td class="lbl">Engine No</td><td class="val bigval"></td></tr>
+                            <tr><td class="lbl">Colour</td><td class="val bigval">@Model.VehicleInfo.ColorName</td></tr>
+                            <tr><td class="lbl">Trim</td><td class="val bigval">@Model.Trim</td></tr>
+                            <tr><td class="lbl">Fuel Reading</td><td class="val">@Model.FuelLevel</td></tr>
+                            <tr><td class="lbl">Vehicle No</td><td class="val bigval"></td></tr>
+                            <tr><td class="lbl">Registration Date</td><td class="val bigval"></td></tr>
+                            <tr><td class="lbl">Mileage</td><td class="val bigval">@Model.VehicleInfo.Mileage</td></tr>
                         </table>
                     </div>
 
                     <!-- RIGHT BLOCK (Admin/status info) -->
                     <div class="jc-block">
                         <table class="jc-table">
-                            <tr><td class="lbl">Created by</td><td class="val">Shemim Sha shaji</td></tr>
-                            <tr><td class="lbl">Phone No.</td><td class="val">0507463231</td></tr>
-                            <tr><td class="lbl">Loan Car Required</td><td class="val">NO</td></tr>
-                            <tr><td class="lbl">Customer Waiting</td><td class="val">YES / 13.00</td></tr>
-                            <tr><td class="lbl">Return Parts</td><td class="val">NO</td></tr>
-                            <tr><td class="lbl">Created Date</td><td class="val">25/12/2025</td></tr>
-                            <tr><td class="lbl">Duplicate Copy</td><td class="val">NO</td></tr>
-                            <tr><td class="lbl">Repeat Repair</td><td class="val">NO</td></tr>
+                            <tr><td class="lbl">Created by</td><td class="val">@Model.CustomerName</td></tr>
+                            <tr><td class="lbl">Phone No.</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Loan Car Required</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Customer Waiting</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Return Parts</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Created Date</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Duplicate Copy</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Repeat Repair</td><td class="val"></td></tr>
                         </table>
                     </div>
                 </div>
 
                 <div class="jc-bottomrow" aria-label="Dates and Account">
-                    <div class="cell"><div class="k">Date In<br /><span class="rtl">تاريخ الدخول</span></div><div class="v">25/12/2025</div></div>
-                    <div class="cell"><div class="k">Time In<br /><span class="rtl">وقت الدخول</span></div><div class="v">9.22</div></div>
-                    <div class="cell"><div class="k">Date Due Out<br /><span class="rtl">تاريخ الخروج</span></div><div class="v">27/12/2025</div></div>
-                    <div class="cell"><div class="k">Time Due Out<br /><span class="rtl">وقت الخروج</span></div><div class="v">18.00</div></div>
-                    <div class="cell"><div class="k">Account No<br /><span class="rtl">رقم الحساب</span></div><div class="v">R9051068</div></div>
-                    <div class="cell"><div class="k">Customer Order No<br /><span class="rtl">رقم طلب العميل</span></div><div class="v">MGA09316</div></div>
+                    <div class="cell"><div class="k">Date In<br /><span class="rtl">تاريخ الدخول</span></div><div class="v">@Model.DateIn</div></div>
+                    <div class="cell"><div class="k">Time In<br /><span class="rtl">وقت الدخول</span></div><div class="v">@Model.TimeIn</div></div>
+                    <div class="cell"><div class="k">Date Due Out<br /><span class="rtl">تاريخ الخروج</span></div><div class="v">@Model.DateOut</div></div>
+                    <div class="cell"><div class="k">Time Due Out<br /><span class="rtl">وقت الخروج</span></div><div class="v">@Model.TimeOut</div></div>
+                    <div class="cell"><div class="k">Account No<br /><span class="rtl">رقم الحساب</span></div><div class="v">@Model.AccountNo</div></div>
+                    <div class="cell"><div class="k">Customer Order No<br /><span class="rtl">رقم طلب العميل</span></div><div class="v"></div></div>
                 </div>
 
                 <div class="jc-minirow" aria-label="Service Summary">
-                    <div class="cell"><div class="k">Dept<br /><span class="rtl">القسم</span></div><div class="v">W</div></div>
-                    <div class="cell"><div class="k">Next Service Due<br /><span class="rtl">الخدمة القادمة</span></div><div class="v">11/09/2025</div></div>
-                    <div class="cell"><div class="k">Date Last Visit<br /><span class="rtl">تاريخ آخر زيارة</span></div><div class="v">26/08/2025</div></div>
+                    <div class="cell"><div class="k">Dept<br /><span class="rtl">القسم</span></div><div class="v"></div></div>
+                    <div class="cell"><div class="k">Next Service Due<br /><span class="rtl">الخدمة القادمة</span></div><div class="v"></div></div>
+                    <div class="cell"><div class="k">Date Last Visit<br /><span class="rtl">تاريخ آخر زيارة</span></div><div class="v">@Model.DateLastVisit</div></div>
                 </div>
             </div>
 
@@ -1005,48 +1100,40 @@
                     <!-- LEFT: Service text + lines -->
                     <div class="left">
                         <div class="svc-free">
-                            LEASING 95000KM-Service<br />
-                            Change Engine Oil and Filter, Perform Multi-point inspection<br />
-                            Inspect tires for wear, Rotation, Replace Engine Air Filter<br />
-                            Replace A/C air filter if equipped. Fuel Filter if applicable<br />
-                            Replace PTU Oil if applicable or Transfer Case 4X4 fluid<br />
-                            Replace A/T Oil &amp; Filter. Timing belt (if applicable). Spark Plugs
+                            @for (int i = 0; i < (Model?.Services?.Count ?? 0); i++)
+                            {
+                                <div>@Model.Services[i].Description &nbsp; @Model.Services[i].StandardHours.ToString("0.0") H </div>
+                            }
                         </div>
 
                         <table class="svc-lines" aria-label="Service Line Items">
                             <tr>
                                 <th class="code">Item Code</th>
                                 <th class="desc">Description</th>
-                                <th class="ln">Line No</th>
                                 <th class="qty">Qty</th>
                                 <th class="ref">Ref</th>
                             </tr>
-                            <tr>
-                                <td class="code">P_OPLTIRE003</td>
-                                <td class="desc">Check Tires light on</td>
-                                <td class="ln">2</td>
-                                <td class="qty">1.00</td>
-                                <td class="ref">OPLTIRE003</td>
-                            </tr>
-                            <tr>
-                                <td class="code">P_OPLNVH049</td>
-                                <td class="desc">Check seat passenger 3row Headrest</td>
-                                <td class="ln">3</td>
-                                <td class="qty">1.00</td>
-                                <td class="ref">OPLNVH049</td>
-                            </tr>
+                            @for (int i = 0; i < (Model?.Items?.Count ?? 0); i++)
+                            {
+                                <tr>
+                                    <td class="code">@Model.Items[i].Code</td>
+                                    <td class="code">@Model.Items[i].PrimaryName</td>
+                                    <td class="qty">@Model.Items[i].Qty</td>
+                                    <td class="ref">@Model.Items[i].UnitPrimaryName</td>
+                                </tr>
+                            }  
                         </table>
                     </div>
 
                     <!-- RIGHT: Damage diagram + faults + signature box -->
                     <div class="right">
                         <!-- UPDATED: use your attached image instead of the svg -->
-                        <div class="jc-diagram" aria-label="Damage Diagram">
-                            <div class="carimg-wrap" style="height: 210px;">
+                        <div class="jc-diagram scratch-wrap" aria-label="Damage Diagram">
+                            <div id="panel" class="carimg-wrap scratch-inner" style="height: 210px;">
                                 <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
                             </div>
                         </div>
-
+                       
                         <div class="jc-faults">
                             <div>
                                 FAULT SYMBOLS:<br />
@@ -1080,5 +1167,28 @@
         </section>
 
     </div>
+<script>
+    function GetVehicleData() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetStrike", "WIP")" + '?MovementId=' + @Model.MovementId,
+            dataType: "JSON",
+            success: function (Data) {
+                if (Data != "") {
+                    let jsonObject = JSON.parse(Data);
+                    for (var i = 0; i < jsonObject.length; i++) {
+                        var shapetype = jsonObject[i].type;
+                        var xcoord = jsonObject[i].x + 35;
+                        var ycoord = jsonObject[i].y + 23;
+                        var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
+                        $shape.css({ 'left': xcoord - 2, 'top': ycoord - 2 });
+                        $("#panel").append($shape);
+                    }
+                }
+            }
+        });
+    }
+    GetVehicleData();
+</script>
 </body>
 </html>

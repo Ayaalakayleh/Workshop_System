@@ -534,5 +534,12 @@ namespace Workshop.API.Controllers
             var result = await _service.WIP_InvoiceDetails_GetByHeaderId(headerId);
             return Ok(result);
         }
+
+        [HttpPost("UpdateWIPServicesExternalAndFixStatus")]
+        public async Task<IActionResult> UpdateWIPServicesExternalAndFixStatus(List<WipServiceFixDto> services)
+        {
+            var result = await _service.UpdateWIPServicesExternalAndFixStatusAsync(services);
+            return Ok(result);
+        }
     }
 }

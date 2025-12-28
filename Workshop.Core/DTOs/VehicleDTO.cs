@@ -374,6 +374,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public List<TyreChecklist>? TyreCkecklist { get; set; }
 		public bool HasRecall { get; set; }
 		public int? RecallId { get; set; }
+        public List<VehicleNams>? ExternalVehicleNams { get; set; }
     }
 
 	public class VehicleMovementDocument

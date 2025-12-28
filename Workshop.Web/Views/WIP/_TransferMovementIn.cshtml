@@ -382,15 +382,15 @@
         var isNotTaxable = $('#NotTaxable').is(':checked');
 
 
-    // Collect all checked service IDs
-    var fixedServiceIds = [];
-    $('.service-checkbox:checked').each(function() {
-        var serviceId = $(this).data('service-id');
-        fixedServiceIds.push(serviceId);
+    var services = [];
+
+    $('.service-checkbox').each(function () {
+        services.push({
+            ServiceId: $(this).data('service-id'),
+            IsFixed: $(this).is(':checked')
+        });
     });
 
-    // Set the hidden field value
-    $('#FixedServiceIds').val(fixedServiceIds.join(','));
 
 
     var itemForm = new FormData($('#TransferMovementIn').get(0));
@@ -418,7 +418,6 @@
         'LaborCost': $("#LaborCost").val(),
         'InvoiceTypeId': $("#InvoiceTypeId").val(),
         'WorkOrderId': $("#WorkOrderId").val(),
-        'FixedServiceIds': fixedServiceIds.join(','), // Add the comma-separated IDs
         'isPart': $('#IsPart').is(':checked')
     };
 
@@ -428,10 +427,11 @@
             itemForm.append(key, movement[key]);
         }
     });
-    
-    // Append fixed service IDs
-    itemForm.append('FixedServiceIds', fixedServiceIds.join(','));
 
+    for (var i = 0; i < services.length; i++) {
+        itemForm.append(`Services[${i}].ServiceId`, services[i].ServiceId);
+        itemForm.append(`Services[${i}].IsFixed`, services[i].IsFixed);
+    }
         // if (cuspond.getFiles().length == 0 && $("#InvoceNo").val() != "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
         //         $("#Invoicefile>.filepond--drop-label").css("border", "2px solid red");
         //         isValid = false;
