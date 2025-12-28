@@ -27,6 +27,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="~/smartadmin-5-styles/plugins/jquery/jquery.min.js"></script>
+
     <title>OPL Forms</title>
 
     <style>
@@ -809,11 +811,11 @@
             <div class="opl-bottomgrid" aria-label="Inspection and Tires">
 
                 <!-- Left: Vehicle diagrams (UPDATED: use your attached image) -->
-                <div class="opl-panel" aria-label="Vehicle Condition Diagrams">
+                @* <div class="opl-panel" aria-label="Vehicle Condition Diagrams">
                     <div class="carimg-wrap" style="min-height: 88mm;">
                         <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
                     </div>
-                </div>
+                </div> *@
 
                 <!-- Middle: Checklist -->
                 <div class="opl-panel" aria-label="Inspection Checklist">
@@ -1077,14 +1079,14 @@
                     <div class="cell"><div class="k">Time In<br /><span class="rtl">وقت الدخول</span></div><div class="v">@Model.TimeIn</div></div>
                     <div class="cell"><div class="k">Date Due Out<br /><span class="rtl">تاريخ الخروج</span></div><div class="v">@Model.DateOut</div></div>
                     <div class="cell"><div class="k">Time Due Out<br /><span class="rtl">وقت الخروج</span></div><div class="v">@Model.TimeOut</div></div>
-                    <div class="cell"><div class="k">Account No<br /><span class="rtl">رقم الحساب</span></div><div class="v"></div></div>
+                    <div class="cell"><div class="k">Account No<br /><span class="rtl">رقم الحساب</span></div><div class="v">@Model.AccountNo</div></div>
                     <div class="cell"><div class="k">Customer Order No<br /><span class="rtl">رقم طلب العميل</span></div><div class="v"></div></div>
                 </div>
 
                 <div class="jc-minirow" aria-label="Service Summary">
                     <div class="cell"><div class="k">Dept<br /><span class="rtl">القسم</span></div><div class="v"></div></div>
                     <div class="cell"><div class="k">Next Service Due<br /><span class="rtl">الخدمة القادمة</span></div><div class="v"></div></div>
-                    <div class="cell"><div class="k">Date Last Visit<br /><span class="rtl">تاريخ آخر زيارة</span></div><div class="v"></div></div>
+                    <div class="cell"><div class="k">Date Last Visit<br /><span class="rtl">تاريخ آخر زيارة</span></div><div class="v">@Model.DateLastVisit</div></div>
                 </div>
             </div>
 
@@ -1165,8 +1167,6 @@
         </section>
 
     </div>
-</body>
-</html>
 <script>
     function GetVehicleData() {
         $.ajax({
@@ -1190,3 +1190,5 @@
     }
     GetVehicleData();
 </script>
+</body>
+</html>
