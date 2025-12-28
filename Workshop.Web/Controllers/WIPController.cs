@@ -1171,14 +1171,14 @@ namespace Workshop.Web.Controllers
                 movement.CompanyId = CompanyId;
                 movement.CreatedBy = UserId;
                 // movement.MoveOutWorkshopId = movement.MoveInWorkshopId; need some attention here :)
-                movement.MoveOutWorkshopId = BranchId;
+                movement.MoveOutWorkshopId = movement.MoveInWorkshopId;
                 movement.MovementOut = true;
                 movement.WorkshopId = BranchId;
                 movement.Status = 4;
                 movement.MasterId = move.MasterId;
                 movement.WorkOrderId = move.WorkOrderId;
                 movement.LastVehicleStatus = move.LastVehicleStatus;
-                movement.IsExternal = true;
+                movement.IsExternal = move.IsExternal;
                 movement.VehicleID = move.VehicleID;
 
                 var movements = await _apiClient.InsertVehicleMovementAsync(movement);
@@ -1220,7 +1220,7 @@ namespace Workshop.Web.Controllers
                 ovehicleMovement.ColMovements = await _apiClient.GetAllVehicleTransferMovementAsync(null, 1, BranchId);
 
                 ovehicleMovement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
-                var externalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
+                ovehicleMovement.ExternalVehicleNams = await _vehicleApiClient.GetExteralVehicleName(lang);
                 ovehicleMovement.ColBranches = await _erpApiClient.GetActiveBranchesByCompanyId(CompanyId);
                 ovehicleMovement.workshops = (await _apiClient.WorkshopGetAllAsync(CompanyId, null, null, lang))?.ToList();
 
