@@ -260,5 +260,22 @@ namespace Workshop.Web.Services
             var result = await SendRequest<CustomerInformation>(url, HttpMethod.Get);
             return result;
         }
+
+
+        public async Task<List<VehicleDefinitions>> GetAllExternalWSVehiclesDetails
+        (int CompanyId, int? manufacturerId =0, int? VehicleModelId = 0, string? platenumber ="", string? ChassisNo = "")
+        {
+
+            string url = $"/VehicleDefinition/VehicleDefinitions_GetAllExternalWSVehiclesDetails?CompanyId={CompanyId}&ManufacturerId={manufacturerId}&Platenumber={platenumber}&VehicleModelId={VehicleModelId}&ChassisNo={ChassisNo}";
+            return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
+        }
+
+        public async Task<List<VehicleDefinitions>> GetAllInternalWSVehiclesDetails
+        (int CompanyId, int? manufacturerId = 0, int? VehicleModelId = 0, string? platenumber = "", string? ChassisNo = "")
+        {
+
+            string url = $"/VehicleDefinition/VehicleDefinitions_GetAllInternalWSVehiclesDetails?CompanyId={CompanyId}&ManufacturerId={manufacturerId}&Platenumber={platenumber}&VehicleModelId={VehicleModelId}&ChassisNo={ChassisNo}";
+            return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
+        }
     }
 }
