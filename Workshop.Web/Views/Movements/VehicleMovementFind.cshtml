@@ -763,29 +763,29 @@
                                                                         @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
                                                                         <td>
                                                                             @(
-                                                                                                                                                    lang == "en"
-                                                                                                                                                    ? Model.VehicleCkecklist[i].LookupPrimaryDescription
-                                                                                                                                                    : Model.VehicleCkecklist[i].LookupSecondaryDescription
-                                                                                                                                                    )
+                                                                                  lang == "en"
+                                                                                  ? Model.VehicleCkecklist[i].LookupPrimaryDescription
+                                                                                  : Model.VehicleCkecklist[i].LookupSecondaryDescription
+                                                                              )
                                                                     </td>
                                                                     <td class="text-center">
                                                                         @Html.CheckBoxFor(
-                                                                                                                                                m => m.VehicleCkecklist[i].Pass,
-                                                                                                                                                new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" }
-                                                                                                                                                )
+                                                                                   m => m.VehicleCkecklist[i].Pass,
+                                                                                   new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" }
+                                                                               )
                                                                     </td>
                                                                     <td>
                                                                         @Html.TextAreaFor(
-                                                                                                                                                m => m.VehicleCkecklist[i].Description,
-                                                                                                                                                new
-                                                                                                                                                {
-                                                                                                                                                    @class = "form-control form-control-sm",
-                                                                                                                                                    rows = 1,
-                                                                                                                                                    placeholder = Common["Label_Remarks"],
-                                                                                                                                                    id = $"rmk_{i}",
-                                                                                                                                                    disabled = "disabled"
-                                                                                                                                                }
-                                                                                                                                                )
+                                                                                  m => m.VehicleCkecklist[i].Description,
+                                                                                  new
+                                                                                   {
+                                                                                     @class = "form-control form-control-sm",
+                                                                                     rows = 1,
+                                                                                     placeholder = Common["Label_Remarks"],
+                                                                                     id = $"rmk_{i}",
+                                                                                     disabled = "disabled"
+                                                                                     }
+                                                                                      )
                                                                     </td>
                                                                 </tr>
                                                                                                                                 }

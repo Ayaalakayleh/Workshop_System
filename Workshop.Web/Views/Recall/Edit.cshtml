@@ -137,7 +137,8 @@
     var MakeID        = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Makes ?? new List<object>()));
     var Vehicle       = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Vehicles ?? new List<object>()));
     var Chasses       = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChassisNo ?? new List<object>()));
-    var VehcilesRecall= @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.VehcilesRecall ?? new List<object>()));
+    var VehcilesRecall  = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.VehcilesRecall ?? new List<object>()));
+    var VehcileStatuses = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.VehcileStatuses ?? new List<object>()));
 </script>
 <script>
     window.RazorVars = Object.assign({}, window.RazorVars || {}, {
