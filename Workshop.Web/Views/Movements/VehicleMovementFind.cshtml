@@ -326,45 +326,44 @@
         display: none
     }
 
-    /* IMPORTANT: keep #panel relative + clip markers */
     #panel.scratch-inner, #panel {
         position: relative;
         min-height: 280px;
         background-color: #f5f5f5;
         border-radius: .5rem;
         border: 1px dashed #ccc;
-        overflow: hidden; /* FIX: prevent markers from appearing outside */
     }
 
-    /* ===========================
-           FIX #1 + FIX #2:
-           - Use classes for scratch type (NOT ids)
-           - Marker centered on click coords
-           =========================== */
     .the-movements .mark-scratces-section .shape {
         position: absolute;
         z-index: 9;
+    }
+
+    .the-movements #deep-scratch,
+    .the-movements #small-scratch,
+    .the-movements #very-deep-scratch,
+    .the-movements #bend-in-body {
         width: 34px;
         height: 34px;
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        pointer-events: none; /* details page => view only */
+        cursor: grab;
     }
 
-    .the-movements .shape.deep-scratch {
+    .the-movements #deep-scratch {
         background-image: url('../images/tajeer-car-assets/DeepScratch.png');
     }
 
-    .the-movements .shape.small-scratch {
+    .the-movements #small-scratch {
         background-image: url('../images/tajeer-car-assets/MinorScratch.png');
     }
 
-    .the-movements .shape.very-deep-scratch {
+    .the-movements #very-deep-scratch {
         background-image: url('../images/tajeer-car-assets/VeryDeepScratch.png');
     }
 
-    .the-movements .shape.bend-in-body {
+    .the-movements #bend-in-body {
         background-image: url('../images/tajeer-car-assets/CurvatureStructure.png');
     }
 
@@ -729,6 +728,9 @@
                                                 </button>
                                             </div>
 
+                                            @*                                             <div class="scratches-container">
+                                                <div id="panel" class="mt-3"></div>
+                                            </div> *@
                                             <div class="scratch-wrap">
                                                 <div id="panel" class="scratch-inner"></div>
                                             </div>
@@ -763,29 +765,29 @@
                                                                         @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
                                                                         <td>
                                                                             @(
-                                                                                  lang == "en"
-                                                                                  ? Model.VehicleCkecklist[i].LookupPrimaryDescription
-                                                                                  : Model.VehicleCkecklist[i].LookupSecondaryDescription
-                                                                              )
+                                                                                                                                                    lang == "en"
+                                                                                                                                                    ? Model.VehicleCkecklist[i].LookupPrimaryDescription
+                                                                                                                                                    : Model.VehicleCkecklist[i].LookupSecondaryDescription
+                                                                                                                                                    )
                                                                     </td>
                                                                     <td class="text-center">
                                                                         @Html.CheckBoxFor(
-                                                                                   m => m.VehicleCkecklist[i].Pass,
-                                                                                   new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" }
-                                                                               )
+                                                                                                                                                m => m.VehicleCkecklist[i].Pass,
+                                                                                                                                                new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" }
+                                                                                                                                                )
                                                                     </td>
                                                                     <td>
                                                                         @Html.TextAreaFor(
-                                                                                  m => m.VehicleCkecklist[i].Description,
-                                                                                  new
-                                                                                   {
-                                                                                     @class = "form-control form-control-sm",
-                                                                                     rows = 1,
-                                                                                     placeholder = Common["Label_Remarks"],
-                                                                                     id = $"rmk_{i}",
-                                                                                     disabled = "disabled"
-                                                                                     }
-                                                                                      )
+                                                                                                                                                m => m.VehicleCkecklist[i].Description,
+                                                                                                                                                new
+                                                                                                                                                {
+                                                                                                                                                    @class = "form-control form-control-sm",
+                                                                                                                                                    rows = 1,
+                                                                                                                                                    placeholder = Common["Label_Remarks"],
+                                                                                                                                                    id = $"rmk_{i}",
+                                                                                                                                                    disabled = "disabled"
+                                                                                                                                                }
+                                                                                                                                                )
                                                                     </td>
                                                                 </tr>
                                                                                                                                 }
@@ -856,10 +858,13 @@
                                             </div>
                                         </div>
 
+
+
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
+
 
                         <div class="card shadow-sm">
                             <div class="card-header">
@@ -870,6 +875,8 @@
                             @Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id = "hasRecall", @disabled = true })
 
                         </div>
+
+
 
                         @if (Model.MaintenanceStatus != 3 || Model.MaintenanceStatus == null)
                         {
@@ -977,102 +984,22 @@
             }
         });
 
-        // ===========================
-        // FIX #1: correct coordinates
-        // FIX #2: show correct type icons
-        // ===========================
         $.ajax({
             type: "GET",
             url: "@Url.Action("GetStrike", "Movements")" + '?MovementId=' + @Model.MovementId,
             dataType: "JSON",
             success: function (Data) {
-                if (!Data) return;
-
-                // sometimes backend returns JSON as string even with dataType: "JSON"
-                var strikes = (typeof Data === "string") ? JSON.parse(Data) : Data;
-                if (!Array.isArray(strikes)) return;
-
-                var $panel = $("#panel");
-                var markerSize = 34;
-
-                function toKebab(raw) {
-                    return (raw ?? "")
-                        .toString()
-                        .trim()
-                        .replace(/([a-z])([A-Z])/g, "$1-$2")  // DeepScratch -> Deep-Scratch
-                        .replace(/[_\s]+/g, "-")              // deep_scratch / deep scratch -> deep-scratch
-                        .toLowerCase();
+                if (Data != "") {
+                    let jsonObject = JSON.parse(Data);
+                    for (var i = 0; i < jsonObject.length; i++) {
+                        var shapetype = jsonObject[i].type;
+                        var xcoord = jsonObject[i].x + 35;
+                        var ycoord = jsonObject[i].y + 23;
+                        var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
+                        $shape.css({ 'left': xcoord - 2, 'top': ycoord - 2 });
+                        $("#panel").append($shape);
+                    }
                 }
-
-                function normalizeType(rawType) {
-                    var t = toKebab(rawType);
-
-                    // handle common stored formats
-                    // (edit these if your DB values are different)
-                    if (t.includes("very") && t.includes("deep")) return "very-deep-scratch";
-                    if (t === "very-deep-scratch") return "very-deep-scratch";
-
-                    if (t.includes("deep")) return "deep-scratch";
-                    if (t.includes("small") || t.includes("minor")) return "small-scratch";
-                    if (t.includes("bend") || t.includes("curv") || t.includes("body")) return "bend-in-body";
-
-                    // numeric enums (optional)
-                    if (t === "0") return "deep-scratch";
-                    if (t === "1") return "small-scratch";
-                    if (t === "2") return "very-deep-scratch";
-                    if (t === "3") return "bend-in-body";
-
-                    // fallback
-                    return "very-deep-scratch";
-                }
-
-                function clamp(v, min, max) {
-                    return Math.max(min, Math.min(max, v));
-                }
-
-                function renderStrikes() {
-                    var panelOffset = $panel.offset();
-                    var panelW = $panel.outerWidth();
-                    var panelH = $panel.outerHeight();
-
-                    $panel.find(".shape").remove();
-
-                    strikes.forEach(function (s, i) {
-                        var typeClass = normalizeType(s.type);
-
-                        var x = Number(s.x);
-                        var y = Number(s.y);
-
-                        // Case A) stored as percentage (0..1)
-                        if (!isNaN(x) && !isNaN(y) && x <= 1 && y <= 1) {
-                            x = x * panelW;
-                            y = y * panelH;
-                        }
-                        // Case B) stored as page coordinates (pageX/pageY)
-                        else if (!isNaN(x) && !isNaN(y) && (x > panelW || y > panelH)) {
-                            x = x - panelOffset.left;
-                            y = y - panelOffset.top;
-                        }
-                        // Case C) stored already panel-relative => use as-is
-
-                        // center marker on point + keep inside panel
-                        var left = clamp((x - markerSize / 2), 0, panelW - markerSize);
-                        var top = clamp((y - markerSize / 2), 0, panelH - markerSize);
-
-                        var $shape = $('<div/>', {
-                            id: "shape_" + i,                 // unique id (IMPORTANT)
-                            class: "shape " + typeClass,      // type is CLASS (IMPORTANT)
-                            "data-type": typeClass
-                        });
-
-                        $shape.css({ left: left + "px", top: top + "px" });
-                        $panel.append($shape);
-                    });
-                }
-
-                // render after layout settles + keep correct on resize
-                requestAnimationFrame(renderStrikes);
-                $(window).off("resize.strikes").on("resize.strikes", renderStrikes);
             }
         });
     }
@@ -1088,11 +1015,11 @@
 
         @foreach (var item in Model.MovementInvoice)
         {
-                <text>
-                    var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
-                    var fi = { "source": source, options: { type: 'local' } };
-                    file.files.push(fi);
-                </text>
+                    <text>
+                        var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
+                        var fi = { "source": source, options: { type: 'local' } };
+                        file.files.push(fi);
+                    </text>
         }
 
         cuspond = FilePond.create(inputElement, {
