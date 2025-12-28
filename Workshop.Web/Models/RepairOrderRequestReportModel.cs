@@ -1,4 +1,5 @@
-﻿using Workshop.Core.DTOs;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
 
 namespace Workshop.Web.Models
@@ -10,13 +11,6 @@ namespace Workshop.Web.Models
         public int? VehicleNo { get; set; }
         public DateTime? Date { get; set; }
         public DateTime? TimeReceived { get; set; }
-        //public string? Make { get; set; }
-        //public string? Model { get; set; }
-        //public int? Year { get; set; }
-        //public string? PlateNumber { get; set; }
-        //public decimal? Mileage { get; set; }
-        //public string? VIN { get; set; }
-
         public VehicleInfoModel VehicleInfo { get; set; }
         public string? ContractExpDate { get; set; }
         public string? CompanyName { get; set; }
@@ -33,6 +27,7 @@ namespace Workshop.Web.Models
         public TimeSpan? TimeIn { get; set; }
         public string? DateOut { get; set; }
         public TimeSpan? TimeOut { get; set; }
+        public DateTime? DateLastVisit { get; set; }
         public string? AccountNo { get; set; }
         //public List<string>? Services { get; set; }
         public List<VehicleChecklist>? VehicleCkecklist { get; set; }

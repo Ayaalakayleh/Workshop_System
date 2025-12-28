@@ -2315,12 +2315,13 @@ namespace Workshop.Web.Controllers
                 {
                     var _customer = await _accountingApiClient.Customer_GetById((int)accountDetails.CustomerId);
                     customer = _customer.CustomerPrimaryName;
+                    model.AccountNo = _customer.AccountNoReceivable;
                 }
 
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
                 //============================================================================================================
-               
+                var last = await _vehicleApiClient.GetLastMovementByVehicleId(Details.VehicleId);
                 model.VehicleInfo ??= new VehicleInfoModel();
                 //model.Date = Details.Date;
                 //model.TimeReceived = Details.TimeReceived;
@@ -2330,6 +2331,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.VIN = vehicleInfo.VIN;
                 model.VehicleInfo.Make = vehicleInfo.Make;
                 model.VehicleInfo.Model = vehicleInfo.Model;
+                model.DateLastVisit = last?.GregorianMovementDate;
                 //model.EngineNumber = vehicleDetails.Eng;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
                 //model.Trim = accountDetails.TermsId;
