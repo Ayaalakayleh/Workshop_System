@@ -2331,7 +2331,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.VIN = vehicleInfo.VIN;
                 model.VehicleInfo.Make = vehicleInfo.Make;
                 model.VehicleInfo.Model = vehicleInfo.Model;
-                model.DateLastVisit = last?.GregorianMovementDate;
+                model.DateLastVisit = last?.GregorianMovementDate?.ToString("yyyy-MM-dd");
                 //model.EngineNumber = vehicleDetails.Eng;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
                 //model.Trim = accountDetails.TermsId;
