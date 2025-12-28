@@ -2396,9 +2396,9 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
             return result != null && result.ContainsKey("deleted") ? result["deleted"] : 0;
         }
-        public async Task<RecallDTO?> GetActiveRecallsByChassis(string chassisNo)
+        public async Task<ActiveRecallsByChassisResponseDto?> GetActiveRecallsByChassis(string chassisNo)
         {
-            return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
+            return await _httpClient.GetFromJsonAsync<ActiveRecallsByChassisResponseDto>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
         }
 
         #endregion

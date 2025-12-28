@@ -225,6 +225,33 @@ namespace Workshop.Web.Controllers
                 item.LookupPrimaryDescription = tLookupChecklist?.Where(i => i.Id == item.LookupId)?.Select(i => i.PrimaryDescription)?.FirstOrDefault();
                 item.LookupSecondaryDescription = tLookupChecklist?.Where(i => i.Id == item.LookupId)?.Select(i => i.SecondaryDescription)?.FirstOrDefault();
             }
+            if(vChecklists == null || vChecklists.Count() == 0)
+            {
+                var vChecklistsTemp = new List<VehicleChecklist>();  
+                foreach (var item in vLookupChecklist ?? Enumerable.Empty<VehicleChecklistLookup>())
+                {
+                    vChecklistsTemp.Add(new VehicleChecklist
+                    {
+                        LookupPrimaryDescription = item.PrimaryDescription,
+                        LookupSecondaryDescription = item.SecondaryDescription,
+                        Pass = false
+                    });
+                }
+                vChecklists = vChecklistsTemp;
+            }
+            if(tChecklist == null || tChecklist.Count() == 0)
+            {
+                var tChecklistTemp = new List<TyreChecklist>();
+                foreach (var item in tLookupChecklist ?? Enumerable.Empty<TyreChecklistLookup>())
+                {
+                    tChecklistTemp.Add(new TyreChecklist
+                    {
+                        LookupPrimaryDescription = item.PrimaryDescription,
+                        LookupSecondaryDescription = item.SecondaryDescription
+                    });
+                }
+                tChecklist = tChecklistTemp;
+            }
             movement.VehicleCkecklist = vChecklists?.ToList();
             movement.TyreCkecklist = tChecklist?.ToList();
 
@@ -233,17 +260,23 @@ namespace Workshop.Web.Controllers
             if (movement.IsExternal ?? false)
             {
                 var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement.VehicleID ?? 0);
-                var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
-                movement.HasRecall = vRecall!= null && vRecall?.Id !=null && vRecall?.Id != 0; 
+                if (vehicle != null && vehicle.ChassisNo != null)
+                {
+                    var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
+                    movement.HasRecall = (vRecall != null ) && ((vRecall?.HasActiveRecall) ?? false);
+                }
                 //    movement.HasRecall = recalls
                 //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
                 //        .Any(v => v.Chassis == vehicle.ChassisNo || (v.MakeID == vehicle.ManufacturerId && v.ModelID == vehicle.VehicleModelId));
             }
             else
             {
-                var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement.VehicleID ?? 0); 
-                var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
-                movement.HasRecall = vRecall != null && vRecall?.Id != null && vRecall?.Id != 0;
+                var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement.VehicleID ?? 0);
+                if (vehicle != null && vehicle.ChassisNo != null)
+                {
+                    var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
+                    movement.HasRecall = (vRecall != null) && ((vRecall?.HasActiveRecall) ?? false);
+                }
                 //    movement.HasRecall = recalls
                 //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
                 //        .Any(v => v.Chassis == vehicle.ChassisNo || (v.MakeID == vehicle.ManufacturerId && v.ModelID == vehicle.VehicleModelId));
