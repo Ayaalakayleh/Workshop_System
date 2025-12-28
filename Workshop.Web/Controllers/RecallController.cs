@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using NPOI.HPSF;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -98,6 +99,39 @@ namespace Workshop.Web.Controllers
                         vehicleRecallDTO.Chassis = vehicleRecallItem.Chassis;
                         vehicleRecallDTO.RecallStatus = vehicleRecallItem.RecallStatus;
                         vehicleRecallDTO.RecallID = recall.Id;
+                        if((vehicleRecallItem.Chassis == null || vehicleRecallItem.Chassis.Equals(String.Empty)) &&
+                            (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
+                            (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
+                        {
+                            var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID, 
+                                vehicleRecallItem.ModelID, null,null );
+                            foreach (var externalVehicle in externalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO { 
+                                 Chassis = externalVehicle.ChassisNo,
+                                  RecallID = recall.Id,
+                                  MakeID = vehicleRecallItem.MakeID,
+                                  ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+
+                            }
+                            var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                              vehicleRecallItem.ModelID, null, null);
+                            foreach (var internalVehicle in internalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = internalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+ 
+                            }
+                        }
+                        else
                         recall.Vehicles.Add(vehicleRecallDTO);
                     }
 
@@ -117,7 +151,42 @@ namespace Workshop.Web.Controllers
                         vehicleRecallDTO.Chassis = vehicleRecallItem.Chassis;
                         vehicleRecallDTO.RecallStatus = vehicleRecallItem.RecallStatus;
                         vehicleRecallDTO.RecallID = recall.Id;
-                        recall.Vehicles.Add(vehicleRecallDTO);
+                        if ((vehicleRecallItem.Chassis == null || vehicleRecallItem.Chassis.Equals(String.Empty)) &&
+                           (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
+                           (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
+                        {
+                            var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                                vehicleRecallItem.ModelID, null, null);
+                            foreach (var externalVehicle in externalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = externalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                    
+                                });
+
+                            }
+                            var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                              vehicleRecallItem.ModelID, null, null);
+                            foreach (var internalVehicle in internalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = internalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+
+                            }
+                        }
+                        else
+                            recall.Vehicles.Add(vehicleRecallDTO);
                     }
                     var result = await _apiClient.AddRecallAsync(MapToCreateRecall(recall));
                 }
