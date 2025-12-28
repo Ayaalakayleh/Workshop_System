@@ -937,6 +937,21 @@ namespace Workshop.Web.Services
             }
         }
 
+        public async Task<VehicleMovement> GetLastMovementOutByWorkOrderId(int workorder)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/WorkshopMovement/VehicleMovement_GetLastMovementOutByWorkOrderId?WorkOrderId={workorder}");
+                response.EnsureSuccessStatusCode();
+                
+                return response != null ? await response.Content.ReadFromJsonAsync<VehicleMovement>() : new VehicleMovement();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public async Task<string> GetVehicleMovementStrikeAsync(int movementId)
         {
             try
@@ -2382,9 +2397,9 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
             return result != null && result.ContainsKey("deleted") ? result["deleted"] : 0;
         }
-        public async Task<RecallDTO?> GetActiveRecallsByChassis(string chassisNo)
+        public async Task<ActiveRecallsByChassisResponseDto?> GetActiveRecallsByChassis(string chassisNo)
         {
-            return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
+            return await _httpClient.GetFromJsonAsync<ActiveRecallsByChassisResponseDto>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
         }
 
         #endregion

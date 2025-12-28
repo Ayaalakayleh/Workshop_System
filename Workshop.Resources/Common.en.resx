@@ -2493,4 +2493,7 @@
   <data name="TransferTotalInvoice" xml:space="preserve">
     <value>Transfer Total Invoice</value>
   </data>
+  <data name="Label_HasRecall" xml:space="preserve">
+    <value>Has Recall</value>
+  </data>
 </root>
