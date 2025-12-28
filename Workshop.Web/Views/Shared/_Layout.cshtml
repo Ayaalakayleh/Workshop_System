@@ -699,13 +699,15 @@
                         {
                             link = Url.Action(i.MethodName, i.ControllerName);
                         }
-                        <li class="nav-item">
+                        <li class=@(link !="#"?"":"nav-item")>
                             <a href="@link" title='@(lang == "en" ? i.PrimaryName : i.SecondarName)' data-filter-tags>
                                 <i class="@i.Icon"></i>
 
                                 <span class="nav-link-text" data-i18n>@(lang == "en" ? i.PrimaryName : i.SecondarName)</span>
                             </a>
-                            <ul>
+                            @if (link =="#")
+                            {
+                                  <ul>
 
                                 @foreach (var j in menus.Where(a => a.ParentId == i.Id).ToList().OrderBy(c => c.Seq))
                                 {
@@ -723,12 +725,41 @@
                                             <i class="@j.Icon"></i>
                                             <span class="nav-link-text" data-i18n>@(lang == "en" ? j.PrimaryName : j.SecondarName)</span>
                                         </a>
-                                    </li>
+                                            @if (link1 == "#")
+                                            {
+                                                <ul>
+
+                                                    @foreach (var g in menus.Where(a => a.ParentId == j.Id).ToList().OrderBy(c => c.Seq))
+                                                    {
+                                                        var link2 = "";
+                                                        if (string.IsNullOrEmpty(g.ControllerName))
+                                                        {
+                                                            link2 = "#";
+                                                        }
+                                                        else
+                                                        {
+                                                            link2 = Url.Action(g.MethodName, g.ControllerName);
+                                                        }
+                                                        <li>
+                                                            <a href="@link2">
+                                                                <i class="@g.Icon"></i>
+                                                                <span class="nav-link-text" data-i18n>@(lang == "en" ? g.PrimaryName : g.SecondarName)</span>
+                                                            </a>
+                                                        </li>
+                                                    }
+
+
+
+                                                </ul>
+                                            }
+                                        </li>
                                 }
 
 
 
                             </ul>
+                            }
+                          
                         </li>
                     }
   
