@@ -413,9 +413,9 @@
 						</fieldset>
 
 						<fieldset class="my-3 ui-fieldset">
-							@Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
+							
 			
-							@Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id ="hasRecall" })
+							@Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id ="hasRecall" })&nbsp;@Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
 
 							@Html.DropDownListFor(model => model.RecallId, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-check-input", @id= "recallList", @disabled= true })
 

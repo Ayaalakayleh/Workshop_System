@@ -27,7 +27,7 @@ namespace Workshop.Web.Models
         public TimeSpan? TimeIn { get; set; }
         public string? DateOut { get; set; }
         public TimeSpan? TimeOut { get; set; }
-        public DateTime? DateLastVisit { get; set; }
+        public string? DateLastVisit { get; set; }
         public string? AccountNo { get; set; }
         //public List<string>? Services { get; set; }
         public List<VehicleChecklist>? VehicleCkecklist { get; set; }

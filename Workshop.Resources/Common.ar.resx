@@ -2493,4 +2493,7 @@
   <data name="TransferTotalInvoice" xml:space="preserve">
     <value>إجمالي الفاتورة المحوّلة</value>
   </data>
+  <data name="Label_HasRecall" xml:space="preserve">
+    <value>إرجاع</value>
+  </data>
 </root>

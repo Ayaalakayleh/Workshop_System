@@ -740,7 +740,7 @@
                                                         {
                                                             link2 = Url.Action(g.MethodName, g.ControllerName);
                                                         }
-                                                        <li>
+                                                        <li class="link-item">
                                                             <a href="@link2">
                                                                 <i class="@g.Icon"></i>
                                                                 <span class="nav-link-text" data-i18n>@(lang == "en" ? g.PrimaryName : g.SecondarName)</span>
@@ -1157,8 +1157,6 @@
             },
             placeholder: "_"
         });
-        $("#actionNavFull").trigger("click");
-        $("#actionNavFixed").trigger("click");
     });
 </script>
 

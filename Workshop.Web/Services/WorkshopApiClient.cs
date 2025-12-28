@@ -937,6 +937,21 @@ namespace Workshop.Web.Services
             }
         }
 
+        public async Task<VehicleMovement> GetLastMovementOutByWorkOrderId(int workorder)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/WorkshopMovement/VehicleMovement_GetLastMovementOutByWorkOrderId?WorkOrderId={workorder}");
+                response.EnsureSuccessStatusCode();
+                
+                return response != null ? await response.Content.ReadFromJsonAsync<VehicleMovement>() : new VehicleMovement();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public async Task<string> GetVehicleMovementStrikeAsync(int movementId)
         {
             try

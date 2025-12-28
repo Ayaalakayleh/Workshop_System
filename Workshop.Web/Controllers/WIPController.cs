@@ -2321,7 +2321,7 @@ namespace Workshop.Web.Controllers
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
                 //============================================================================================================
-                var last = await _vehicleApiClient.GetLastMovementByVehicleId(Details.VehicleId);
+                var last = await _apiClient.GetLastMovementOutByWorkOrderId((int)Details.WorkOrderId);
                 model.VehicleInfo ??= new VehicleInfoModel();
                 //model.Date = Details.Date;
                 //model.TimeReceived = Details.TimeReceived;
@@ -2331,7 +2331,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.VIN = vehicleInfo.VIN;
                 model.VehicleInfo.Make = vehicleInfo.Make;
                 model.VehicleInfo.Model = vehicleInfo.Model;
-                model.DateLastVisit = last?.GregorianMovementDate;
+                model.DateLastVisit = last?.GregorianMovementDate?.ToString("yyyy-MM-dd");
                 //model.EngineNumber = vehicleDetails.Eng;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
                 //model.Trim = accountDetails.TermsId;
@@ -2485,13 +2485,58 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                var checklistsTask = _apiClient.GetVehicleChecklistByMovementId(movementId);
-                var lookupTask = _apiClient.GetVehicleChecklistLookup();
+                var checklistsTask = await _apiClient.GetVehicleChecklistByMovementId(movementId);
+                var lookupTask = await _apiClient.GetVehicleChecklistLookup();
 
-                await Task.WhenAll(checklistsTask, lookupTask);
+                //await Task.WhenAll(checklistsTask, lookupTask);
 
-                var checklists = (await checklistsTask) ?? new List<VehicleChecklist>();
-                var lookup = (await lookupTask) ?? new List<VehicleChecklistLookup>();
+                var checklists = (checklistsTask) ?? new List<VehicleChecklist>();
+                var lookup = (lookupTask) ?? new List<VehicleChecklistLookup>();
+
+                var lookupById = lookup.ToDictionary(x => x.Id);
+
+                foreach (var item in checklists)
+                {
+                    if (lookupById.TryGetValue(item.LookupId, out var lu))
+                    {
+                        item.LookupPrimaryDescription = lu.PrimaryDescription;
+                        item.LookupSecondaryDescription = lu.SecondaryDescription;
+                    }
+                }
+                if (checklists == null || checklists.Count() == 0)
+                {
+                    var vChecklistsTemp = new List<VehicleChecklist>();
+                    foreach (var item in lookupTask ?? Enumerable.Empty<VehicleChecklistLookup>())
+                    {
+                        vChecklistsTemp.Add(new VehicleChecklist
+                        {
+                            LookupPrimaryDescription = item.PrimaryDescription,
+                            LookupSecondaryDescription = item.SecondaryDescription,
+                            Pass = false
+                        });
+                    }
+                    checklists = vChecklistsTemp;
+                }
+                return checklists.ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private async Task<List<TyreChecklist>> GetTyreChecklistAsync(int movementId)
+        {
+            try
+            {
+                var checklistsTask = await _apiClient.GetTyresChecklistByMovementId(movementId);
+                var lookupTask = await _apiClient.GetTyreChecklistLookup();
+
+                //await Task.WhenAll(checklistsTask, lookupTask);
+
+                var checklists = (checklistsTask) ?? new List<TyreChecklist>();
+                var lookup = (lookupTask) ?? new List<TyreChecklistLookup>();
 
                 var lookupById = lookup.ToDictionary(x => x.Id);
 
@@ -2504,6 +2549,20 @@ namespace Workshop.Web.Controllers
                     }
                 }
 
+                if (checklists == null || checklists.Count() == 0)
+                {
+                    var tChecklistTemp = new List<TyreChecklist>();
+                    foreach (var item in lookupTask ?? Enumerable.Empty<TyreChecklistLookup>())
+                    {
+                        tChecklistTemp.Add(new TyreChecklist
+                        {
+                            LookupPrimaryDescription = item.PrimaryDescription,
+                            LookupSecondaryDescription = item.SecondaryDescription
+                        });
+                    }
+                    checklists = tChecklistTemp;
+                }
+
                 return checklists.ToList();
 
             }
@@ -2511,30 +2570,6 @@ namespace Workshop.Web.Controllers
             {
                 throw ex;
             }
-        }
-
-        private async Task<List<TyreChecklist>> GetTyreChecklistAsync(int movementId)
-        {
-            var checklistsTask = _apiClient.GetTyresChecklistByMovementId(movementId);
-            var lookupTask = _apiClient.GetTyreChecklistLookup();
-
-            await Task.WhenAll(checklistsTask, lookupTask);
-
-            var checklists = (await checklistsTask) ?? new List<TyreChecklist>();
-            var lookup = (await lookupTask) ?? new List<TyreChecklistLookup>();
-
-            var lookupById = lookup.ToDictionary(x => x.Id);
-
-            foreach (var item in checklists)
-            {
-                if (lookupById.TryGetValue(item.LookupId, out var lu))
-                {
-                    item.LookupPrimaryDescription = lu.PrimaryDescription;
-                    item.LookupSecondaryDescription = lu.SecondaryDescription;
-                }
-            }
-
-            return checklists.ToList();
         }
 
 
