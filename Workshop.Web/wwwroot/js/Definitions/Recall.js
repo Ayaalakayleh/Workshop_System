@@ -115,7 +115,20 @@ $(function () {
                       displayExpr: 'ChassisNo'
                 }
 
+            }, {
+                dataField: "RecallStatus",
+                caption: LABELS.Status || "Status",
+                allowEditing: true,
+                validationRules: [
+                    { type: "required", message: VALIDATION.Required || "Required" }
+                ],
+                lookup: {
+                    dataSource: VehcileStatuses,
+                    valueExpr: "Value",
+                    displayExpr: "Text"
+                }
             },
+
             {
                 caption: LABELS.Action || "Action",
                 type: "buttons",
@@ -125,6 +138,7 @@ $(function () {
         ],
         onInitNewRow: (e) => {
             e.data.Id = parseInt(e.data.Id) || counter--;
+            e.data.Status = 1; // Open
         },
         onRowRemoving: function (e) {
             if (!window.Swal) return;
@@ -153,7 +167,8 @@ $(function () {
             var dataLookups = {
                 MakeID: ((typeof MakeID !== "undefined" && MakeID) ? MakeID : []).map(v => v.Text),
                 ModelID: ((typeof Vehicle !== "undefined" && Vehicle) ? Vehicle : []).map(v => v.Name),
-                Chassis: ((typeof Chasses !== "undefined" && Chasses) ? Chasses : []).map(v => v.ChassisNo)
+                Chassis: ((typeof Chasses !== "undefined" && Chasses) ? Chasses : []).map(v => v.ChassisNo),
+                Status: ((typeof VehicleRecallStatus !== "undefined" && VehicleRecallStatus) ? VehicleRecallStatus : []).map(v => v.Text)
             };
 
             let colStart = 1;

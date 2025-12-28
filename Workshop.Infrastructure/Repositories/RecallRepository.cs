@@ -112,16 +112,21 @@ namespace Workshop.Infrastructure.Repositories
             using var connection = _context.CreateConnection();
 
             var vehicleTable = new DataTable();
-            vehicleTable.Columns.Add("RecallID", typeof(int));
             vehicleTable.Columns.Add("MakeId", typeof(int));
             vehicleTable.Columns.Add("ModelId", typeof(int));
             vehicleTable.Columns.Add("Chassis", typeof(string));
+            vehicleTable.Columns.Add("RecallStatus", typeof(int));
 
             if (dto.Vehicles != null && dto.Vehicles.Count > 0)
             {
                 foreach (var v in dto.Vehicles)
                 {
-                    vehicleTable.Rows.Add(DBNull.Value, v.MakeID, v.ModelID, v.Chassis);
+                    vehicleTable.Rows.Add(
+                        v.MakeID,
+                        v.ModelID,
+                        v.Chassis,
+                        v.RecallStatus
+                    );
                 }
             }
 
@@ -143,26 +148,32 @@ namespace Workshop.Infrastructure.Repositories
 
             return result;
         }
+
         public async Task<int> UpdateAsync(UpdateRecallDTO dto)
         {
             using var connection = _context.CreateConnection();
 
             var vehicleTable = new DataTable();
-            vehicleTable.Columns.Add("RecallID", typeof(int));
             vehicleTable.Columns.Add("MakeId", typeof(int));
             vehicleTable.Columns.Add("ModelId", typeof(int));
             vehicleTable.Columns.Add("Chassis", typeof(string));
+            vehicleTable.Columns.Add("RecallStatus", typeof(int));
 
             if (dto.Vehicles != null && dto.Vehicles.Count > 0)
             {
                 foreach (var v in dto.Vehicles)
                 {
-                    vehicleTable.Rows.Add(v.RecallID, v.MakeID, v.ModelID, v.Chassis);
+                    vehicleTable.Rows.Add(
+                        v.MakeID,
+                        v.ModelID,
+                        v.Chassis,
+                        v.RecallStatus
+                    );
                 }
             }
 
             var parameters = new DynamicParameters();
-            parameters.Add("@Id", dto.Id);
+            parameters.Add("@RecallId", dto.Id);
             parameters.Add("@Code", dto.Code);
             parameters.Add("@Title", dto.Title);
             parameters.Add("@Description", dto.Description);
@@ -170,16 +181,16 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@StartDate", dto.StartDate);
             parameters.Add("@IsActive", dto.IsActive);
             parameters.Add("@UpdatedBy", dto.UpdatedBy);
-            parameters.Add("@VehicleList", vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
+            parameters.Add("@VehicleList",
+                vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
 
-            var result = await connection.QuerySingleAsync<int>(
-            "Recall_Update",
-            parameters,
-            commandType: CommandType.StoredProcedure
-        );
-
-            return result;
+            return await connection.QuerySingleAsync<int>(
+                "Recall_Update",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
         }
+
         public async Task<int> DeleteAsync(DeleteRecallDTO dto)
         {
             using var connection = _context.CreateConnection();
