@@ -941,9 +941,10 @@ namespace Workshop.Web.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/WorkshopMovement/VehicleMovement_GetLastMovementOutByWorkOrderId/{workorder}");
+                var response = await _httpClient.GetAsync($"api/WorkshopMovement/VehicleMovement_GetLastMovementOutByWorkOrderId?WorkOrderId={workorder}");
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<VehicleMovement>();
+                
+                return response != null ? await response.Content.ReadFromJsonAsync<VehicleMovement>() : new VehicleMovement();
             }
             catch (Exception e)
             {
