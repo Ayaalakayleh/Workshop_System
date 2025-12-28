@@ -65,7 +65,7 @@ namespace Workshop.Web.Controllers
             if (Id > 0)
             {
                 var recallItem = await _apiClient.GetRecallByIdAsync(Id);
-                ViewBag.VehcilesRecall = recallItem.Vehicles;
+                ViewBag.VehcilesRecall = recallItem?.Vehicles;
                 return View(recallItem);
             }
             return View(new RecallDTO());

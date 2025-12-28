@@ -263,7 +263,7 @@ namespace Workshop.Web.Controllers
                 if (vehicle != null && vehicle.ChassisNo != null)
                 {
                     var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
-                    movement.HasRecall = vRecall != null && vRecall?.Id != null && vRecall?.Id != 0;
+                    movement.HasRecall = (vRecall != null ) && ((vRecall?.HasActiveRecall) ?? false);
                 }
                 //    movement.HasRecall = recalls
                 //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
@@ -275,7 +275,7 @@ namespace Workshop.Web.Controllers
                 if (vehicle != null && vehicle.ChassisNo != null)
                 {
                     var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
-                    movement.HasRecall = vRecall != null && vRecall?.Id != null && vRecall?.Id != 0;
+                    movement.HasRecall = (vRecall != null) && ((vRecall?.HasActiveRecall) ?? false);
                 }
                 //    movement.HasRecall = recalls
                 //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
