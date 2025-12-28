@@ -2321,7 +2321,7 @@ namespace Workshop.Web.Controllers
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
                 //============================================================================================================
-                var last = await _vehicleApiClient.GetLastMovementByVehicleId(Details.VehicleId);
+                var last = await _apiClient.GetLastMovementOutByWorkOrderId((int)Details.WorkshopId);
                 model.VehicleInfo ??= new VehicleInfoModel();
                 //model.Date = Details.Date;
                 //model.TimeReceived = Details.TimeReceived;

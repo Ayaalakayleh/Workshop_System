@@ -63,9 +63,9 @@ namespace Workshop.API.Controllers
 		}
 
 		[HttpPost("InsertMWorkshopMovementStrikes")]
-		public async Task<IActionResult> InsertMWorkshopMovementStrikes(int movementId, string strikes)
+		public async Task<IActionResult> InsertMWorkshopMovementStrikes([FromBody] VehicleMovementStrike dto)
 		{
-			await _workshopMovementService.InsertMWorkshopMovementStrikesAsync(movementId, strikes);
+			await _workshopMovementService.InsertMWorkshopMovementStrikesAsync((int)dto.MovementId, dto.Strike);
 			return Ok(new { IsSuccess = true, Message = "Strikes inserted successfully" });
 		}
 
