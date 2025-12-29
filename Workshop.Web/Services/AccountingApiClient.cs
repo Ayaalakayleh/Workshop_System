@@ -69,7 +69,8 @@ namespace Workshop.Web.Services
                 string url = $"/SalesInvoice/AccountSalesMaster_IsValidSupplierInvoiceNo?SupplierId={supplierId}&SupplierInvoiceNo={invoiceNo}";
                 return await SendRequest<bool>(url, HttpMethod.Get);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return new bool();
             }
         }
@@ -84,7 +85,8 @@ namespace Workshop.Web.Services
                 var request = await SendRequest<string>(url, HttpMethod.Post, validSupplierInvoicesNo);
                 return JsonConvert.DeserializeObject<List<string>>(request);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return new List<string>();
             }
         }
@@ -116,7 +118,7 @@ namespace Workshop.Web.Services
             return await SendRequest<AccountSalesMaster>(url, HttpMethod.Post, data);
         }
 
-        public async Task<List<CustomerInformation>> Customer_GetAll(int companyId, int branchId, int isCompanyCenterialized, string lang ="en")
+        public async Task<List<CustomerInformation>> Customer_GetAll(int companyId, int branchId, int isCompanyCenterialized, string lang = "en")
         {
 
             string url = $"/Customers/Customers_GetAll?CompanyId={companyId}&BranchId={branchId}&IsCompanyCenterialized={isCompanyCenterialized}&Language={lang}";
@@ -142,22 +144,16 @@ namespace Workshop.Web.Services
             return await SendRequest<List<TransTypeTable>>(url, HttpMethod.Get);
         }
 
-        public async Task<List<ExpenseType>> ExpenseType_Get(int companyId)
-        {
-            string url = $"/ExpenseType/ExpenseType_Get?CompanyId={companyId}";
-            return await SendRequest<List<ExpenseType>>(url, HttpMethod.Get);
-        }
-
         //=====================================================================================================
-        public async Task<TransactionMaster?> SaveTransaction(VehicleDefinitions vehicle,List<AccountTable> accountDTO,AccountDefinitionDTO accountDefinitionDTO,int companyId,int branchId,int userId,
+        public async Task<TransactionMaster?> SaveTransaction(VehicleDefinitions vehicle, List<AccountTable> accountDTO, AccountDefinitionDTO accountDefinitionDTO, int companyId, int branchId, int userId,
             int tranTypeNo,
-            decimal? totalInternal=0,
-            decimal? totalExternal=0,
+            decimal? totalInternal = 0,
+            decimal? totalExternal = 0,
             DateTime? transactionDate = null,
-            string? notes = null,int? CurrencyId=null,string InternalType="")
+            string? notes = null, int? CurrencyId = null, string InternalType = "")
         {
             try
-            {            
+            {
                 var WIPAccount = accountDTO.FirstOrDefault(a => a.ID == accountDefinitionDTO.WIPAccountId);
                 var CostAccount = accountDTO.FirstOrDefault(a => a.ID == accountDefinitionDTO.InternalCostPartId);
                 var ExternalCostAccount = accountDTO.FirstOrDefault(a => a.ID == accountDefinitionDTO.ExternalCostPartId);
@@ -178,7 +174,7 @@ namespace Workshop.Web.Services
                     BranchId = branchId,
                     oLTransactionDetails = new List<TransactionDetails>()
                 };
-                if (totalInternal >0)
+                if (totalInternal > 0)
                 {
                     transaction.oLTransactionDetails.Add(new TransactionDetails
                     {
@@ -263,7 +259,7 @@ namespace Workshop.Web.Services
                 // Debit entry
                 if (totalInternal > 0)
                 {
-                    if (InternalType =="1")
+                    if (InternalType == "1")
                     {
                         transaction.oLTransactionDetails.Add(new TransactionDetails
                         {
@@ -291,7 +287,7 @@ namespace Workshop.Web.Services
 
                     }
                     else if (InternalType == "2")
-                        {
+                    {
                         transaction.oLTransactionDetails.Add(new TransactionDetails
                         {
                             AccountNo = AccessoriesAccount.AccountNo,
@@ -378,7 +374,7 @@ namespace Workshop.Web.Services
                         AccountNo = InternalPartAccount.AccountNo,
                         KeyId = Guid.NewGuid().ToString(),
                         DAmount = 0m,
-                        CAmount =(decimal) totalInternal,
+                        CAmount = (decimal)totalInternal,
                         Notes = notes ?? "",
                         Customer_DimensionsId = InternalPartAccount.IsCustomer_Dimensions ? vehicle.Customer_DimensionsId : null,
                         Vendor_DimensionsId = InternalPartAccount.IsVendor_Dimensions ? vehicle.Vendor_DimensionsId : null,
@@ -497,7 +493,7 @@ namespace Workshop.Web.Services
                 var saveTeansURL = $"/Transaction/SaveTransaction";
                 var request = await SendRequest<TransactionMaster>(saveTeansURL, HttpMethod.Post, transaction);
 
-                
+
                 return request ?? new TransactionMaster();
 
                 //return envelope.ResponseDetails; // <-- your FinancialTransactionMaster
@@ -537,5 +533,86 @@ namespace Workshop.Web.Services
             }
         }
 
+
+
+
+
+
+        public async Task<List<ExpenseType>> ExpenseType_Get(int companyId)
+        {
+            string url = $"/ExpenseType/ExpenseType_Get?CompanyId={companyId}";
+            return await SendRequest<List<ExpenseType>>(url, HttpMethod.Get);
+        }
+        public async Task<decimal> PettyCashExpenses_UserBalanceByRequest(Int64 requestNo)
+        {
+            string url = $"/PettyCashExpenses/PettyCashExpenses_UserBalanceByRequest?RequestNo={requestNo}";
+            return await SendRequest<decimal>(url, HttpMethod.Get);
+        }
+
+        public async Task<bool> PettyCashExpenses_IsValidInvoiceNo(int id, int sellerId, string invoiceNo)
+        {
+            string url = $"/PettyCashExpenses/PettyCashExpenses_IsValidInvoiceNo?Id={id}&SellerId={sellerId}&InvoiceNo={invoiceNo}";
+            return await SendRequest<bool>(url, HttpMethod.Get);
+        }
+
+        public async Task<List<PettyCashSeller>> PettyCashSeller_Get(int companyId)
+        {
+            string url = $"/PettyCashSeller/PettyCashSeller_Get?CompanyId={companyId}";
+            return await SendRequest<List<PettyCashSeller>>(url, HttpMethod.Get);
+        }
+
+        public async Task<Int64> PettyCashRequest_GetApproved(int userId)
+        {
+            try
+            {
+                userId = 298;
+                string url = $"/PettyCashRequest/PettyCashRequest_GetApproved?UserId={userId}";
+                var response = await SendRequest<List<PettyCashRequest>>(url, HttpMethod.Get);
+
+                // Return the RequestNo of the first approved request, or 0 if none found
+                return response?.FirstOrDefault()?.RequestNo ?? 0;
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return 0 as fallback
+                return 0;
+            }
+        }
+
+        public async Task<int> PettyCashExpenses_Insert(PettyCashExpenses pettyCashExpenses)
+        {
+            string url = $"/PettyCashExpenses/PettyCashExpenses_Insert";
+            return await SendRequest<int>(url, HttpMethod.Post, pettyCashExpenses);
+        }
+
+        public async Task<bool> PettyCashSeller_IsValidInfo(int id, string primaryName, string secondaryName, string taxNumber)
+        {
+            string url = $"/PettyCashSeller/PettyCashSeller_IsValidInfo?Id={id}&PrimaryName={primaryName}&SecondaryName={secondaryName}&TaxNumber={taxNumber}";
+            return await SendRequest<bool>(url, HttpMethod.Get);
+        }
+
+        public async Task<int> PettyCashSeller_Insert(PettyCashSeller pettyCashSeller)
+        {
+            string url = $"/PettyCashSeller/PettyCashSeller_Insert";
+            return await SendRequest<int>(url, HttpMethod.Post, pettyCashSeller);
+        }
+        public async Task<PettyCashRequest> PettyCashRequest_GetById(int id)
+        {
+            string url = $"/PettyCashRequest/PettyCashRequest_GetById/{id}";
+            return await SendRequest<PettyCashRequest>(url, HttpMethod.Get);
+        }
+
+        public async Task<List<LKP_TypeOfExpense>> LKP_TypeOfExpense_Get()
+        {
+            string url = $"/LKP_TypeOfExpense/LKP_TypeOfExpense_Get";
+            return await SendRequest<List<LKP_TypeOfExpense>>(url, HttpMethod.Get);
+        }
+
+        public async Task<List<ExpenseType>> ExpenseType_GetByRequestTerms(long requestNo)
+        {
+            string url = $"/ExpenseType/ExpenseType_GetByRequestTerms?RequestNo={requestNo}";
+            return await SendRequest<List<ExpenseType>>(url, HttpMethod.Get);
+        }
+        // -- VehicleDetails = await _vehicleApiClient.GetVehicleDetails(item.VehicleId, lang); --
     }
 }

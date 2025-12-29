@@ -75,7 +75,7 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.WIP.View)]
         public async Task<IActionResult> Index([FromForm] FilterWIPDTO? oFilterWIPDTO)
         {
-           
+
             var isCompanyCenterialized = 1;
             oFilterWIPDTO ??= new FilterWIPDTO();
             oFilterWIPDTO.PageNumber = oFilterWIPDTO.PageNumber ?? 1;
@@ -108,7 +108,7 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.WIP.Create)]
         public async Task<IActionResult> Add([FromBody] CreateWIPDTO dto)
         {
-          
+
             int? result;
             dto.WorkshopId = BranchId;
             dto.CreatedBy = UserId;
@@ -187,8 +187,8 @@ namespace Workshop.Web.Controllers
                             ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
 
                         }
-                            var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
-                            ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                        var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
+                        ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
                     }
 
                     // Get vehicle documents - handle nulls
@@ -338,7 +338,7 @@ namespace Workshop.Web.Controllers
                         }
                         else
                         {
-                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId))?? new CreateVehicleDefinitionsModel();
+                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId)) ?? new CreateVehicleDefinitionsModel();
                             dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
                             dto.VehicleTab.ModelId = vehicleDetails.VehicleModelId;
                             dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
@@ -398,7 +398,7 @@ namespace Workshop.Web.Controllers
                     ViewBag.Status = new List<SelectListItem>();
                 }
 
-                
+
 
                 // Get units
                 try
@@ -509,7 +509,7 @@ namespace Workshop.Web.Controllers
                 {
                     if (dto.VehicleId > 0)
                     {
-                        
+
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
 
                         selectedCustomerId = activeAgreement?.CustomerId;
@@ -659,7 +659,7 @@ namespace Workshop.Web.Controllers
         {
             filter ??= new VehicleAdvancedFilter();
             var colVehicleDefinitions = new List<VehicleDefinitions>();
-           
+
 
             filter.CompanyId = CompanyId;
 
@@ -675,7 +675,7 @@ namespace Workshop.Web.Controllers
         }
         public async Task<IActionResult> GetAccountNumber(int Id)
         {
-         
+
             var TypeList = await _accountingApiClient.TypeSalesPurchases_GetAll(CompanyId, BranchId, 1, 1);
             var selectedType = TypeList.FirstOrDefault(t => t.Id == Id);
             var AccountList = await _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId, "en");
@@ -924,7 +924,7 @@ namespace Workshop.Web.Controllers
                     KeyId = oWIPSChedule.KeyId,
                     Status = (int)LabourLineEnum.Booked
                 };
-              
+
                 var updateResult = await UpdateServiceStatus(updateService);
 
                 return Json(new
@@ -1138,7 +1138,7 @@ namespace Workshop.Web.Controllers
         {
 
             var resultJson = new TempData();
-           
+
             try
             {
                 var move = await _apiClient.GetVehicleMovementByIdAsync(movement.MovementId.Value);
@@ -1254,6 +1254,17 @@ namespace Workshop.Web.Controllers
             movement.WIPServices = (await _apiClient.GetWIPServicesByMovementIdAsync(movement.MovementInId.Value))?.Where(s => s.IsExternal).ToList();
             movement.WIPServices ??= (new List<CreateWIPServiceDTO>());
 
+            // Add AccountDefinition to ViewBag for Petty Cash functionality
+            try
+            {
+                var accountDefinition = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
+                ViewBag.AccountDefinition = accountDefinition;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching account definition for company {CompanyId}", CompanyId);
+                ViewBag.AccountDefinition = null;
+            }
             //var services = await _apiClient.WIP_GetServicesById(WIP_Id);
 
             //DamageFilter damageFilter = new DamageFilter();
@@ -1341,207 +1352,207 @@ namespace Workshop.Web.Controllers
 
 
 
-                    //MovementInvoice invoice = new MovementInvoice();
+                //MovementInvoice invoice = new MovementInvoice();
 
-                    // List<HttpPostedFileBase> files = Request.Files["DamageReport"];
-                    //for (int i = 0; i < file.Length; i++)
-                    //{
-                    //    var validationResult = _fileValidationService.CheckFileTypeAndSize(file);
+                // List<HttpPostedFileBase> files = Request.Files["DamageReport"];
+                //for (int i = 0; i < file.Length; i++)
+                //{
+                //    var validationResult = _fileValidationService.CheckFileTypeAndSize(file);
 
-                    //    //Logic should be implemented 
-                    //    //if (Request.Files.GetKey(i) == "ExternalWorkshopInvoice")
-                    //    if (validationResult.IsSuccess)
-                    //    {
-                    //        var (filePath, fileName) = await _fileService.SaveFileAsync(file, "ExternalWorkshopInvoice");
+                //    //Logic should be implemented 
+                //    //if (Request.Files.GetKey(i) == "ExternalWorkshopInvoice")
+                //    if (validationResult.IsSuccess)
+                //    {
+                //        var (filePath, fileName) = await _fileService.SaveFileAsync(file, "ExternalWorkshopInvoice");
 
-                    //        invoice.FileName = fileName;
-                    //        invoice.FilePath = filePath;
-                    //        invoice.MovementId = movements.MovementId.Value;
-                    //        invoice.Invoice_Date = DateTime.Now;
-                    //        await _apiClient.DExternalWorkshopInvoiceInsertAsync(invoice);
-                    //    }
-                    //    else
-                    //    {
-                    //        await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
-                    //    }
-                    //}
-
-
-                    //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
-                    //{
-                    //    invoice.MovementId = movements.MovementId.Value;
-                    //    invoice.MasterId = movement.MasterId.Value;
-                    //    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
-                    //    invoice.InvoiceNo = movement.InvoceNo;
-                    //    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
-                    //    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
-                    //    invoice.DeductibleAmount = movement.DeductibleAmount.Value;
-                    //    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts.Value;
-                    //    invoice.Vat = movement.Vat ?? 0;// من لفيو اذا مش تاكسبل ابعتها صفر 
-                    //    invoice.PartsCost = movement.PartsCost.Value;
-                    //    invoice.LaborCost = movement.LaborCost.Value;
-
-                    //    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
-                    //    AccountSales oAccountSales = new AccountSales();
-                    //    oAccountSales.AccountSalesDetails = new List<AccountSalesDetails>();
-                    //    oAccountSales.AccountSalesMaster = new AccountSalesMaster();
-
-                    //    var oAccountSalesDetails = new AccountSalesDetails();
-                    //    var Supplier = await _accountingApiClient.Supplier_Find(ExternalWorkshop.SupplierId.Value);
-                    //    var VehicleDetails = new VehicleDefinitions();
-                    //    var items = new List<Item>();
-                    //    items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
-                    //    var InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetById((int)movement.InvoiceTypeId);
+                //        invoice.FileName = fileName;
+                //        invoice.FilePath = filePath;
+                //        invoice.MovementId = movements.MovementId.Value;
+                //        invoice.Invoice_Date = DateTime.Now;
+                //        await _apiClient.DExternalWorkshopInvoiceInsertAsync(invoice);
+                //    }
+                //    else
+                //    {
+                //        await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
+                //    }
+                //}
 
 
-                    //    oAccountSales.AccountSalesMaster = new AccountSalesMaster()
-                    //    {
+                //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
+                //{
+                //    invoice.MovementId = movements.MovementId.Value;
+                //    invoice.MasterId = movement.MasterId.Value;
+                //    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
+                //    invoice.InvoiceNo = movement.InvoceNo;
+                //    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
+                //    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
+                //    invoice.DeductibleAmount = movement.DeductibleAmount.Value;
+                //    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts.Value;
+                //    invoice.Vat = movement.Vat ?? 0;// من لفيو اذا مش تاكسبل ابعتها صفر 
+                //    invoice.PartsCost = movement.PartsCost.Value;
+                //    invoice.LaborCost = movement.LaborCost.Value;
 
-                    //        Total = invoice.LaborCost + invoice.PartsCost,
-                    //        Net = invoice.TotalInvoice,
-                    //        Final = invoice.LaborCost + invoice.PartsCost,
-                    //        Tax = invoice.Vat,
-                    //        AccSalesTypeNo = 8,
-                    //        AccSalesDate = DateTime.Now,
-                    //        InvoiceType = 2,
-                    //        TypeSalesPurchasesID = (int)movement.InvoiceTypeId,
-                    //        Notes = "Maintenance",
-                    //        SupplierInvoiceNo = invoice.InvoiceNo,
-                    //        CustomerId = (int)Supplier.Id,
-                    //        Customer_DimensionsId = Supplier.Customer_DimensionsId,
-                    //        Vendor_DimensionsId = Supplier.Vendor_DimensionsId,
-                    //        LOB_DimensionsId = Supplier.LOB_DimensionsId,
-                    //        Regions_DimensionsId = Supplier.Regions_DimensionsId,
-                    //        Locations_DimensionsId = Supplier.Locations_DimensionsId,
-                    //        Item_DimensionsId = Supplier.Item_DimensionsId,
-                    //        Worker_DimensionsId = Supplier.Worker_DimensionsId,
-                    //        FixedAsset_DimensionsId = Supplier.FixedAsset_DimensionsId,
-                    //        Department_DimensionsId = Supplier.Department_DimensionsId,
-                    //        Contract_CC_DimensionsId = Supplier.Contract_CC_DimensionsId,
-                    //        City_DimensionsId = Supplier.City_DimensionsId,
-                    //        D1_DimensionsId = Supplier.D1_DimensionsId,
-                    //        D2_DimensionsId = Supplier.D2_DimensionsId,
-                    //        D3_DimensionsId = Supplier.D3_DimensionsId,
-                    //        D4_DimensionsId = Supplier.D4_DimensionsId,
-                    //        CustomerAccountNo = AccountList.Where(x => x.ID == Supplier.AccountNoPayableId).FirstOrDefault().AccountNo,
-                    //    };
+                //    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
+                //    AccountSales oAccountSales = new AccountSales();
+                //    oAccountSales.AccountSalesDetails = new List<AccountSalesDetails>();
+                //    oAccountSales.AccountSalesMaster = new AccountSalesMaster();
 
-                    //    VehicleDetails = await _vehicleApiClient.GetVehicleDetails(movement.VehicleID.Value, lang);
-
-                    //    if (invoice.PartsCost > 0)
-                    //    {
-                    //        accountId = items.Where(a => a.ItemNumber == -1).FirstOrDefault()?.ItemSalesAccountId;
-                    //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
-                    //        accountTable = new AccountTable();
-                    //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
-                    //        oAccountSalesDetails = new AccountSalesDetails()
-                    //        {
-                    //            ItemNumber = items.Where(a => a.ItemNumber == -1).FirstOrDefault().ItemId,
-                    //            UnitId = items.Where(a => a.ItemNumber == -1).FirstOrDefault().UnitId,
-                    //            Discount = 0,
-                    //            Description = "Maintenance Parts " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة قطع غيار ",
-                    //            Quantity = 1,
-                    //            UnitQuantity = 1,
-                    //            Price = invoice.PartsCost,
-                    //            Total = invoice.PartsCost,
-                    //            TaxValue = movement.Vat == 0 ? 0 : invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100),///اذا فوق صفر ياخدها صفر
-                    //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -1).FirstOrDefault().TaxClassificationNo,
-                    //            Final = invoice.PartsCost + (invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100)),
-                    //            CostsCentersNo = VehicleDetails.CostCenter,
-                    //            Reference = VehicleDetails.PlateNumber,
-                    //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
-                    //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
-                    //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
-                    //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
-                    //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
-                    //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
-                    //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
-                    //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
-                    //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
-                    //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
-                    //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
-                    //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
-                    //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
-                    //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
-                    //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
-                    //        };
-                    //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
-
-                    //    }
-                    //    if (invoice.LaborCost > 0)
-                    //    {
-                    //        accountId = items.Where(a => a.ItemNumber == -2).FirstOrDefault()?.ItemSalesAccountId;
-                    //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
-                    //        accountTable = new AccountTable();
-                    //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
-                    //        oAccountSalesDetails = new AccountSalesDetails()
-                    //        {
-                    //            ItemNumber = items.Where(a => a.ItemNumber == -2).FirstOrDefault().ItemId,
-                    //            UnitId = items.Where(a => a.ItemNumber == -2).FirstOrDefault().UnitId,
-                    //            Discount = 0,
-                    //            Description = "Maintenance Labor " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة عمالة",
-                    //            Quantity = 1,
-                    //            UnitQuantity = 1,
-                    //            Price = invoice.LaborCost,
-                    //            Total = invoice.LaborCost,
-                    //            TaxValue = movement.Vat == 0 ? 0 : invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100), //??
-                    //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -2).FirstOrDefault().TaxClassificationNo,
-                    //            Final = invoice.LaborCost + (invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100)),
-                    //            CostsCentersNo = VehicleDetails.CostCenter,
-                    //            Reference = VehicleDetails.PlateNumber,
-                    //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
-                    //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
-                    //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
-                    //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
-                    //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
-                    //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
-                    //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
-                    //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
-                    //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
-                    //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
-                    //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
-                    //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
-                    //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
-                    //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
-                    //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
-                    //        };
-                    //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
-
-                    //    }
-
-                    //    oAccountSales.AccountSalesMaster.UserId = userID.ToString();
-                    //    //ToDo Important
-                    //    oAccountSales.AccountSalesMaster.CurrencyID = 1;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
-                    //    oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
-                    //    oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
-                    //    oAccountSales.CompanyId = CompanyId;
-                    //    oAccountSales.BranchId = BranchId;
-                    //    oAccountSales.AccountSalesMaster.InventoryAccountId = InvoiceType.AccountId;
-                    //    //ToDo Important
-                    //    oAccountSales.CompanyType = 1; // ((CompanyInfo)Session["CompanyInfo"]).CompanyType;
-                    //    await _accountingApiClient.AccountSalesMaster_Insert(oAccountSales);
-                    //}
-
-                    //Posible to return to this logic
-                    //await _apiClient.UpdateDMaintenanceCardAsync(Movement.Card);
-                    //foreach (var item in Movement.ColMaintenanceCard)
-                    //{
-                    //    await _apiClient.FixDamage(Convert.ToInt32(item.WorkOrderId), item.status);
-                    //}
-                    //bool isUpated = await _apiClient.VehicleMovement_Status(Movement);
-
-                    //Overriddn
-                    //await _apiClient.UpdateDMaintenanceCardAsync(movement.Card);
-
-                    //foreach (var item in movement.ColMaintenanceCard)
-                    //{
-                    //    await _apiClient.FixWorkOrderAsync(item.WorkOrderId.Value, item.status.Value);
-                    //}
-                    //await _apiClient.UpdateVehicleMovementStatusAync(movement.MoveInWorkshopId.Value, movement.MasterId.Value);
+                //    var oAccountSalesDetails = new AccountSalesDetails();
+                //    var Supplier = await _accountingApiClient.Supplier_Find(ExternalWorkshop.SupplierId.Value);
+                //    var VehicleDetails = new VehicleDefinitions();
+                //    var items = new List<Item>();
+                //    items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
+                //    var InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetById((int)movement.InvoiceTypeId);
 
 
-                    //Mark fixed services as fixed/not fixed (WIP_Service) this will be on IsFixed column
-                    resultJson.IsSuccess = true;
+                //    oAccountSales.AccountSalesMaster = new AccountSalesMaster()
+                //    {
+
+                //        Total = invoice.LaborCost + invoice.PartsCost,
+                //        Net = invoice.TotalInvoice,
+                //        Final = invoice.LaborCost + invoice.PartsCost,
+                //        Tax = invoice.Vat,
+                //        AccSalesTypeNo = 8,
+                //        AccSalesDate = DateTime.Now,
+                //        InvoiceType = 2,
+                //        TypeSalesPurchasesID = (int)movement.InvoiceTypeId,
+                //        Notes = "Maintenance",
+                //        SupplierInvoiceNo = invoice.InvoiceNo,
+                //        CustomerId = (int)Supplier.Id,
+                //        Customer_DimensionsId = Supplier.Customer_DimensionsId,
+                //        Vendor_DimensionsId = Supplier.Vendor_DimensionsId,
+                //        LOB_DimensionsId = Supplier.LOB_DimensionsId,
+                //        Regions_DimensionsId = Supplier.Regions_DimensionsId,
+                //        Locations_DimensionsId = Supplier.Locations_DimensionsId,
+                //        Item_DimensionsId = Supplier.Item_DimensionsId,
+                //        Worker_DimensionsId = Supplier.Worker_DimensionsId,
+                //        FixedAsset_DimensionsId = Supplier.FixedAsset_DimensionsId,
+                //        Department_DimensionsId = Supplier.Department_DimensionsId,
+                //        Contract_CC_DimensionsId = Supplier.Contract_CC_DimensionsId,
+                //        City_DimensionsId = Supplier.City_DimensionsId,
+                //        D1_DimensionsId = Supplier.D1_DimensionsId,
+                //        D2_DimensionsId = Supplier.D2_DimensionsId,
+                //        D3_DimensionsId = Supplier.D3_DimensionsId,
+                //        D4_DimensionsId = Supplier.D4_DimensionsId,
+                //        CustomerAccountNo = AccountList.Where(x => x.ID == Supplier.AccountNoPayableId).FirstOrDefault().AccountNo,
+                //    };
+
+                //    VehicleDetails = await _vehicleApiClient.GetVehicleDetails(movement.VehicleID.Value, lang);
+
+                //    if (invoice.PartsCost > 0)
+                //    {
+                //        accountId = items.Where(a => a.ItemNumber == -1).FirstOrDefault()?.ItemSalesAccountId;
+                //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
+                //        accountTable = new AccountTable();
+                //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
+                //        oAccountSalesDetails = new AccountSalesDetails()
+                //        {
+                //            ItemNumber = items.Where(a => a.ItemNumber == -1).FirstOrDefault().ItemId,
+                //            UnitId = items.Where(a => a.ItemNumber == -1).FirstOrDefault().UnitId,
+                //            Discount = 0,
+                //            Description = "Maintenance Parts " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة قطع غيار ",
+                //            Quantity = 1,
+                //            UnitQuantity = 1,
+                //            Price = invoice.PartsCost,
+                //            Total = invoice.PartsCost,
+                //            TaxValue = movement.Vat == 0 ? 0 : invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100),///اذا فوق صفر ياخدها صفر
+                //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -1).FirstOrDefault().TaxClassificationNo,
+                //            Final = invoice.PartsCost + (invoice.PartsCost * (items.Where(a => a.ItemNumber == -1).FirstOrDefault().taxRate / 100)),
+                //            CostsCentersNo = VehicleDetails.CostCenter,
+                //            Reference = VehicleDetails.PlateNumber,
+                //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
+                //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
+                //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
+                //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
+                //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
+                //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
+                //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
+                //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
+                //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
+                //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
+                //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
+                //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
+                //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
+                //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
+                //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
+                //        };
+                //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
+
+                //    }
+                //    if (invoice.LaborCost > 0)
+                //    {
+                //        accountId = items.Where(a => a.ItemNumber == -2).FirstOrDefault()?.ItemSalesAccountId;
+                //        accountId = accountId == null ? InvoiceType.AccountId : accountId;
+                //        accountTable = new AccountTable();
+                //        accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
+                //        oAccountSalesDetails = new AccountSalesDetails()
+                //        {
+                //            ItemNumber = items.Where(a => a.ItemNumber == -2).FirstOrDefault().ItemId,
+                //            UnitId = items.Where(a => a.ItemNumber == -2).FirstOrDefault().UnitId,
+                //            Discount = 0,
+                //            Description = "Maintenance Labor " + "( " + VehicleDetails.PlateNumber + " ) " + " صيانة عمالة",
+                //            Quantity = 1,
+                //            UnitQuantity = 1,
+                //            Price = invoice.LaborCost,
+                //            Total = invoice.LaborCost,
+                //            TaxValue = movement.Vat == 0 ? 0 : invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100), //??
+                //            TaxClassificationId = movement.Vat == 0 ? zeroTaxClassification.TaxClassificationNo : items.Where(a => a.ItemNumber == -2).FirstOrDefault().TaxClassificationNo,
+                //            Final = invoice.LaborCost + (invoice.LaborCost * (items.Where(a => a.ItemNumber == -2).FirstOrDefault().taxRate / 100)),
+                //            CostsCentersNo = VehicleDetails.CostCenter,
+                //            Reference = VehicleDetails.PlateNumber,
+                //            Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
+                //            Vendor_DimensionsId = accountTable.IsVendor_Dimensions ? VehicleDetails.Vendor_DimensionsId : null,
+                //            LOB_DimensionsId = accountTable.IsLOB_Dimensions ? VehicleDetails.LOB_DimensionsId : null,
+                //            Regions_DimensionsId = accountTable.IsRegions_Dimensions ? VehicleDetails.Regions_DimensionsId : null,
+                //            Locations_DimensionsId = accountTable.IsLocations_Dimensions ? VehicleDetails.Locations_DimensionsId : null,
+                //            Item_DimensionsId = accountTable.IsItem_Dimensions ? VehicleDetails.Item_DimensionsId : null,
+                //            Worker_DimensionsId = accountTable.IsWorker_Dimensions ? VehicleDetails.Worker_DimensionsId : null,
+                //            FixedAsset_DimensionsId = accountTable.IsFixedAsset_Dimensions ? VehicleDetails.FixedAsset_DimensionsId : null,
+                //            Department_DimensionsId = accountTable.IsDepartment_Dimensions ? VehicleDetails.Department_DimensionsId : null,
+                //            Contract_CC_DimensionsId = accountTable.IsContract_CC_Dimensions ? VehicleDetails.Contract_CC_DimensionsId : null,
+                //            City_DimensionsId = accountTable.IsCity_Dimensions ? VehicleDetails.City_DimensionsId : null,
+                //            D1_DimensionsId = accountTable.IsD1_Dimensions ? VehicleDetails.D1_DimensionsId : null,
+                //            D2_DimensionsId = accountTable.IsD2_Dimensions ? VehicleDetails.D2_DimensionsId : null,
+                //            D3_DimensionsId = accountTable.IsD3_Dimensions ? VehicleDetails.D3_DimensionsId : null,
+                //            D4_DimensionsId = accountTable.IsD4_Dimensions ? VehicleDetails.D4_DimensionsId : null,
+                //        };
+                //        oAccountSales.AccountSalesDetails.Add(oAccountSalesDetails);
+
+                //    }
+
+                //    oAccountSales.AccountSalesMaster.UserId = userID.ToString();
+                //    //ToDo Important
+                //    oAccountSales.AccountSalesMaster.CurrencyID = 1;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
+                //    oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
+                //    oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
+                //    oAccountSales.CompanyId = CompanyId;
+                //    oAccountSales.BranchId = BranchId;
+                //    oAccountSales.AccountSalesMaster.InventoryAccountId = InvoiceType.AccountId;
+                //    //ToDo Important
+                //    oAccountSales.CompanyType = 1; // ((CompanyInfo)Session["CompanyInfo"]).CompanyType;
+                //    await _accountingApiClient.AccountSalesMaster_Insert(oAccountSales);
+                //}
+
+                //Posible to return to this logic
+                //await _apiClient.UpdateDMaintenanceCardAsync(Movement.Card);
+                //foreach (var item in Movement.ColMaintenanceCard)
+                //{
+                //    await _apiClient.FixDamage(Convert.ToInt32(item.WorkOrderId), item.status);
+                //}
+                //bool isUpated = await _apiClient.VehicleMovement_Status(Movement);
+
+                //Overriddn
+                //await _apiClient.UpdateDMaintenanceCardAsync(movement.Card);
+
+                //foreach (var item in movement.ColMaintenanceCard)
+                //{
+                //    await _apiClient.FixWorkOrderAsync(item.WorkOrderId.Value, item.status.Value);
+                //}
+                //await _apiClient.UpdateVehicleMovementStatusAync(movement.MoveInWorkshopId.Value, movement.MasterId.Value);
+
+
+                //Mark fixed services as fixed/not fixed (WIP_Service) this will be on IsFixed column
+                resultJson.IsSuccess = true;
                 resultJson.Type = "success";
                 return Json(resultJson);
 
@@ -1575,7 +1586,7 @@ namespace Workshop.Web.Controllers
                         ? System.Text.Json.JsonSerializer.Deserialize<IEnumerable<CreateWIPServiceDTO>>(dto.Services)
                         : new List<CreateWIPServiceDTO>();
                     var Internalinvoice = await _SaveInvoice(dto);
-                    if (Internalinvoice.ID > 0 )
+                    if (Internalinvoice.ID > 0)
                     {// Insert External Invoice
                         if (dto.AccountDetails.AccountType == AccountTypeEnum.Internal || dto.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
                         {
@@ -1590,7 +1601,7 @@ namespace Workshop.Web.Controllers
                                 Net = dto.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity),
                                 InvoiceType = (int)AccountTypeEnum.Internal,
                                 AccountType = (int)AccountTypeEnum.Internal,
-                                CreatedBy= UserId
+                                CreatedBy = UserId
                             };
                             await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
 
@@ -1669,24 +1680,24 @@ namespace Workshop.Web.Controllers
                 });
             }
         }
-        
+
 
         public async Task<TransactionMaster> _SaveInvoice(UpdateWIPDTO oWIPDTO)
         {
             string InternalType = "";
             var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
-            decimal ? totalInternal = oWIPDTO.ItemsList.Where(x=>x.AccountType== (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity);
-            decimal ? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.Quantity);
+            decimal? totalInternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity);
+            decimal? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.Quantity);
             var VehicleDetails = _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang).Result;
 
-            if (oWIPDTO.AccountDetails.AccountType==AccountTypeEnum.Internal|| oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
+            if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
             {
                 var InternalList = await _apiClient.GetLookupDetailByIdAsync(oWIPDTO.AccountDetails.SalesType == null ? (int)oWIPDTO.AccountDetails.PartialSalesType : (int)oWIPDTO.AccountDetails.SalesType, 9, CompanyId);
 
                 InternalType = InternalList.Code;
             }
-            var saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account,CompanyId,BranchId,UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now,"Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
+            var saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
             return saveTransaction;
 
         }
@@ -1698,7 +1709,7 @@ namespace Workshop.Web.Controllers
         public async Task<AccountSalesMaster> SaveInvoice(UpdateWIPDTO oWIPDTO)
         {
             var result = new TempData();
-        
+
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
             var invoice = account.InvoiceTypeId; //to be invoice type only
             var AccountList = await _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId, lang);
@@ -1708,7 +1719,7 @@ namespace Workshop.Web.Controllers
             var oAccountSalesDetails = new AccountSalesDetails();
             AccountSales oAccountSales = new AccountSales();
             var VehicleDetails = _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang).Result;
-            var taxClass = _accountingApiClient.GetTaxClassificationById(oWIPDTO.AccountDetails.Vat??1).Result;
+            var taxClass = _accountingApiClient.GetTaxClassificationById(oWIPDTO.AccountDetails.Vat ?? 1).Result;
             //oWIPDTO.AccountDetails.TaxClassificationId ?? oWIPDTO.AccountDetails.PartialVat
             var items = new List<Workshop.Core.DTOs.AccountingDTOs.Item>();
             items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
@@ -1721,9 +1732,9 @@ namespace Workshop.Web.Controllers
                 oAccountSales.AccountSalesDetails = new List<AccountSalesDetails>();
 
                 // --- Services Labour -------------------
-                foreach (var item in oWIPDTO.ServicesList.Where(x=>x.AccountType == (int)AccountTypeEnum.External).ToList())
+                foreach (var item in oWIPDTO.ServicesList.Where(x => x.AccountType == (int)AccountTypeEnum.External).ToList())
                 {
-                    if (item.Total> 0)
+                    if (item.Total > 0)
                     {
                         accountId = items.Where(a => a.ItemNumber == -2).FirstOrDefault()?.ItemSalesAccountId;
                         //accountId = accountId == null ? InvoiceType.AccountId : accountId;
@@ -1842,7 +1853,7 @@ namespace Workshop.Web.Controllers
                 //-------------------------------------
                 oAccountSales.AccountSalesMaster = AccountSalesMaster;
                 oAccountSales.AccountSalesMaster.UserId = UserId.ToString();
-                oAccountSales.AccountSalesMaster.CurrencyID = oWIPDTO.AccountDetails.CurrencyId==null? CurrencyId:(int) oWIPDTO.AccountDetails.CurrencyId;
+                oAccountSales.AccountSalesMaster.CurrencyID = oWIPDTO.AccountDetails.CurrencyId == null ? CurrencyId : (int)oWIPDTO.AccountDetails.CurrencyId;
                 oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
                 oAccountSales.AccountSalesMaster.PaymentTerms = Customer.oLDBPaymentType > 0 ? Customer.oLDBPaymentType : 0;
                 oAccountSales.CompanyId = CompanyId;
@@ -1884,12 +1895,12 @@ namespace Workshop.Web.Controllers
         public async Task<JsonResult> GetAvailableTechnicians([FromQuery] DateTime date, decimal duration)
         {
             var technicians = await _apiClient.GetAvailableTechniciansAsync(date, duration, BranchId);
-            
+
             var data = technicians.Select(t => new
             {
-                value = t.TechnicianId,      
+                value = t.TechnicianId,
                 text = lang == "en" ? t.PrimaryName : t.SecondaryName,
-                freeIntervalsList = t.FreeIntervalsList         
+                freeIntervalsList = t.FreeIntervalsList
             }).ToList();
 
             return Json(new { success = true, data = data });
@@ -1904,22 +1915,22 @@ namespace Workshop.Web.Controllers
             var List = await _inventoryApiClient.GetAvailableLocatorsDDL(dto);
             //var Warehouses = List.Select(t => new SelectListItem { Text = t.LocatorCode+ "(Available:" +t.OnHandQtyInUnit+")", Value = t.LocatorId.ToString() }).ToList();
 
-            return Json(new { success = true, data = List } );        
+            return Json(new { success = true, data = List });
         }
 
         [HttpPost]
         public async Task<JsonResult> CreateInventoryTransaction([FromBody] CreateInventoryTransactionDTO dto)
         {
-            
+
             dto.CreatedBy = UserId;
             dto.BranchId = BranchId;
             dto.CompanyId = CompanyId;
-            dto.TransactionDate =  DateTime.Now.Date;
+            dto.TransactionDate = DateTime.Now.Date;
             var result = await _inventoryApiClient.GRNAdd(dto);
-            
+
             bool isSuccess = result != null;
-            return Json(new { success = isSuccess, data = result});
-              
+            return Json(new { success = isSuccess, data = result });
+
         }
 
         public async Task<string> CreateIssueVoucher([FromForm] CreateInventoryTransactionDTO model)
@@ -1980,7 +1991,7 @@ namespace Workshop.Web.Controllers
             };
 
             var addIssueToWIP = await _apiClient.UpdateIssueIdToWIP(dto);
-          
+
             var responseString = await _inventoryApiClient.GetAllGRNByIdHead(headerId);
 
             var response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
@@ -1995,7 +2006,7 @@ namespace Workshop.Web.Controllers
                 Console.WriteLine(" No details in response!");
                 return null;
             }
-           
+
 
             var itemUnitList = new List<BaseItemDTO>();
 
@@ -2004,12 +2015,12 @@ namespace Workshop.Web.Controllers
                 var matchingDetail = model.Details?
                     .FirstOrDefault(x => x.FK_ItemId == d.FK_ItemId && x.FK_UnitId == d.FK_UnitId);
 
-               
+
                 var baseItem = new BaseItemDTO
                 {
                     WIPId = model.TransactionReferenceNo.HasValue ? (int)model.TransactionReferenceNo : 0,
                     RequestId = model.RequestId,
-                    ItemId = d.FK_ItemId ,
+                    ItemId = d.FK_ItemId,
                     fk_UnitId = d.FK_UnitId.HasValue ? (int)d.FK_UnitId : 0,
                     RequestQuantity = matchingDetail?.Quantity ?? 0,
                     Quantity = d.UnitQuantity,
@@ -2022,7 +2033,7 @@ namespace Workshop.Web.Controllers
                     Total = 0
                 };
 
-                
+
                 itemUnitList.Add(baseItem);
             }
             var responseToClient = new
@@ -2036,7 +2047,7 @@ namespace Workshop.Web.Controllers
             //return result;
         }
 
-   
+
         public async Task<JsonResult> UndoIssueVoucher(int PartsIssueId, int WIPId)
         {
             var responseString = await _inventoryApiClient.GetAllGRNByIdHead(PartsIssueId);
@@ -2057,15 +2068,16 @@ namespace Workshop.Web.Controllers
                 ModifiedBy = 1,
                 FK_FinancialTransactionReverseId = rev.ID
             };
-            
+
             var deleteResult = await _inventoryApiClient.InventoryTransactionDelete(deleteDTO);
-            
-            if (deleteResult==0) {
+
+            if (deleteResult == 0)
+            {
                 var isDelete = await _apiClient.WIP_DeleteItems(WIPId, PartsIssueId);
             }
             return Json(new { success = true, data = deleteResult });
         }
-        public async Task<JsonResult> UpdatePartStatusForSingleItem([FromBody]UpdateSinglePartStatusDTO dto)
+        public async Task<JsonResult> UpdatePartStatusForSingleItem([FromBody] UpdateSinglePartStatusDTO dto)
         {
             try
             {
@@ -2113,13 +2125,13 @@ namespace Workshop.Web.Controllers
         public async Task<JsonResult> CreditNote(int WIPId)
         {
             var Reverse = new TransactionMaster();
-           var InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(WIPId, null);
+            var InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(WIPId, null);
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
 
-            InvoiceDetailsList = InvoiceDetailsList.Where(x => x.ReferanceNo == null && x.InvoiceType == 1 && x.IsReturn==false).ToList();
+            InvoiceDetailsList = InvoiceDetailsList.Where(x => x.ReferanceNo == null && x.InvoiceType == 1 && x.IsReturn == false).ToList();
             foreach (var item in InvoiceDetailsList)
             {
-                if (item.AccountType==1)
+                if (item.AccountType == 1)
                 {
                     TransactionMaster ReverseTrans = new TransactionMaster()
                     {
@@ -2134,7 +2146,7 @@ namespace Workshop.Web.Controllers
                         VoucherType = 1,
 
                     };
-                     Reverse = await _accountingApiClient.ReverseTrans(ReverseTrans);
+                    Reverse = await _accountingApiClient.ReverseTrans(ReverseTrans);
                     if (Reverse.ID > 0)
                     {
                         CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
@@ -2174,7 +2186,7 @@ namespace Workshop.Web.Controllers
                         VoucherType = 1,
                     };
                     Reverse = await _accountingApiClient.ReverseTrans(ReverseTrans);
-                     ReverseTrans = new TransactionMaster()
+                    ReverseTrans = new TransactionMaster()
                     {
                         ID = (int)InvoiceDetailsList.FirstOrDefault().TransactionMasterId,
                         TranTypeNo = 6,
@@ -2185,8 +2197,8 @@ namespace Workshop.Web.Controllers
                         BranchId = BranchId,
                         IsCompanyCenterialized = 1,
                         VoucherType = 1,
-                         Notes= Notes
-                     };
+                        Notes = Notes
+                    };
                     Reverse = await _accountingApiClient.ReverseTrans(ReverseTrans);
                     if (Reverse.ID > 0)
                     {
@@ -2203,7 +2215,7 @@ namespace Workshop.Web.Controllers
                             InvoiceType = -3,
                             AccountType = (int)AccountTypeEnum.External,
                             CreatedBy = UserId,
-                            OldTransactionMasterId=item.TransactionMasterId
+                            OldTransactionMasterId = item.TransactionMasterId
 
                         };
                         await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
@@ -2211,7 +2223,7 @@ namespace Workshop.Web.Controllers
                 }
             }
 
-            bool isSuccess = Reverse.ID >0;
+            bool isSuccess = Reverse.ID > 0;
             UpdateWIPStatusDTO updateWIPStatusDTO = new UpdateWIPStatusDTO()
             {
                 WIPId = WIPId,
@@ -2229,7 +2241,7 @@ namespace Workshop.Web.Controllers
 
             return View();
         }
-        public async Task<ActionResult> PrintInternal(int WIPId,int TransactionMasterId)
+        public async Task<ActionResult> PrintInternal(int WIPId, int TransactionMasterId)
         {
             var PrintInternalDTO = new PrintInternalDTO();
             var InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(WIPId, TransactionMasterId);
@@ -2239,22 +2251,440 @@ namespace Workshop.Web.Controllers
             PrintInternalDTO.InvoiceDetails = InvoiceDetailsList.FirstOrDefault();
             foreach (var item in PrintInternalDTO.WipInvoiceDetail)
             {
-                if (item.ItemId !=null)
+                if (item.ItemId != null)
                 {
                     var mapping = await _inventoryApiClient.GetItemByIdAsync((int)item.ItemId);
                     if (mapping != null)
                     {
-                        item.FullDescription= mapping.Code+" - " + (lang == "en" ? mapping.PrimaryName : mapping.SecondaryName);
+                        item.FullDescription = mapping.Code + " - " + (lang == "en" ? mapping.PrimaryName : mapping.SecondaryName);
                     }
 
                 }
 
-                
-      
+
+
             }
 
 
             return View(PrintInternalDTO);
         }
+
+
+
+
+
+
+
+
+
+
+
+        #region Petty Cash Methods
+
+        [HttpGet]
+        public async Task<JsonResult> GetPettyCashRequests()
+        {
+            try
+            {
+                // Add null check for UserId
+                if (UserId <= 0)
+                {
+                    _logger.LogWarning("GetPettyCashRequests called with invalid UserId: {UserId}", UserId);
+                    return Json(new List<object>());
+                }
+
+                var approvedRequestNo = await _accountingApiClient.PettyCashRequest_GetApproved(UserId);
+                var result = new List<object>();
+
+                if (approvedRequestNo > 0)
+                {
+                    var request = await _accountingApiClient.PettyCashRequest_GetById((int)approvedRequestNo);
+                    if (request != null)
+                    {
+                        result.Add(new
+                        {
+                            requestNo = request.RequestNo,
+                            reasonForRequest = request.Description ?? "Petty Cash Request",
+                            requestAmount = request.RequestAmount
+                        });
+                    }
+                }
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting petty cash requests for user {UserId}", UserId);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetExpenseTypes()
+        {
+            try
+            {
+                var expenseTypes = await _accountingApiClient.ExpenseType_Get(CompanyId);
+                var result = expenseTypes.Select(e => new
+                {
+                    id = e.Id,
+                    primaryName = e.PrimaryName,
+                    secondaryName = e.SecondaryName
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting expense types for company {CompanyId}", CompanyId);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetPettyCashSellers()
+        {
+            try
+            {
+                var sellers = await _accountingApiClient.PettyCashSeller_Get(CompanyId);
+                var result = sellers.Select(s => new
+                {
+                    id = s.Id,
+                    primaryName = s.PrimaryName,
+                    secondaryName = s.SecondaryName,
+                    taxNumber = s.TaxNumber
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting petty cash sellers for company {CompanyId}", CompanyId);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetCurrencies()
+        {
+            try
+            {
+                var currencies = await _erpApiClient.GetCurrecy(CompanyId, BranchId, lang);
+                var result = currencies.Select(c => new
+                {
+                    currencyId = c.CurrencyID,
+                    currencyCode = c.CurrencyCode,
+                    currencyName = lang == "en" ? c.CurrencyPrimaryName : c.CurrencySecondlyName
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting currencies for company {CompanyId}", CompanyId);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetTaxClassifications()
+        {
+            try
+            {
+                var taxClassifications = await _accountingApiClient.GetTaxClassificationListByCompanyIdAndBranchId(CompanyId, BranchId, lang);
+                var result = taxClassifications.Select(t => new
+                {
+                    taxClassificationNo = t.TaxClassificationNo,
+                    name = t.Name,
+                    taxRate = t.TaxRate
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting tax classifications for company {CompanyId}", CompanyId);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetRequestBalance(long requestNo)
+        {
+            try
+            {
+                var balance = await _accountingApiClient.PettyCashExpenses_UserBalanceByRequest(requestNo);
+                return Json(balance);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting request balance for request {RequestNo}", requestNo);
+                return Json(0);
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetExpenseTypesByRequest(long requestNo)
+        {
+            try
+            {
+                // This method might need to be implemented in the API if it doesn't exist
+                // For now, return all expense types
+                var expenseTypes = await _accountingApiClient.ExpenseType_Get(CompanyId);
+                var result = expenseTypes.Select(e => new
+                {
+                    id = e.Id,
+                    primaryName = e.PrimaryName,
+                    secondaryName = e.SecondaryName
+                }).ToList();
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting expense types by request {RequestNo}", requestNo);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetTypeOfExpenseByExpenseType(int expenseTypeId)
+        {
+            try
+            {
+                var expenseTypes = await _accountingApiClient.ExpenseType_Get(CompanyId);
+                var selectedExpenseType = expenseTypes.FirstOrDefault(x => x.Id == expenseTypeId);
+
+                if (selectedExpenseType == null)
+                {
+                    return Json(new List<object>());
+                }
+
+                // Return the related type of expense
+                var result = new List<object>
+        {
+            new
+            {
+                id = selectedExpenseType.FK_TypeOfExpenseId,
+                primaryName = selectedExpenseType.oLKP_TypeOfExpense?.FirstOrDefault()?.PrimaryName ?? "General Expense",
+                secondaryName = selectedExpenseType.oLKP_TypeOfExpense?.FirstOrDefault()?.SecondaryName ?? "مصروف عام"
+            }
+        };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting type of expense by expense type {ExpenseTypeId}", expenseTypeId);
+                return Json(new List<object>());
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreatePettyCashSeller([FromBody] CreatePettyCashSellerDTO model)
+        {
+            try
+            {
+                // Validate seller info first
+                var isValid = await _accountingApiClient.PettyCashSeller_IsValidInfo(
+                    0, model.PrimaryName, model.SecondaryName, model.TaxNumber);
+
+                if (!isValid)
+                {
+                    return Json(new { success = false, message = "Seller with this information already exists" });
+                }
+
+                var pettyCashSeller = new PettyCashSeller
+                {
+                    PrimaryName = model.PrimaryName,
+                    SecondaryName = model.SecondaryName,
+                    TaxNumber = model.TaxNumber,
+                    CompanyId = CompanyId,
+                    CreatedBy = UserId,
+                    ModifiedBy = UserId
+                };
+
+                var sellerId = await _accountingApiClient.PettyCashSeller_Insert(pettyCashSeller);
+
+                if (sellerId > 0)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        sellerId = sellerId,
+                        sellerName = model.PrimaryName
+                    });
+                }
+
+                return Json(new { success = false, message = "Failed to create seller" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating petty cash seller");
+                return Json(new { success = false, message = "An error occurred while creating seller" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TransferMoveInPettyCash(
+            [FromForm] PettyCashVehicleMovementDTO model,
+            [FromForm] IFormFile PettyCash_Files)
+        {
+            var resultJson = new TempData();
+
+            try
+            {
+                // Get the original movement to access ExitMeter
+                var originalMovement = await _apiClient.GetVehicleMovementByIdAsync(model.MovementId.Value);
+
+                // Validate the petty cash request balance
+                var availableBalance = await _accountingApiClient.PettyCashExpenses_UserBalanceByRequest(model.PettyCash_RequestNo);
+                if (model.PettyCash_NetAmount > availableBalance)
+                {
+                    resultJson.IsSuccess = false;
+                    resultJson.Message = "Net amount exceeds available balance";
+                    return Json(resultJson);
+                }
+
+                // Validate invoice number uniqueness
+                var isValidInvoice = await _accountingApiClient.PettyCashExpenses_IsValidInvoiceNo(
+                    0, model.PettyCash_SellerId, model.PettyCash_InvoiceNo);
+
+                if (!isValidInvoice)
+                {
+                    resultJson.IsSuccess = false;
+                    resultJson.Message = "Invoice number already exists for this seller";
+                    return Json(resultJson);
+                }
+
+                var vehicleMovement = originalMovement;
+
+                vehicleMovement.GregorianMovementEndDate = model.PettyCash_MovementDate;
+                vehicleMovement.ReceivedTime = model.PettyCash_ReceivedTime;
+                vehicleMovement.ReceivedMeter = model.PettyCash_ReceivedMeter;
+                vehicleMovement.FuelLevelId = model.PettyCash_FuelLevelId;
+                vehicleMovement.ReceivedDriverId = model.PettyCash_DriverName;
+                vehicleMovement.TotalWorkOrder = model.PettyCash_NetAmount;
+                vehicleMovement.Vat = model.PettyCash_Tax;
+                vehicleMovement.VatRate = (await _accountingApiClient.GetTaxClassificationById(model.PettyCash_TaxClassificationId))?.TaxRate;
+
+                vehicleMovement.CompanyId = CompanyId;
+                vehicleMovement.CreatedBy = UserId;
+                vehicleMovement.MovementIN = true;
+                vehicleMovement.MovementInId = null;
+                vehicleMovement.MovementOut = null;
+                vehicleMovement.MovementOutId = model.MovementId;
+                vehicleMovement.WorkshopId = BranchId;
+                vehicleMovement.Status = 1;
+                vehicleMovement.IsExternal = true;
+                
+
+                // Check vehicle movement status
+                var vehicleMovementStatus = await _apiClient.CheckVehicleMovementStatusAsync(vehicleMovement.VehicleID.Value);
+                if (vehicleMovement.GregorianMovementDate.Value.Date.Add(vehicleMovement.ReceivedTime.Value) < vehicleMovementStatus.lastmovemnetDate)
+                {
+                    resultJson.IsSuccess = false;
+                    resultJson.Message = "Cannot make In before last movement in " + vehicleMovementStatus.lastmovemnetDate;
+                    return Json(resultJson);
+                }
+
+                // Insert vehicle movement (now with same data structure as TransferMoveIn)
+                var movements = await _apiClient.InsertVehicleMovementAsync(vehicleMovement);
+
+                // Handle file upload to accounting module directory
+                string filePath = null, fileName = null;
+                if (PettyCash_Files != null)
+                {
+                    var validationResult = _fileValidationService.CheckFileTypeAndSize(PettyCash_Files);
+                    if (validationResult.IsSuccess)
+                    {
+                        if (PettyCash_Files.FileName != "blob")
+                        {
+                            string guid = Guid.NewGuid().ToString();
+                            var accountingDirectoryPath = _configuration["FileUpload:DirectoryAccountingPath"];
+                            var path1 = Path.Combine(accountingDirectoryPath, "TransFiles", guid);
+
+                            if (!Directory.Exists(path1))
+                            {
+                                Directory.CreateDirectory(path1);
+                            }
+
+                            var filename = DateTime.Now.Ticks.ToString();
+                            var extension = Path.GetExtension(PettyCash_Files.FileName);
+                            var fullFileName = filename + extension;
+
+                            var fullPath = Path.Combine(path1, fullFileName);
+
+                            // Save the file to accounting module directory
+                            using (var stream = new FileStream(fullPath, FileMode.Create))
+                            {
+                                await PettyCash_Files.CopyToAsync(stream);
+                            }
+
+                            filePath = guid; // Store the GUID as the path reference
+                            fileName = fullFileName;
+                        }
+                    }
+                    else
+                    {
+                        resultJson.IsSuccess = false;
+                        resultJson.Message = validationResult.Message;
+                        return Json(resultJson);
+                    }
+                }
+
+                var VehicleDetails = await _vehicleApiClient.GetVehicleDetails((int)model.VehicleID, lang);
+
+                var accountDefinition = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
+                // Create petty cash expense
+                var pettyCashExpense = new PettyCashExpenses
+                {
+                    RequestNo = model.PettyCash_RequestNo,
+                    FK_TypeOfExpense = 1, // Direct
+                    FK_ExpenseType = accountDefinition.PettyCashExpenseTypeId,
+                    FK_EmployeeId = UserId,
+                    InvoiceNumber = model.PettyCash_InvoiceNo,
+                    InvoiceDate = model.PettyCash_InvoiceDate,
+                    FK_CurrencyId = model.PettyCash_CurrencyId,
+                    FK_SellerId = model.PettyCash_SellerId,
+                    NetAmount = model.PettyCash_NetAmount,
+                    Tax = model.PettyCash_Tax,
+                    TotalAmount = model.PettyCash_TotalAmount,
+                    Description = model.PettyCash_Description,
+                    FK_VehicleId = VehicleDetails.FixedAsset_DimensionsId ?? 0,
+                    LastKM = (int)originalMovement.ExitMeter, // Use ExitMeter from original movement
+                    KM = (int)model.PettyCash_ReceivedMeter, // Use ReceivedMeter as LastKM
+                    CreatedBy = UserId,
+                    FileName = fileName,
+                    FilePath = filePath,
+                    CompanyId = CompanyId,
+                    BranchId = BranchId,
+                    TaxClassificationId = model.PettyCash_TaxClassificationId
+                };
+
+                var expenseId = await _accountingApiClient.PettyCashExpenses_Insert(pettyCashExpense);
+
+                // Update services if any are marked as fixed
+                if (!string.IsNullOrWhiteSpace(model.PettyCash_FixedServiceIds))
+                {
+                    await _apiClient.UpdateWIPServicesIsFixedAsync(model.PettyCash_FixedServiceIds);
+                }
+
+                resultJson.IsSuccess = true;
+                resultJson.Type = "success";
+                resultJson.Message = $"Petty cash expense created successfully. Expense ID: {expenseId}";
+                return Json(resultJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating petty cash expense");
+                resultJson.IsSuccess = false;
+                resultJson.Type = "error";
+                resultJson.Message = "An error occurred while processing the petty cash expense";
+                return Json(resultJson);
+            }
+        }
+
+        #endregion
     }
 }

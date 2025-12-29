@@ -9,328 +9,872 @@
 @{
     var lang = "en";
 }
-@using (Html.BeginForm("TransferMoveIn", "WorkshopMovement", FormMethod.Post, new { enctype = "multipart/form-data", id = "TransferMovementIn" }))
-{
-    @Html.HiddenFor(a => a.MovementId)
-    @Html.HiddenFor(a => a.VehicleID)
-    @Html.HiddenFor(a => a.MoveInWorkshopId)
-    @Html.HiddenFor(a => a.MoveOutWorkshopId)
-    @Html.HiddenFor(a => a.WorkshopId)
-    @Html.HiddenFor(a => a.ExitMeter)
-    @Html.HiddenFor(a => a.MasterId)
-    @Html.HiddenFor(a => a.ExitDriverId)
-    @Html.HiddenFor(a => a.LastVehicleStatus)
-    @Html.HiddenFor(a => a.VatRate)
-    @Html.HiddenFor(a => a.WorkOrderId)
-    @Html.Hidden("FixedServiceIds", "", new { id = "FixedServiceIds" })
-    <div class="row">
-        <div class="col-6">
-            <div class="form-group">
-                <label class="">@Common["Movement Date"]</label>
-                <div class=" input-group" id="">
-                    @Html.EditorFor(model => model.GregorianMovementDate, new { htmlAttributes = new { @class = "form-control flat-picker" } })
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="form-group">
-                <label class="">@Common["Received Time"]</label>
-                @Html.EditorFor(model => model.ReceivedTime, new { htmlAttributes = new { @type = "time", @class = "form-control" } })
-            </div>
-        </div>
 
-        <div class="col-6">
-
-            <div class="form-group">
-                <label class=" ">@Common["Received Meter"]</label>
-                <input type="number"
-                       class="form-control"
-                       id="ReceivedMeter"
-                       name="ReceivedMeter"
-                       @(Model.isPart ? "disabled='disabled'" : "") />
-            </div>
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons" id="invoiceTypeToggle">
+            <label class="btn btn-outline-primary btn-lg active" style="width: 50%">
+                <input type="radio" name="invoiceType" id="creditInvoice" value="credit" checked> 
+                Credit Invoice
+            </label>
+            <label class="btn btn-outline-success btn-lg" style="width: 50%">
+                <input type="radio" name="invoiceType" id="pettyCashInvoice" value="pettycash"> 
+                Petty Cash Invoice
+            </label>
         </div>
-        <div class="col-lg-6">
-
-            <div class="form-group">
-                <label class="">@Common["Fuel Level"]</label>
-                @Html.DropDownListFor(model => model.FuelLevelId,
-                new SelectList(Model.fuelLevels, "Id", "FuleLevelPrimaryName"),
-                        @Common["Select"],
-                        Model.isPart
-                        ? new { @class = "form-control select2", @id = "OutfuelLevelId", disabled = "disabled" }
-                        : new { @class = "form-control select2", @id = "OutfuelLevelId" })
-        </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="form-group">
-                <label class="font-normal ">@Common["Driver"]</label>
-                <input type="text" id="ExitDriverName" name="ResivedDriver" class="form-control" @(Model.isPart ? "disabled='disabled'" : "")>
-            </div>
-        </div>
-        @* @{var claim = Model.Dameges.Find(p => p.Id == Model.ColMaintenanceCard[0].DamageId); *@
-        @*     var claimType = claim != null ? claim.ClaimType : 0; *@
-        @*     var insurance = claim != null ? claim.FullInsuranceStatus : 0; *@
-        @* } *@
-        @* <input type="hidden" id="claimType" value="@(claimType)" /> *@
-        @* @if (claimType == 2 || (claimType == 1 && insurance == 2)) *@
-        @* { *@
-        @*     <div class="col-6"> *@
-
-        @*         <div class="form-group"> *@
-        @*             <label class=" ">@Common["DeductibleAmount"]</label> *@
-        @*             @Html.TextBoxFor(a => a.DeductibleAmount, htmlAttributes: new { @class = "form-control " }) *@
-        @*         </div> *@
-        @*     </div> *@
-        @*     <div class="col-6"> *@
-
-        @*         <div class="form-group"> *@
-        @*             <label class=" ">@Common["ConsumptionValueOfSpareParts"]</label> *@
-        @*             @Html.TextBoxFor(a => a.ConsumptionValueOfSpareParts, htmlAttributes: new { @class = "form-control " }) *@
-        @*         </div> *@
-        @*     </div> *@
-        @* } *@
-
-        <div class="col-6">
-            <div class="form-group">
-                <label class=" ">@Common["Parts Cost"]</label>
-                @Html.TextBoxFor(a => a.PartsCost, htmlAttributes: new { @class = "form-control ", @type = "number", @onchange = "ChangeVat()" })
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group">
-                <label class=" ">@Common["Labor Cost"]</label>
-                @Html.TextBoxFor(a => a.LaborCost, htmlAttributes: new { @class = "form-control ", @type = "number", @onchange = "ChangeVat()" })
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="form-group">
-                <label class=" ">@Common["Vat"]</label>
-                @Html.TextBoxFor(a => a.Vat, htmlAttributes: new { @class = "form-control ", @type = "number", @readonly = "readonly" })
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="form-group">
-                <label class=" ">@Common["Total Invoice"]</label>
-                @Html.TextBoxFor(a => a.TotalWorkOrder, htmlAttributes: new { @class = "form-control ", @type = "number", @readonly = "readonly" })
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="form-group">
-                <label class=" ">@Common["Invoice Type"]</label>
-
-                @Html.DropDownListFor(model => model.InvoiceTypeId, new SelectList(Model.InvoiceType ?? new List<TypeSalesPurchases>(), "Id", lang == "en" ? "PrimaryName" : "SecondaryName"), Common["Select"], new { @class = "form-control select2" })
-
-                @Html.ValidationMessageFor(m => m.InvoiceTypeId, "", new { @class = "text-danger " })
-            </div>
-        </div>
-        <div class="col-6">
-
-            <div class="form-group">
-                <label class=" ">@Common["Invoice No"]</label>
-                @Html.TextBoxFor(a => a.InvoceNo, htmlAttributes: new { @class = "form-control " })
-            </div>
-        </div>
-        <div class="col-6 my-5">
-            <div class="form-group">
-                <div class="form-check form-switch">
-                    @Html.CheckBoxFor(model => model.NotTaxable, new { @class = "form-check-input", id = "NotTaxable" })
-                    <label class="form-check-label" for="NotTaxable">Not Taxable</label>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="form-group form-check mt-3">
-                <input type="checkbox"
-                       class="form-check-input"
-                       id="IsPart"
-                       @(Model.isPart ? "checked" : "")
-                       disabled />
-
-                <label class="form-check-label" for="IsPart">
-                    @Common["Is Part"]
-                </label>
-            </div>
-        </div>
-
     </div>
+</div>
 
-    <div class="row mt-2">
-        <div class="col-12">
-            <div id="panel-1" class="panel">
-                <div class="panel-container show">
-                    <div class="panel-content">
-                        <div class="row">
-                            <div id="MaintenanceCard" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <table class="table table-bordered table-hover w-100 text-center" id="tblMainteneance">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                @Common["Service"]
-                                            </th>
+<!-- Credit Invoice Form (Original Content) -->
+<div id="creditInvoiceForm">
+    @using (Html.BeginForm("TransferMoveIn", "WorkshopMovement", FormMethod.Post, new { enctype = "multipart/form-data", id = "TransferMovementIn" }))
+    {
+        @Html.HiddenFor(a => a.MovementId)
+        @Html.HiddenFor(a => a.VehicleID)
+        @Html.HiddenFor(a => a.MoveInWorkshopId)
+        @Html.HiddenFor(a => a.MoveOutWorkshopId)
+        @Html.HiddenFor(a => a.WorkshopId)
+        @Html.HiddenFor(a => a.ExitMeter)
+        @Html.HiddenFor(a => a.MasterId)
+        @Html.HiddenFor(a => a.ExitDriverId)
+        @Html.HiddenFor(a => a.LastVehicleStatus)
+        @Html.HiddenFor(a => a.VatRate)
+        @Html.HiddenFor(a => a.WorkOrderId)
+        @Html.Hidden("FixedServiceIds", "", new { id = "FixedServiceIds" })
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Movement Date"]</label>
+                    <div class=" input-group" id="">
+                        @Html.EditorFor(model => model.GregorianMovementDate, new { htmlAttributes = new { @class = "form-control flat-picker" } })
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Received Time"]</label>
+                    @Html.EditorFor(model => model.ReceivedTime, new { htmlAttributes = new { @type = "time", @class = "form-control" } })
+                </div>
+            </div>
 
-                                            <th>
-                                                @Common["Description"]
-                                            </th>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Received Meter"]</label>
+                    <input type="number"
+                           class="form-control"
+                           id="ReceivedMeter"
+                           name="ReceivedMeter"
+                           @(Model.isPart ? "disabled='disabled'" : "") />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="">@Common["Fuel Level"]</label>
+                    @Html.DropDownListFor(model => model.FuelLevelId,
+                    new SelectList(Model.fuelLevels, "Id", "FuleLevelPrimaryName"),
+                            @Common["Select"],
+                            Model.isPart
+                            ? new { @class = "form-control select2", @id = "OutfuelLevelId", disabled = "disabled" }
+                            : new { @class = "form-control select2", @id = "OutfuelLevelId" })
+            </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="font-normal ">@Common["Driver"]</label>
+                    <input type="text" id="ExitDriverName" name="ResivedDriver" class="form-control" @(Model.isPart ? "disabled='disabled'" : "")>
+                </div>
+            </div>
 
-                                            <th>
-                                                @Common["Status"]
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tblData">
-                                        @foreach (var item in Model.WIPServices)
-                                        {
-                                            if (item.Id > 0)
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Parts Cost"]</label>
+                    @Html.TextBoxFor(a => a.PartsCost, htmlAttributes: new { @class = "form-control ", @type = "number", @onchange = "ChangeVat()" })
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Labor Cost"]</label>
+                    @Html.TextBoxFor(a => a.LaborCost, htmlAttributes: new { @class = "form-control ", @type = "number", @onchange = "ChangeVat()" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Vat"]</label>
+                    @Html.TextBoxFor(a => a.Vat, htmlAttributes: new { @class = "form-control ", @type = "number", @readonly = "readonly" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Total Invoice"]</label>
+                    @Html.TextBoxFor(a => a.TotalWorkOrder, htmlAttributes: new { @class = "form-control ", @type = "number", @readonly = "readonly" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Invoice Type"]</label>
+                    @Html.DropDownListFor(model => model.InvoiceTypeId, new SelectList(Model.InvoiceType ?? new List<TypeSalesPurchases>(), "Id", lang == "en" ? "PrimaryName" : "SecondaryName"), Common["Select"], new { @class = "form-control select2" })
+                    @Html.ValidationMessageFor(m => m.InvoiceTypeId, "", new { @class = "text-danger " })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class=" ">@Common["Invoice No"]</label>
+                    @Html.TextBoxFor(a => a.InvoceNo, htmlAttributes: new { @class = "form-control " })
+                </div>
+            </div>
+            <div class="col-6 my-5">
+                <div class="form-group">
+                    <div class="form-check form-switch">
+                        @Html.CheckBoxFor(model => model.NotTaxable, new { @class = "form-check-input", id = "NotTaxable" })
+                        <label class="form-check-label" for="NotTaxable">Not Taxable</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group form-check mt-3">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           id="IsPart"
+                           @(Model.isPart ? "checked" : "")
+                           disabled />
+                    <label class="form-check-label" for="IsPart">
+                        @Common["Is Part"]
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <div id="panel-1" class="panel">
+                    <div class="panel-container show">
+                        <div class="panel-content">
+                            <div class="row">
+                                <div id="MaintenanceCard" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <table class="table table-bordered table-hover w-100 text-center" id="tblMainteneance">
+                                        <thead>
+                                            <tr>
+                                                <th>@Common["Service"]</th>
+                                                <th>@Common["Description"]</th>
+                                                <th>@Common["Status"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblData">
+                                            @foreach (var item in Model.WIPServices)
                                             {
-                                                <tr>
-                                                    <td>
-                                                        <input type="hidden" class="service-id" value="@item.Id" />
-                                                        <label class="text-info mt-0">@item.Code</label>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" readonly class="form-control" value="@item.Description">
-                                                    </td>
-                                                    <td>
-                                                        <div class="custom-control custom-switch custom-control-inline my-1">
-                                                            <input type="checkbox" class="custom-control-input service-checkbox"
-                                                                   data-service-id="@item.Id" />
-                                                            <label class="custom-control-label align-middle">@Common["IsFix"]</label>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                if (item.Id > 0)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input type="hidden" class="service-id" value="@item.Id" />
+                                                            <label class="text-info mt-0">@item.Code</label>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" readonly class="form-control" value="@item.Description">
+                                                        </td>
+                                                        <td>
+                                                            <div class="custom-control custom-switch custom-control-inline my-1">
+                                                                <input type="checkbox" class="custom-control-input service-checkbox"
+                                                                       data-service-id="@item.Id" />
+                                                                <label class="custom-control-label align-middle">@Common["IsFix"]</label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
                                             }
-                                        }
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    @* <div class="row"> *@
-    @*     <div class="col-12"> *@
-    @*         <form role="form"> *@
-    @*             <div class="form-group"> *@
-    @*                 <label class=" ">@Common["Upload"]</label> *@
-    @*                 <input type="file" name="Invoice" id="Invoicefile" /> *@
-    @*             </div> *@
-    @*         </form> *@
-    @*     </div> *@
-    @* </div> *@
 
-    <div class="text-center mt-4">
-        <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+        <div class="text-center mt-4">
+            <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+        </div>
+    }
+</div>
+
+<!-- Petty Cash Invoice Form -->
+<div id="pettyCashInvoiceForm" style="display: none;">
+    @using (Html.BeginForm("TransferMoveInPettyCash", "WIP", FormMethod.Post, new { enctype = "multipart/form-data", id = "PettyCashInvoiceForm" }))
+    {
+        @Html.HiddenFor(a => a.MovementId, new { id = "PettyCash_MovementId" })
+        @Html.HiddenFor(a => a.VehicleID, new { id = "PettyCash_VehicleID" })
+        @Html.HiddenFor(a => a.MoveInWorkshopId, new { id = "PettyCash_MoveInWorkshopId" })
+        @Html.HiddenFor(a => a.MoveOutWorkshopId, new { id = "PettyCash_MoveOutWorkshopId" })
+        @Html.HiddenFor(a => a.WorkshopId, new { id = "PettyCash_WorkshopId" })
+        @Html.HiddenFor(a => a.ExitMeter, new { id = "PettyCash_ExitMeter" })
+        @Html.HiddenFor(a => a.MasterId, new { id = "PettyCash_MasterId" })
+        @Html.HiddenFor(a => a.ExitDriverId, new { id = "PettyCash_ExitDriverId" })
+        @Html.HiddenFor(a => a.LastVehicleStatus, new { id = "PettyCash_LastVehicleStatus" })
+        @Html.HiddenFor(a => a.WorkOrderId, new { id = "PettyCash_WorkOrderId" })
+        @Html.Hidden("PettyCash_FixedServiceIds", "", new { id = "PettyCash_FixedServiceIds" })
+
+        <div class="row">
+            <!-- Movement Details -->
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Movement Date"] <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="date" class="form-control flat-picker" id="PettyCash_MovementDate" name="PettyCash_MovementDate" value="@Model.GregorianMovementDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Received Time"] <span class="text-danger">*</span></label>
+                    <input type="time" class="form-control" id="PettyCash_ReceivedTime" name="PettyCash_ReceivedTime" value="@Model.ReceivedTime?.ToString(@"hh\:mm")" />
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Received Meter"]</label>
+                    <input type="number" class="form-control" id="PettyCash_ReceivedMeter" name="PettyCash_ReceivedMeter" @(Model.isPart ? "disabled='disabled'" : "") />
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Fuel Level"]</label>
+                    @Html.DropDownList("PettyCash_FuelLevelId", new SelectList(Model.fuelLevels, "Id", "FuleLevelPrimaryName"), @Common["Select"], new { @class = "form-control select2", id = "PettyCash_FuelLevelId" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="">@Common["Driver"]</label>
+                    <input type="text" id="PettyCash_DriverName" name="PettyCash_DriverName" class="form-control" @(Model.isPart ? "disabled='disabled'" : "") />
+                </div>
+            </div>
+
+            <!-- Petty Cash Expense Fields -->
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Request No <span class="text-danger">*</span></label>
+                    <select id="PettyCash_RequestNo" name="PettyCash_RequestNo" class="form-control select2" required>
+                        <option value="">@Common["Select"]</option>
+                    </select>
+                    <div class="text-right mt-1">
+                        <small class="text-muted">Balance: <span id="PettyCash_UserBalance" class="text-success font-weight-bold">0.00</span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Expense Type <span class="text-danger">*</span></label>
+                    <select id="PettyCash_ExpenseType" name="PettyCash_ExpenseType" class="form-control select2" required>
+                        <option value="">@Common["Select"]</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Type of Expense <span class="text-danger">*</span></label>
+                    <select id="PettyCash_TypeOfExpense" name="PettyCash_TypeOfExpense" class="form-control select2" required>
+                        <option value="">@Common["Select"]</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Seller Name <span class="text-danger">*</span></label>
+                    <select id="PettyCash_SellerId" name="PettyCash_SellerId" class="form-control select2" required>
+                        <option value="">@Common["Select"]</option>
+                        <option value="-1" style="color:#1ab394; font-weight: 600;">+ Create New Seller</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Invoice No <span class="text-danger">*</span></label>
+                    <input type="text" id="PettyCash_InvoiceNo" name="PettyCash_InvoiceNo" class="form-control" placeholder="@Common["Invoice No"]" required />
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Invoice Date <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" id="PettyCash_InvoiceDate" name="PettyCash_InvoiceDate" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Currency <span class="text-danger">*</span></label>
+                    <select id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" class="form-control select2" required>
+                        <option value="">@Common["Select"]</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Net Amount <span class="text-danger">*</span></label>
+                    <input type="number" id="PettyCash_NetAmount" name="PettyCash_NetAmount" class="form-control" step="0.01" min="0.01" required />
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Tax Classification <span class="text-danger">*</span></label>
+                    <select id="PettyCash_TaxClassificationId" name="PettyCash_TaxClassificationId" class="form-control select2" required>
+                        <option value="">@Common["Select"]</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Tax Amount</label>
+                    <input type="number" id="PettyCash_Tax" name="PettyCash_Tax" class="form-control" step="0.01" readonly />
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Total Amount</label>
+                    <input type="number" id="PettyCash_TotalAmount" name="PettyCash_TotalAmount" class="form-control" step="0.01" readonly />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Description <span class="text-danger">*</span></label>
+                    <textarea id="PettyCash_Description" name="PettyCash_Description" class="form-control" rows="3" required></textarea>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Upload Invoice <span class="text-warning"> (pdf, png, jpeg allowed)</span></label>
+                    <input type="file" id="PettyCash_Files" name="PettyCash_Files" class="form-control" accept=".pdf,.png,.jpg,.jpeg" />
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="form-group form-check mt-3">
+                    <input type="checkbox" class="form-check-input" id="PettyCash_IsPart" @(Model.isPart ? "checked" : "") disabled />
+                    <label class="form-check-label" for="PettyCash_IsPart">@Common["Is Part"]</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Table for Petty Cash -->
+        <div class="row mt-2">
+            <div class="col-12">
+                <div id="panel-2" class="panel">
+                    <div class="panel-container show">
+                        <div class="panel-content">
+                            <div class="row">
+                                <div id="PettyCashMaintenanceCard" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <table class="table table-bordered table-hover w-100 text-center" id="tblPettyCashMaintenance">
+                                        <thead>
+                                            <tr>
+                                                <th>@Common["Service"]</th>
+                                                <th>@Common["Description"]</th>
+                                                <th>@Common["Status"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblPettyCashData">
+                                            @foreach (var item in Model.WIPServices)
+                                            {
+                                                if (item.Id > 0)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input type="hidden" class="pettycash-service-id" value="@item.Id" />
+                                                            <label class="text-info mt-0">@item.Code</label>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" readonly class="form-control" value="@item.Description">
+                                                        </td>
+                                                        <td>
+                                                            <div class="custom-control custom-switch custom-control-inline my-1">
+                                                                <input type="checkbox" class="custom-control-input pettycash-service-checkbox"
+                                                                       data-service-id="@item.Id" id="pettycash_service_@item.Id" />
+                                                                <label class="custom-control-label align-middle" for="pettycash_service_@item.Id">@Common["IsFix"]</label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="button" id="btnCreatePettyCash" onclick="ValidPettyCashOut();" class="btn btn-success">
+                <i class="fa fa-save"></i>&nbsp;Save Petty Cash Invoice
+            </button>
+        </div>
+    }
+</div>
+
+<!-- Add Seller Modal -->
+<div id="AddSellerModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Seller</h5>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="SellerPrimaryName">Name (English) <span class="text-danger">*</span></label>
+                    <input id="SellerPrimaryName" type="text" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="SellerSecondaryName">Name (Arabic) <span class="text-danger">*</span></label>
+                    <input id="SellerSecondaryName" type="text" class="form-control" dir="rtl" required />
+                </div>
+                <div class="form-group">
+                    <label for="SellerTaxNumber">Tax Number</label>
+                    <input id="SellerTaxNumber" type="text" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="AddSeller()" class="btn btn-primary">
+                    <i class="fa fa-save"></i>&nbsp;Save
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="$('#AddSellerModal').modal('hide'); $('#PettyCash_SellerId').val('');">
+                    <i class="fa fa-times"></i>&nbsp;Cancel
+                </button>
+            </div>
+        </div>
     </div>
-}
+</div>
 
 <script src="~/js/site.js"></script>
 <script>
     var cuspond;
     var validPhoto = true;
-    $(document).ready(function () {
 
+    // Move setDefaultExpenseType to global scope
+    function setDefaultExpenseType() {
+        @if (ViewBag.AccountDefinition != null)
+        {
+            <text>
+            var defaultExpenseTypeId = @(ViewBag.AccountDefinition.PettyCashExpenseTypeId);
+            if (defaultExpenseTypeId && defaultExpenseTypeId > 0) {
+                $('#PettyCash_ExpenseType').val(defaultExpenseTypeId).trigger('change');
+                // Make the field readonly since it should always be this value
+                $('#PettyCash_ExpenseType').prop('disabled', true);
+                // Make the field readonly too since it should always be this value
+                $('#PettyCash_TypeOfExpense').prop('disabled', true);
+            }
+            </text>
+        }
+    }
+
+    $(document).ready(function () {
+        // Initialize FilePond for original form
         var inputElement = document.querySelector('#Invoicefile');
-        // Create the FilePond instance
-        cuspond = FilePond.create(inputElement, {
-            imageCropAspectRatio: '1:1',
-            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/PNG', 'application/pdf'],
-            maxFileSize: fileSizeAllowed + fileSizeUnit,
-            fileMetadataObject: {
-                'markup': [
-                    [
-                        'rect', {
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            height: '60px',
-                            backgroundColor: 'rgba(0,0,0,.5)',
-                        },
+        if (inputElement) {
+            cuspond = FilePond.create(inputElement, {
+                imageCropAspectRatio: '1:1',
+                acceptedFileTypes: ['image/png', 'image/jpeg', 'image/PNG', 'application/pdf'],
+                maxFileSize: fileSizeAllowed + fileSizeUnit,
+                fileMetadataObject: {
+                    'markup': [
+                        [
+                            'rect', {
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                height: '60px',
+                                backgroundColor: 'rgba(0,0,0,.5)',
+                            },
+                        ]
                     ]
-                ]
-            },
-            allowMultiple: true,
-            maxFiles: 5,
-            onprocessfile: (files) => { isLoadingCheck(); },
-            onaddfile: (file) => { isLoadingCheck(); },
-            onremovefile: (file) => { isLoadingCheck(); }
+                },
+                allowMultiple: true,
+                maxFiles: 5,
+                onprocessfile: (files) => { isLoadingCheck(); },
+                onaddfile: (file) => { isLoadingCheck(); },
+                onremovefile: (file) => { isLoadingCheck(); }
+            });
+        }
+
+        // Handle invoice type toggle
+        $('input[name="invoiceType"]').change(function() {
+            if ($(this).val() === 'credit') {
+                $('#creditInvoiceForm').show();
+                $('#pettyCashInvoiceForm').hide();
+                $('#creditInvoice').parent().addClass('active');
+                $('#pettyCashInvoice').parent().removeClass('active');
+            } else {
+                $('#creditInvoiceForm').hide();
+                $('#pettyCashInvoiceForm').show();
+                $('#pettyCashInvoice').parent().addClass('active');
+                $('#creditInvoice').parent().removeClass('active');
+                loadPettyCashData();
+            }
         });
 
+        // Load Petty Cash dropdowns when switching to petty cash
+        function loadPettyCashData() {
+            // Load Request Numbers
+            loadPettyCashRequests();
+            // Load Expense Types  
+            loadExpenseTypes();
+            // Load Sellers
+            loadSellers();
+            // Load Currencies
+            loadCurrencies();
+            // Load Tax Classifications
+            loadTaxClassifications();
+            // Set default expense type from AccountDefinition
+            setDefaultExpenseType();
+        }
+
+        // Petty Cash Request change handler
+        $('#PettyCash_RequestNo').on('change', function () {
+            var requestId = $(this).val();
+            if (requestId) {
+                // Load balance
+                loadRequestBalance(requestId);
+                // Load expense types for this request
+                loadExpenseTypesByRequest(requestId);
+            } else {
+                $('#PettyCash_UserBalance').text('0.00');
+                $('#PettyCash_ExpenseType').empty().append('<option value="">Select</option>');
+            }
+        });
+
+        // Expense Type change handler
+        $('#PettyCash_ExpenseType').on('change', function () {
+            var expenseTypeId = $(this).val();
+            if (expenseTypeId) {
+                loadTypeOfExpenseByExpenseType(expenseTypeId);
+            } else {
+                $('#PettyCash_TypeOfExpense').empty().append('<option value="">Select</option>');
+            }
+        });
+
+        // Seller change handler
+        $('#PettyCash_SellerId').on('change', function () {
+            if ($(this).val() === '-1') {
+                $(this).val('');
+                showAddSellerModal();
+            }
+        });
+
+        // Tax calculation
+        $('#PettyCash_NetAmount, #PettyCash_TaxClassificationId').on('input change', function() {
+            calculatePettyCashTax();
+        });
+
+        // Set default invoice date
+        $('#PettyCash_InvoiceDate').val(new Date().toISOString().split('T')[0]);
     });
 
-    function ChangeVat() {
+    // Load functions for Petty Cash
+    function loadPettyCashRequests() {
+        $.ajax({
+            url: '@Url.Action("GetPettyCashRequests", "WIP")',
+            type: 'GET',
+            success: function (data) {
+                var $dropdown = $('#PettyCash_RequestNo');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.requestNo,
+                            text: item.requestNo + " | " + item.reasonForRequest
+                        }));
+                    });
+                }
+            }
+        });
+    }
 
+    // loadExpenseTypes
+    function loadExpenseTypes() {
+        $.ajax({
+            url: '@Url.Action("GetExpenseTypes", "WIP")',
+            type: 'GET',
+            success: function (data) {
+                var $dropdown = $('#PettyCash_ExpenseType');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.id,
+                            text: item.primaryName
+                        }));
+                    });
+                }
+                // Set default value after loading options
+                setDefaultExpenseType();
+            }
+        });
+    }
+
+    function loadSellers() {
+        $.ajax({
+            url: '@Url.Action("GetPettyCashSellers", "WIP")',
+            type: 'GET',
+            success: function (data) {
+                var $dropdown = $('#PettyCash_SellerId');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.id,
+                            text: item.primaryName
+                        }));
+                    });
+                }
+                $dropdown.append('<option value="-1" style="color:#1ab394; font-weight: 600;">+ Create New Seller</option>');
+            }
+        });
+    }
+
+    function loadCurrencies() {
+        $.ajax({
+            url: '@Url.Action("GetCurrencies", "WIP")',
+            type: 'GET',
+            success: function (data) {
+                var $dropdown = $('#PettyCash_CurrencyId');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.currencyId,
+                            text: item.currencyCode + " - " + item.currencyName
+                        }));
+                    });
+                    // Set default currency if available
+                    if (data.length === 1) {
+                        $dropdown.val(data[0].currencyId);
+                    }
+                }
+            }
+        });
+    }
+
+    function loadTaxClassifications() {
+        $.ajax({
+            url: '@Url.Action("GetTaxClassifications", "WIP")',
+            type: 'GET',
+            success: function (data) {
+                var $dropdown = $('#PettyCash_TaxClassificationId');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.taxClassificationNo,
+                            text: item.name,
+                            'data-rate': item.taxRate
+                        }));
+                    });
+                }
+            }
+        });
+    }
+
+    function loadRequestBalance(requestNo) {
+        $.ajax({
+            url: '@Url.Action("GetRequestBalance", "WIP")',
+            type: 'GET',
+            data: { requestNo: requestNo },
+            success: function (balance) {
+                $('#PettyCash_UserBalance').text(parseFloat(balance).toFixed(2));
+            }
+        });
+    }
+
+    function loadExpenseTypesByRequest(requestNo) {
+        $.ajax({
+            url: '@Url.Action("GetExpenseTypesByRequest", "WIP")',
+            type: 'GET',
+            data: { requestNo: requestNo },
+            success: function (data) {
+                var $dropdown = $('#PettyCash_ExpenseType');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.id,
+                            text: item.primaryName
+                        }));
+                    });
+                }
+                // Set default value after loading filtered options
+                setDefaultExpenseType();
+            }
+        });
+    }
+
+    function loadTypeOfExpenseByExpenseType(expenseTypeId) {
+        $.ajax({
+            url: '@Url.Action("GetTypeOfExpenseByExpenseType", "WIP")',
+            type: 'GET',
+            data: { expenseTypeId: expenseTypeId },
+            success: function (data) {
+                var $dropdown = $('#PettyCash_TypeOfExpense');
+                $dropdown.empty().append('<option value="">Select</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $dropdown.append($('<option>', {
+                            value: item.id,
+                            text: item.primaryName
+                        }));
+                    });
+                    if (data.length === 1) {
+                        $dropdown.val(data[0].id);
+                    }
+                }
+            }
+        });
+    }
+
+    function calculatePettyCashTax() {
+        var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
+        var selectedOption = $('#PettyCash_TaxClassificationId option:selected');
+        var taxRate = parseFloat(selectedOption.attr('data-rate')) || 0;
+
+        if (netAmount > 0 && taxRate > 0) {
+            // Since NetAmount is tax-inclusive, we need to calculate the tax portion
+            // Tax = NetAmount * (taxRate / (100 + taxRate))
+            var taxAmount = netAmount * (taxRate / (100 + taxRate));
+            // Total Amount (excluding tax) = NetAmount - TaxAmount
+            var totalAmount = netAmount - taxAmount;
+
+            $('#PettyCash_Tax').val(taxAmount.toFixed(2));
+            $('#PettyCash_TotalAmount').val(totalAmount.toFixed(2));
+        } else {
+            $('#PettyCash_Tax').val('0.00');
+            $('#PettyCash_TotalAmount').val(netAmount.toFixed(2));
+        }
+    }
+
+    function showAddSellerModal() {
+        $('#SellerPrimaryName').val('');
+        $('#SellerSecondaryName').val('');
+        $('#SellerTaxNumber').val('');
+        $('#AddSellerModal').modal('show');
+    }
+
+    function AddSeller() {
+        var primaryName = $('#SellerPrimaryName').val().trim();
+        var secondaryName = $('#SellerSecondaryName').val().trim();
+        var taxNumber = $('#SellerTaxNumber').val().trim();
+
+        if (!primaryName || !secondaryName) {
+            Swal.fire("Error", "Primary and Secondary names are required", "error");
+            return;
+        }
+
+        var model = {
+            PrimaryName: primaryName,
+            SecondaryName: secondaryName,
+            TaxNumber: taxNumber
+        };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreatePettyCashSeller", "WIP")',
+            data: JSON.stringify(model),
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                if (result.success) {
+                    Swal.fire("Success", "Seller created successfully: " + result.sellerName, "success");
+                    $('#AddSellerModal').modal('hide');
+                    // Add new seller to dropdown
+                    var newOption = '<option value="' + result.sellerId + '" selected>' + result.sellerName + '</option>';
+                    $('#PettyCash_SellerId option[value="-1"]').before(newOption);
+                    $('#PettyCash_SellerId').val(result.sellerId);
+                } else {
+                    Swal.fire("Error", result.message, "error");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "Unexpected error creating seller", "error");
+            }
+        });
+    }
+
+    // Original Credit Invoice functions
+    function ChangeVat() {
         var LaborCost = $('#LaborCost').val();
         var PartsCost = $('#PartsCost').val();
-
-        /*var VatRate = $('#VatRate').val();*/
         var isNotTaxable = $('#NotTaxable').is(':checked');
         var VatRate = isNotTaxable ? 0 : parseFloat($('#VatRate').val()) || 0;
 
         var VatValue = (parseFloat(LaborCost) + parseFloat(PartsCost)) * (parseFloat(VatRate) / 100);
-       // var VatValue = ( parseFloat(PartsCost)) * (parseFloat(VatRate) / 100);
         $('#Vat').val(VatValue);
-         $('#TotalWorkOrder').val( parseFloat(VatValue)+parseFloat(PartsCost)+parseFloat(LaborCost)) ;
+        $('#TotalWorkOrder').val(parseFloat(VatValue) + parseFloat(PartsCost) + parseFloat(LaborCost));
     }
 
     function ValidOut() {
-
         isValid = true;
         var isPart = $("#IsPart").is(":checked");
-        if(!isPart){
-        if ($("#OutfuelLevelId").val() == "") {
-            $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
-            isValid = false;
-        } else {
-            $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
-        }
-        }
         
+        if (!isPart) {
+            if ($("#OutfuelLevelId").val() == "") {
+                $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color", "#ffdddd");
+                isValid = false;
+            } else {
+                $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+            }
+        }
+
         if ($("#GregorianMovementDate").val() == "") {
-            $("#GregorianMovementDate").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            $("#GregorianMovementDate").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color", "#ffdddd");
             isValid = false;
         } else {
             $("#GregorianMovementDate").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
         }
+
         if ($("#ReceivedTime").val() == "") {
-            $("#ReceivedTime").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+            $("#ReceivedTime").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color", "#ffdddd");
             isValid = false;
         } else {
             $("#ReceivedTime").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
         }
-        if(!isPart){
-         if ($("#ReceivedMeter").val() == "" || $("#ReceivedMeter").val() == 0) {
-            $("#ReceivedMeter").addClass("invalids");
-            isValid = false;
-        } else {
-            $("#ReceivedMeter").removeClass("invalids");
-        }}
-           if (!isPart) {
-        if (parseInt($('#ReceivedMeter').val()) < parseInt($("#ExitMeter").val())) {
-            $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
-            Swal.fire("@Common["Error"]", "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]"+" : "+parseInt($("#ExitMeter").val())+" "+"@Common["KiloMeter"]", "error");
-            isValid= false;
-        } else {
-            $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
-        }
-    }
 
-        if ($("#InvoceNo").val() == "" && ($("#LaborCost").val() >0 || $("#PartsCost").val() >0) ) {
+        if (!isPart) {
+            if ($("#ReceivedMeter").val() == "" || $("#ReceivedMeter").val() == 0) {
+                $("#ReceivedMeter").addClass("invalids");
+                isValid = false;
+            } else {
+                $("#ReceivedMeter").removeClass("invalids");
+            }
+        }
+
+        if (!isPart) {
+            if (parseInt($('#ReceivedMeter').val()) < parseInt($("#ExitMeter").val())) {
+                $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color", "#ffdddd");
+                Swal.fire("@Common["Error"]", "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " + parseInt($("#ExitMeter").val()) + " " + "@Common["KiloMeter"]", "error");
+                isValid = false;
+            } else {
+                $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
+            }
+        }
+
+        if ($("#InvoceNo").val() == "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
             $("#InvoceNo").addClass("invalids");
             isValid = false;
         } else {
             $("#InvoceNo").removeClass("invalids");
         }
-
-        //if ($("#Vat").val() == "" || $("#Vat").val() == 0 && ($("#LaborCost").val() >0 || $("#PartsCost").val() >0)) {
-        //    $("#Vat").addClass("invalids");
-        //    isValid = false;
-        //} else {
-        //    $("#Vat").removeClass("invalids");
-        //}
 
         if (!$("#NotTaxable").is(":checked")) {
             if (
@@ -347,15 +891,14 @@
             $("#Vat").removeClass("invalids");
         }
 
-        if ($("#InvoiceTypeId").val() == "" && ($("#LaborCost").val() >0 || $("#PartsCost").val() >0)) {
-            $("#InvoiceTypeId").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color","#ffdddd");
+        if ($("#InvoiceTypeId").val() == "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
+            $("#InvoiceTypeId").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color", "#ffdddd");
             isValid = false;
         } else {
             $("#InvoiceTypeId").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
         }
 
         if ($("#claimType").val() == 2) {
-
             if ($("#ConsumptionValueOfSpareParts").val() == "" || $("#ConsumptionValueOfSpareParts").val() == 0) {
                 $("#ConsumptionValueOfSpareParts").addClass("invalids");
                 isValid = false;
@@ -369,103 +912,88 @@
                 $("#DeductibleAmount").removeClass("invalids");
             }
         }
-        if (!isPart) {
-         if ($("#ExitDriverName").val() == "") {
-            $("#ExitDriverName").addClass("invalids");
-            isValid = false;
-        } else {
-            $("#ExitDriverName").removeClass("invalids");
-        }}
-       
 
-       
+        if (!isPart) {
+            if ($("#ExitDriverName").val() == "") {
+                $("#ExitDriverName").addClass("invalids");
+                isValid = false;
+            } else {
+                $("#ExitDriverName").removeClass("invalids");
+            }
+        }
+
         var isNotTaxable = $('#NotTaxable').is(':checked');
 
+        // Collect all checked service IDs
+        var fixedServiceIds = [];
+        $('.service-checkbox:checked').each(function() {
+            var serviceId = $(this).data('service-id');
+            fixedServiceIds.push(serviceId);
+        });
 
-    // Collect all checked service IDs
-    var fixedServiceIds = [];
-    $('.service-checkbox:checked').each(function() {
-        var serviceId = $(this).data('service-id');
-        fixedServiceIds.push(serviceId);
-    });
+        // Set the hidden field value
+        $('#FixedServiceIds').val(fixedServiceIds.join(','));
 
-    // Set the hidden field value
-    $('#FixedServiceIds').val(fixedServiceIds.join(','));
+        var itemForm = new FormData($('#TransferMovementIn').get(0));
 
+        var movement = {
+            'VehicleID': $('#VehicleID').val(),
+            'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
+            'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
+            'WorkshopId': $('#WorkshopId').val(),
+            'ReceivedMeter': $('#ReceivedMeter').val(),
+            'MasterId': $('#MasterId').val(),
+            'ExitMeter': $('#ExitMeter').val(),
+            'FuelLevelId': $("#OutfuelLevelId").val(),
+            'ReceivedDriverId': $('#ExitDriverName').val(),
+            'ExitDriverId': $('#ExitDriverId').val(),
+            'MovementOutId': $('#MovementId').val(),
+            'InvoceNo': $('#InvoceNo').val(),
+            'TotalWorkOrder': $('#TotalWorkOrder').val(),
+            'Vat': isNotTaxable ? 0 : $("#Vat").val(),
+            'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
+            'DeductibleAmount': $("#DeductibleAmount").val(),
+            'LastVehicleStatus': $('#LastVehicleStatus').val(),
+            'ReceivedTime': $("#ReceivedTime").val(),
+            'PartsCost': $("#PartsCost").val(),
+            'LaborCost': $("#LaborCost").val(),
+            'InvoiceTypeId': $("#InvoiceTypeId").val(),
+            'WorkOrderId': $("#WorkOrderId").val(),
+            'FixedServiceIds': fixedServiceIds.join(','), // Add the comma-separated IDs
+            'isPart': $('#IsPart').is(':checked')
+        };
 
-    var itemForm = new FormData($('#TransferMovementIn').get(0));
-    
-    var movement = {
-        'VehicleID': $('#VehicleID').val(),
-        'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
-        'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
-        'WorkshopId': $('#WorkshopId').val(),
-        'ReceivedMeter': $('#ReceivedMeter').val(),
-        'MasterId': $('#MasterId').val(),
-        'ExitMeter': $('#ExitMeter').val(),
-        'FuelLevelId': $("#OutfuelLevelId").val(),
-        'ReceivedDriverId': $('#ExitDriverName').val(),
-        'ExitDriverId': $('#ExitDriverId').val(),
-        'MovementOutId': $('#MovementId').val(),
-        'InvoceNo': $('#InvoceNo').val(),
-        'TotalWorkOrder': $('#TotalWorkOrder').val(),
-        'Vat': isNotTaxable ? 0 : $("#Vat").val(),
-        'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
-        'DeductibleAmount': $("#DeductibleAmount").val(),
-        'LastVehicleStatus': $('#LastVehicleStatus').val(),
-        'ReceivedTime': $("#ReceivedTime").val(),
-        'PartsCost': $("#PartsCost").val(),
-        'LaborCost': $("#LaborCost").val(),
-        'InvoiceTypeId': $("#InvoiceTypeId").val(),
-        'WorkOrderId': $("#WorkOrderId").val(),
-        'FixedServiceIds': fixedServiceIds.join(','), // Add the comma-separated IDs
-        'isPart': $('#IsPart').is(':checked')
-    };
+        // Append each property individually
+        Object.keys(movement).forEach(function(key) {
+            if (movement[key] !== null && movement[key] !== undefined) {
+                itemForm.append(key, movement[key]);
+            }
+        });
 
-    // Append each property individually
-    Object.keys(movement).forEach(function(key) {
-        if (movement[key] !== null && movement[key] !== undefined) {
-            itemForm.append(key, movement[key]);
-        }
-    });
-    
-    // Append fixed service IDs
-    itemForm.append('FixedServiceIds', fixedServiceIds.join(','));
-
-        // if (cuspond.getFiles().length == 0 && $("#InvoceNo").val() != "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
-        //         $("#Invoicefile>.filepond--drop-label").css("border", "2px solid red");
-        //         isValid = false;
-        // }
-        // if (cuspond.getFiles().length > 0) {
-        //     for (var j = 0; j < cuspond.getFiles().length; j++) {
-        //         itemForm.append('ExternalWorkshopInvoice', cuspond.getFiles().length > 0 ? cuspond.getFiles()[j].file : null);
-        //     }
-        // }
+        // Append fixed service IDs
+        itemForm.append('FixedServiceIds', fixedServiceIds.join(','));
 
         if (isValid) {
             $.ajax({
-
                 url: "@Url.Action("TransferMoveIn", "WIP")",
                 type: 'POST',
-                data:  itemForm,
+                data: itemForm,
                 dataType: 'JSON',
                 contentType: false,
                 cache: false,
                 processData: false,
                 success: function (data) {
                     if (data.isSuccess) {
-
                         Swal.fire({
-                                icon: 'success',
-                                title: "Done Successfully",
-                                confirmButtonText: '@Common["Ok"]',
-                                confirmButtonColor: 'var(--primary-600)',
-                                timer: 3000,
-                                timerProgressBar: true
-                            }).then(() => {
-
-                                window.location.href="@Url.Action("TransferMovements", "WIP")";
-                            });
+                            icon: 'success',
+                            title: "Done Successfully",
+                            confirmButtonText: '@Common["Ok"]',
+                            confirmButtonColor: 'var(--primary-600)',
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = "@Url.Action("TransferMovements", "WIP")";
+                        });
                     }
                     else {
                         Swal.fire("@Common["Error"]", data.message);
@@ -473,9 +1001,93 @@
                 }
             });
         }
-    }  
+    }
+
+    function ValidPettyCashOut() {
+        var isValid = true;
+        var isPart = $("#PettyCash_IsPart").is(":checked");
+
+        // Validation for Petty Cash form
+        if (!$('#PettyCash_RequestNo').val()) {
+            $('#PettyCash_RequestNo').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#PettyCash_RequestNo').removeClass('is-invalid');
+        }
+
+        if (!$('#PettyCash_ExpenseType').val()) {
+            $('#PettyCash_ExpenseType').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#PettyCash_ExpenseType').removeClass('is-invalid');
+        }
+
+        if (!$('#PettyCash_SellerId').val()) {
+            $('#PettyCash_SellerId').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#PettyCash_SellerId').removeClass('is-invalid');
+        }
+
+        if (!$('#PettyCash_InvoiceNo').val()) {
+            $('#PettyCash_InvoiceNo').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#PettyCash_InvoiceNo').removeClass('is-invalid');
+        }
+
+        if (!$('#PettyCash_NetAmount').val() || parseFloat($('#PettyCash_NetAmount').val()) <= 0) {
+            $('#PettyCash_NetAmount').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#PettyCash_NetAmount').removeClass('is-invalid');
+        }
+
+        // Check balance
+        var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
+        var balance = parseFloat($('#PettyCash_UserBalance').text()) || 0;
+        if (netAmount > balance) {
+            Swal.fire("Error", "Net amount exceeds available balance", "error");
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Collect petty cash service IDs
+            var fixedServiceIds = [];
+            $('.pettycash-service-checkbox:checked').each(function() {
+                fixedServiceIds.push($(this).data('service-id'));
+            });
+            $('#PettyCash_FixedServiceIds').val(fixedServiceIds.join(','));
+
+            // Submit petty cash form
+            var formData = new FormData($('#PettyCashInvoiceForm').get(0));
+            
+            $.ajax({
+                url: '@Url.Action("TransferMoveInPettyCash", "WIP")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.isSuccess) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Petty Cash Invoice Created Successfully",
+                            confirmButtonText: 'OK',
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = "@Url.Action("TransferMovements", "WIP")";
+                        });
+                    } else {
+                        Swal.fire("Error", data.message, "error");
+                    }
+                }
+            });
+        }
+    }
+
     $('#NotTaxable').change(function () {
         ChangeVat();       
-    })
+    });
 </script>
-
