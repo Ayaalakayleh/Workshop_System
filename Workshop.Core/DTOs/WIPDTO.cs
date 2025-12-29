@@ -51,6 +51,7 @@ namespace Workshop.Core.DTOs
         public string? LookupCode { get; set; }
         public string? LookupPrimaryName { get; set; }
         public string? LookupSecondaryName { get; set; }
+        public int? ClosedBy { get; set; }
     }
 
     public class AccountDTO
@@ -401,6 +402,9 @@ namespace Workshop.Core.DTOs
     {
         public IEnumerable<WipInvoiceDetailDTO>? WipInvoiceDetail { get; set; }
         public WIPInvoiceDTO? InvoiceDetails { get; set; }
+        public string CreatingOperator { get; set; }
+        public string InvoicingOperator { get; set; }
+        public string BookedOutOperator { get; set; }
 
     }
 }

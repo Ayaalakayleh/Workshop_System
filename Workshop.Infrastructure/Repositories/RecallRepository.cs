@@ -173,7 +173,7 @@ namespace Workshop.Infrastructure.Repositories
             }
 
             var parameters = new DynamicParameters();
-            parameters.Add("@RecallId", dto.Id);
+            parameters.Add("@Id", dto.Id);
             parameters.Add("@Code", dto.Code);
             parameters.Add("@Title", dto.Title);
             parameters.Add("@Description", dto.Description);
@@ -184,11 +184,13 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@VehicleList",
                 vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
 
-            return await connection.QuerySingleAsync<int>(
-                "Recall_Update",
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
+                var result = await connection.QuerySingleAsync<int>(
+                    "Recall_Update",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+                return result;
+
         }
 
         public async Task<int> DeleteAsync(DeleteRecallDTO dto)

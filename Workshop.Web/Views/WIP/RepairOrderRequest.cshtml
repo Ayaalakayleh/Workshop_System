@@ -19,9 +19,8 @@
     .text-start{
         font-size: 10px;
     }
-
-   
 </style>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -33,10 +32,7 @@
 
     <style>
         /* ========= GLOBAL / PRINT ========= */
-        @@page {
-            size: A4 portrait;
-            margin: 0;
-        }
+        @@page { size: A4 portrait; margin: 0; }
 
         html, body {
             height: 100%;
@@ -47,10 +43,7 @@
             color: #111;
         }
 
-        body {
-            display: flex;
-            justify-content: center;
-        }
+        body { display: flex; justify-content: center; }
 
         .doc {
             width: 100%;
@@ -71,19 +64,11 @@
             page-break-after: always;
         }
 
-            .sheet:last-child {
-                page-break-after: auto;
-            }
+        .sheet:last-child { page-break-after: auto; }
 
         @@media print {
-            body {
-                background: #fff;
-            }
-
-            .doc {
-                padding: 0;
-            }
-
+            body { background: #fff; }
+            .doc { padding: 0; }
             .sheet {
                 margin: 0;
                 border-radius: 0;
@@ -94,31 +79,12 @@
         }
 
         /* ========= UTILS ========= */
-        .rtl {
-            direction: rtl;
-            text-align: right;
-        }
-
-        .muted {
-            color: #333;
-        }
-
-        .thin {
-            font-weight: 400;
-        }
-
-        .b {
-            font-weight: 700;
-        }
-
-        .u {
-            text-decoration: underline;
-        }
-
-        .box {
-            border: 2px solid #000;
-            padding: 0;
-        }
+        .rtl { direction: rtl; text-align: right; }
+        .muted { color: #333; }
+        .thin { font-weight: 400; }
+        .b { font-weight: 700; }
+        .u { text-decoration: underline; }
+        .box { border: 2px solid #000; padding: 0; }
 
         .line {
             display: inline-block;
@@ -126,12 +92,9 @@
             height: 6mm;
             vertical-align: bottom;
         }
+        .line.thin { border-bottom-width: 1px; }
 
-            .line.thin {
-                border-bottom-width: 1px;
-            }
-
-        /* --- shared car diagram image (NEW) --- */
+        /* --- shared car diagram image --- */
         .carimg-wrap {
             width: 100%;
             height: 100%;
@@ -143,7 +106,7 @@
         img.carimg {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* IMPORTANT: no cropping */
+            object-fit: contain;
             display: block;
         }
 
@@ -158,14 +121,8 @@
             font-size: 12px;
             letter-spacing: .2px;
         }
-
-            .opl-headerbar .left {
-                font-weight: 700;
-            }
-
-            .opl-headerbar .right {
-                font-weight: 700;
-            }
+        .opl-headerbar .left { font-weight: 700; }
+        .opl-headerbar .right { font-weight: 700; }
 
         .opl-seal {
             width: 18mm;
@@ -179,21 +136,9 @@
             text-align: center;
         }
 
-        .opl-title {
-            text-align: center;
-            margin: 6mm 0 4mm;
-        }
-
-            .opl-title .t1 {
-                font-size: 20px;
-                font-weight: 800;
-            }
-
-            .opl-title .t2 {
-                font-size: 18px;
-                font-weight: 800;
-                margin-top: 1mm;
-            }
+        .opl-title { text-align: center; margin: 6mm 0 4mm; }
+        .opl-title .t1 { font-size: 20px; font-weight: 800; }
+        .opl-title .t2 { font-size: 18px; font-weight: 800; margin-top: 1mm; }
 
         .opl-topmeta {
             display: flex;
@@ -203,54 +148,17 @@
             margin-top: -2mm;
             margin-bottom: 2mm;
         }
+        .opl-topmeta .meta { white-space: nowrap; }
+        .opl-topmeta .meta .line { width: 55mm; }
 
-            .opl-topmeta .meta {
-                white-space: nowrap;
-            }
-
-                .opl-topmeta .meta .line {
-                    width: 55mm;
-                }
-
-        .opl-info {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-            .opl-info td {
-                border: 2px solid #000;
-                padding: 2.2mm 2.2mm;
-                vertical-align: middle;
-            }
-
-            .opl-info .lbl {
-                width: 34mm;
-                font-weight: 700;
-            }
-
-            .opl-info .fill {
-                width: 70mm;
-            }
-
-                .opl-info .fill .line {
-                    width: 100%;
-                    height: 7mm;
-                }
-
-            .opl-info .lblR {
-                width: 44mm;
-                font-weight: 700;
-            }
-
-            .opl-info .fillR {
-                width: 52mm;
-            }
-
-                .opl-info .fillR .line {
-                    width: 100%;
-                    height: 7mm;
-                }
+        .opl-info { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .opl-info td { border: 2px solid #000; padding: 2.2mm 2.2mm; vertical-align: middle; }
+        .opl-info .lbl { width: 34mm; font-weight: 700; }
+        .opl-info .fill { width: 70mm; }
+        .opl-info .fill .line { width: 100%; height: 7mm; }
+        .opl-info .lblR { width: 44mm; font-weight: 700; }
+        .opl-info .fillR { width: 52mm; }
+        .opl-info .fillR .line { width: 100%; height: 7mm; }
 
         .opl-multiline {
             border-left: 2px solid #000;
@@ -258,39 +166,20 @@
             border-bottom: 2px solid #000;
             padding: 0;
         }
-
-            .opl-multiline .row {
-                display: flex;
-                border-top: 2px solid #000;
-                min-height: 26mm;
-            }
-
-                .opl-multiline .row:first-child {
-                    border-top: 2px solid #000;
-                }
-
-                .opl-multiline .row .lbl {
-                    width: 60mm;
-                    padding: 2mm 2mm;
-                    font-weight: 800;
-                    border-right: 2px solid #000;
-                }
-
-                .opl-multiline .row .lines {
-                    flex: 1;
-                    padding: 2mm 4mm;
-                }
-
-            .opl-multiline .lines .write {
-                display: block;
-                border-bottom: 2px solid #000;
-                height: 7mm;
-                margin: 4mm 0 0;
-            }
+        .opl-multiline .row { display: flex; border-top: 2px solid #000; min-height: 26mm; }
+        .opl-multiline .row:first-child { border-top: 2px solid #000; }
+        .opl-multiline .row .lbl {
+            width: 60mm;
+            padding: 2mm 2mm;
+            font-weight: 800;
+            border-right: 2px solid #000;
+        }
+        .opl-multiline .row .lines { flex: 1; padding: 2mm 4mm; }
+        .opl-multiline .lines .write { display: block; border-bottom: 2px solid #000; height: 7mm; margin: 4mm 0 0; }
 
         .opl-bottomgrid {
             display: grid;
-            grid-template-columns: 1fr 1.25fr 1fr; /* diagrams | checklist | tires */
+            grid-template-columns: 1fr 1.25fr 1fr;
             gap: 3mm;
             border-left: 2px solid #000;
             border-right: 2px solid #000;
@@ -298,68 +187,14 @@
             padding: 3mm;
         }
 
-        .opl-panel {
-            border: 2px solid #000;
-            min-height: 92mm;
-            padding: 2mm;
-        }
+        .opl-panel { border: 2px solid #000; min-height: 92mm; padding: 2mm; }
 
-        /* Checklist table */
-        .opl-check {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-
-            .opl-check th, .opl-check td {
-                border: 1px solid #000;
-                padding: 1.5mm 1.5mm;
-                vertical-align: middle;
-            }
-
-            .opl-check thead th {
-                font-weight: 800;
-                text-align: center;
-            }
-
-            .opl-check .item {
-                width: 58%;
-                font-weight: 700;
-            }
-
-            .opl-check .pass {
-                width: 12%;
-                text-align: center;
-            }
-
-            .opl-check .remark {
-                width: 30%;
-            }
-
-        .tickbox {
-            width: 6mm;
-            height: 6mm;
-            border: 2px solid #000;
-            display: inline-block;
-        }
-
-        .remarkline {
-            display: block;
-            border-bottom: 1px solid #000;
-            height: 6mm;
-        }
-
-        /* Tires block */
-        .opl-tires .photo {
-            width: 42mm;
-            height: 42mm;
-            border: 2px solid #000;
-            margin: 0 auto 2mm;
-            display: grid;
-            place-items: center;
-            font-size: 10px;
-            font-weight: 700;
-        }
+        .opl-check { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .opl-check th, .opl-check td { border: 1px solid #000; padding: 1.5mm 1.5mm; vertical-align: middle; }
+        .opl-check thead th { font-weight: 800; text-align: center; }
+        .opl-check .item { width: 58%; font-weight: 700; }
+        .opl-check .pass { width: 12%; text-align: center; }
+        .opl-check .remark { width: 30%; }
 
         .opl-tires .hdr {
             display: grid;
@@ -370,7 +205,6 @@
             text-align: center;
             margin-bottom: 2mm;
         }
-
         .opl-tires .trow {
             display: grid;
             grid-template-columns: 24mm 1fr 1fr 1fr;
@@ -379,29 +213,8 @@
             font-size: 11px;
             margin: 2mm 0;
         }
-
-            .opl-tires .trow .pos {
-                font-weight: 800;
-            }
-
-            .opl-tires .trow .line {
-                width: 100%;
-                height: 6mm;
-                border-bottom-width: 1px;
-            }
-
-        .opl-tires .remarks {
-            margin-top: 4mm;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-            .opl-tires .remarks .write {
-                display: block;
-                border-bottom: 2px solid #000;
-                height: 7mm;
-                margin-top: 2mm;
-            }
+        .opl-tires .trow .pos { font-weight: 800; }
+        .opl-tires .trow .line { width: 100%; height: 6mm; border-bottom-width: 1px; }
 
         .opl-note {
             border-left: 2px solid #000;
@@ -420,138 +233,48 @@
             border-bottom: 2px solid #000;
             padding: 6mm 6mm 4mm;
         }
-
-            .opl-sign .grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 18mm;
-                font-size: 13px;
-                font-weight: 800;
-            }
-
-            .opl-sign .field {
-                display: grid;
-                grid-template-columns: 42mm 1fr;
-                gap: 4mm;
-                align-items: end;
-                margin: 4mm 0;
-            }
-
-                .opl-sign .field .line {
-                    width: 100%;
-                }
+        .opl-sign .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18mm;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .opl-sign .field {
+            display: grid;
+            grid-template-columns: 42mm 1fr;
+            gap: 4mm;
+            align-items: end;
+            margin: 4mm 0;
+        }
+        .opl-sign .field .line { width: 100%; }
 
         /* ========= FORM 2 (Job Card) ========= */
-        .jc-header {
-            text-align: center;
-            margin-bottom: 2mm;
-            font-size: 11px;
-        }
+        .jc-header { text-align: center; margin-bottom: 2mm; font-size: 11px; }
+        .jc-header .company { font-weight: 800; letter-spacing: .2px; }
 
-            .jc-header .company {
-                font-weight: 800;
-                letter-spacing: .2px;
-            }
+        .jc-idrow { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 2mm; }
+        .jc-idrow td { border-bottom: 2px solid #000; padding: 2mm 2mm; vertical-align: middle; font-weight: 800; }
+        .jc-idrow .rightTitle { text-align: right; font-size: 18px; }
+        .jc-idrow .mid { text-align: center; }
+        .jc-idrow .leftTitle { font-size: 20px; }
 
-        .jc-idrow {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            margin-top: 2mm;
-        }
+        .jc-contacts { width: 100%; border-collapse: collapse; margin-top: 2mm; font-size: 12px; }
+        .jc-contacts td { border-bottom: 2px solid #000; padding: 2mm 2mm 3mm; vertical-align: top; }
+        .jc-contacts .hdr { font-weight: 900; display: flex; justify-content: space-between; gap: 6mm; }
+        .jc-contacts .val { margin-top: 1mm; font-weight: 700; }
 
-            .jc-idrow td {
-                border-bottom: 2px solid #000;
-                padding: 2mm 2mm;
-                vertical-align: middle;
-                font-weight: 800;
-            }
+        .jc-main { border: 2px solid #000; margin-top: 3mm; }
+        .jc-main .grid { display: grid; grid-template-columns: 1.25fr 1fr; }
 
-            .jc-idrow .rightTitle {
-                text-align: right;
-                font-size: 18px;
-            }
+        .jc-block { border-right: 2px solid #000; }
+        .jc-block:last-child { border-right: none; }
 
-            .jc-idrow .mid {
-                text-align: center;
-            }
-
-            .jc-idrow .leftTitle {
-                font-size: 20px;
-            }
-
-        .jc-contacts {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2mm;
-            font-size: 12px;
-        }
-
-            .jc-contacts td {
-                border-bottom: 2px solid #000;
-                padding: 2mm 2mm 3mm;
-                vertical-align: top;
-            }
-
-            .jc-contacts .hdr {
-                font-weight: 900;
-                display: flex;
-                justify-content: space-between;
-                gap: 6mm;
-            }
-
-            .jc-contacts .val {
-                margin-top: 1mm;
-                font-weight: 700;
-            }
-
-            .jc-contacts .note {
-                font-weight: 900;
-            }
-
-        .jc-main {
-            border: 2px solid #000;
-            margin-top: 3mm;
-        }
-
-            .jc-main .grid {
-                display: grid;
-                grid-template-columns: 1.25fr 1fr;
-            }
-
-        .jc-block {
-            border-right: 2px solid #000;
-        }
-
-            .jc-block:last-child {
-                border-right: none;
-            }
-
-        .jc-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
-            .jc-table td {
-                border-bottom: 1px solid #000;
-                padding: 1.6mm 1.8mm;
-                vertical-align: middle;
-            }
-
-            .jc-table .lbl {
-                width: 32mm;
-                font-weight: 900;
-            }
-
-            .jc-table .val {
-                font-weight: 800;
-            }
-
-            .jc-table .bigval {
-                font-size: 18px;
-                letter-spacing: .3px;
-            }
+        .jc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .jc-table td { border-bottom: 1px solid #000; padding: 1.6mm 1.8mm; vertical-align: middle; }
+        .jc-table .lbl { width: 32mm; font-weight: 900; }
+        .jc-table .val { font-weight: 800; }
+        .jc-table .bigval { font-size: 18px; letter-spacing: .3px; }
 
         .jc-bottomrow {
             border-top: 2px solid #000;
@@ -559,25 +282,10 @@
             grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr 1.2fr;
             font-size: 12px;
         }
-
-            .jc-bottomrow .cell {
-                border-right: 1px solid #000;
-                padding: 2mm 2mm;
-            }
-
-                .jc-bottomrow .cell:last-child {
-                    border-right: none;
-                }
-
-            .jc-bottomrow .k {
-                font-weight: 900;
-            }
-
-            .jc-bottomrow .v {
-                font-weight: 900;
-                font-size: 14px;
-                margin-top: 1mm;
-            }
+        .jc-bottomrow .cell { border-right: 1px solid #000; padding: 2mm 2mm; }
+        .jc-bottomrow .cell:last-child { border-right: none; }
+        .jc-bottomrow .k { font-weight: 900; }
+        .jc-bottomrow .v { font-weight: 900; font-size: 14px; margin-top: 1mm; }
 
         .jc-minirow {
             border-top: 2px solid #000;
@@ -585,113 +293,40 @@
             grid-template-columns: 1fr 1fr 1fr;
             font-size: 12px;
         }
+        .jc-minirow .cell { border-right: 1px solid #000; padding: 2mm 2mm; }
+        .jc-minirow .cell:last-child { border-right: none; }
+        .jc-minirow .k { font-weight: 900; }
+        .jc-minirow .v { font-weight: 900; font-size: 14px; margin-top: 1mm; }
 
-            .jc-minirow .cell {
-                border-right: 1px solid #000;
-                padding: 2mm 2mm;
-            }
-
-                .jc-minirow .cell:last-child {
-                    border-right: none;
-                }
-
-            .jc-minirow .k {
-                font-weight: 900;
-            }
-
-            .jc-minirow .v {
-                font-weight: 900;
-                font-size: 14px;
-                margin-top: 1mm;
-            }
-
-        .jc-services {
-            border: 2px solid #000;
-            border-top: none;
-            padding: 0;
+        .jc-services { border: 2px solid #000; border-top: none; padding: 0; }
+        .jc-services .hdr {
+            border-top: 2px solid #000;
+            padding: 2mm 2mm;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
         }
-
-            .jc-services .hdr {
-                border-top: 2px solid #000;
-                padding: 2mm 2mm;
-                font-weight: 900;
-                display: flex;
-                justify-content: space-between;
-            }
-
-            .jc-services .body {
-                display: grid;
-                grid-template-columns: 1.35fr 1fr;
-                gap: 0;
-                border-top: 1px solid #000;
-                min-height: 120mm;
-            }
-
-            .jc-services .left {
-                border-right: 1px solid #000;
-                padding: 2mm 2mm;
-            }
-
-            .jc-services .right {
-                padding: 2mm 2mm;
-            }
-
-        .svc-free {
-            font-size: 12px;
-            font-weight: 800;
-            line-height: 1.35;
-            margin-bottom: 3mm;
+        .jc-services .body {
+            display: grid;
+            grid-template-columns: 1.35fr 2fr;
+            gap: 0;
+            border-top: 1px solid #000;
+            min-height: 120mm;
         }
+        .jc-services .left { border-right: 1px solid #000; padding: 2mm 2mm; }
+        .jc-services .right { padding: 2mm 2mm; }
 
-        .svc-lines {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-top: 2mm;
-        }
+        .svc-free { font-size: 12px; font-weight: 800; line-height: 1.35; margin-bottom: 3mm; }
 
-            .svc-lines td, .svc-lines th {
-                border-top: 1px solid #000;
-                padding: 1.6mm 1.6mm;
-                vertical-align: top;
-            }
+        .svc-lines { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 2mm; }
+        .svc-lines td, .svc-lines th { border-top: 1px solid #000; padding: 1.6mm 1.6mm; vertical-align: top; }
+        .svc-lines th { font-weight: 900; text-align: left; }
+        .svc-lines .code { width: 40mm; font-weight: 900; }
+        .svc-lines .desc { font-weight: 800; }
+        .svc-lines .qty { width: 18mm; text-align: center; font-weight: 900; }
+        .svc-lines .ref { width: 40mm; text-align: right; font-weight: 900; }
 
-            .svc-lines th {
-                font-weight: 900;
-                text-align: left;
-            }
-
-            .svc-lines .code {
-                width: 40mm;
-                font-weight: 900;
-            }
-
-            .svc-lines .desc {
-                font-weight: 800;
-            }
-
-            .svc-lines .ln {
-                width: 18mm;
-                text-align: center;
-                font-weight: 900;
-            }
-
-            .svc-lines .qty {
-                width: 18mm;
-                text-align: center;
-                font-weight: 900;
-            }
-
-            .svc-lines .ref {
-                width: 40mm;
-                text-align: right;
-                font-weight: 900;
-            }
-
-        .jc-diagram {
-            border: 2px solid #000;
-            padding: 2mm;
-        }
+        .jc-diagram { border: 2px solid #000; padding: 2mm; }
 
         .jc-faults {
             margin-top: 3mm;
@@ -710,11 +345,7 @@
             font-size: 12px;
         }
 
-        .jc-footnote {
-            margin-top: 4mm;
-            font-weight: 900;
-            font-size: 12px;
-        }
+        .jc-footnote { margin-top: 4mm; font-weight: 900; font-size: 12px; }
 
         .jc-brand {
             margin-top: 10mm;
@@ -724,6 +355,36 @@
             font-weight: 900;
             letter-spacing: 2px;
         }
+
+        /* =========================================================
+           SCRATCHES OVERLAY (JOB CARD) - FIXED MAPPING
+           ========================================================= */
+        .damage-panel {
+            position: relative;
+            width: 100%;
+            height: 230px;
+            overflow: hidden;            /* clip in bounds */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;     /* key: contain */
+            background-color: #fff;
+            display: block;
+        }
+
+        .damage-panel .shape {
+            position: absolute;
+            z-index: 9;
+            width: 34px !important;
+            height: 34px !important;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .damage-panel #deep-scratch { background-image: url('../../images/tajeer-car-assets/DeepScratch.png'); }
+        .damage-panel #small-scratch { background-image: url('../../images/tajeer-car-assets/MinorScratch.png'); }
+        .damage-panel #very-deep-scratch { background-image: url('../../images/tajeer-car-assets/VeryDeepScratch.png'); }
+        .damage-panel #bend-in-body { background-image: url('../../images/tajeer-car-assets/CurvatureStructure.png'); }
     </style>
 </head>
 
@@ -738,9 +399,7 @@
             <div class="opl-headerbar">
                 <div class="left">AL JAZIRAH VEHICLES AGENCIES CO. LTD.</div>
                 <div class="right rtl">شركة توكيل الجزيرة للسيارات المحدودة</div>
-                <div class="opl-seal">
-                    OFFICIAL<br />SEAL
-                </div>
+                <div class="opl-seal">OFFICIAL<br />SEAL</div>
             </div>
 
             <div class="opl-title">
@@ -810,13 +469,6 @@
 
             <div class="opl-bottomgrid" aria-label="Inspection and Tires">
 
-                <!-- Left: Vehicle diagrams (UPDATED: use your attached image) -->
-                @* <div class="opl-panel" aria-label="Vehicle Condition Diagrams">
-                    <div class="carimg-wrap" style="min-height: 88mm;">
-                        <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
-                    </div>
-                </div> *@
-
                 <!-- Middle: Checklist -->
                 <div class="opl-panel" aria-label="Inspection Checklist">
                     @if(Model.VehicleCkecklist?.Count > 0)
@@ -836,157 +488,68 @@
                                         @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
                                         <td>
                                             @(lang == "en" ? Model.VehicleCkecklist[i].LookupPrimaryDescription
-                                                                                : Model.VehicleCkecklist[i].LookupSecondaryDescription)
-                                                                            
-                                    </td>
-                                    <td class="text-center">
-                                        @Html.CheckBoxFor( m => m.VehicleCkecklist[i].Pass,
-                                                                            new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" } )
-                                                                       
-                                    </td>
-                                    <td>
-                                        @Html.TextAreaFor( m => m.VehicleCkecklist[i].Description,
-                                                                            new
-                                                                            {
-                                                                                @class = "form-control form-control-sm",
-                                                                                rows = 1,
-                                                                                placeholder = Common["Label_Remarks"],
-                                                                                id = $"rmk_{i}",
-                                                                                disabled = "disabled"
-                                                                            } )
-                                                                       
-                                    </td>
-                                </tr>
+                                                           : Model.VehicleCkecklist[i].LookupSecondaryDescription)
+                                        </td>
+                                        <td class="text-center">
+                                            @Html.CheckBoxFor(m => m.VehicleCkecklist[i].Pass,
+                                                new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" })
+                                        </td>
+                                        <td>
+                                            @Html.TextAreaFor(m => m.VehicleCkecklist[i].Description,
+                                                new {
+                                                    @class = "form-control form-control-sm",
+                                                    rows = 1,
+                                                    placeholder = Common["Label_Remarks"],
+                                                    id = $"rmk_{i}",
+                                                    disabled = "disabled"
+                                                })
+                                        </td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
                     }
                     else
                     {
-                        <table class="table table-sm table-bordered table-hover align-middle text-start mb-0" id="tblInspectionChecklist">
-                            <thead class="thead-light">
+                        <table class="opl-check">
+                            <thead>
                                 <tr>
                                     <th class="item"></th>
                                     <th class="pass">PASSED</th>
                                     <th class="remark">NOT PASSED / REMARKS</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @for (int i = 0; i < Model?.VehicleCkecklist?.Count; i++)
-                                {
-                                    <tr>
-                                        @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
-                                        <td>
-                                            @(lang == "en" ? Model.VehicleCkecklist[i].LookupPrimaryDescription : Model.VehicleCkecklist[i].LookupSecondaryDescription)
-                                        </td>
-
-                                        <td class="text-center">
-                                            @Html.CheckBoxFor(m => m.VehicleCkecklist[i].Pass, new { @class = "form-check-input", id = $"chk_{i}" })
-                                        </td>
-
-                                        <td>
-                                            @Html.TextAreaFor(m => m.VehicleCkecklist[i].Description, new { @class = "form-control form-control-sm", rows = 1, placeholder = Common["Label_Remarks"], id = $"rmk_{i}" } )
-                                        </td>
-                                    </tr>
-                                 }
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     }
                 </div>
 
                 <!-- Right: Tires -->
-                @if (Model?.TyreCkecklist?.Count > 0)
-                {
-                    <div class="col-lg-3 col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header">
-                                <h5>@Common["Label_Tires"]</h5>
-                            </div>
-
-                            <div class="card-body">
-                                <div class="tire-thumb mb-2">
-                                    <i class="fal fa-tire"></i>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered table-hover align-middle text-center mb-0" id="tblTires">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th style="width:28%"></th>
-                                                <th style="width:24%">@Common["Label_Brand"]</th>
-                                                <th style="width:24%">@Common["Label_DOT"]</th>
-                                                <th style="width:24%">@Common["Label_WearLevel"]</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (int i = 0; i < (Model?.TyreCkecklist?.Count ?? 0); i++)
-                                            {
-                                                <tr>
-                                                    @Html.HiddenFor(m => m.TyreCkecklist[i].LookupId)
-                                                    <th class="text-start">
-                                                        @(  lang == "en" ? Model.TyreCkecklist[i].LookupPrimaryDescription : Model.TyreCkecklist[i].LookupSecondaryDescription )
-                                                    </th>
-
-                                                    <td>
-                                                        @Html.EditorFor(m => m.TyreCkecklist[i].Brand, new { htmlAttributes = new { @class = "lineThin", disabled = "disabled" } })
-                                                    </td>
-
-                                                    <td>
-                                                        @Html.EditorFor(m => m.TyreCkecklist[i].DOT, new { htmlAttributes = new { @class = "lineThin", disabled = "disabled" } })
-                                                    </td>
-
-                                                    <td>
-                                                        @Html.EditorFor(m => m.TyreCkecklist[i].WearLevel, new { htmlAttributes = new { @class = "lineThin", disabled = "disabled" } })
-                                                    </td>
-                                                </tr>
-                                            }
-
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                @* <div class="form-group mt-2">
-                                    <label for="TireRemarks">@Common["Label_RemarksForTires"]</label>
-                                    <textarea type="text" id="TireRemarks" name="Tires.Remarks" class="form-control form-control-sm" rows="3" placeholder="@Common["Label_Remarks"]" disabled></textarea>
-                                </div> *@
-                            </div>
-                        </div>
+                <div class="opl-panel opl-tires" aria-label="Tires">
+                    <div class="hdr">
+                        <div>BRAND</div>
+                        <div>DOT</div>
+                        <div>WEAR LEVEL</div>
                     </div>
-                }
-                else
-                {
-                    <div class="opl-panel opl-tires" aria-label="Tires">
-                        @* <div class="photo">TIRE<br />PHOTO</div> *@
 
-                        <div class="hdr">
-                            <div>BRAND</div>
-                            <div>DOT</div>
-                            <div>WEAR LEVEL</div>
-                        </div>
-
-                        <div class="trow">
-                            <div class="pos">FRONT RH</div>
-                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                        </div>
-                        <div class="trow">
-                            <div class="pos">FRONT LH</div>
-                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                        </div>
-                        <div class="trow">
-                            <div class="pos">REAR RH</div>
-                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                        </div>
-                        <div class="trow">
-                            <div class="pos">REAR LH</div>
-                            <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
-                        </div>
-
-                        @* <div class="remarks">REMARKS FOR TIRES:</div>
-                        <span class="write"></span>
-                        <span class="write"></span>
-                        <span class="write"></span> *@
+                    <div class="trow">
+                        <div class="pos">FRONT RH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
                     </div>
-                }
-                
+                    <div class="trow">
+                        <div class="pos">FRONT LH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+                    <div class="trow">
+                        <div class="pos">REAR RH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+                    <div class="trow">
+                        <div class="pos">REAR LH</div>
+                        <span class="line thin"></span><span class="line thin"></span><span class="line thin"></span>
+                    </div>
+                </div>
+
             </div>
 
             <div class="opl-note">
@@ -1021,7 +584,6 @@
 
         </section>
 
-
         <!-- =========================================================
              PAGE 2: JOB CARD
              ========================================================= -->
@@ -1037,7 +599,6 @@
                     <td class="leftTitle">Job Card</td>
                     <td class="mid">W.I.P No&nbsp;&nbsp;<span class="u">@Model.WIPId</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم مرجع العمل</span></td>
                     <td class="mid">Job No&nbsp;&nbsp;<span class="u">@Model.WIPId</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">رقم العمل</span></td>
-                    @* <td class="mid">Page&nbsp;&nbsp;<span class="u">1</span>&nbsp;&nbsp;<span class="rtl" style="font-size:12px;">صفحة</span></td> *@
                     <td class="rightTitle rtl">بطاقة عمل</td>
                 </tr>
             </table>
@@ -1050,7 +611,6 @@
                             <span class="rtl">اسم وعنوان العميل</span>
                         </div>
                         <div class="val">@Model.CustomerName</div>
-                        @* <div class="note">****To be used only for Workshop****</div> *@
                     </td>
                     <td>
                         <div class="hdr">
@@ -1070,14 +630,12 @@
                             <span class="rtl">اسم وعنوان الحساب</span>
                         </div>
                         <div class="val">@Model.CustomerName</div>
-                        @* <div class="note">****To be used only for Workshop****</div> *@
                     </td>
                 </tr>
             </table>
 
             <div class="jc-main" aria-label="Job Card Main Info">
                 <div class="grid">
-                    <!-- LEFT BLOCK (Vehicle info) -->
                     <div class="jc-block">
                         <table class="jc-table">
                             <tr><td class="lbl">Preferred Contact No</td><td class="val"></td></tr>
@@ -1093,7 +651,6 @@
                         </table>
                     </div>
 
-                    <!-- RIGHT BLOCK (Admin/status info) -->
                     <div class="jc-block">
                         <table class="jc-table">
                             <tr><td class="lbl">Created by</td><td class="val">@Model.CustomerName</td></tr>
@@ -1131,12 +688,11 @@
                 </div>
 
                 <div class="body">
-                    <!-- LEFT: Service text + lines -->
                     <div class="left">
                         <div class="svc-free">
                             @for (int i = 0; i < (Model?.Services?.Count ?? 0); i++)
                             {
-                                <div>@Model.Services[i].Description &nbsp; @Model.Services[i].StandardHours.ToString("0.0") H </div>
+                                <div>@Model.Services[i].Description &nbsp; @Model.Services[i].StandardHours.ToString("0.0") H</div>
                             }
                         </div>
 
@@ -1155,19 +711,22 @@
                                     <td class="qty">@Model.Items[i].Qty</td>
                                     <td class="ref">@Model.Items[i].UnitPrimaryName</td>
                                 </tr>
-                            }  
+                            }
                         </table>
                     </div>
 
-                    <!-- RIGHT: Damage diagram + faults + signature box -->
                     <div class="right">
-                        <!-- UPDATED: use your attached image instead of the svg -->
-                        <div class="jc-diagram scratch-wrap" aria-label="Damage Diagram">
-                            <div id="panel" class="carimg-wrap scratch-inner" style="height: 210px;">
-                                <img class="carimg" src="~/images/tajeer-car-assets/tajeer-car.jpeg" alt="Car technical condition diagram" />
+                        <!-- DAMAGE DIAGRAM -->
+                        <div class="jc-diagram" aria-label="Damage Diagram">
+                            <div id="damagePanelJC"
+                                 class="damage-panel"
+                                 data-img-src="@Url.Content("~/images/tajeer-car-assets/tajeer-car.jpeg")"
+                                 data-base-w="650"
+                                 data-base-h="280"
+                                 style="background-image:url('@Url.Content("~/images/tajeer-car-assets/tajeer-car.jpeg")');">
                             </div>
                         </div>
-                       
+
                         <div class="jc-faults">
                             <div>
                                 FAULT SYMBOLS:<br />
@@ -1201,28 +760,104 @@
         </section>
 
     </div>
-<script>
-    function GetVehicleData() {
-        $.ajax({
-            type: "GET",
-            url: "@Url.Action("GetStrike", "WIP")" + '?MovementId=' + @Model.MovementId,
-            dataType: "JSON",
-            success: function (Data) {
-                if (Data != "") {
-                    let jsonObject = JSON.parse(Data);
-                    for (var i = 0; i < jsonObject.length; i++) {
-                        var shapetype = jsonObject[i].type;
-                        var xcoord = jsonObject[i].x + 35;
-                        var ycoord = jsonObject[i].y + 23;
-                        var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
-                        $shape.css({ 'left': xcoord - 2, 'top': ycoord - 2 });
-                        $("#panel").append($shape);
+
+    <script>
+        function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+        // Computes the actual drawn image rectangle inside a "contain" box
+        function getContainRect(boxW, boxH, imgW, imgH) {
+            var scale = Math.min(boxW / imgW, boxH / imgH);
+            var drawW = imgW * scale;
+            var drawH = imgH * scale;
+            var offX = (boxW - drawW) / 2;
+            var offY = (boxH - drawH) / 2;
+            return { x: offX, y: offY, w: drawW, h: drawH };
+        }
+
+        function RenderStrikesOnDamagePanel(panelSelector) {
+            var $panel = $(panelSelector);
+            if ($panel.length === 0) return;
+
+            var imgSrc = $panel.data("img-src");
+            var baseW = parseFloat($panel.data("base-w")) || 650;
+            var baseH = parseFloat($panel.data("base-h")) || 280;
+
+            var ICON_W = 34;
+            var ICON_H = 34;
+
+            var img = new Image();
+
+            img.onload = function () {
+
+                // ✅ Use same source as details page (recommended)
+                var strikeUrl = "@Url.Action("GetStrike", "Movements")" + "?MovementId=@Model.MovementId";
+
+                // If you MUST keep WIP endpoint, use this instead:
+                // var strikeUrl = "@Url.Action("GetStrike", "WIP")" + "?MovementId=@Model.MovementId";
+
+                $.ajax({
+                    type: "GET",
+                    url: strikeUrl,
+                    dataType: "JSON",
+                    success: function (Data) {
+                        if (!Data) return;
+
+                        var strikes = (typeof Data === "string") ? JSON.parse(Data) : Data;
+                        if (!Array.isArray(strikes) || strikes.length === 0) return;
+
+                        var boxW = $panel.innerWidth();
+                        var boxH = $panel.innerHeight();
+                        var rect = getContainRect(boxW, boxH, img.naturalWidth, img.naturalHeight);
+
+                        $panel.find(".shape").remove();
+
+                        for (var i = 0; i < strikes.length; i++) {
+                            var s = strikes[i];
+
+                            var nx, ny;
+
+                            // ✅ If backend ever sends normalized coords, prefer them
+                            if (s.nx != null && s.ny != null) {
+                                nx = parseFloat(s.nx);
+                                ny = parseFloat(s.ny);
+                            } else {
+                                // ✅ Legacy conversion: match movement page formula (x+35, y+23)
+                                var xcoordLegacy = (parseFloat(s.x) + 35);
+                                var ycoordLegacy = (parseFloat(s.y) + 23);
+
+                                nx = xcoordLegacy / baseW;
+                                ny = ycoordLegacy / baseH;
+                            }
+
+                            // map normalized coords into the drawn image rect
+                            var mappedX = rect.x + (nx * rect.w);
+                            var mappedY = rect.y + (ny * rect.h);
+
+                            // keep the same "-2" that you used on the details page
+                            var left = mappedX - 2;
+                            var top = mappedY - 2;
+
+                            // clamp so it never clips outside the panel
+                            left = clamp(left, 0, boxW - ICON_W);
+                            top = clamp(top, 0, boxH - ICON_H);
+
+                            var shapetype = s.type;
+
+                            var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
+                            $shape.css({ left: left + "px", top: top + "px" });
+                            $panel.append($shape);
+                        }
                     }
-                }
-            }
+                });
+            };
+
+            img.src = imgSrc;
+        }
+
+        // Wait for layout to be ready
+        $(window).on("load", function () {
+            RenderStrikesOnDamagePanel("#damagePanelJC");
         });
-    }
-    GetVehicleData();
-</script>
+    </script>
 </body>
 </html>

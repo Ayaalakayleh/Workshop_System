@@ -195,18 +195,24 @@ namespace Workshop.Web.Controllers
                         movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
                         if (movement != null)
                         {
-                            var user = await _erpApiClient.GetUserInfoById((int)movement.CreatedBy);
-
-                            var first = user?.FirstName?.Trim();
-                            var last = user?.LastName?.Trim();
-
-                            string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
-                            ViewBag.CreatingOperator = userFullName;
                             ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
 
                         }
                         var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
                         ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                        
+                        ViewBag.CreatingOperator = await GetUserFullNameAsync(dto?.CreatedBy as int? ?? dto?.CreatedBy);
+
+                        if (dto?.Status == 2032) // closed
+                        {
+                            ViewBag.InvoicingOperator = await GetUserFullNameAsync(dto.ClosedBy as int? ?? dto.ClosedBy);
+                        }
+
+
+                        if (LastMovement?.MovementOut == true)
+                        {
+                            ViewBag.BookedOutOperator = await GetUserFullNameAsync(LastMovement.CreatedBy as int? ?? LastMovement.CreatedBy);
+                        }
                     }
 
                     // Get vehicle documents - handle nulls
@@ -2269,11 +2275,23 @@ namespace Workshop.Web.Controllers
                     {
                         item.FullDescription = mapping.Code + " - " + (lang == "en" ? mapping.PrimaryName : mapping.SecondaryName);
                     }
-
                 }
+            }
 
+            var details = await _apiClient.GetWIPByIdAsync(WIPId);
 
+            PrintInternalDTO.CreatingOperator = await GetUserFullNameAsync(details?.CreatedBy as int? ?? details?.CreatedBy); 
 
+            if (details?.Status == 2032) // closed
+            {
+                PrintInternalDTO.InvoicingOperator = await GetUserFullNameAsync(details.ClosedBy as int? ?? details.ClosedBy);
+            }
+
+            var lastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(details.VehicleId);
+
+            if (lastMovement?.MovementOut == true)
+            {
+                PrintInternalDTO.BookedOutOperator = await GetUserFullNameAsync(lastMovement.CreatedBy as int? ?? lastMovement.CreatedBy);
             }
 
 
@@ -2598,7 +2616,19 @@ namespace Workshop.Web.Controllers
                 throw ex;
             }
         }
-        
+
+        private async Task<string> GetUserFullNameAsync(int? userId)
+        {
+            if (userId is null) return string.Empty;
+
+            var user = await _erpApiClient.GetUserInfoById(userId.Value);
+            var first = user?.FirstName?.Trim();
+            var last = user?.LastName?.Trim();
+
+            return string.Join(" ",
+                new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x))
+            );
+        }
 
     }
 }
