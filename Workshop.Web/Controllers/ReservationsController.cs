@@ -464,8 +464,15 @@ namespace Workshop.Web.Controllers
                 });
             }
         }
+        [HttpGet]
+        public async Task<bool> HasRecall(string chassis)
+        {
+            var result = await _workshopapiClient.GetActiveRecallsByChassis(chassis);
+            if(result != null)
+            return result.HasActiveRecall;
 
-
+            return false;
+        }
 
 
     }

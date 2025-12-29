@@ -1,0 +1,109 @@
+﻿@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model Workshop.Core.DTOs.RecallDTO
+
+<!-- Button to open modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="recallModal" tabindex="-1" aria-labelledby="recallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="recallModalLabel">@Common["DefineRecallRule"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Begin form -->
+            @using (Html.BeginForm("EditNoRedirect", "Recall", FormMethod.Post, new { enctype = "multipart/form-data", id = "newRecallForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    @Html.HiddenFor(m => m.Id)
+                    @Html.Hidden("recallJson", new { @id = "recallJson", @name = "recallJson" })
+
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Code, @Common["Label_Code"]) <span class="text-danger">*</span>
+                                @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Title, @Common["Label_Title"]) <span class="text-danger">*</span>
+                                @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Description, @Common["Label_Description"])
+                                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "3" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.StartDate, @Common["Label_StartDate"])
+                                @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12 my-1">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.EndDate, @Common["Label_EndDate"])
+                                @Html.TextBoxFor(m => m.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "text" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-check form-switch mt-5">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input", id = "customSwitch1" })
+                                @Html.LabelFor(m => m.IsActive, (string)Common["Label_IsActive"], new { @class = "form-check-label", @for = "customSwitch1" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times"></i>&nbsp;@Common["Button_Cancel"]
+                    </button>
+                </div>
+            }
+            <!-- End form -->
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Optional: submit form via jQuery click
+        $(document).on("click", "#btnCreateRecall", function () {
+            const form = $("#newRecallForm");
+            if (form.length === 0) return console.error("Form not found");
+
+            if (!form[0].checkValidity()) {
+                form[0].reportValidity();
+                return;
+            }
+
+            form.trigger("submit");
+        });
+
+        // Debug: confirm submit event
+        $(document).on("submit", "#newRecallForm", function () {
+            console.log("Recall form submitted!");
+        });
+    });
+</script>

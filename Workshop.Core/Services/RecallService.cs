@@ -50,6 +50,10 @@ namespace Workshop.Core.Services
 		{
 			return await _repository.DeleteAsync(dto);
 		}
+        public async Task<int> UpdateRecallVehicleStatus(string chassisNo, int statusId)
+		{
+			return await _repository.UpdateRecallVehicleStatus(chassisNo, statusId);
+		}
 
 
     }

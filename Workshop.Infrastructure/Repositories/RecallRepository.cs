@@ -212,6 +212,24 @@ namespace Workshop.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<int> UpdateRecallVehicleStatus(string chassisNo, int statusId)
+        {
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@Chassis", chassisNo, DbType.String);
+            parameters.Add("@RecallStatusId", statusId, DbType.Int32);
+
+            var rowsAffected = await connection.QuerySingleAsync<int>(
+                "RecallVehicle_UpdateStatus",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return rowsAffected;
+        }
+
+
 
     }
 }

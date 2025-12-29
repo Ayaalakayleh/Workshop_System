@@ -60,6 +60,7 @@
                                                         Common["Select"].Value,
                                                         new { @class = "form-control", id = "vehicleDropdown", required = "required" }
                                                         )
+
                         </div>
                     </div>
 
@@ -101,6 +102,7 @@
                         <select id="chassisDropdown" name="ChassisId" class="form-control" required>
                             <option value="">@Common["Select"]</option>
                         </select>
+                        <span class="badge bg-secondary" id="recallChip">Recall: </span>
                     </div>
 
                     <div class="col-md-4 col-sm-12">
@@ -175,7 +177,7 @@
         getChassisByVehicleTypeUrl: '@Url.Action("GetChassisByVehicleType", "Reservations")',
         updateReservation: '@Url.Action("UpdateReservation", "Reservations")',
         getOpenAgreementInfoUrl: '@Url.Action("GetOpenAgreementInfoByCustomerIdOrVehicleId", "Reservations")',
-
+        
         reservationInserted: '@Html.Raw(Common["Booked_Reservation"])',
         reservationAlreadyExist: '@Html.Raw(Common["ActiveReservationExists"])',
         reservationBookedSuccessfully: '@Html.Raw(Common["Booked_Reservation"])',

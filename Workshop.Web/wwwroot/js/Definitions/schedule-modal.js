@@ -414,6 +414,9 @@
 
                     state.chassisId = Number(chassisId);
                     $('#CompanyId').val(res.data.vehicle.companyId).trigger('change');
+
+
+
                 }
 
                 isVehicleChassisSyncing = false;
@@ -443,7 +446,25 @@
         });
 
     }
+    function updateRecallChip(chassisId) {
+        if (!chassisId) {
+            $("#recallChip").text("Recall: -");
+            return;
+        }
 
+        $.ajax({
+            url: window.API_BASE.hasRecallURL,
+            type: 'GET',
+            data: { chassis: chassisId },
+            success: function (result) {
+                const hasRecall = result === true || result === "true";
+                $("#recallChip").text("Recall: " + (hasRecall ? "Yes" : "No"));
+            },
+            error: function () {
+                $("#recallChip").text("Recall: -");
+            }
+        });
+    }
     function handleChassisChange() {
         if (isVehicleChassisSyncing) return;
 
@@ -455,6 +476,8 @@
 
         isVehicleChassisSyncing = true;
 
+       
+        updateRecallChip($('#vehicleDropdown').val());
         $('#vehicleDropdown')
             .val(String(chassisId))
             .trigger('change.select2');
@@ -664,6 +687,7 @@
             }
         });
     }
+    
 
     function recomputeEndTime() {
         const startHHMM = $('#schStart').val();

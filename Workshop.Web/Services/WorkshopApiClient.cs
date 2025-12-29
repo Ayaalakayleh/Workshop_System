@@ -2401,6 +2401,24 @@ namespace Workshop.Web.Services
         {
             return await _httpClient.GetFromJsonAsync<ActiveRecallsByChassisResponseDto>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
         }
+        public async Task<int> UpdateRecallVehicleStatusAsync(string chassisNo, int statusId)
+        {
+            var url = $"api/Recall/UpdateRecallVehicleStatus?chassisNo={Uri.EscapeDataString(chassisNo)}&statusId={statusId}";
+            var response = await _httpClient.PutAsync(url, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return 0;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<int>();
+            return result;
+
+        }
+
 
         #endregion
 
