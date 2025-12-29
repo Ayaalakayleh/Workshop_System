@@ -83,7 +83,7 @@
 					<h6 class="mx-4 my-2 text-end">@ViewBag.AgreementEndDate</h6>
 					</div>
 					</div>
-
+			
 
 
 			</div>
@@ -108,7 +108,7 @@
 
 					<!-- tabs -->
 					<div class="row">
-						<ul class="nav nav-tabs mb-3 col-10" id="wipTabs" role="tablist">
+						<ul class="nav nav-tabs mb-3 col-8" id="wipTabs" role="tablist">
 							<li class="nav-item" role="presentation">
 								<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabAccount" type="button" role="tab">
 									@Common["Label_Account"]
@@ -134,14 +134,26 @@
 							</li>
 						</ul>
 
-						@if (ViewBag.IsWaitingInvoiced == true || ViewBag.IsWaitingInvoiced == "true")
+
+							<div class="col-4 text-end">
+							@if (ViewBag.HasRecall == true)
+							{
+								<button type="button"
+										id="btnFixRecall"
+										class="btn btn-warning btn-sm me-1"
+										data-chassis="@Model?.VehicleTab?.ChassisNo">
+									<i class="fa fa-exclamation-triangle"></i>
+									@Common["Fix_Recall"]
+								</button>
+
+							}
+													@if (ViewBag.IsWaitingInvoiced == true || ViewBag.IsWaitingInvoiced == "true")
 						{
-							<div class="col-2 text-end">
 								<button type="button" class="btn btn-secondary btn-sm" id="closeBTN">
 									<i class="fa fa-times"></i>&nbsp;@Common["Button_Close"]
 								</button>
+							 } 
 							</div>
-						}
 					</div>
 					
 					<!-- tab-content -->
@@ -208,6 +220,26 @@
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>@Common["Label_Parts"]</span><strong id="totParts" data-value="0"></strong>
                                     </div>
+									@if (ViewBag.HasExternalInvoices == true)
+									{
+										<hr class="my-2" />
+										<div class="d-flex justify-content-between mb-2">
+											<span>@Common["TransferLabourCost"]</span>
+											<strong>@ViewBag.TransferLabourCost</strong>
+										</div>
+
+										<div class="d-flex justify-content-between mb-2">
+											<span>@Common["TransferPartsCost"]</span>
+											<strong>@ViewBag.TransferPartsCost</strong>
+										</div>
+
+										<hr class="my-2" />
+										<div class="d-flex justify-content-between">
+											<span class="fw-bold">@Common["TransferTotalInvoice"]</span>
+											<strong class="fw-bold">@ViewBag.TransferTotalInvoiceWithoutVat</strong>
+										</div>
+									}
+
                                     <hr class="my-2" />
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>@Common["Label_Subtotal"]</span><strong id="totSubtotal" data-value="0"></strong>
@@ -295,9 +327,11 @@
 		transferMoveInUrl: '@Url.Action("TransferMoveIn", "WIP")',
 		addUrl: '@Url.Action("Add", "WIP")',
 		createIssueVoucher: '@Url.Action("CreateIssueVoucher", "WIP")',
-		  addCreditNote: '@Url.Action("CreditNote", "WIP")',
+		addCreditNote: '@Url.Action("CreditNote", "WIP")',
+		hasExternalPendingInvoice: '@Url.Action("hasExternalPendingInvoice", "WIP")',
+		updateRecallVehicleStatus: '@Url.Action("UpdateRecallVehicleStatus", "WIP")'
 
-	}
+	  }
 
 	window.resources = @Html.Raw(Json.Serialize(new
 		{
@@ -387,7 +421,11 @@
 		  DXPartApproved: '@Html.Raw(Common["Label_PartApproved"])',
 		  DXPartRejected: '@Html.Raw(Common["Label_PartReject"])',
 	   	  DXPartReceived: '@Html.Raw(Common["Label_PartReceived"])',
-			  DXPartTransferReq: '@Html.Raw(Common["Label_PartTransferReq"])',
+		  DXPartTransferReq: '@Html.Raw(Common["Label_PartTransferReq"])',
+		  RecallConfirmation: '@Html.Raw(Common["RecallConfirmation"])',
+		  RecallFixed: '@Html.Raw(Common["Recall_fixed"])',
+		  ErrorHappend: '@Html.Raw(Common["ErrorHappend"])',
+		  LabelError: '@Html.Raw(Common["Label_Error"])',
 
 		  // ============================
 		  // DevExpress Labels - Services
@@ -425,7 +463,15 @@
 			// URLs - History
 			// ============================
 		 getServiceHistoryUrl: '@Url.Action("GetWIPServiceHistory", "WIP")',
-		 getWIPDetailsUrl: '@Url.Action("GetWIPDetails", "WIP")'
+		 getWIPDetailsUrl: '@Url.Action("GetWIPDetails", "WIP")',
+
+
+	// ============================
+	// Transfer Totals (External Invoices)
+	// ============================
+	transferSubtotal: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoiceWithoutVat : 0),
+	transferVatAmount: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferVatAmount : 0),
+	transferTotal: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoice : 0)
 	  };
 		const internalMatches = @Html.Raw(Json.Serialize(ViewBag.InternalMatches));
 	  const externalMatches = @Html.Raw(Json.Serialize(ViewBag.ExternalMatches));

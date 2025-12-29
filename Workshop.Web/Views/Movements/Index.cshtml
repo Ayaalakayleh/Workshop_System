@@ -54,8 +54,7 @@
     </div>
 </div>
 <div id="MovementList"></div>
-<div id="contentPager" hidden></div>
-
+<div class="d-flex justify-content-end"><div id="contentPager" hidden></div></div>
 
 <script>
 
@@ -110,7 +109,11 @@
             currentPage: page,
             prevText: '&laquo;',   // «
             nextText: '&raquo;',   // »
-            onPageClick: function (p) { getData(p); }
+            onPageClick: function (p,e) {
+                e.preventDefault(); 
+                getData(p); 
+            },
+            hrefTextPrefix: 'javascript:void(0)'
         });
 
         // Bootstrap-like look, same as your Technicians code

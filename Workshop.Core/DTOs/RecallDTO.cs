@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Workshop.Core.DTOs
+﻿namespace Workshop.Core.DTOs
 {
 	public abstract class RecallBaseDTO
 	{
@@ -13,7 +7,7 @@ namespace Workshop.Core.DTOs
 		public string? Description { get; set; }
 		public DateTime? StartDate { get; set; }
 		public DateTime? EndDate { get; set; }
-		public bool IsActive { get; set; } 
+		public bool IsActive { get; set; }
 		public List<VehicleRecallDTO>? Vehicles { get; set; }
 	}
 
@@ -50,37 +44,41 @@ namespace Workshop.Core.DTOs
 		public int? PageNumber { get; set; }
 	}
 
-    public class VehicleRecallDTO
-    {
-		public int? Id  { get; set; }
-        public int? RecallID { get; set; }
-        public int? MakeID { get; set; }
-        public int? ModelID { get; set; }
-        public string? Chassis { get; set; }
-    }
+	public class VehicleRecallDTO
+	{
+		public int? Id { get; set; }
+		public int? RecallID { get; set; }
+		public int? MakeID { get; set; }
+		public int? ModelID { get; set; }
+		public string? Chassis { get; set; }
+		public int? RecallStatus { get; set; }
+	}
 
-    public class ActiveRecallDto
-    {
-        public int RecallId { get; set; }
-        public string Code { get; set; } = default!;
-        public string Title { get; set; } = default!;
-        public string? Description { get; set; }
+	public class ActiveRecallDto
+	{
+		public int RecallId { get; set; }
+		public string Code { get; set; } = default!;
+		public string Title { get; set; } = default!;
+		public string? Description { get; set; }
 
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+		public DateTime? StartDate { get; set; }
+		public DateTime? EndDate { get; set; }
 
-        public bool IsActive { get; set; }
+		public bool IsActive { get; set; }
 
-        public DateTime? CreatedAt { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public int? UpdatedBy { get; set; }
-    }
+		public DateTime? CreatedAt { get; set; }
+		public int? CreatedBy { get; set; }
+		public DateTime? UpdatedAt { get; set; }
+		public int? UpdatedBy { get; set; }
+	}
 
-    public class ActiveRecallsByChassisResponseDto
-    {
-        public string ChassisNo { get; set; } = default!;
-        public bool HasActiveRecall => Recalls != null && Recalls.Count > 0;
-        public List<ActiveRecallDto> Recalls { get; set; } = new();
+	public class ActiveRecallsByChassisResponseDto
+	{
+		public string ChassisNo { get; set; } = default!;
+		public bool HasActiveRecall => Recalls != null && Recalls.Count > 0;
+		public List<ActiveRecallDto> Recalls { get; set; } = new();
+	}
+	public enum VehicleRecallStatus {
+		Open = 1, Done = 2
     }
 }

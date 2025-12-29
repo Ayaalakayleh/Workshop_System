@@ -63,9 +63,9 @@ namespace Workshop.API.Controllers
 		}
 
 		[HttpPost("InsertMWorkshopMovementStrikes")]
-		public async Task<IActionResult> InsertMWorkshopMovementStrikes(int movementId, string strikes)
+		public async Task<IActionResult> InsertMWorkshopMovementStrikes([FromBody] VehicleMovementStrike dto)
 		{
-			await _workshopMovementService.InsertMWorkshopMovementStrikesAsync(movementId, strikes);
+			await _workshopMovementService.InsertMWorkshopMovementStrikesAsync((int)dto.MovementId, dto.Strike);
 			return Ok(new { IsSuccess = true, Message = "Strikes inserted successfully" });
 		}
 
@@ -200,15 +200,27 @@ namespace Workshop.API.Controllers
 		public async Task<ActionResult<VehicleMovement>> VehicleMovement_GetLastMovementOutByWorkOrderId(int WorkOrderId)
 		{
 			var result = await _workshopMovementService.VehicleMovement_GetLastMovementOutByWorkOrderIdAsync(WorkOrderId);
-			return Ok(result);
+			if (result == null)
+			{
+				result = new VehicleMovement();
+
+            }
+
+            return Ok(result);
 		}
+        [HttpGet("GetWorkshopInvoiceByWorkOrderId/{workOrderId}")]
+        public async Task<IActionResult> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+        {
+            var result = await _workshopMovementService.GetWorkshopInvoiceByWorkOrderId(workOrderId);
+            return Ok(result);
+        }
 
 
-		#endregion
+        #endregion
 
-		#region MovementOut
+        #region MovementOut
 
-		[HttpPut("UpdateVehicleMovementStatus")]
+        [HttpPut("UpdateVehicleMovementStatus")]
 		public async Task<IActionResult> UpdateVehicleMovementStatusAync(int workshopId, Guid masterId)
 		{
 			await _workshopMovementService.UpdateVehicleMovementStatusAync(workshopId, masterId);

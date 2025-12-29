@@ -229,6 +229,11 @@ namespace Workshop.Web.Services
             string url = $"/Agreement/GetActiveAgreementId?VehicleDefinitionId={id}";
             return await SendRequest<Agreement>(url, HttpMethod.Get);
         }
+        public async Task<Agreement> GetGeneralInfo(int AgreementId)
+        {
+            string url = $"/Agreement/GetGeneralInfo?AgreementId={AgreementId}";
+            return await SendRequest<Agreement>(url, HttpMethod.Get);
+        }
         public async Task<VehicleDefinitions> VehicleDefinitionsGetByChassisNo(string chassisNo)
         {
             string url = $"/VehicleDefinition/VehicleDefinitionsGetByChassisNo?chassisNo={chassisNo}";
@@ -259,6 +264,23 @@ namespace Workshop.Web.Services
             string url = $"/CustomerInformation/GetCustomerData?id={customerId}";
             var result = await SendRequest<CustomerInformation>(url, HttpMethod.Get);
             return result;
+        }
+
+
+        public async Task<List<VehicleDefinitions>> GetAllExternalWSVehiclesDetails
+        (int CompanyId, int? manufacturerId =0, int? VehicleModelId = 0, string? platenumber ="", string? ChassisNo = "")
+        {
+
+            string url = $"/VehicleDefinition/VehicleDefinitions_GetAllExternalWSVehiclesDetails?CompanyId={CompanyId}&ManufacturerId={manufacturerId}&Platenumber={platenumber}&VehicleModelId={VehicleModelId}&ChassisNo={ChassisNo}";
+            return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
+        }
+
+        public async Task<List<VehicleDefinitions>> GetAllInternalWSVehiclesDetails
+        (int CompanyId, int? manufacturerId = 0, int? VehicleModelId = 0, string? platenumber = "", string? ChassisNo = "")
+        {
+
+            string url = $"/VehicleDefinition/VehicleDefinitions_GetAllInternalWSVehiclesDetails?CompanyId={CompanyId}&ManufacturerId={manufacturerId}&Platenumber={platenumber}&VehicleModelId={VehicleModelId}&ChassisNo={ChassisNo}";
+            return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
         }
     }
 }

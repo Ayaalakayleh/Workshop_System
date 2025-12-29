@@ -368,11 +368,11 @@
     }
 
     /* ==========================================================
-           COMPACT + LIGHTWEIGHT UI ONLY INSIDE mark-scratces-section
-           - smaller sizes
-           - remove uppercase
-           - table-sm
-           ========================================================== */
+               COMPACT + LIGHTWEIGHT UI ONLY INSIDE mark-scratces-section
+               - smaller sizes
+               - remove uppercase
+               - table-sm
+               ========================================================== */
     .the-movements .mark-scratces-section {
         font-size: .82rem;
         line-height: 1.25;
@@ -728,7 +728,7 @@
                                                 </button>
                                             </div>
 
-@*                                             <div class="scratches-container">
+                                            @*                                             <div class="scratches-container">
                                                 <div id="panel" class="mt-3"></div>
                                             </div> *@
                                             <div class="scratch-wrap">
@@ -827,10 +827,10 @@
                                                                         @Html.HiddenFor(m => m.TyreCkecklist[i].LookupId)
                                                                         <th class="text-start">
                                                                             @(
-                                                                               lang == "en"
-                                                                                   ? Model.TyreCkecklist[i].LookupPrimaryDescription
-                                                                                     : Model.TyreCkecklist[i].LookupSecondaryDescription
-                                                                                 )
+                                                                                                                                                    lang == "en"
+                                                                                                                                                    ? Model.TyreCkecklist[i].LookupPrimaryDescription
+                                                                                                                                                    : Model.TyreCkecklist[i].LookupSecondaryDescription
+                                                                                                                                                    )
                                                                     </th>
 
                                                                         <td>
@@ -858,10 +858,25 @@
                                             </div>
                                         </div>
 
+
+
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
+
+
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5>@Common["Label_Recall"]</h5>
+                            </div>
+                            @Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
+
+                            @Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id = "hasRecall", @disabled = true })
+
+                        </div>
+
+
 
                         @if (Model.MaintenanceStatus != 3 || Model.MaintenanceStatus == null)
                         {
@@ -1000,11 +1015,11 @@
 
         @foreach (var item in Model.MovementInvoice)
         {
-                <text>
-                    var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
-                    var fi = { "source": source, options: { type: 'local' } };
-                    file.files.push(fi);
-                </text>
+                    <text>
+                        var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
+                        var fi = { "source": source, options: { type: 'local' } };
+                        file.files.push(fi);
+                    </text>
         }
 
         cuspond = FilePond.create(inputElement, {

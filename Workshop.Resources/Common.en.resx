@@ -2478,4 +2478,31 @@
   <data name="Button_More" xml:space="preserve">
     <value>More</value>
   </data>
+  <data name="TransferLabourCost" xml:space="preserve">
+    <value>Transfer Labour Cost</value>
+  </data>
+  <data name="TransferPartsCost" xml:space="preserve">
+    <value>Transfer Parts Cost</value>
+  </data>
+  <data name="TransferSubtotal" xml:space="preserve">
+    <value>Transfer Subtotal (Excl. VAT)</value>
+  </data>
+  <data name="TransferVatAmount" xml:space="preserve">
+    <value>Transfer VAT</value>
+  </data>
+  <data name="TransferTotalInvoice" xml:space="preserve">
+    <value>Transfer Total Invoice</value>
+  </data>
+  <data name="Label_HasRecall" xml:space="preserve">
+    <value>Has Recall</value>
+  </data>
+  <data name="RecallConfirmation" xml:space="preserve">
+    <value>Do you want to fix this recall?</value>
+  </data>
+  <data name="Fix_Recall" xml:space="preserve">
+    <value>Fix Recall</value>
+  </data>
+  <data name="Recall_fixed" xml:space="preserve">
+    <value>Recall fixed successfully</value>
+  </data>
 </root>

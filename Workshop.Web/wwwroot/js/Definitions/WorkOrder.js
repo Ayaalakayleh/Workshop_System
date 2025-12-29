@@ -167,33 +167,45 @@ function buildWorkOrderFilter(page) {
 }
 
 function applyWorkOrderPager(currentPage) {
-    const pagerTotalPages = parseInt($("#total_pages").val(), 10);
-    const hasPager = !Number.isNaN(pagerTotalPages) && pagerTotalPages > 0;
-    const pagerPlugin = typeof $('#contentPager').pagination === 'function';
+    debugger
+    const totalPages = parseInt($("#total_pages").val(), 10) || 0;
+    const $pager = $('#contentPager');
 
-    if (!hasPager || !pagerPlugin) {
-        $("#contentPager").attr("hidden", true);
+    const pagerPlugin = typeof $pager.pagination === 'function';
+
+    if (!pagerPlugin || totalPages <= 1) {
+        $pager.attr("hidden", true).empty();
         return;
     }
 
-    $("#contentPager").attr("hidden", false);
+    $pager.attr("hidden", false);
 
-    try { $('#contentPager').pagination('destroy'); } catch (e) { /* ignore */ }
+    try { $pager.pagination('destroy'); } catch (e) { }
 
-    $('#contentPager').pagination({
-        items: pagerTotalPages,      // total pages from backend
-        itemOnPage: 1,               // treat each "item" as a page
-        currentPage: currentPage || 1,
+    $pager.pagination({
+        items: totalPages,                 
+        itemsOnPage: 1,                   
+        currentPage: parseInt(currentPage, 10) || 1,
         prevText: '&laquo;',
         nextText: '&raquo;',
-        onPageClick: function (pageNumber) {
-            loadWorkOrders(pageNumber);
+        hrefTextPrefix: '',                
+        onPageClick: function (pageNumber, evt) {
+            if (evt && evt.preventDefault) evt.preventDefault();
+            loadWorkOrders(pageNumber);    
+            return false;
         }
     });
 
-    $('#contentPager ul').addClass('pagination');
-    $('#contentPager li').addClass('page-item');
-    $('#contentPager a, #contentPager span').addClass('page-link');
+    $pager.off('click.pagerFix').on('click.pagerFix', 'a', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    $pager.find('a').attr('href', 'javascript:void(0)').attr('role', 'button');
+
+    $pager.find('ul').addClass('pagination');
+    $pager.find('li').addClass('page-item');
+    $pager.find('a, span').addClass('page-link');
 }
 
 function loadWorkOrders(page) {

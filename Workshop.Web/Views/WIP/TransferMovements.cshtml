@@ -51,10 +51,15 @@
                             {
                                 <tr id="@tt.MovementId">
                                     <td>
-                                        @((Model.vehicleNams).Where(x => x.id == tt.VehicleID).FirstOrDefault() != null ?
-                                                        (Model.vehicleNams).Where(x => x.id == tt.VehicleID).FirstOrDefault().VehicleName : "")
+                                        @{
+                                            var list = (tt.IsExternal == true)
+                                            ? Model.ExternalVehicleNams
+                                            : Model.vehicleNams;
 
-                                    </td>
+                                            var v = list?.FirstOrDefault(x => x.id == (tt.VehicleID ?? 0));
+                                        }
+                                    @(v?.VehicleName ?? "")
+                                </td>
 
                                     <td>
                                         @((Model.workshops).Where(x => x.Id == tt.MoveInWorkshopId).FirstOrDefault() != null ?

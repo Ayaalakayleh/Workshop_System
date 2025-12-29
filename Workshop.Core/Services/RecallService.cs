@@ -28,8 +28,13 @@ namespace Workshop.Core.Services
 		{
 			return await _repository.GetAllAsync(filterRecallDTO);
 		}
+        public async Task<IEnumerable<RecallDTO>> GetAllDDLAsync()
+		{
+            return await _repository.GetAllDDLAsync();
+        }
 
-		public async Task<RecallDTO?> GetByIdAsync(int id)
+
+        public async Task<RecallDTO?> GetByIdAsync(int id)
 		{
 			return await _repository.GetByIdAsync(id);
 		}
@@ -45,7 +50,14 @@ namespace Workshop.Core.Services
 		{
 			return await _repository.DeleteAsync(dto);
 		}
-
+        public async Task<int> UpdateRecallVehicleStatus(string chassisNo, int statusId)
+		{
+			return await _repository.UpdateRecallVehicleStatus(chassisNo, statusId);
+		}
+        public async Task<List<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassisBulkAsync(List<string> chassisList)
+		{
+			return await _repository.GetActiveRecallsByChassisBulkAsync(chassisList);
+		}
 
     }
 }

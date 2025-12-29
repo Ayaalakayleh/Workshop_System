@@ -937,6 +937,21 @@ namespace Workshop.Web.Services
             }
         }
 
+        public async Task<VehicleMovement> GetLastMovementOutByWorkOrderId(int workorder)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/WorkshopMovement/VehicleMovement_GetLastMovementOutByWorkOrderId?WorkOrderId={workorder}");
+                response.EnsureSuccessStatusCode();
+                
+                return response != null ? await response.Content.ReadFromJsonAsync<VehicleMovement>() : new VehicleMovement();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public async Task<string> GetVehicleMovementStrikeAsync(int movementId)
         {
             try
@@ -963,6 +978,13 @@ namespace Workshop.Web.Services
             {
                 throw new Exception(e.Message);
             }
+        }
+        public async Task<List<MovementInvoice>> GetWorkshopInvoiceByWorkOrderId(int workOrderId)
+        {
+            var response = await _httpClient.GetAsync($"api/workshopmovement/GetWorkshopInvoiceByWorkOrderId/{workOrderId}");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<List<MovementInvoice>>();
         }
         #endregion
 
@@ -1468,10 +1490,24 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<List<ExternalWorkshopInvoiceDetailsDTO>>(url);
         }
 
+        public async Task<List<ExternalWorkshopInvoiceDetailsDTO>?> GetInvoiceDetailsByWIPIdAsync(int? WIPId)
+        {
+            var url = $"api/ExternalWorkshopInvoice/GetInvoiceDetailsByWIPId?WIPId={WIPId}";
+
+            var response = await _httpClient.GetAsync(url);
+            var body = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"API failed: {(int)response.StatusCode} {response.ReasonPhrase} | Body: {body}");
+
+            return await response.Content.ReadFromJsonAsync<List<ExternalWorkshopInvoiceDetailsDTO>>();
+        }
+
+
         #endregion
 
         #region MaintenanceCard
-        
+
         public async Task InsertDMaintenanceCardAsync(MaintenanceCardDTO maintenanceCard)
         {
             var response = await _httpClient.PostAsJsonAsync("api/MaintenanceCard/InsertDMaintenanceCard", maintenanceCard);
@@ -2277,6 +2313,21 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<WipInvoiceDetailDTO>>($"api/WIP/WipInvoiceByHeaderId?headerId={headerId}");
 
         }
+        public async Task<int> UpdateWIPServicesExternalAndFixStatus(List<Models.WipServiceFixDto> services)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/WIP/UpdateWIPServicesExternalAndFixStatus", services);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return 0;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<int>();
+            return result;
+        }
         #endregion
 
 
@@ -2294,8 +2345,12 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<RecallDTO>?>();
             return result;
         }
+        public async Task<IEnumerable<RecallDTO>?> GetAllRecallsDDLAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<IEnumerable<RecallDTO>?>($"api/Recall/GetAllDDL");
+        }
 
-		public async Task<RecallDTO?> GetRecallByIdAsync(int id)
+        public async Task<RecallDTO?> GetRecallByIdAsync(int id)
 		{
 			return await _httpClient.GetFromJsonAsync<RecallDTO>($"api/Recall/GetById/{id}");
 		}
@@ -2342,6 +2397,45 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
             return result != null && result.ContainsKey("deleted") ? result["deleted"] : 0;
         }
+        public async Task<ActiveRecallsByChassisResponseDto?> GetActiveRecallsByChassis(string chassisNo)
+        {
+            return await _httpClient.GetFromJsonAsync<ActiveRecallsByChassisResponseDto>($"api/Recall/GetActiveRecallsByChassis/{chassisNo}");
+        }
+        public async Task<int> UpdateRecallVehicleStatusAsync(string chassisNo, int statusId)
+        {
+            var url = $"api/Recall/UpdateRecallVehicleStatus?chassisNo={Uri.EscapeDataString(chassisNo)}&statusId={statusId}";
+            var response = await _httpClient.PutAsync(url, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return 0;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<int>();
+            return result;
+
+        }
+        public async Task<List<ActiveRecallsByChassisResponseDto>?> GetActiveRecallsByChassisBulkAsync(List<string> chassisList)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Recall/GetActiveRecallsByChassisBulk",  chassisList);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return null;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<List<ActiveRecallsByChassisResponseDto>>();
+
+            return result;
+        }
+
+
 
         #endregion
 

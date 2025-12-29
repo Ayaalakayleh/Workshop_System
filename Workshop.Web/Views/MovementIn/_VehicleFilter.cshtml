@@ -190,8 +190,7 @@
         });
 
         $('#resetVehicleDefinitions').click(function () {
-            // Best reset for Select2
-            $('select.select2').val(null).trigger('change');
+            $('select.select2').not('#VehicleStatusId').val(null).trigger('change');
 
             $('.plate-mask').val('');
             $('#plateText').text('');

@@ -3,12 +3,14 @@ using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.ExtendedProperties;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -158,7 +160,7 @@ namespace Workshop.Web.Controllers
                         ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
 
                         ViewBag.DueOutDate = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-
+                        ViewBag.ReceivedMeter = movement.ReceivedMeter;
                     }
                 }
 
@@ -171,24 +173,46 @@ namespace Workshop.Web.Controllers
                         _logger.LogWarning($"WIP with ID {id.Value} not found.");
                         return NotFound();
                     }
+                    var externalInvoices = await _apiClient.GetWorkshopInvoiceByWorkOrderId(dto.WorkOrderId ?? 0);
+                    if (externalInvoices != null && externalInvoices.Any())
+                    {
+                        ViewBag.HasExternalInvoices = true;
+
+                        ViewBag.TransferLabourCost = externalInvoices.Sum(x => x.LaborCost);
+                        ViewBag.TransferPartsCost = externalInvoices.Sum(x => x.PartsCost);
+                        ViewBag.TransferTotalInvoice = externalInvoices.Sum(x => x.TotalAmount);
+                        ViewBag.TransferTotalInvoiceWithoutVat = externalInvoices.Sum(x => x.TotalAmount - x.Vat);
+                        ViewBag.TransferVatAmount = externalInvoices.Sum(x => x.Vat);
+
+                    }
+                    else
+                    {
+                        ViewBag.HasExternalInvoices = false;
+                    }
 
                     if (dto.MovementId > 0)
                     {
                         movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
                         if (movement != null)
                         {
-                            var user = await _erpApiClient.GetUserInfoById((int)movement.CreatedBy);
-
-                            var first = user?.FirstName?.Trim();
-                            var last = user?.LastName?.Trim();
-
-                            string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
-                            ViewBag.CreatingOperator = userFullName;
                             ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
 
                         }
                         var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
                         ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                        
+                        ViewBag.CreatingOperator = await GetUserFullNameAsync(dto?.CreatedBy as int? ?? dto?.CreatedBy);
+
+                        if (dto?.Status == 2032) // closed
+                        {
+                            ViewBag.InvoicingOperator = await GetUserFullNameAsync(dto.ClosedBy as int? ?? dto.ClosedBy);
+                        }
+
+
+                        if (LastMovement?.MovementOut == true)
+                        {
+                            ViewBag.BookedOutOperator = await GetUserFullNameAsync(LastMovement.CreatedBy as int? ?? LastMovement.CreatedBy);
+                        }
                     }
 
                     // Get vehicle documents - handle nulls
@@ -334,6 +358,9 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
                             dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
                             dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                            var recallResponse =await _apiClient.GetActiveRecallsByChassis(vehicleDetails?.ChassisNo);
+
+                            ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
 
                         }
                         else
@@ -1154,14 +1181,15 @@ namespace Workshop.Web.Controllers
 
                 movement.CompanyId = CompanyId;
                 movement.CreatedBy = UserId;
-                movement.MoveOutWorkshopId = BranchId;
+                // movement.MoveOutWorkshopId = movement.MoveInWorkshopId; need some attention here :)
+                movement.MoveOutWorkshopId = movement.MoveInWorkshopId;
                 movement.MovementOut = true;
                 movement.WorkshopId = BranchId;
                 movement.Status = 4;
                 movement.MasterId = move.MasterId;
                 movement.WorkOrderId = move.WorkOrderId;
                 movement.LastVehicleStatus = move.LastVehicleStatus;
-                movement.IsExternal = true;
+                movement.IsExternal = move.IsExternal;
                 movement.VehicleID = move.VehicleID;
 
                 var movements = await _apiClient.InsertVehicleMovementAsync(movement);
@@ -1203,7 +1231,7 @@ namespace Workshop.Web.Controllers
                 ovehicleMovement.ColMovements = await _apiClient.GetAllVehicleTransferMovementAsync(null, 1, BranchId);
 
                 ovehicleMovement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
-                var externalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
+                ovehicleMovement.ExternalVehicleNams = await _vehicleApiClient.GetExteralVehicleName(lang);
                 ovehicleMovement.ColBranches = await _erpApiClient.GetActiveBranchesByCompanyId(CompanyId);
                 ovehicleMovement.workshops = (await _apiClient.WorkshopGetAllAsync(CompanyId, null, null, lang))?.ToList();
 
@@ -1279,7 +1307,7 @@ namespace Workshop.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> TransferMoveIn(
         [FromForm] VehicleMovement movement,
-        [FromForm] string FixedServiceIds,
+        [FromForm] List<Models.WipServiceFixDto> Services,
         [FromForm] IFormFile file)
         {
             var resultJson = new TempData();
@@ -1324,9 +1352,9 @@ namespace Workshop.Web.Controllers
                 //Check
                 //Movement.DamageId = Movement.ColMaintenanceCard[0].DamageId;
                 var movements = await _apiClient.InsertVehicleMovementAsync(movement);
-                if (!string.IsNullOrWhiteSpace(FixedServiceIds))
+                if (Services != null && Services.Any())
                 {
-                    await _apiClient.UpdateWIPServicesIsFixedAsync(FixedServiceIds);
+                    await _apiClient.UpdateWIPServicesExternalAndFixStatus(Services);
                 }
 
                 MovementInvoice invoice = new MovementInvoice();
@@ -2258,15 +2286,384 @@ namespace Workshop.Web.Controllers
                     {
                         item.FullDescription = mapping.Code + " - " + (lang == "en" ? mapping.PrimaryName : mapping.SecondaryName);
                     }
-
                 }
+            }
 
+            var details = await _apiClient.GetWIPByIdAsync(WIPId);
 
+            PrintInternalDTO.CreatingOperator = await GetUserFullNameAsync(details?.CreatedBy as int? ?? details?.CreatedBy); 
 
+            if (details?.Status == 2032) // closed
+            {
+                PrintInternalDTO.InvoicingOperator = await GetUserFullNameAsync(details.ClosedBy as int? ?? details.ClosedBy);
+            }
+
+            var lastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(details.VehicleId);
+
+            if (lastMovement?.MovementOut == true)
+            {
+                PrintInternalDTO.BookedOutOperator = await GetUserFullNameAsync(lastMovement.CreatedBy as int? ?? lastMovement.CreatedBy);
             }
 
 
             return View(PrintInternalDTO);
+        }
+
+        public async Task<JsonResult> hasExternalPendingInvoice(int WIPId)
+        {
+            try
+            {
+                var result = await _apiClient.GetInvoiceDetailsByWIPIdAsync(WIPId);
+
+                return Json(new { success = true, hasPending = result?.Any() == true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+
+            }
+        }
+
+        public async Task<IActionResult> RepairOrderRequest(int Id)
+        {
+            try
+            {
+                var Details = await _apiClient.GetWIPByIdAsync(Id);
+                var vehicleId = Details.VehicleId;
+                var accountDetails = await _apiClient.WIP_GetAccountById(Id) ?? new AccountDTO();
+                var movement = await _apiClient.GetVehicleMovementByIdAsync((int)Details.MovementId);
+                var services = await _apiClient.WIP_GetServicesById(Id);
+                var workOrderDetials = await _apiClient.GetMWorkOrderByID((int)Details.WorkOrderId);
+                var Complaint = workOrderDetials != null ? workOrderDetials.Description : string.Empty;
+               
+
+                RepairOrderRequestReportModel model = new RepairOrderRequestReportModel();
+                model.WIPId = Details.Id;
+                model.MovementId = Details.MovementId;
+                model.VehicleNo = Details.VehicleId;
+
+                var customer = "";
+                if (accountDetails.CustomerId != null)
+                {
+                    var _customer = await _accountingApiClient.Customer_GetById((int)accountDetails.CustomerId);
+
+                    customer = _customer.CustomerPrimaryName;
+                    model.AccountNo = _customer.AccountNoReceivable;
+                }
+
+                var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
+                if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
+                {
+                    var customerLease = await _vehicleApiClient.GetGeneralInfo((int)activeAgreement.AgreementId);
+                    var CustomerId = customerLease.LeaseCustomerId;
+                     
+                    var customerName = "";
+                    var _customerInfo = await _vehicleApiClient.Get_CustomerInformation(BranchId, lang);
+                    
+                    if(CustomerId != null)
+                    {
+                        var _customerDetails =  _customerInfo.FirstOrDefault(c => c.Id == CustomerId) ;
+                        customerName = _customerDetails.CustomerPrimaryName;
+                        model.MobileNumber = _customerDetails.CustomerPhoneNumber;
+                    }
+
+                        model.CustomerName = customerName;
+                }
+
+                //============================================================================================================
+                var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
+                //============================================================================================================
+                var last = await _apiClient.GetLastMovementOutByWorkOrderId((int)Details.WorkOrderId);
+                model.VehicleInfo ??= new VehicleInfoModel();
+                model.Date = DateTime.Now;
+                model.TimeReceived = movement.ReceivedTime;
+                model.VehicleInfo.Year = vehicleInfo.Year;
+                model.VehicleInfo.PlateNumber = vehicleInfo.PlateNumber;
+                model.VehicleInfo.ColorName = vehicleInfo.ColorName;
+                model.VehicleInfo.VIN = vehicleInfo.VIN;
+                model.VehicleInfo.Make = vehicleInfo.Make;
+                model.VehicleInfo.Model = vehicleInfo.Model;
+                model.VehicleInfo.Mileage = vehicleInfo.Mileage?? movement.ReceivedMeter;
+                model.DateLastVisit = last?.GregorianMovementDate?.ToString("yyyy-MM-dd");
+                //model.EngineNumber = vehicleDetails.Eng;
+                model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
+                //model.Trim = accountDetails.TermsId;
+                //model.CompanyName = Details.CompanyName;
+                model.InsuranceExpDate = await VehicleDocumants(Details.VehicleId, 5); 
+                model.EstimaraExpDate = await VehicleDocumants(Details.VehicleId, 2);
+                model.MVPIExpDate = await VehicleDocumants(Details.VehicleId, 6); 
+                model.RegistrationExpDate = await VehicleDocumants(Details.VehicleId, 8); 
+                model.Complaint = Complaint;
+                model.DateIn = movement.GregorianMovementDate?.ToString("yyyy-MM-dd");
+                model.TimeIn = movement.ReceivedTime;
+                model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                //model.TimeOut = movement.ReceivedTime;
+                //model.AccountNo = Details.AccountNo;
+                model.FuelLevel = movement.fuelLevel;
+                model.Services = services?.ToList();
+                model.Items = await GetItemsModelsAsync(Id, lang); 
+                model.VehicleCkecklist = await GetVehicleChecklistAsync(Details.MovementId);
+                model.TyreCkecklist = await GetTyreChecklistAsync(Details.MovementId);
+                
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "An error occurred in RepairOrderRequestReport");
+                throw;
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetStrike(int movementId)
+        {
+            string strike = await _apiClient.GetVehicleMovementStrikeAsync(movementId);
+            return Json(strike);
+        }
+        [HttpPut]
+        public async Task<JsonResult> UpdateRecallVehicleStatus(string chassisNo)
+        {
+            try
+            {
+                var updated = await _apiClient.UpdateRecallVehicleStatusAsync(chassisNo, (int)RecallStatusEnum.Done);
+
+                return Json(new
+                {
+                    success = true,
+                    updated
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    success = false,
+                    updated = 0
+                });
+            }
+        }
+
+
+
+        private async Task<string?> GetContractExpDateAsync(int vehicleId)
+        {
+            try
+            {
+                var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
+
+                if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
+                    return activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
+
+
+                return null;
+
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
+            
+        }
+
+        private async Task<VehicleInfoModel> GetVehicleInfoAsync(int vehicleId, int? vehicleType)
+        {
+            try
+            {
+                var allManufacturers = await GetMakes();
+                var allModels = await GetModels();
+                var VehiclesColors = await _vehicleApiClient.GetAllColors(lang);
+
+                if (vehicleType == (int)VehicleTypeId.Internal)
+                {
+                    var v = (await _vehicleApiClient.VehicleDefinitions_Find(vehicleId)) ?? new VehicleDefinitions();
+
+                    return new VehicleInfoModel
+                    {
+                        Year = v.ManufacturingYear,
+                        PlateNumber = v.PlateNumber,
+                        ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == v.Color)?.Name,
+                        VIN = v.ChassisNo,
+                        Make = allManufacturers?.FirstOrDefault(i => i.Id == v.ManufacturerId)?.ManufacturerPrimaryName,
+                        Model = allModels?.FirstOrDefault(i => i.Id == v.VehicleModelId)?.VehicleModelPrimaryName
+                    };
+                }
+                else
+                {
+                    var v = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(vehicleId))
+                            ?? new CreateVehicleDefinitionsModel();
+
+                    return new VehicleInfoModel
+                    {
+                        Year = v.ManufacturingYear,
+                        PlateNumber = v.PlateNumber,
+                        ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == v.Color)?.Name,
+                        VIN = v.ChassisNo,
+                        Make = allManufacturers?.FirstOrDefault(i => i.Id == v.ManufacturerId)?.ManufacturerPrimaryName,
+                        Model = allModels?.FirstOrDefault(i => i.Id == v.VehicleModelId)?.VehicleModelPrimaryName
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        private async Task<List<ItemModel>> GetItemsModelsAsync(int id, string lang)
+        {
+            try
+            {
+                var items = await _apiClient.WIP_GetItemsById(id, lang);
+
+                var uniqueIds = items
+                    .Select(x => x.ItemId)
+                    .Distinct()
+                    .ToList();
+
+                var details = await Task.WhenAll(
+                    uniqueIds.Select(itemId => _inventoryApiClient.GetItemByIdAsync(itemId))
+                );
+
+                var dict = details
+                    .Where(d => d != null)
+                    .ToDictionary(d => d.Id);
+
+                var result = items
+                    .Select(x =>
+                    {
+                        if (!dict.TryGetValue(x.ItemId, out var d))
+                            return null;
+
+                        return new ItemModel
+                        {
+                            Id = d.Id,
+                            Code = d.Code,
+                            ItemNumber = d.ItemNumber,
+                            Name = d.Name,
+                            PrimaryName = d.PrimaryName,
+                            SecondaryName = d.SecondaryName,
+                            UnitPrimaryName = d.UnitPrimaryName,
+                            UnitSecondaryName = d.UnitSecondaryName,
+                            Qty = x.Quantity
+                        };
+                    })
+                    .Where(m => m != null)
+                    .Cast<ItemModel>()
+                    .ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        private async Task<List<VehicleChecklist>> GetVehicleChecklistAsync(int movementId)
+        {
+            try
+            {
+                var checklistsTask = await _apiClient.GetVehicleChecklistByMovementId(movementId);
+                var lookupTask = await _apiClient.GetVehicleChecklistLookup();
+
+                //await Task.WhenAll(checklistsTask, lookupTask);
+
+                var checklists = (checklistsTask) ?? new List<VehicleChecklist>();
+                var lookup = (lookupTask) ?? new List<VehicleChecklistLookup>();
+
+                var lookupById = lookup.ToDictionary(x => x.Id);
+
+                foreach (var item in checklists)
+                {
+                    if (lookupById.TryGetValue(item.LookupId, out var lu))
+                    {
+                        item.LookupPrimaryDescription = lu.PrimaryDescription;
+                        item.LookupSecondaryDescription = lu.SecondaryDescription;
+                    }
+                }
+                if (checklists == null || checklists.Count() == 0)
+                {
+                    var vChecklistsTemp = new List<VehicleChecklist>();
+                    foreach (var item in lookupTask ?? Enumerable.Empty<VehicleChecklistLookup>())
+                    {
+                        vChecklistsTemp.Add(new VehicleChecklist
+                        {
+                            LookupPrimaryDescription = item.PrimaryDescription,
+                            LookupSecondaryDescription = item.SecondaryDescription,
+                            Pass = false
+                        });
+                    }
+                    checklists = vChecklistsTemp;
+                }
+                return checklists.ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private async Task<List<TyreChecklist>> GetTyreChecklistAsync(int movementId)
+        {
+            try
+            {
+                var checklistsTask = await _apiClient.GetTyresChecklistByMovementId(movementId);
+                var lookupTask = await _apiClient.GetTyreChecklistLookup();
+
+                //await Task.WhenAll(checklistsTask, lookupTask);
+
+                var checklists = (checklistsTask) ?? new List<TyreChecklist>();
+                var lookup = (lookupTask) ?? new List<TyreChecklistLookup>();
+
+                var lookupById = lookup.ToDictionary(x => x.Id);
+
+                foreach (var item in checklists)
+                {
+                    if (lookupById.TryGetValue(item.LookupId, out var lu))
+                    {
+                        item.LookupPrimaryDescription = lu.PrimaryDescription;
+                        item.LookupSecondaryDescription = lu.SecondaryDescription;
+                    }
+                }
+
+                if (checklists == null || checklists.Count() == 0)
+                {
+                    var tChecklistTemp = new List<TyreChecklist>();
+                    foreach (var item in lookupTask ?? Enumerable.Empty<TyreChecklistLookup>())
+                    {
+                        tChecklistTemp.Add(new TyreChecklist
+                        {
+                            LookupPrimaryDescription = item.PrimaryDescription,
+                            LookupSecondaryDescription = item.SecondaryDescription
+                        });
+                    }
+                    checklists = tChecklistTemp;
+                }
+
+                return checklists.ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private async Task<string> GetUserFullNameAsync(int? userId)
+        {
+            if (userId is null) return string.Empty;
+
+            var user = await _erpApiClient.GetUserInfoById(userId.Value);
+            var first = user?.FirstName?.Trim();
+            var last = user?.LastName?.Trim();
+
+            return string.Join(" ",
+                new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x))
+            );
+        }
+        private async Task<string> VehicleDocumants(int vehicleId, int type)
+        {
+            var vehicleDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(vehicleId, type);
+            return vehicleDoc?.strExpiryDate ?? "";
         }
 
 

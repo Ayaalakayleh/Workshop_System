@@ -924,54 +924,66 @@
 
         var isNotTaxable = $('#NotTaxable').is(':checked');
 
-        // Collect all checked service IDs
-        var fixedServiceIds = [];
-        $('.service-checkbox:checked').each(function() {
-            var serviceId = $(this).data('service-id');
-            fixedServiceIds.push(serviceId);
+
+    var services = [];
+
+    $('.service-checkbox').each(function () {
+        services.push({
+            ServiceId: $(this).data('service-id'),
+            IsFixed: $(this).is(':checked')
         });
+    });
 
-        // Set the hidden field value
-        $('#FixedServiceIds').val(fixedServiceIds.join(','));
 
-        var itemForm = new FormData($('#TransferMovementIn').get(0));
 
-        var movement = {
-            'VehicleID': $('#VehicleID').val(),
-            'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
-            'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
-            'WorkshopId': $('#WorkshopId').val(),
-            'ReceivedMeter': $('#ReceivedMeter').val(),
-            'MasterId': $('#MasterId').val(),
-            'ExitMeter': $('#ExitMeter').val(),
-            'FuelLevelId': $("#OutfuelLevelId").val(),
-            'ReceivedDriverId': $('#ExitDriverName').val(),
-            'ExitDriverId': $('#ExitDriverId').val(),
-            'MovementOutId': $('#MovementId').val(),
-            'InvoceNo': $('#InvoceNo').val(),
-            'TotalWorkOrder': $('#TotalWorkOrder').val(),
-            'Vat': isNotTaxable ? 0 : $("#Vat").val(),
-            'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
-            'DeductibleAmount': $("#DeductibleAmount").val(),
-            'LastVehicleStatus': $('#LastVehicleStatus').val(),
-            'ReceivedTime': $("#ReceivedTime").val(),
-            'PartsCost': $("#PartsCost").val(),
-            'LaborCost': $("#LaborCost").val(),
-            'InvoiceTypeId': $("#InvoiceTypeId").val(),
-            'WorkOrderId': $("#WorkOrderId").val(),
-            'FixedServiceIds': fixedServiceIds.join(','), // Add the comma-separated IDs
-            'isPart': $('#IsPart').is(':checked')
-        };
+    var itemForm = new FormData($('#TransferMovementIn').get(0));
+    
+    var movement = {
+        'VehicleID': $('#VehicleID').val(),
+        'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
+        'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
+        'WorkshopId': $('#WorkshopId').val(),
+        'ReceivedMeter': $('#ReceivedMeter').val(),
+        'MasterId': $('#MasterId').val(),
+        'ExitMeter': $('#ExitMeter').val(),
+        'FuelLevelId': $("#OutfuelLevelId").val(),
+        'ReceivedDriverId': $('#ExitDriverName').val(),
+        'ExitDriverId': $('#ExitDriverId').val(),
+        'MovementOutId': $('#MovementId').val(),
+        'InvoceNo': $('#InvoceNo').val(),
+        'TotalWorkOrder': $('#TotalWorkOrder').val(),
+        'Vat': isNotTaxable ? 0 : $("#Vat").val(),
+        'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
+        'DeductibleAmount': $("#DeductibleAmount").val(),
+        'LastVehicleStatus': $('#LastVehicleStatus').val(),
+        'ReceivedTime': $("#ReceivedTime").val(),
+        'PartsCost': $("#PartsCost").val(),
+        'LaborCost': $("#LaborCost").val(),
+        'InvoiceTypeId': $("#InvoiceTypeId").val(),
+        'WorkOrderId': $("#WorkOrderId").val(),
+        'isPart': $('#IsPart').is(':checked')
+    };
 
-        // Append each property individually
-        Object.keys(movement).forEach(function(key) {
-            if (movement[key] !== null && movement[key] !== undefined) {
-                itemForm.append(key, movement[key]);
-            }
-        });
+    // Append each property individually
+    Object.keys(movement).forEach(function(key) {
+        if (movement[key] !== null && movement[key] !== undefined) {
+            itemForm.append(key, movement[key]);
+        }
+    });
 
-        // Append fixed service IDs
-        itemForm.append('FixedServiceIds', fixedServiceIds.join(','));
+    for (var i = 0; i < services.length; i++) {
+        itemForm.append(`Services[${i}].ServiceId`, services[i].ServiceId);
+        itemForm.append(`Services[${i}].IsFixed`, services[i].IsFixed);
+    }
+        // if (cuspond.getFiles().length == 0 && $("#InvoceNo").val() != "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
+        //         $("#Invoicefile>.filepond--drop-label").css("border", "2px solid red");
+        //         isValid = false;
+        // }
+        // if (cuspond.getFiles().length > 0) {
+        //     for (var j = 0; j < cuspond.getFiles().length; j++) {
+        //         itemForm.append('ExternalWorkshopInvoice', cuspond.getFiles().length > 0 ? cuspond.getFiles()[j].file : null);
+        //     }
+        // }
 
         if (isValid) {
             $.ajax({

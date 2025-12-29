@@ -67,8 +67,9 @@ namespace Workshop.Core.DTOs.Vehicle
 		public int? D3_DimensionsId { get; set; }
 		public int? D4_DimensionsId { get; set; }
 		public int VehicleClassId { get; set; }
+        public bool isRecall { get; set; }
 
-	}
+    }
 
 	public class CustomerInformationSummery
 	{
@@ -370,8 +371,11 @@ namespace Workshop.Core.DTOs.Vehicle
 		public List<int>? ServicesIds { get; set; }
 		public List<CreateWIPServiceDTO>? WIPServices { get; set; }
 		public bool isPart { get; set; } = false;
-		public List<VehicleChecklist>? VehicleCkecklist {get;set;}
-        public List<TyreChecklist>? TyreCkecklist { get; set; }
+		public List<VehicleChecklist>? VehicleCkecklist { get; set; }
+		public List<TyreChecklist>? TyreCkecklist { get; set; }
+		public bool HasRecall { get; set; }
+		public int? RecallId { get; set; }
+        public List<VehicleNams>? ExternalVehicleNams { get; set; }
     }
 
 	public class VehicleMovementDocument

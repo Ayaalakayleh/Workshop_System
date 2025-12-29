@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using NPOI.HPSF;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -57,15 +58,15 @@ namespace Workshop.Web.Controllers
             var Makes = await GetMakes();
             var Vehicles = await GetVehicles();
             var Chassis = await GetChasses();
-
+            var VehcileStatuses = await GetVehicleStatuses();
             ViewBag.Makes = Makes;
             ViewBag.Vehicles = Vehicles;
             ViewBag.ChassisNo = Chassis;
-
+            ViewBag.VehcileStatuses = VehcileStatuses;
             if (Id > 0)
             {
                 var recallItem = await _apiClient.GetRecallByIdAsync(Id);
-                ViewBag.VehcilesRecall = recallItem.Vehicles;
+                ViewBag.VehcilesRecall = recallItem?.Vehicles;
                 return View(recallItem);
             }
             return View(new RecallDTO());
@@ -75,27 +76,68 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.Recall.Create)]
         public async Task<IActionResult> Edit(RecallDTO recall, string recallJson)
         {
-            var vehicleRecallJson = JsonConvert.DeserializeObject<List<VehicleRecallDTO>>(recallJson) ?? new List<VehicleRecallDTO>();
+            var vehicleRecallJson = new List<VehicleRecallDTO>();
+            try
+            {
+                vehicleRecallJson = JsonConvert.DeserializeObject<List<VehicleRecallDTO>>(recallJson);
+            }catch(Exception e)
+            {
+            }
 
             ViewBag.Makes = await GetMakes();
             ViewBag.Vehicles = await GetVehicles();
             ViewBag.ChassisNo = await GetChasses();
+            
             if (recall != null)
             {
                 if (recall.Id > 0)
                 {
 
-                    foreach (var at in vehicleRecallJson)
+                    foreach (var vehicleRecallItem in vehicleRecallJson)
                     {
                         if (recall.Vehicles == null)
                             recall.Vehicles = new List<VehicleRecallDTO>();
 
                         VehicleRecallDTO vehicleRecallDTO = new VehicleRecallDTO();
-                        vehicleRecallDTO.Id = at.Id;
-                        vehicleRecallDTO.MakeID = at.MakeID;
-                        vehicleRecallDTO.ModelID = at.ModelID;
-                        vehicleRecallDTO.Chassis = at.Chassis;
+                        vehicleRecallDTO.Id = vehicleRecallItem.Id;
+                        vehicleRecallDTO.MakeID = vehicleRecallItem.MakeID;
+                        vehicleRecallDTO.ModelID = vehicleRecallItem.ModelID;
+                        vehicleRecallDTO.Chassis = vehicleRecallItem.Chassis;
+                        vehicleRecallDTO.RecallStatus = vehicleRecallItem.RecallStatus;
                         vehicleRecallDTO.RecallID = recall.Id;
+                        if((vehicleRecallItem.Chassis == null || vehicleRecallItem.Chassis.Equals(String.Empty)) &&
+                            (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
+                            (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
+                        {
+                            //var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID, 
+                            //    vehicleRecallItem.ModelID, null,null );
+                            //foreach (var externalVehicle in externalVehicles)
+                            //{
+                            //    recall.Vehicles.Add(new VehicleRecallDTO { 
+                            //     Chassis = externalVehicle.ChassisNo,
+                            //      RecallID = recall.Id,
+                            //      MakeID = vehicleRecallItem.MakeID,
+                            //      ModelID = vehicleRecallItem.ModelID,
+                            //        RecallStatus = vehicleRecallItem.RecallStatus
+                            //    });
+
+                            //}
+                            var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                              vehicleRecallItem.ModelID, null, null);
+                            foreach (var internalVehicle in internalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = internalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+ 
+                            }
+                        }
+                        else
                         recall.Vehicles.Add(vehicleRecallDTO);
                     }
 
@@ -103,24 +145,196 @@ namespace Workshop.Web.Controllers
                 }
                 else
                 {
-                    foreach (var at in vehicleRecallJson)
+                    foreach (var vehicleRecallItem in vehicleRecallJson)
                     {
                         if (recall.Vehicles == null)
                             recall.Vehicles = new List<VehicleRecallDTO>();
 
                         VehicleRecallDTO vehicleRecallDTO = new VehicleRecallDTO();
-                        vehicleRecallDTO.Id = at.Id;
-                        vehicleRecallDTO.MakeID = at.MakeID;
-                        vehicleRecallDTO.ModelID = at.ModelID;
-                        vehicleRecallDTO.Chassis = at.Chassis;
+                        vehicleRecallDTO.Id = vehicleRecallItem.Id;
+                        vehicleRecallDTO.MakeID = vehicleRecallItem.MakeID;
+                        vehicleRecallDTO.ModelID = vehicleRecallItem.ModelID;
+                        vehicleRecallDTO.Chassis = vehicleRecallItem.Chassis;
+                        vehicleRecallDTO.RecallStatus = vehicleRecallItem.RecallStatus;
                         vehicleRecallDTO.RecallID = recall.Id;
-                        recall.Vehicles.Add(vehicleRecallDTO);
+                        if ((vehicleRecallItem.Chassis == null || vehicleRecallItem.Chassis.Equals(String.Empty)) &&
+                           (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
+                           (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
+                        {
+                            //var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                            //    vehicleRecallItem.ModelID, null, null);
+                            //foreach (var externalVehicle in externalVehicles)
+                            //{
+                            //    recall.Vehicles.Add(new VehicleRecallDTO
+                            //    {
+                            //        Chassis = externalVehicle.ChassisNo,
+                            //        RecallID = recall.Id,
+                            //        MakeID = vehicleRecallItem.MakeID,
+                            //        ModelID = vehicleRecallItem.ModelID,
+                            //        RecallStatus = vehicleRecallItem.RecallStatus
+                                    
+                            //    });
+
+                            //}
+                            var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                              vehicleRecallItem.ModelID, null, null);
+                            foreach (var internalVehicle in internalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = internalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+
+                            }
+                        }
+                        else
+                            recall.Vehicles.Add(vehicleRecallDTO);
                     }
                     var result = await _apiClient.AddRecallAsync(MapToCreateRecall(recall));
                 }
 
             }
 
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        [CustomAuthorize(Permissions.Recall.Create)]
+        public async Task<IActionResult> EditNoRedirect(RecallDTO recall, string recallJson)
+        {
+            var vehicleRecallJson = new List<VehicleRecallDTO>();
+            try
+            {
+                vehicleRecallJson = JsonConvert.DeserializeObject<List<VehicleRecallDTO>>(recallJson);
+            }
+            catch (Exception e)
+            {
+            }
+
+            ViewBag.Makes = await GetMakes();
+            ViewBag.Vehicles = await GetVehicles();
+            ViewBag.ChassisNo = await GetChasses();
+
+            if (recall != null)
+            {
+                if (recall.Id > 0)
+                {
+
+                    foreach (var vehicleRecallItem in vehicleRecallJson)
+                    {
+                        if (recall.Vehicles == null)
+                            recall.Vehicles = new List<VehicleRecallDTO>();
+
+                        VehicleRecallDTO vehicleRecallDTO = new VehicleRecallDTO();
+                        vehicleRecallDTO.Id = vehicleRecallItem.Id;
+                        vehicleRecallDTO.MakeID = vehicleRecallItem.MakeID;
+                        vehicleRecallDTO.ModelID = vehicleRecallItem.ModelID;
+                        vehicleRecallDTO.Chassis = vehicleRecallItem.Chassis;
+                        vehicleRecallDTO.RecallStatus = vehicleRecallItem.RecallStatus;
+                        vehicleRecallDTO.RecallID = recall.Id;
+                        if ((vehicleRecallItem.Chassis == null || vehicleRecallItem.Chassis.Equals(String.Empty)) &&
+                            (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
+                            (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
+                        {
+                            var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                                vehicleRecallItem.ModelID, null, null);
+                            foreach (var externalVehicle in externalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = externalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+
+                            }
+                            var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                              vehicleRecallItem.ModelID, null, null);
+                            foreach (var internalVehicle in internalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = internalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+
+                            }
+                        }
+                        else
+                            recall.Vehicles.Add(vehicleRecallDTO);
+                    }
+
+                    var result = await _apiClient.UpdateRecallAsync(MapToUpdateRecall(recall));
+                }
+                else
+                {
+                    foreach (var vehicleRecallItem in vehicleRecallJson)
+                    {
+                        if (recall.Vehicles == null)
+                            recall.Vehicles = new List<VehicleRecallDTO>();
+
+                        VehicleRecallDTO vehicleRecallDTO = new VehicleRecallDTO();
+                        vehicleRecallDTO.Id = vehicleRecallItem.Id;
+                        vehicleRecallDTO.MakeID = vehicleRecallItem.MakeID;
+                        vehicleRecallDTO.ModelID = vehicleRecallItem.ModelID;
+                        vehicleRecallDTO.Chassis = vehicleRecallItem.Chassis;
+                        vehicleRecallDTO.RecallStatus = vehicleRecallItem.RecallStatus;
+                        vehicleRecallDTO.RecallID = recall.Id;
+                        if ((vehicleRecallItem.Chassis == null || vehicleRecallItem.Chassis.Equals(String.Empty)) &&
+                           (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
+                           (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
+                        {
+                            var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                                vehicleRecallItem.ModelID, null, null);
+                            foreach (var externalVehicle in externalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = externalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+
+                                });
+
+                            }
+                            var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                              vehicleRecallItem.ModelID, null, null);
+                            foreach (var internalVehicle in internalVehicles)
+                            {
+                                recall.Vehicles.Add(new VehicleRecallDTO
+                                {
+                                    Chassis = internalVehicle.ChassisNo,
+                                    RecallID = recall.Id,
+                                    MakeID = vehicleRecallItem.MakeID,
+                                    ModelID = vehicleRecallItem.ModelID,
+                                    RecallStatus = vehicleRecallItem.RecallStatus
+                                });
+
+                            }
+                        }
+                        else
+                            recall.Vehicles.Add(vehicleRecallDTO);
+                    }
+                    var result = await _apiClient.AddRecallAsync(MapToCreateRecall(recall));
+                }
+
+            }
+
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer))
+                return Redirect(referer);
             return RedirectToAction("Index");
         }
 
@@ -190,6 +404,20 @@ namespace Workshop.Web.Controllers
 
             }).ToList();
         }
+        private async Task<List<SelectListItem>> GetVehicleStatuses()
+        {
+            var result = Enum.GetValues(typeof(VehicleRecallStatus))
+                .Cast<VehicleRecallStatus>()
+                .Select(e => new SelectListItem
+                {
+                    Value = ((int)e).ToString(),
+                    Text = e.ToString()
+                })
+                .ToList();
+
+            return result;
+        }
+
         public async Task<VehicleDefinitions> GetVehicleById(int Id)
         {
             var models = await _vehicleApiClient.GetVehicleDetails(Id, lang);

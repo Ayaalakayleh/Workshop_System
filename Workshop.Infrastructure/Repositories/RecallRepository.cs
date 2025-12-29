@@ -31,6 +31,39 @@ namespace Workshop.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<IEnumerable<RecallDTO>> GetAllDDLAsync()
+        {
+            using var connection = _context.CreateConnection();
+
+            using var multi = await connection.QueryMultipleAsync(
+                "Recall_GetAllDDL",
+                commandType: CommandType.StoredProcedure
+            );
+
+            var recalls = (await multi.ReadAsync<RecallDTO>()).ToList();
+            var vehicles = (await multi.ReadAsync<VehicleRecallDTO>()).ToList();
+
+            var vehicleLookup = vehicles
+                .Where(v => v.RecallID.HasValue)
+                .GroupBy(v => v.RecallID!.Value)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var recall in recalls)
+            {
+
+                recall.Vehicles ??= new List<VehicleRecallDTO>();
+
+                if (vehicleLookup.TryGetValue(recall.Id, out var recallVehicles))
+                {
+                    recall.Vehicles.AddRange(recallVehicles);
+                }
+            }
+
+            return recalls;
+        }
+
+
+
         public async Task<RecallDTO?> GetByIdAsync(int id)
         {
             using var connection = _context.CreateConnection();
@@ -79,16 +112,21 @@ namespace Workshop.Infrastructure.Repositories
             using var connection = _context.CreateConnection();
 
             var vehicleTable = new DataTable();
-            vehicleTable.Columns.Add("RecallID", typeof(int));
             vehicleTable.Columns.Add("MakeId", typeof(int));
             vehicleTable.Columns.Add("ModelId", typeof(int));
             vehicleTable.Columns.Add("Chassis", typeof(string));
+            vehicleTable.Columns.Add("RecallStatus", typeof(int));
 
             if (dto.Vehicles != null && dto.Vehicles.Count > 0)
             {
                 foreach (var v in dto.Vehicles)
                 {
-                    vehicleTable.Rows.Add(DBNull.Value, v.MakeID, v.ModelID, v.Chassis);
+                    vehicleTable.Rows.Add(
+                        v.MakeID,
+                        v.ModelID,
+                        v.Chassis,
+                        v.RecallStatus
+                    );
                 }
             }
 
@@ -110,21 +148,27 @@ namespace Workshop.Infrastructure.Repositories
 
             return result;
         }
+
         public async Task<int> UpdateAsync(UpdateRecallDTO dto)
         {
             using var connection = _context.CreateConnection();
 
             var vehicleTable = new DataTable();
-            vehicleTable.Columns.Add("RecallID", typeof(int));
             vehicleTable.Columns.Add("MakeId", typeof(int));
             vehicleTable.Columns.Add("ModelId", typeof(int));
             vehicleTable.Columns.Add("Chassis", typeof(string));
+            vehicleTable.Columns.Add("RecallStatus", typeof(int));
 
             if (dto.Vehicles != null && dto.Vehicles.Count > 0)
             {
                 foreach (var v in dto.Vehicles)
                 {
-                    vehicleTable.Rows.Add(v.RecallID, v.MakeID, v.ModelID, v.Chassis);
+                    vehicleTable.Rows.Add(
+                        v.MakeID,
+                        v.ModelID,
+                        v.Chassis,
+                        v.RecallStatus
+                    );
                 }
             }
 
@@ -137,16 +181,18 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@StartDate", dto.StartDate);
             parameters.Add("@IsActive", dto.IsActive);
             parameters.Add("@UpdatedBy", dto.UpdatedBy);
-            parameters.Add("@VehicleList", vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
+            parameters.Add("@VehicleList",
+                vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
 
-            var result = await connection.QuerySingleAsync<int>(
-            "Recall_Update",
-            parameters,
-            commandType: CommandType.StoredProcedure
-        );
+                var result = await connection.QuerySingleAsync<int>(
+                    "Recall_Update",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+                return result;
 
-            return result;
         }
+
         public async Task<int> DeleteAsync(DeleteRecallDTO dto)
         {
             using var connection = _context.CreateConnection();
@@ -165,6 +211,68 @@ namespace Workshop.Infrastructure.Repositories
 
             return result;
         }
+
+        public async Task<int> UpdateRecallVehicleStatus(string chassisNo, int statusId)
+        {
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@Chassis", chassisNo, DbType.String);
+            parameters.Add("@RecallStatusId", statusId, DbType.Int32);
+
+            var rowsAffected = await connection.QuerySingleAsync<int>(
+                "RecallVehicle_UpdateStatus",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return rowsAffected;
+        }
+        public async Task<List<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassisBulkAsync(List<string> chassisList)
+        {
+            using var connection = _context.CreateConnection();
+
+            if (chassisList == null || chassisList.Count == 0)
+                return new List<ActiveRecallsByChassisResponseDto>();
+
+            var parameters = new DynamicParameters();
+            parameters.Add( "@ChassisList",Newtonsoft.Json.JsonConvert.SerializeObject(chassisList), DbType.String);
+
+            var rows = (await connection.QueryAsync<ActiveRecallBulkRowDto>("GetActiveRecallsByChassisBulk", parameters, commandType: CommandType.StoredProcedure)).ToList();
+
+            var result = new List<ActiveRecallsByChassisResponseDto>();
+
+            foreach (var chassis in chassisList)
+            {
+                var recalls = rows
+                    .Where(r => r.ChassisNo == chassis && r.RecallId.HasValue)
+                    .Select(r => new ActiveRecallDto
+                    {
+                        RecallId = r.RecallId!.Value,
+                        Code = r.Code!,
+                        Title = r.Title!,
+                        Description = r.Description,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        IsActive = r.IsActive ?? false,
+                        CreatedAt = r.CreatedAt,
+                        CreatedBy = r.CreatedBy,
+                        UpdatedAt = r.UpdatedAt,
+                        UpdatedBy = r.UpdatedBy
+                    })
+                    .ToList();
+
+                result.Add(new ActiveRecallsByChassisResponseDto
+                {
+                    ChassisNo = chassis,
+                    Recalls = recalls
+                });
+            }
+
+            return result;
+        }
+
+
 
 
     }

@@ -282,6 +282,27 @@
             line-height: 1.3;
         }
 
+        .ops-table {
+            width: 95%; 
+            margin: 0 auto; 
+            border-collapse: collapse;
+            table-layout: fixed; 
+        }
+
+            .ops-table th,
+            .ops-table td {
+                border: none; 
+                text-align: center; 
+                vertical-align: middle; 
+                padding: 0px 10px; 
+                font-size: 16px;
+                white-space: nowrap;
+            }
+
+            .ops-table th {
+                font-weight: 600;
+            }
+
         /* ---------- FOOTER ---------- */
 
         .footer {
@@ -540,7 +561,23 @@
                 </tr>
             </tfoot>
         </table>
-
+        <br />
+        <table class="ops-table">
+            <thead>
+                <tr>
+                    <th><h5>Creating Operator</h5></th>
+                    <th><h5>Invoicing Operator</h5></th>
+                    <th><h5>Booked Out Operator</h5></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.CreatingOperator</td>
+                    <td>@Model.InvoicingOperator</td>
+                    <td>@Model.BookedOutOperator</td>
+                </tr>
+            </tbody>
+        </table>
 @*         <div class="footer">
             Page 1 of 1
         </div> *@

@@ -856,10 +856,11 @@
         return resp.Message ?? resp.message ?? resp.error ?? resp.Error ?? "";
     }
 
-    function ValidOut() {
+        function ValidOut() {
         var isValid = true;
 
-        if ($("#OutfuelLevelId").val() == "") {
+        // ---- validation (keep yours, I only made it safer) ----
+        if ($("#OutfuelLevelId").length && ($("#OutfuelLevelId").val() == "" || $("#OutfuelLevelId").val() == "0")) {
             $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red");
             isValid = false;
         }
@@ -869,13 +870,11 @@
             isValid = false;
         } else if (parseFloat($("#ExitMeter").val()) < parseFloat($("#ReceivedMeter").val())) {
             $("#ExitMeter").addClass("invalid");
-
             alert(
                 '@Common["Error"]' + "\n" +
                 '@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]' +
                 " : " + parseInt($("#ReceivedMeter").val()) + " " + '@Common["KiloMeter"]'
             );
-
             $("#ExitMeter").focus();
             isValid = false;
         } else {
@@ -885,6 +884,8 @@
         if ($("#ExitDriverName").val() == "") {
             $("#ExitDriverName").addClass("invalid");
             isValid = false;
+        } else {
+            $("#ExitDriverName").removeClass("invalid");
         }
 
         if ($("#VehicleSubStatusId").val() == "" || $("#VehicleSubStatusId").val() == 0) {
@@ -894,40 +895,50 @@
             $("#VehicleSubStatusId").next().children().children().removeClass("invalid");
         }
 
+        // ---- build maintenance cards with backend-friendly names ----
         var cards = [];
         var i = 0;
-        $('#tblMainteneance > tbody  > tr').each(function () {
+        $('#tblMainteneance > tbody > tr').each(function () {
             cards.push({
-                'DamageId': $(this).find('#MaintenanceType_' + i).val(),
-                'Description': $(this).find('#MaintenanceDesc_' + i).val(),
-                'status': $(this).find('#switchh_' + i).is(":checked"),
-                'MovementId': $(this).find('#MaintenanceMovementId_' + i).val()
+                // Use WorkOrderId (your view uses item.WorkOrderId)
+                WorkOrderId: parseInt($(this).find('#MaintenanceType_' + i).val()) || null,
+                Description: $(this).find('#MaintenanceDesc_' + i).val() || "",
+                status: $(this).find('#switchh_' + i).is(":checked"),
+                MovementId: parseInt($(this).find('#MaintenanceMovementId_' + i).val()) || null
             });
-            i = i + 1;
+            i++;
         });
 
-        // Make bool parsing robust (handles "True"/"False" too)
+        // robust bool parsing
         var isRegularMaintenanceVal = String($('#IsRegularMaintenance').val() ?? '').toLowerCase() === 'true';
         var isExternalVal = String($('#IsExternal').val() ?? '').toLowerCase() === 'true';
 
+        // ✅ IMPORTANT: send the property names your server likely expects
+        // - MovementId (not MovementInId)
+        // - WorkshopMovDmg (not strikes)
         var movement = {
-            MovementInId: parseInt($('#MovementId').val()) || null,
+            MovementId: parseInt($('#MovementId').val()) || null,
             InvoiceId: parseInt('@Model.InvoiceId') || null,
             VehicleID: parseInt($('#VehicleID').val()) || null,
-            ReceivedBranchId: parseInt($('#ExitBranchId').val()) || null,
-            MoveOutWorkshopId: parseInt($('#WorkshopId').val()) || null,
-            TotalWorkOrder: parseFloat($('#TotalWorkOrder').val()) || null,
+            ExitBranchId: parseInt($('#ExitBranchId').val()) || null,
             WorkshopId: parseInt($('#WorkshopId').val()) || null,
+            TotalWorkOrder: parseFloat($('#TotalWorkOrder').val()) || null,
             ReceivedMeter: parseFloat($('#ReceivedMeter').val()) || null,
             MasterId: $('#MasterId').val() || null,
+
             ExitMeter: parseFloat($('#ExitMeter').val()) || null,
-            FuelLevelId: parseInt($("#OutfuelLevelId").val()) || null,
+            FuelLevelId: ($("#OutfuelLevelId").length ? (parseInt($("#OutfuelLevelId").val()) || null) : null),
             ExitDriverId: $('#ExitDriverName').val() || null,
+
             IsRegularMaintenance: isRegularMaintenanceVal,
-            strikes: $('#WorkshopMovDmg').val() || null,
+            IsExternal: isExternalVal,
+
+            // send damage in the expected field name
+            WorkshopMovDmg: $('#WorkshopMovDmg').val() || "[]",
+
             LastVehicleStatus: parseInt($('#LastVehicleStatus').val()) || null,
             ColMaintenanceCard: cards,
-            IsExternal: isExternalVal,
+
             GregorianMovementDate: $("#GregorianMovementDate").val() || null,
             ExitTime: $('#ExitTime').val() || null,
             TotalCost: parseFloat($('#TotalCost').val()) || null,
@@ -935,39 +946,49 @@
             WorkOrderId: parseInt($("#WorkOrderId").val()) || null
         };
 
-        if (isValid) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("MoveOut", "MovementOut")",
-                data: JSON.stringify(movement),
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                success: function (data, textStatus, xhr) {
-                    // Debug: see the real response in console
-                    console.log("MoveOut response:", data);
+        if (!isValid) return;
 
-                    var ok = getSuccessFlag(data);
+        // ✅ send anti-forgery token (ASP.NET Core reads this header by default)
+        var token = $('input[name="__RequestVerificationToken"]').val();
 
-                    // Some APIs return empty body with 200 OK (ok should be true in that case)
-                    if (!ok && (data == null || data === "")) {
-                        ok = (xhr && xhr.status >= 200 && xhr.status < 300);
-                    }
+        // prevent double submit
+        $("#btnCreate").prop("disabled", true);
 
-                    if (ok) {
-                        window.location.href = "@Url.Action("Index", "Movements")";
-                    } else {
-                        var msg = getMessage(data) || "Failed (response didn't include success flag). Check console log.";
-                        alert(msg);
-                    }
-                },
-                error: function (xhr) {
-                    // This will show you the actual server response if JSON parse failed or server returned HTML/text
-                    console.log("MoveOut error:", xhr.status, xhr.responseText);
-                    alert("Error from Api: " + xhr.status);
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("MoveOut", "MovementOut")",
+            data: JSON.stringify(movement),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            headers: token ? { "RequestVerificationToken": token } : {},
+
+            success: function (data, textStatus, xhr) {
+                console.log("MoveOut response:", data);
+
+                var ok = getSuccessFlag(data);
+
+                // if API returns 200 with empty body, treat it as OK
+                if (!ok && (data == null || data === "")) {
+                    ok = (xhr && xhr.status >= 200 && xhr.status < 300);
                 }
-            });
-        }
+
+                if (ok) {
+                    window.location.href = "@Url.Action("Index", "Movements")";
+                } else {
+                    var msg = getMessage(data) || "MoveOut failed (no success flag). Check console log / Network response.";
+                    alert(msg);
+                    $("#btnCreate").prop("disabled", false);
+                }
+            },
+
+            error: function (xhr) {
+                console.log("MoveOut error:", xhr.status, xhr.responseText);
+                alert("Server error: " + xhr.status);
+                $("#btnCreate").prop("disabled", false);
+            }
+        });
     }
+
 
     function GetVehicleData() {
         var type = '@Model.IsExternal' == 'True' ? 2 : 1;

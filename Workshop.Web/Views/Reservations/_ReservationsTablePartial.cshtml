@@ -8,7 +8,7 @@
     var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
 }
 
-<table class="table main-table table-borderless">
+<table class="table main-table table-striped">
     <thead>
         <tr class="text-muted">
             <th>@Common["Label_Date"]</th>
@@ -42,7 +42,7 @@
                             </button>
                             <div class="dropdown-menu fadeup">
                                 <div class="dropdown-item p-2">
-                                    <button class="btn btn-sm btn-outline-primary w-100" data-id="@item.Id">
+                                    <button class="btn btn-sm btn-outline-primary btn-edit-reservation w-100" data-id="@item.Id">
                                         <i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]
                                     </button>
                                 </div>

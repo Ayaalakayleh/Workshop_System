@@ -680,6 +680,7 @@ function updateFieldsFromGrid() {
     var rows = grid.getVisibleRows() || [];
     var totalSum = 0;
     var totalDiscountsPart = 0;
+    var totalVAT = 0; 
 
     rows.forEach(function (r) {
         var d = r.data || {};
@@ -690,7 +691,7 @@ function updateFieldsFromGrid() {
 
         var base = qty * price;
 
-        var discAmt = parseFloat(d.Discount) || 0;  
+        var discAmt = parseFloat(d.Discount) || 0;
         //var discAmt = base * (disc / 100);
 
         var lineTot = base - discAmt;
@@ -698,12 +699,17 @@ function updateFieldsFromGrid() {
         totalDiscountsPart += discAmt;
         totalSum += lineTot;
 
-        var lineTot = base - discAmt;
+        totalVAT += tax; 
     });
 
     $("#totParts").text("SAR " + totalSum.toFixed(2));
     setAmount("#totParts", totalSum);
     $("#TotalDiscountsPart").text("SAR " + totalDiscountsPart.toFixed(2));
+
+    const currentVAT = getAmount("#totVAT");
+    const combinedVAT = currentVAT + totalVAT;
+    setAmount("#totVAT", combinedVAT);
+
     updateSubtotal();
 }
 
@@ -750,9 +756,16 @@ function setVatPercentageText(pct) {
 function updateSubtotal() {
     const labour = getAmount("#totLabour");
     const parts = getAmount("#totParts");
-    setAmount("#totSubtotal", labour + parts);
+
+    const internalSubtotal = labour + parts;
+    const transferSubtotal = Number(window.RazorVars.transferSubtotal || 0);
+
+    const subtotal = internalSubtotal + transferSubtotal;
+
+    setAmount("#totSubtotal", subtotal);
     updateVatAndTotal();
 }
+
 
 function updateVatAndTotal() {
     const labour = getAmount("#totLabour");
@@ -761,11 +774,22 @@ function updateVatAndTotal() {
     const subtotal = getAmount("#totSubtotal");
     const vatPct = getVatPercent();
 
-    const vatAmt = (labour * (vatPct / 100)) + (parts * (vatPct / 100));
-    const total = subtotal + vatAmt;
+    const internalVat =
+        (labour * (vatPct / 100)) + (parts * (vatPct / 100));
+
+    const transferVat = Number(window.RazorVars.transferVatAmount || 0);
+
+    const vatAmt = internalVat + transferVat;
+
+    const transferTotal = Number(window.RazorVars.transferTotal || 0);
+
+    const internalSubtotal = (labour + parts);
+    const internalTotal = internalSubtotal + internalVat;
+
+    const total = internalTotal + transferTotal;
 
     setVatPercentageText(vatPct);
-    setAmount("#totVAT", vatAmt);
+    //setAmount("#totVAT", vatAmt);
     setAmount("#totTotal", total);
 }
 

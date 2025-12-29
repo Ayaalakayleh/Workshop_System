@@ -178,7 +178,8 @@
         getAllReservationsFiltered: '@Url.Action("GetAllReservationsFiltered", "Reservations")',
         getAllReservationsFilteredJSON: '@Url.Action("GetAllReservationsFilteredJSON", "Reservations")',
         getReservationsByIds: '@Url.Action("GetReservationsByIds", "Reservations")',
-        updateReservation: '@Url.Action("UpdateReservation", "Reservations")'
+        updateReservation: '@Url.Action("UpdateReservation", "Reservations")',
+        hasRecallURL: '@Url.Action("HasRecall", "Reservations")',
 
     };
 
@@ -360,7 +361,10 @@
                 return;
             }
             const r = res.data[0];
-
+            $('#vehicleTypeDropdown').prop('disabled', true);
+            $('#CustomerId').prop('disabled', true);
+            $('#chassisDropdown').prop('disabled', true);
+            $('#vehicleDropdown').prop('disabled', true);
             // 🔹 mark modal as EDIT mode
             $('#scheduleModal').data('mode', 'edit');
             $('#scheduleModal').data('reservationId', r.id);
