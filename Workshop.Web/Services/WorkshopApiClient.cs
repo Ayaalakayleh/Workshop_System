@@ -2418,6 +2418,23 @@ namespace Workshop.Web.Services
             return result;
 
         }
+        public async Task<List<ActiveRecallsByChassisResponseDto>?> GetActiveRecallsByChassisBulkAsync(List<string> chassisList)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Recall/GetActiveRecallsByChassisBulk",  chassisList);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return null;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<List<ActiveRecallsByChassisResponseDto>>();
+
+            return result;
+        }
+
 
 
         #endregion
