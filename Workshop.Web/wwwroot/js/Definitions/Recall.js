@@ -118,15 +118,15 @@ $(function () {
             }, {
                 dataField: "RecallStatus",
                 caption: LABELS.Status || "Status",
-                allowEditing: true,
+                allowEditing: false,
                 validationRules: [
-                    { type: "required", message: VALIDATION.Required || "Required" }
+  
                 ],
                 lookup: {
                     dataSource: VehcileStatuses,
                     valueExpr: "Value",
                     displayExpr: "Text"
-                }
+                },
             },
 
             {
@@ -138,7 +138,9 @@ $(function () {
         ],
         onInitNewRow: (e) => {
             e.data.Id = parseInt(e.data.Id) || counter--;
-            e.data.Status = 1; // Open
+
+            e.data.RecallStatus = 1; // Open
+            console.log(e);
         },
         onRowRemoving: function (e) {
             if (!window.Swal) return;
