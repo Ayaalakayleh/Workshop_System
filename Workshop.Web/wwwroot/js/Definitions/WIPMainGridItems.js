@@ -680,6 +680,7 @@ function updateFieldsFromGrid() {
     var rows = grid.getVisibleRows() || [];
     var totalSum = 0;
     var totalDiscountsPart = 0;
+    var totalVAT = 0; 
 
     rows.forEach(function (r) {
         var d = r.data || {};
@@ -690,7 +691,7 @@ function updateFieldsFromGrid() {
 
         var base = qty * price;
 
-        var discAmt = parseFloat(d.Discount) || 0;  
+        var discAmt = parseFloat(d.Discount) || 0;
         //var discAmt = base * (disc / 100);
 
         var lineTot = base - discAmt;
@@ -698,12 +699,17 @@ function updateFieldsFromGrid() {
         totalDiscountsPart += discAmt;
         totalSum += lineTot;
 
-        var lineTot = base - discAmt;
+        totalVAT += tax; 
     });
 
     $("#totParts").text("SAR " + totalSum.toFixed(2));
     setAmount("#totParts", totalSum);
     $("#TotalDiscountsPart").text("SAR " + totalDiscountsPart.toFixed(2));
+
+    const currentVAT = getAmount("#totVAT");
+    const combinedVAT = currentVAT + totalVAT;
+    setAmount("#totVAT", combinedVAT);
+
     updateSubtotal();
 }
 
@@ -783,7 +789,7 @@ function updateVatAndTotal() {
     const total = internalTotal + transferTotal;
 
     setVatPercentageText(vatPct);
-    setAmount("#totVAT", vatAmt);
+    //setAmount("#totVAT", vatAmt);
     setAmount("#totTotal", total);
 }
 

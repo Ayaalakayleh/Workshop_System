@@ -357,15 +357,15 @@ async function updateTotalLabourFieldsFromGrid() {
 
     const allRows = await ds.store().load();
 
-    let totalBase = 0;            
-    let totalDiscountAmount = 0;  
-    let totalTaxAmount = 0;      
-    let totalAfterDiscount = 0;  
+    let totalBase = 0;
+    let totalDiscountAmount = 0;
+    let totalTaxAmount = 0;
+    let totalAfterDiscount = 0;
 
     allRows.forEach(d => {
         d = d || {};
 
-        const rate = ensureDiscountedRate(d); 
+        const rate = ensureDiscountedRate(d);
         const hours = parseFloat(d.StandardHours) || 0;
         const pct = parseFloat(d.Discount) || 0;
         const tax = parseFloat(d.Tax) || 0;
@@ -390,6 +390,10 @@ async function updateTotalLabourFieldsFromGrid() {
     $("#TotalDiscountsLabour").text("SAR " + totalDiscountAmount.toFixed(2));
 
     $("#TotalTaxLabour").text("SAR " + totalTaxAmount.toFixed(2));
+
+    const currentVAT = getAmount("#totVAT");
+    const combinedVAT = currentVAT + totalTaxAmount;
+    setAmount("#totVAT", combinedVAT);
 
     updateSubtotal();
 }
