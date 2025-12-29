@@ -2372,6 +2372,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.VIN = vehicleInfo.VIN;
                 model.VehicleInfo.Make = vehicleInfo.Make;
                 model.VehicleInfo.Model = vehicleInfo.Model;
+                model.VehicleInfo.Mileage = vehicleInfo.Mileage?? movement.ReceivedMeter;
                 model.DateLastVisit = last?.GregorianMovementDate?.ToString("yyyy-MM-dd");
                 //model.EngineNumber = vehicleDetails.Eng;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
@@ -2384,7 +2385,7 @@ namespace Workshop.Web.Controllers
                 model.Complaint = Complaint;
                 model.DateIn = movement.GregorianMovementDate?.ToString("yyyy-MM-dd");
                 model.TimeIn = movement.ReceivedTime;
-                //model.DateOut = movement.GregorianMovementDate?.ToString("yyyy-MM-dd");
+                model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
                 //model.TimeOut = movement.ReceivedTime;
                 //model.AccountNo = Details.AccountNo;
                 model.FuelLevel = movement.fuelLevel;
