@@ -229,6 +229,11 @@ namespace Workshop.Web.Services
             string url = $"/Agreement/GetActiveAgreementId?VehicleDefinitionId={id}";
             return await SendRequest<Agreement>(url, HttpMethod.Get);
         }
+        public async Task<Agreement> GetGeneralInfo(int AgreementId)
+        {
+            string url = $"/Agreement/GetGeneralInfo?AgreementId={AgreementId}";
+            return await SendRequest<Agreement>(url, HttpMethod.Get);
+        }
         public async Task<VehicleDefinitions> VehicleDefinitionsGetByChassisNo(string chassisNo)
         {
             string url = $"/VehicleDefinition/VehicleDefinitionsGetByChassisNo?chassisNo={chassisNo}";
