@@ -109,19 +109,19 @@ namespace Workshop.Web.Controllers
                             (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
                             (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
                         {
-                            var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID, 
-                                vehicleRecallItem.ModelID, null,null );
-                            foreach (var externalVehicle in externalVehicles)
-                            {
-                                recall.Vehicles.Add(new VehicleRecallDTO { 
-                                 Chassis = externalVehicle.ChassisNo,
-                                  RecallID = recall.Id,
-                                  MakeID = vehicleRecallItem.MakeID,
-                                  ModelID = vehicleRecallItem.ModelID,
-                                    RecallStatus = vehicleRecallItem.RecallStatus
-                                });
+                            //var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID, 
+                            //    vehicleRecallItem.ModelID, null,null );
+                            //foreach (var externalVehicle in externalVehicles)
+                            //{
+                            //    recall.Vehicles.Add(new VehicleRecallDTO { 
+                            //     Chassis = externalVehicle.ChassisNo,
+                            //      RecallID = recall.Id,
+                            //      MakeID = vehicleRecallItem.MakeID,
+                            //      ModelID = vehicleRecallItem.ModelID,
+                            //        RecallStatus = vehicleRecallItem.RecallStatus
+                            //    });
 
-                            }
+                            //}
                             var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
                               vehicleRecallItem.ModelID, null, null);
                             foreach (var internalVehicle in internalVehicles)
@@ -161,21 +161,21 @@ namespace Workshop.Web.Controllers
                            (vehicleRecallItem.MakeID != 0 || vehicleRecallItem.MakeID != null) &&
                            (vehicleRecallItem.ModelID != 0 || vehicleRecallItem.ModelID != null))
                         {
-                            var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
-                                vehicleRecallItem.ModelID, null, null);
-                            foreach (var externalVehicle in externalVehicles)
-                            {
-                                recall.Vehicles.Add(new VehicleRecallDTO
-                                {
-                                    Chassis = externalVehicle.ChassisNo,
-                                    RecallID = recall.Id,
-                                    MakeID = vehicleRecallItem.MakeID,
-                                    ModelID = vehicleRecallItem.ModelID,
-                                    RecallStatus = vehicleRecallItem.RecallStatus
+                            //var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
+                            //    vehicleRecallItem.ModelID, null, null);
+                            //foreach (var externalVehicle in externalVehicles)
+                            //{
+                            //    recall.Vehicles.Add(new VehicleRecallDTO
+                            //    {
+                            //        Chassis = externalVehicle.ChassisNo,
+                            //        RecallID = recall.Id,
+                            //        MakeID = vehicleRecallItem.MakeID,
+                            //        ModelID = vehicleRecallItem.ModelID,
+                            //        RecallStatus = vehicleRecallItem.RecallStatus
                                     
-                                });
+                            //    });
 
-                            }
+                            //}
                             var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
                               vehicleRecallItem.ModelID, null, null);
                             foreach (var internalVehicle in internalVehicles)
