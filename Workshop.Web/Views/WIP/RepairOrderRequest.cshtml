@@ -408,8 +408,8 @@
             </div>
 
             <div class="opl-topmeta">
-                <div class="meta"><span class="b">DATE:</span> <span class="line thin"></span></div>
-                <div class="meta"><span class="b">TIME RECEIVED:</span> <span class="line thin"></span></div>
+                <div class="meta"><span class="b">DATE:</span> <span class="line thin">@Model.Date</span></div>
+                <div class="meta"><span class="b">TIME RECEIVED:</span> <span class="line thin">@Model.TimeReceived</span></div>
             </div>
 
             <table class="opl-info" aria-label="Vehicle Details">
@@ -435,19 +435,19 @@
                     <td class="lbl">COMPANY NAME:</td>
                     <td class="fill"><span class="line"></span></td>
                     <td class="lblR">INSURANCE EXPIRATION DATE:</td>
-                    <td class="fillR"><span class="line"></span></td>
+                    <td class="fillR"><span class="line">@Model.InsuranceExpDate</span></td>
                 </tr>
                 <tr>
                     <td class="lbl">CUSTOMER/USER NAME:</td>
                     <td class="fill"><span class="line">@Model.CustomerName</span></td>
                     <td class="lblR">ESTIMARA EXPIRATION DATE:</td>
-                    <td class="fillR"><span class="line"></span></td>
+                    <td class="fillR"><span class="line">@Model.EstimaraExpDate</span></td>
                 </tr>
                 <tr>
                     <td class="lbl">MOBILE NUMBER:</td>
-                    <td class="fill"><span class="line"></span></td>
+                    <td class="fill"><span class="line">@Model.MobileNumber</span></td>
                     <td class="lblR">MVPI EXPIRATION DATE:</td>
-                    <td class="fillR"><span class="line"></span></td>
+                    <td class="fillR"><span class="line">@Model.MVPIExpDate</span></td>
                 </tr>
             </table>
 
@@ -646,7 +646,7 @@
                             <tr><td class="lbl">Trim</td><td class="val bigval">@Model.Trim</td></tr>
                             <tr><td class="lbl">Fuel Reading</td><td class="val">@Model.FuelLevel</td></tr>
                             <tr><td class="lbl">Vehicle No</td><td class="val bigval"></td></tr>
-                            <tr><td class="lbl">Registration Date</td><td class="val bigval"></td></tr>
+                            <tr><td class="lbl">Registration Date</td><td class="val bigval">@Model.RegistrationExpDate</td></tr>
                             <tr><td class="lbl">Mileage</td><td class="val bigval">@Model.VehicleInfo.Mileage</td></tr>
                         </table>
                     </div>
