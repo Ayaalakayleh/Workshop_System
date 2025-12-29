@@ -228,6 +228,50 @@ namespace Workshop.Infrastructure.Repositories
 
             return rowsAffected;
         }
+        public async Task<List<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassisBulkAsync(List<string> chassisList)
+        {
+            using var connection = _context.CreateConnection();
+
+            if (chassisList == null || chassisList.Count == 0)
+                return new List<ActiveRecallsByChassisResponseDto>();
+
+            var parameters = new DynamicParameters();
+            parameters.Add( "@ChassisList",Newtonsoft.Json.JsonConvert.SerializeObject(chassisList), DbType.String);
+
+            var rows = (await connection.QueryAsync<ActiveRecallBulkRowDto>("GetActiveRecallsByChassisBulk", parameters, commandType: CommandType.StoredProcedure)).ToList();
+
+            var result = new List<ActiveRecallsByChassisResponseDto>();
+
+            foreach (var chassis in chassisList)
+            {
+                var recalls = rows
+                    .Where(r => r.ChassisNo == chassis && r.RecallId.HasValue)
+                    .Select(r => new ActiveRecallDto
+                    {
+                        RecallId = r.RecallId!.Value,
+                        Code = r.Code!,
+                        Title = r.Title!,
+                        Description = r.Description,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        IsActive = r.IsActive ?? false,
+                        CreatedAt = r.CreatedAt,
+                        CreatedBy = r.CreatedBy,
+                        UpdatedAt = r.UpdatedAt,
+                        UpdatedBy = r.UpdatedBy
+                    })
+                    .ToList();
+
+                result.Add(new ActiveRecallsByChassisResponseDto
+                {
+                    ChassisNo = chassis,
+                    Recalls = recalls
+                });
+            }
+
+            return result;
+        }
+
 
 
 

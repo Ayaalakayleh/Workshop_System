@@ -2335,8 +2335,28 @@ namespace Workshop.Web.Controllers
                 if (accountDetails.CustomerId != null)
                 {
                     var _customer = await _accountingApiClient.Customer_GetById((int)accountDetails.CustomerId);
+
                     customer = _customer.CustomerPrimaryName;
                     model.AccountNo = _customer.AccountNoReceivable;
+                }
+
+                var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
+                if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
+                {
+                    var customerLease = await _vehicleApiClient.GetGeneralInfo((int)activeAgreement.AgreementId);
+                    var CustomerId = customerLease.LeaseCustomerId;
+                     
+                    var customerName = "";
+                    var _customerInfo = await _vehicleApiClient.Get_CustomerInformation(BranchId, lang);
+                    
+                    if(CustomerId != null)
+                    {
+                        var _customerDetails =  _customerInfo.FirstOrDefault(c => c.Id == CustomerId) ;
+                        customerName = _customerDetails.CustomerPrimaryName;
+                        model.MobileNumber = _customerDetails.CustomerPhoneNumber;
+                    }
+
+                        model.CustomerName = customerName;
                 }
 
                 //============================================================================================================
@@ -2344,28 +2364,28 @@ namespace Workshop.Web.Controllers
                 //============================================================================================================
                 var last = await _apiClient.GetLastMovementOutByWorkOrderId((int)Details.WorkOrderId);
                 model.VehicleInfo ??= new VehicleInfoModel();
-                //model.Date = Details.Date;
-                //model.TimeReceived = Details.TimeReceived;
+                model.Date = DateTime.Now;
+                model.TimeReceived = movement.ReceivedTime;
                 model.VehicleInfo.Year = vehicleInfo.Year;
                 model.VehicleInfo.PlateNumber = vehicleInfo.PlateNumber;
                 model.VehicleInfo.ColorName = vehicleInfo.ColorName;
                 model.VehicleInfo.VIN = vehicleInfo.VIN;
                 model.VehicleInfo.Make = vehicleInfo.Make;
                 model.VehicleInfo.Model = vehicleInfo.Model;
+                model.VehicleInfo.Mileage = vehicleInfo.Mileage?? movement.ReceivedMeter;
                 model.DateLastVisit = last?.GregorianMovementDate?.ToString("yyyy-MM-dd");
                 //model.EngineNumber = vehicleDetails.Eng;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
                 //model.Trim = accountDetails.TermsId;
                 //model.CompanyName = Details.CompanyName;
-                //model.InsuranceExpDate = Details.InsuranceExpDate;
-                model.CustomerName = customer;
-                //model.EstimaraExpDate = Details.EstimaraExpDate;
-                //model.MobileNumber = Details.MobileNumber;
-                //model.MVPIExpDate = Details.MVPIExpDate;
+                model.InsuranceExpDate = await VehicleDocumants(Details.VehicleId, 5); 
+                model.EstimaraExpDate = await VehicleDocumants(Details.VehicleId, 2);
+                model.MVPIExpDate = await VehicleDocumants(Details.VehicleId, 6); 
+                model.RegistrationExpDate = await VehicleDocumants(Details.VehicleId, 8); 
                 model.Complaint = Complaint;
                 model.DateIn = movement.GregorianMovementDate?.ToString("yyyy-MM-dd");
                 model.TimeIn = movement.ReceivedTime;
-                //model.DateOut = movement.GregorianMovementDate?.ToString("yyyy-MM-dd");
+                model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
                 //model.TimeOut = movement.ReceivedTime;
                 //model.AccountNo = Details.AccountNo;
                 model.FuelLevel = movement.fuelLevel;
@@ -2629,6 +2649,10 @@ namespace Workshop.Web.Controllers
                 new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x))
             );
         }
-
+        private async Task<string> VehicleDocumants(int vehicleId, int type)
+        {
+            var vehicleDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(vehicleId, type);
+            return vehicleDoc?.strExpiryDate ?? "";
+        }
     }
 }

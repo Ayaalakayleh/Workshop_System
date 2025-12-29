@@ -91,20 +91,43 @@ namespace Workshop.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> VehicleList([FromBody] VehicleAdvancedFilter filter)
         {
-            filter ??= new VehicleAdvancedFilter();
-            var colVehicleDefinitions = new List<VehicleDefinitions>();
+            try {
+                filter ??= new VehicleAdvancedFilter();
+                var colVehicleDefinitions = new List<VehicleDefinitions>();
 
-            filter.CompanyId = CompanyId;
+                filter.CompanyId = CompanyId;
 
-            if (filter.VehicleTypeId == 1) // internal
-            {
-                colVehicleDefinitions = await _vehicleApiClient.GetWorkshopVehicles(filter);
+                if (filter.VehicleTypeId == 1) // internal
+                {
+                    colVehicleDefinitions = await _vehicleApiClient.GetWorkshopVehicles(filter);
+
+                    var chassisNo = colVehicleDefinitions.Where(x => !string.IsNullOrWhiteSpace(x.ChassisNo)).Select(x => x.ChassisNo!).ToList();
+
+                    if (chassisNo.Any())
+                    {
+                        var recallResult = await _apiClient.GetActiveRecallsByChassisBulkAsync(chassisNo);
+
+                        foreach (var vehicle in colVehicleDefinitions)
+                        {
+                            vehicle.isRecall =  vehicle.ChassisNo != null && recallResult != null && recallResult.Any(r =>r.ChassisNo == vehicle.ChassisNo &&r.HasActiveRecall);
+                        }
+                    }
+
+                }
+                else if (filter.VehicleTypeId == 2) // external
+                {
+                    colVehicleDefinitions = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicles(filter.PageNumber, filter.ManufacturerId == 0 ? default(int?) : filter.ManufacturerId, filter.PlateNumber, filter.VehicleModelId == 0 ? default(int?) : filter.VehicleModelId, filter.ChassisNo);
+                }
+                return PartialView("_VehicleSelectList", colVehicleDefinitions);
             }
-            else if (filter.VehicleTypeId == 2) // external
+            catch(Exception ex)
             {
-                colVehicleDefinitions = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicles(filter.PageNumber, filter.ManufacturerId == 0 ? default(int?) : filter.ManufacturerId, filter.PlateNumber, filter.VehicleModelId == 0 ? default(int?) : filter.VehicleModelId, filter.ChassisNo);
+                return StatusCode(500, new
+                {
+                    isSuccess = false,
+                    message = ex.Message
+                });
             }
-            return PartialView("_VehicleSelectList", colVehicleDefinitions);
         }
 
         public async Task<IActionResult> GetLastOutMaintenanceCard(int vehicleId)

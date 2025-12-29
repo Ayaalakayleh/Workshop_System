@@ -10,18 +10,19 @@ namespace Workshop.Web.Models
         public int? MovementId { get; set; }
         public int? VehicleNo { get; set; }
         public DateTime? Date { get; set; }
-        public DateTime? TimeReceived { get; set; }
+        public TimeSpan? TimeReceived { get; set; }
         public VehicleInfoModel VehicleInfo { get; set; }
         public string? ContractExpDate { get; set; }
         public string? CompanyName { get; set; }
         public string? FuelLevel { get; set; }
-        public DateTime? InsuranceExpDate { get; set; }
+        public string? InsuranceExpDate { get; set; }
         public string? CustomerName { get; set; }
         //public string? ColorName { get; set; }
         public string? Trim { get; set; }
-        public DateTime? EstimaraExpDate { get; set; }
+        public string? EstimaraExpDate { get; set; }
         public string? MobileNumber { get; set; }
-        public DateTime? MVPIExpDate { get; set; }
+        public string? MVPIExpDate { get; set; }
+        public string? RegistrationExpDate { get; set; }
         public string? Complaint { get; set; }
         public string? DateIn { get; set; }
         public TimeSpan? TimeIn { get; set; }

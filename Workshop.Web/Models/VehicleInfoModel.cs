@@ -9,6 +9,6 @@
         public decimal? Mileage { get; set; }
         public string? VIN { get; set; }
         public string? ColorName { get; set; }
-
+        public string? CustomerName { get; set; }
     }
 }
