@@ -597,9 +597,9 @@ $(function () {
         $nav.empty();
 
         if (currentPage === 0) {
-            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Previous"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></span></li>');
+            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Previous"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></span></li>');
         } else {
-            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Previous" data-prev="1"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></a></li>');
+            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Previous" data-prev="1"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></a></li>');
         }
 
         for (var i = 0; i < numPages; i++) {
@@ -611,9 +611,9 @@ $(function () {
         }
 
         if (currentPage === numPages - 1) {
-            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Next"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></span></li>');
+            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Next"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></span></li>');
         } else {
-            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Next" data-next="1"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></a></li>');
+            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Next" data-next="1"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></a></li>');
         }
     }
 
