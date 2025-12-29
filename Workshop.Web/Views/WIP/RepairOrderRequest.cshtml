@@ -485,46 +485,80 @@
 
                 <!-- Middle: Checklist -->
                 <div class="opl-panel" aria-label="Inspection Checklist">
-                    <table class="opl-check">
-                        <thead>
-                            <tr>
-                                <th class="item"></th>
-                                <th class="pass">PASSED</th>
-                                <th class="remark">NOT PASSED / REMARKS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < (Model?.VehicleCkecklist?.Count ?? 0); i++)
-                            {
+                    @if(Model.VehicleCkecklist?.Count > 0)
+                    {
+                        <table class="opl-check">
+                            <thead>
                                 <tr>
-                                    @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
-                                    <td>
-                                        @(lang == "en"
-                                            ? Model.VehicleCkecklist[i].LookupPrimaryDescription
-                                            : Model.VehicleCkecklist[i].LookupSecondaryDescription)
+                                    <th class="item"></th>
+                                    <th class="pass">PASSED</th>
+                                    <th class="remark">NOT PASSED / REMARKS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < (Model?.VehicleCkecklist?.Count ?? 0); i++)
+                                {
+                                    <tr>
+                                        @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
+                                        <td>
+                                            @(lang == "en" ? Model.VehicleCkecklist[i].LookupPrimaryDescription
+                                                                                : Model.VehicleCkecklist[i].LookupSecondaryDescription)
+                                                                            
                                     </td>
                                     <td class="text-center">
-                                        @Html.CheckBoxFor(
-                                            m => m.VehicleCkecklist[i].Pass,
-                                            new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" }
-                                        )
+                                        @Html.CheckBoxFor( m => m.VehicleCkecklist[i].Pass,
+                                                                            new { @class = "form-check-input", id = $"chk_{i}", disabled = "disabled" } )
+                                                                       
                                     </td>
                                     <td>
-                                        @Html.TextAreaFor(
-                                            m => m.VehicleCkecklist[i].Description,
-                                            new {
-                                                @class = "form-control form-control-sm",
-                                                rows = 1,
-                                                placeholder = Common["Label_Remarks"],
-                                                id = $"rmk_{i}",
-                                                disabled = "disabled"
-                                            }
-                                        )
+                                        @Html.TextAreaFor( m => m.VehicleCkecklist[i].Description,
+                                                                            new
+                                                                            {
+                                                                                @class = "form-control form-control-sm",
+                                                                                rows = 1,
+                                                                                placeholder = Common["Label_Remarks"],
+                                                                                id = $"rmk_{i}",
+                                                                                disabled = "disabled"
+                                                                            } )
+                                                                       
                                     </td>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <table class="table table-sm table-bordered table-hover align-middle text-start mb-0" id="tblInspectionChecklist">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="item"></th>
+                                    <th class="pass">PASSED</th>
+                                    <th class="remark">NOT PASSED / REMARKS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model?.VehicleCkecklist?.Count; i++)
+                                {
+                                    <tr>
+                                        @Html.HiddenFor(m => m.VehicleCkecklist[i].LookupId)
+                                        <td>
+                                            @(lang == "en" ? Model.VehicleCkecklist[i].LookupPrimaryDescription : Model.VehicleCkecklist[i].LookupSecondaryDescription)
+                                        </td>
+
+                                        <td class="text-center">
+                                            @Html.CheckBoxFor(m => m.VehicleCkecklist[i].Pass, new { @class = "form-check-input", id = $"chk_{i}" })
+                                        </td>
+
+                                        <td>
+                                            @Html.TextAreaFor(m => m.VehicleCkecklist[i].Description, new { @class = "form-control form-control-sm", rows = 1, placeholder = Common["Label_Remarks"], id = $"rmk_{i}" } )
+                                        </td>
+                                    </tr>
+                                 }
+                            </tbody>
+                        </table>
+                    }
+                   
                 </div>
 
                 <!-- Right: Tires (kept as your original structure) -->
