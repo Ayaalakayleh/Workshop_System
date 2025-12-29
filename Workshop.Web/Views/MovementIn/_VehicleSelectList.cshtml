@@ -199,6 +199,11 @@
                 </div>
 
                 <!-- Image -->
+                @if (item.isRecall)
+                {
+                    <span class="badge bg-warning text-dark recall-badge">@Common["Recall"]</span>
+                }
+                
                 <img class="vehicle-media"
                      src="/Workshop/Content/smart_theme/dist/img/default_car_260.jpeg"
                      alt="@(lang == "en" ? item.RefManufacturers?.ManufacturerPrimaryName : item.RefManufacturers?.ManufacturerSecondaryName) @(lang == "en" ? item.RefVehicleModels?.VehicleModelPrimaryName : item.RefVehicleModels?.VehicleModelSecondaryName)"
