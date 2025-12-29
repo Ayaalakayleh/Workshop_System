@@ -99,6 +99,9 @@ namespace Workshop.Web.Controllers
             if (filter.VehicleTypeId == 1) // internal
             {
                 colVehicleDefinitions = await _vehicleApiClient.GetWorkshopVehicles(filter);
+                List<string> chassisNo = colVehicleDefinitions?.Where(x => !string.IsNullOrWhiteSpace(x.ChassisNo)).Select(x => x.ChassisNo).ToList() ?? new List<string>();
+                ViewBag.RecalStatusBulk = (chassisNo != null && chassisNo.Any()) ? await _apiClient.GetActiveRecallsByChassisBulkAsync(chassisNo): null;
+
             }
             else if (filter.VehicleTypeId == 2) // external
             {

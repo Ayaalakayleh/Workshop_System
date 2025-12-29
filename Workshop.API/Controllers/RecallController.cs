@@ -75,5 +75,12 @@ namespace Workshop.API.Controllers
 			return Ok(result);
 
 		}
-	}
+        [HttpPost("GetActiveRecallsByChassisBulk")]
+        public async Task<IActionResult> GetActiveRecallsByChassisBulk(List<string> chassisList)
+        {
+            var result = await _service.GetActiveRecallsByChassisBulkAsync(chassisList);
+            return Ok(result);
+
+        }
+    }
 }

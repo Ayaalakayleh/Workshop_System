@@ -54,7 +54,10 @@ namespace Workshop.Core.Services
 		{
 			return await _repository.UpdateRecallVehicleStatus(chassisNo, statusId);
 		}
-
+        public async Task<List<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassisBulkAsync(List<string> chassisList)
+		{
+			return await _repository.GetActiveRecallsByChassisBulkAsync(chassisList);
+		}
 
     }
 }
