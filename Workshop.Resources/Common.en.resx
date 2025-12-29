@@ -2496,4 +2496,13 @@
   <data name="Label_HasRecall" xml:space="preserve">
     <value>Has Recall</value>
   </data>
+  <data name="RecallConfirmation" xml:space="preserve">
+    <value>Do you want to fix this recall?</value>
+  </data>
+  <data name="Fix_Recall" xml:space="preserve">
+    <value>Fix Recall</value>
+  </data>
+  <data name="Recall_fixed" xml:space="preserve">
+    <value>Recall fixed successfully</value>
+  </data>
 </root>

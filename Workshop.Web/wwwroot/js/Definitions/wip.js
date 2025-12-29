@@ -871,6 +871,54 @@ $(document).ready(function () {
     }
 
     wireOnRowInserted();
+    $(document).on("click", "#btnFixRecall", function () {
+
+        const chassisNo = $(this).data("chassis");
+        const $btn = $(this);
+
+        Swal.fire({
+            icon: "warning",
+            title: window.resources.are_you_sure,
+            text: window.RazorVars.RecallConfirmation,
+            showCancelButton: true,
+            confirmButtonText: resources.yes,
+            cancelButtonText: resources.no,
+            confirmButtonColor: "#d33"
+        }).then(result => {
+
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                type: "PUT",
+                url: window.URLs.updateRecallVehicleStatus,
+                data: { chassisNo }
+            }).done(function (res) {
+
+                if (res && res.updated > 0) {
+                    Swal.fire({
+                        icon: "success",
+                        title: resources.done_title,
+                        text: window.RazorVars.RecallFixed
+                    });
+                    $btn.remove();
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: window.RazorVars.LabelError,
+                        text: window.RazorVars.ErrorHappend
+                    });
+                }
+
+            }).fail(function () {
+                Swal.fire({
+                    icon: "error",
+                    title: window.RazorVars.LabelError,
+                    text: window.RazorVars.ErrorHappend
+                });
+            });
+        });
+    });
+
 });
 function validateGridsAccountTypeForPartialInv() {
     const partialInvoicing = $("#optPartialInv").is(":checked");

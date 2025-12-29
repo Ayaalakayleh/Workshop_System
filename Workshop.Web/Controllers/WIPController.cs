@@ -358,6 +358,9 @@ namespace Workshop.Web.Controllers
                             dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
                             dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
                             dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                            var recallResponse =await _apiClient.GetActiveRecallsByChassis(vehicleDetails?.ChassisNo);
+
+                            ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
 
                         }
                         else
@@ -2387,6 +2390,30 @@ namespace Workshop.Web.Controllers
             string strike = await _apiClient.GetVehicleMovementStrikeAsync(movementId);
             return Json(strike);
         }
+        [HttpPut]
+        public async Task<JsonResult> UpdateRecallVehicleStatus(string chassisNo)
+        {
+            try
+            {
+                var updated = await _apiClient.UpdateRecallVehicleStatusAsync(chassisNo, (int)RecallStatusEnum.Done);
+
+                return Json(new
+                {
+                    success = true,
+                    updated
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    success = false,
+                    updated = 0
+                });
+            }
+        }
+
+
 
         private async Task<string?> GetContractExpDateAsync(int vehicleId)
         {
