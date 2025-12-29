@@ -378,7 +378,8 @@ async function updateTotalLabourFieldsFromGrid() {
         totalBase += lineBase;
         totalDiscountAmount += lineDisc;
         totalTaxAmount += tax;
-        totalAfterDiscount += lineTotal;
+        //totalAfterDiscount += lineTotal;
+        totalAfterDiscount += lineAfterDiscount;
     });
 
     const totalDiscountPct = totalBase > 0 ? (totalDiscountAmount / totalBase) * 100 : 0;
