@@ -21,14 +21,14 @@ namespace Workshop.API.Controllers
 			var result = await _service.GetAllAsync(filterRecallDTO);
 			return Ok(result);
 		}
-        [HttpGet("GetAllDDL")]
-        public async Task<ActionResult<IEnumerable<RecallDTO>>> GetAllDDL()
-        {
-            var result = await _service.GetAllDDLAsync();
-            return Ok(result);
-        }
+		[HttpGet("GetAllDDL")]
+		public async Task<ActionResult<IEnumerable<RecallDTO>>> GetAllDDL()
+		{
+			var result = await _service.GetAllDDLAsync();
+			return Ok(result);
+		}
 
-        [HttpGet("GetById/{id}")]
+		[HttpGet("GetById/{id}")]
 		public async Task<ActionResult<RecallDTO>> GetById(int id)
 		{
 			var result = await _service.GetByIdAsync(id);
@@ -36,19 +36,19 @@ namespace Workshop.API.Controllers
 			return Ok(result);
 		}
 
-        [HttpGet("GetActiveRecallsByChassis/{chassisNo}")]
-        public async Task<ActionResult<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassis(string chassisNo)
-        {
-            if (string.IsNullOrWhiteSpace(chassisNo))
-            {
-                return BadRequest("Chassis number is required.");
-            }
+		[HttpGet("GetActiveRecallsByChassis/{chassisNo}")]
+		public async Task<ActionResult<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassis(string chassisNo)
+		{
+			if (string.IsNullOrWhiteSpace(chassisNo))
+			{
+				return BadRequest("Chassis number is required.");
+			}
 
-            var result = await _service.GetActiveRecallsByChassisAsync(chassisNo);
-            return Ok(result);
-        }
+			var result = await _service.GetActiveRecallsByChassisAsync(chassisNo);
+			return Ok(result);
+		}
 
-        [HttpPost("Add")]
+		[HttpPost("Add")]
 		public async Task<ActionResult> Add([FromBody] CreateRecallDTO dto)
 		{
 			var id = await _service.AddAsync(dto);
@@ -62,11 +62,18 @@ namespace Workshop.API.Controllers
 			return Ok(new { Updated = updated });
 		}
 
-        [HttpPost("Delete")]
-        public async Task<ActionResult> Delete([FromBody] DeleteRecallDTO dto)
-        {
-            var delete = await _service.DeleteAsync(dto);
-            return Ok(new { deleted = delete });
-        }
-    }
+		[HttpPost("Delete")]
+		public async Task<ActionResult> Delete([FromBody] DeleteRecallDTO dto)
+		{
+			var delete = await _service.DeleteAsync(dto);
+			return Ok(new { deleted = delete });
+		}
+		[HttpPut("UpdateRecallVehicleStatus")]
+		public async Task<IActionResult> UpdateRecallVehicleStatusAsync(string chassisNo, int statusId)
+		{
+			var result = await _service.UpdateRecallVehicleStatus(chassisNo, statusId);
+			return Ok(result);
+
+		}
+	}
 }
