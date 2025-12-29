@@ -79,6 +79,6 @@
 		public List<ActiveRecallDto> Recalls { get; set; } = new();
 	}
 	public enum VehicleRecallStatus {
-		Open = 1, Done = 3
+		Open = 1, Done = 2
     }
 }

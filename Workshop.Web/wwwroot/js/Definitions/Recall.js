@@ -138,9 +138,7 @@ $(function () {
         ],
         onInitNewRow: (e) => {
             e.data.Id = parseInt(e.data.Id) || counter--;
-
             e.data.RecallStatus = 1; // Open
-            console.log(e);
         },
         onRowRemoving: function (e) {
             if (!window.Swal) return;
