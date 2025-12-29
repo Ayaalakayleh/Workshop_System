@@ -67,8 +67,9 @@ namespace Workshop.Core.DTOs.Vehicle
 		public int? D3_DimensionsId { get; set; }
 		public int? D4_DimensionsId { get; set; }
 		public int VehicleClassId { get; set; }
+        public bool isRecall { get; set; }
 
-	}
+    }
 
 	public class CustomerInformationSummery
 	{
