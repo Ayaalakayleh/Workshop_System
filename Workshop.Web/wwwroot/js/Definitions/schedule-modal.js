@@ -411,7 +411,7 @@
                     $('#chassisDropdown')
                         .val(String(chassisId))
                         .trigger('change.select2'); // ❌ NO trigger('change')
-
+                    updateRecallChip($('#chassisDropdown').find('option:selected').text());
                     state.chassisId = Number(chassisId);
                     $('#CompanyId').val(res.data.vehicle.companyId).trigger('change');
 
@@ -446,8 +446,8 @@
         });
 
     }
-    function updateRecallChip(chassisId) {
-        if (!chassisId) {
+    function updateRecallChip(chassis) {
+        if (!chassis) {
             $("#recallChip").text("Recall: -");
             return;
         }
@@ -455,7 +455,7 @@
         $.ajax({
             url: window.API_BASE.hasRecallURL,
             type: 'GET',
-            data: { chassis: chassisId },
+            data: { chassis: chassis },
             success: function (result) {
                 const hasRecall = result === true || result === "true";
                 $("#recallChip").text("Recall: " + (hasRecall ? "Yes" : "No"));
@@ -477,7 +477,7 @@
         isVehicleChassisSyncing = true;
 
        
-        updateRecallChip($('#vehicleDropdown').val());
+        
         $('#vehicleDropdown')
             .val(String(chassisId))
             .trigger('change.select2');
