@@ -14,11 +14,11 @@
     <div class="col-12">
         <div class="btn-group btn-group-toggle w-100" data-toggle="buttons" id="invoiceTypeToggle">
             <label class="btn btn-outline-primary btn-lg active" style="width: 50%">
-                <input type="radio" name="invoiceType" id="creditInvoice" value="credit" checked> 
+                <input type="radio" name="invoiceType" id="creditInvoice" value="credit" class="opacity-0" checked>
                 Credit Invoice
             </label>
             <label class="btn btn-outline-success btn-lg" style="width: 50%">
-                <input type="radio" name="invoiceType" id="pettyCashInvoice" value="pettycash"> 
+                <input type="radio" name="invoiceType" id="pettyCashInvoice" value="pettycash" class="opacity-0"> 
                 Petty Cash Invoice
             </label>
         </div>
@@ -992,92 +992,99 @@
     }
 
     function ValidPettyCashOut() {
-        var isValid = true;
-        var isPart = $("#PettyCash_IsPart").is(":checked");
+    var isValid = true;
+    var isPart = $("#PettyCash_IsPart").is(":checked");
 
-        // Validation for Petty Cash form
-        if (!$('#PettyCash_RequestNo').val()) {
-            $('#PettyCash_RequestNo').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#PettyCash_RequestNo').removeClass('is-invalid');
-        }
-
-        if (!$('#PettyCash_ExpenseType').val()) {
-            $('#PettyCash_ExpenseType').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#PettyCash_ExpenseType').removeClass('is-invalid');
-        }
-
-        if (!$('#PettyCash_SellerId').val()) {
-            $('#PettyCash_SellerId').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#PettyCash_SellerId').removeClass('is-invalid');
-        }
-
-        if (!$('#PettyCash_InvoiceNo').val()) {
-            $('#PettyCash_InvoiceNo').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#PettyCash_InvoiceNo').removeClass('is-invalid');
-        }
-
-        // Updated validation for Parts Cost and Labor Cost
-        if (!$('#PettyCash_PartsCost').val() && !$('#PettyCash_LaborCost').val()) {
-            $('#PettyCash_PartsCost').addClass('is-invalid');
-            $('#PettyCash_LaborCost').addClass('is-invalid');
-            Swal.fire("Error", "At least one of Parts Cost or Labor Cost must be provided", "error");
-            isValid = false;
-        } else {
-            $('#PettyCash_PartsCost').removeClass('is-invalid');
-            $('#PettyCash_LaborCost').removeClass('is-invalid');
-        }
-
-        // Check balance
-        var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
-        var balance = parseFloat($('#PettyCash_UserBalance').text()) || 0;
-        if (netAmount > balance) {
-            Swal.fire("Error", "Net amount exceeds available balance", "error");
-            isValid = false;
-        }
-
-        if (isValid) {
-            // Collect petty cash service IDs
-            var fixedServiceIds = [];
-            $('.pettycash-service-checkbox:checked').each(function() {
-                fixedServiceIds.push($(this).data('service-id'));
-            });
-            $('#PettyCash_FixedServiceIds').val(fixedServiceIds.join(','));
-
-            // Submit petty cash form
-            var formData = new FormData($('#PettyCashInvoiceForm').get(0));
-            
-            $.ajax({
-                url: '@Url.Action("TransferMoveInPettyCash", "WIP")',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    if (data.isSuccess) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: "Petty Cash Invoice Created Successfully",
-                            confirmButtonText: 'OK',
-                            timer: 3000,
-                            timerProgressBar: true
-                        }).then(() => {
-                            window.location.href = "@Url.Action("TransferMovements", "WIP")";
-                        });
-                    } else {
-                        Swal.fire("Error", data.message, "error");
-                    }
-                }
-            });
-        }
+    // Validation for Petty Cash form
+    if (!$('#PettyCash_RequestNo').val()) {
+        $('#PettyCash_RequestNo').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#PettyCash_RequestNo').removeClass('is-invalid');
     }
+
+    if (!$('#PettyCash_ExpenseType').val()) {
+        $('#PettyCash_ExpenseType').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#PettyCash_ExpenseType').removeClass('is-invalid');
+    }
+
+    if (!$('#PettyCash_SellerId').val()) {
+        $('#PettyCash_SellerId').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#PettyCash_SellerId').removeClass('is-invalid');
+    }
+
+    if (!$('#PettyCash_InvoiceNo').val()) {
+        $('#PettyCash_InvoiceNo').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#PettyCash_InvoiceNo').removeClass('is-invalid');
+    }
+
+    // Updated validation for Parts Cost and Labor Cost
+    if (!$('#PettyCash_PartsCost').val() && !$('#PettyCash_LaborCost').val()) {
+        $('#PettyCash_PartsCost').addClass('is-invalid');
+        $('#PettyCash_LaborCost').addClass('is-invalid');
+        Swal.fire("Error", "At least one of Parts Cost or Labor Cost must be provided", "error");
+        isValid = false;
+    } else {
+        $('#PettyCash_PartsCost').removeClass('is-invalid');
+        $('#PettyCash_LaborCost').removeClass('is-invalid');
+    }
+
+    // Check balance
+    var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
+    var balance = parseFloat($('#PettyCash_UserBalance').text()) || 0;
+    if (netAmount > balance) {
+        Swal.fire("Error", "Net amount exceeds available balance", "error");
+        isValid = false;
+    }
+
+    if (isValid) {
+        // FIX: Use the correct selector for petty cash checkboxes
+        var services = [];
+        $('.pettycash-service-checkbox').each(function () {
+            services.push({
+                ServiceId: $(this).data('service-id'),
+                IsFixed: $(this).is(':checked')
+            });
+        });
+
+        // Submit petty cash form
+        var formData = new FormData($('#PettyCashInvoiceForm').get(0));
+
+        for (var i = 0; i < services.length; i++) {
+            formData.append(`Services[${i}].ServiceId`, services[i].ServiceId);
+            formData.append(`Services[${i}].IsFixed`, services[i].IsFixed);
+        }
+        
+        $.ajax({
+            url: '@Url.Action("TransferMoveInPettyCash", "WIP")',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data.isSuccess) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Petty Cash Invoice Created Successfully",
+                        confirmButtonText: 'OK',
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        window.location.href = "@Url.Action("TransferMovements", "WIP")";
+                    });
+                } else {
+                    Swal.fire("Error", data.message, "error");
+                }
+            }
+        });
+    }
+}
 
     $('#NotTaxable').change(function () {
         ChangeVat();       

@@ -50,6 +50,8 @@
 										)
 					{
 						@Html.HiddenFor(a => a.Id)
+						@Html.HiddenFor(a => a.Phone)
+
 						@Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col-lg-3 col-md-6 col-sm-12">
@@ -77,7 +79,8 @@
 							<div class="col-lg-3 col-md-6 col-sm-12">
 								<div class="form-group">
 									<label>@Common["Label_PhoneNumber"]<span class="text-danger required-star">*</span></label>
-									@Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control phone-number" } })
+									@* @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control phone-number" } }) *@
+									<input class="form-control phone-number text-box single-line" id="PhoneH" name="PhoneH" type="text" autocomplete="off" data-intl-tel-input-id="0" value="@Model.Phone">
 									<span class="field-validation-valid text-danger" data-valmsg-for="CustomerPhoneNumber" data-valmsg-replace="true"> &nbsp;</span>
 								</div>
 							</div>

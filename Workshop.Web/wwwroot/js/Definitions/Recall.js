@@ -168,7 +168,7 @@ $(function () {
                 MakeID: ((typeof MakeID !== "undefined" && MakeID) ? MakeID : []).map(v => v.Text),
                 ModelID: ((typeof Vehicle !== "undefined" && Vehicle) ? Vehicle : []).map(v => v.Name),
                 Chassis: ((typeof Chasses !== "undefined" && Chasses) ? Chasses : []).map(v => v.ChassisNo),
-                Status: ((typeof VehicleRecallStatus !== "undefined" && VehicleRecallStatus) ? VehicleRecallStatus : []).map(v => v.Text)
+                RecallStatus: ((typeof VehcileStatuses !== "undefined" && VehcileStatuses) ? VehcileStatuses : []).map(v => v.Text)
             };
 
             let colStart = 1;
@@ -241,11 +241,84 @@ $(function () {
         });
     }
 
+    // Live validation for Code uniqueness
+    var codeValidationTimeout;
+    var isCodeValid = true;
+
+    function validateCodeUniqueness(code, callback) {
+        if (!code || code.trim().length === 0) {
+            callback(true, ""); // Empty code is considered valid for uniqueness
+            return;
+        }
+
+        var excludeId = $("#Id").val() || null;
+
+        $.ajax({
+            url: '/Recall/CheckRecallCodeUnique',
+            type: 'GET',
+            data: { code: code.trim(), excludeId: excludeId },
+            success: function (response) {
+                callback(response.isUnique, response.message);
+            },
+            error: function (xhr, status, error) {
+                callback(false, "Error checking code uniqueness");
+            }
+        });
+    }
+
+    function showCodeValidation(isValid, message) {
+        var $codeField = $("#Code");
+        var $feedback = $("#code-validation-feedback");
+
+        // Remove existing feedback
+        $codeField.removeClass("is-valid is-invalid");
+        if ($feedback.length) {
+            $feedback.remove();
+        }
+
+        if (message) {
+            var feedbackClass = isValid ? "valid-feedback" : "invalid-feedback";
+            var feedbackHtml = '<div id="code-validation-feedback" class="' + feedbackClass + '">' + message + '</div>';
+            $codeField.after(feedbackHtml);
+
+            if (!isValid) {
+                $codeField.addClass("is-invalid");
+            } else {
+                $codeField.addClass("is-valid");
+            }
+        }
+
+        isCodeValid = isValid;
+    }
+
+    $("#Code").on("input", function () {
+        var code = $(this).val();
+
+        // Clear previous timeout
+        clearTimeout(codeValidationTimeout);
+
+        // Remove immediate feedback
+        $(this).removeClass("is-valid is-invalid");
+        $("#code-validation-feedback").remove();
+
+        // Debounce validation (wait 500ms after user stops typing)
+        codeValidationTimeout = setTimeout(function () {
+            validateCodeUniqueness(code, function (isValid, message) {
+                showCodeValidation(isValid, message);
+            });
+        }, 500);
+    });
+
     // SUBMIT: success if (a) backend gives result > 0 OR (b) backend returns HTML page
     $('#recallForm').on('submit', function (evt) {
         evt.preventDefault();
 
         if ($.fn.validate && !$("#recallForm").valid()) {
+            return false;
+        }
+
+        if (!isCodeValid) {
+            $("#Code").focus();
             return false;
         }
 

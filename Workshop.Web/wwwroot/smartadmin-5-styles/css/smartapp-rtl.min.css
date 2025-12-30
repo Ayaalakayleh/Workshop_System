@@ -18458,10 +18458,6 @@ body.fullscreen-active .sa-fullscreen-off {
             opacity: .8
         }
 
-html[dir=rtl] .app-logo {
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1)
-}
 
 html[dir=rtl] .app-logo {
     background-image: linear-gradient(270deg,rgba(var(--bs-info-rgb),.18),transparent) !important
