@@ -872,28 +872,23 @@
 
                             var nx, ny;
 
-                            // ✅ If backend ever sends normalized coords, prefer them
                             if (s.nx != null && s.ny != null) {
                                 nx = parseFloat(s.nx);
                                 ny = parseFloat(s.ny);
                             } else {
-                                // ✅ Legacy conversion: match movement page formula (x+35, y+23)
-                                var xcoordLegacy = (parseFloat(s.x) + 35);
-                                var ycoordLegacy = (parseFloat(s.y) + 23);
+                                var xcoordLegacy = (parseFloat(s.x) - 20);
+                                var ycoordLegacy = (parseFloat(s.y) - 25);
 
                                 nx = xcoordLegacy / baseW;
                                 ny = ycoordLegacy / baseH;
                             }
 
-                            // map normalized coords into the drawn image rect
                             var mappedX = rect.x + (nx * rect.w);
                             var mappedY = rect.y + (ny * rect.h);
 
-                            // keep the same "-2" that you used on the details page
                             var left = mappedX - 2;
                             var top = mappedY - 2;
 
-                            // clamp so it never clips outside the panel
                             left = clamp(left, 0, boxW - ICON_W);
                             top = clamp(top, 0, boxH - ICON_H);
 
