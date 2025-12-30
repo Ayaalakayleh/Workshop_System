@@ -1,4 +1,14 @@
-﻿function loadEditModal(id) {
+﻿// =========================
+// Helpers
+// =========================
+function dateOnly(val) {
+    if (!val) return '';
+    // Handles: "2025-12-28T00:00:00", "2025-12-28 00:00:00", etc.
+    const m = String(val).match(/^(\d{4}-\d{2}-\d{2})/);
+    return m ? m[1] : '';
+}
+
+function loadEditModal(id) {
     $.ajax({
         type: 'GET',
         url: window.RazorVars.loadWorkOrderDataUrl,
@@ -22,12 +32,15 @@
                 });
 
             $('#SubStatus').val(data.wfstatus).trigger('change');
-            $('#WorkOrderForm_AccidentDate').val(data.gregorianDamageDate).trigger('change');
+
+            // ✅ Date only (trim time)
+            $('#WorkOrderForm_AccidentDate').val(dateOnly(data.gregorianDamageDate)).trigger('change');
+
             $('#WorkOrderForm_AccidentTime').val(data.accidentTime).trigger('change');
             $('#WorkOrderForm_Description').val(data.description).trigger('change');
             $('#WorkOrderForm_Note').val(data.note).trigger('change');
-           // $("#WorkOrderForm_ImagesFilePath").attr("src", data.imagesFilePath).show();
-            
+
+            // FilePond load existing image
             if (data.imagesFilePath && data.imagesFilePath.trim() !== "") {
                 pond.setOptions({
                     files: [
@@ -40,8 +53,12 @@
             } else {
                 pond.removeFiles();
             }
+
+            // Related To radio
             $("#Agreement" + data.relatedId).prop('checked', true);
-            formChoice(data.relatedId);
+
+            // ✅ Use the ONE global formChoice (defined below)
+            formChoice(String(data.relatedId));
 
             Get_Agreement_Movement(data.vehicleId);
 
@@ -65,7 +82,7 @@
 
             $('#FK_AgreementId').val("");
 
-            // Show modal — Select2 inside will init on "shown.bs.modal"
+            // Show modal
             $('#workOrderModal').modal('show');
         },
         error: function (xhr, status, error) {
@@ -78,6 +95,7 @@
 // =========================
 // Select2 Initialization
 // =========================
+
 // 1) Initialize Select2 for selects NOT in the modal
 $(document).ready(function () {
     $('select').not('#workOrderModal select').each(function () {
@@ -101,7 +119,7 @@ $('#workOrderModal').on('shown.bs.modal', function () {
         $sel.select2({
             theme: 'bootstrap-5',
             width: '100%',
-            dropdownParent: $modal, // <-- the key fix
+            dropdownParent: $modal,
             placeholder: $sel.data('placeholder') || 'Select an option'
         });
     });
@@ -127,17 +145,17 @@ $(document).ready(function () {
 
     $('#BtnAddNew').on('click', function () {
         $('#WorkOrderForm_Id').val('').trigger('change')
-        $("#VehicleId").val('');
+        $("#VehicleId").val('').trigger('change');
         $('#SubStatus').val('').trigger('change');
         $('#WorkOrderForm_AccidentDate').val('').trigger('change');
         $('#WorkOrderForm_AccidentTime').val('').trigger('change');
         $('#WorkOrderForm_Description').val('').trigger('change');
         $('#WorkOrderForm_Note').val('').trigger('change');
-        $("#FK_AgreementId").val('');
+        $("#FK_AgreementId").val('').trigger('change');
         $("#FkVehicleMovementId").val('').trigger('change');
         $("#WorkOrderForm_ImagesFilePath").val('').trigger('change');
         $("#Agreement1").prop('checked', true);
-        formChoice(1);
+        formChoice('1');
     });
 });
 
@@ -167,10 +185,8 @@ function buildWorkOrderFilter(page) {
 }
 
 function applyWorkOrderPager(currentPage) {
-    debugger
     const totalPages = parseInt($("#total_pages").val(), 10) || 0;
     const $pager = $('#contentPager');
-
     const pagerPlugin = typeof $pager.pagination === 'function';
 
     if (!pagerPlugin || totalPages <= 1) {
@@ -183,15 +199,15 @@ function applyWorkOrderPager(currentPage) {
     try { $pager.pagination('destroy'); } catch (e) { }
 
     $pager.pagination({
-        items: totalPages,                 
-        itemsOnPage: 1,                   
+        items: totalPages,
+        itemsOnPage: 1,
         currentPage: parseInt(currentPage, 10) || 1,
         prevText: '&laquo;',
         nextText: '&raquo;',
-        hrefTextPrefix: '',                
+        hrefTextPrefix: '',
         onPageClick: function (pageNumber, evt) {
             if (evt && evt.preventDefault) evt.preventDefault();
-            loadWorkOrders(pageNumber);    
+            loadWorkOrders(pageNumber);
             return false;
         }
     });
@@ -202,7 +218,6 @@ function applyWorkOrderPager(currentPage) {
     });
 
     $pager.find('a').attr('href', 'javascript:void(0)').attr('role', 'button');
-
     $pager.find('ul').addClass('pagination');
     $pager.find('li').addClass('page-item');
     $pager.find('a, span').addClass('page-link');
@@ -238,28 +253,6 @@ $(document).ready(function () {
         loadWorkOrders(1);
     });
 });
-
-// =========================
-// Show/Hide related sections
-// =========================
-function formChoice(x) {
-    if (x == 2) {
-        $('#showAgreement').css('display', 'block');
-        $('#showVehicleMovemen').css('display', 'none');
-        if ($("#agreements").val() == 0) {
-            $("#agreements").next().children(':first-child').children(':first-child').css("border-color", "red");
-            isValid = false;
-        } else {
-            $("#agreements").next().children(':first-child').children(':first-child').css("border-color", "#e7eaec");
-        }
-    } else if (x == 3) {
-        $('#showVehicleMovemen').css('display', 'block');
-        $('#showAgreement').css('display', 'none');
-    } else if (x == 1) {
-        $('#showVehicleMovemen').css('display', 'none');
-        $('#showAgreement').css('display', 'none');
-    }
-}
 
 // =========================
 // Data loaders
@@ -344,7 +337,6 @@ function Get_Agreement_Movement(id) {
 let pond;
 
 $(document).ready(function () {
-
     FilePond.registerPlugin(
         FilePondPluginImagePreview,
         FilePondPluginFileValidateType,
@@ -373,17 +365,18 @@ $(document).ready(function () {
 
 // =========================
 // Validation (jQuery Validate)
+// Show messages ONLY after submit attempt
 // =========================
 $(document).ready(function () {
     const $form = $('#WorkOrderForm');
+    let submitAttempted = false;
 
     function relatedChoice() {
         return $('input[name="WorkOrderForm.RelatedId"]:checked').val();
     }
 
     function placeError(error, element) {
-        // Bootstrap-friendly error styling
-        error.addClass('d-block'); // ensures display
+        error.addClass('d-block');
         if (element.hasClass('select2-hidden-accessible')) {
             error.insertAfter(element.next('.select2'));
             return;
@@ -399,12 +392,16 @@ $(document).ready(function () {
         error.insertAfter(element);
     }
 
-    $form.validate({
-        // Keep hidden select2 fields validated
+    const validator = $form.validate({
         ignore: [],
         errorElement: 'div',
         errorClass: 'invalid-feedback',
         errorPlacement: placeError,
+
+        // ✅ prevent live validation until submit is clicked once
+        onkeyup: function (element) { if (submitAttempted) $(element).valid(); },
+        onfocusout: function (element) { if (submitAttempted) $(element).valid(); },
+        onclick: function (element) { if (submitAttempted) $(element).valid(); },
 
         highlight: function (element) {
             var $el = $(element);
@@ -454,12 +451,34 @@ $(document).ready(function () {
         }
     });
 
-    // Validate immediately when Select2 changes (delegated in case of re-init)
+    // ✅ Select2 validation ONLY after submit attempt (stops errors during modal load)
     $('body').on('change', 'select.select2-hidden-accessible', function () {
-        $(this).valid();
+        if (submitAttempted) $(this).valid();
     });
 
-    // Public formChoice that also triggers validation of dependent fields
+    // ✅ Submit: show messages (only here), block submit if invalid
+    $form.on('submit', function (e) {
+        submitAttempted = true;
+
+        if (!$form.valid()) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    });
+
+    // ✅ Reset validator every time modal opens (so old errors don’t stick)
+    $('#workOrderModal').on('show.bs.modal', function () {
+        submitAttempted = false;
+        validator.resetForm();
+
+        $form.find('.is-invalid').removeClass('is-invalid');
+        $form.find('.select2-selection.is-invalid').removeClass('is-invalid');
+    });
+
+    // =========================
+    // ONE formChoice (global)
+    // =========================
     window.formChoice = function (val) {
         const showAgreement = $('#showAgreement');
         const showMovement = $('#showVehicleMovemen');
@@ -478,24 +497,27 @@ $(document).ready(function () {
             $('#FK_AgreementId, #FkVehicleMovementId').val('').trigger('change');
         }
 
-        $('[name="WorkOrderForm.FkAgreementId"], [name="WorkOrderForm.FkVehicleMovementId"]').valid();
+        // ✅ validate dependent fields only after submit attempt
+        if (submitAttempted) {
+            $('[name="WorkOrderForm.FkAgreementId"], [name="WorkOrderForm.FkVehicleMovementId"]').valid();
+        }
     };
 
-    // Initialize related sections on first load
+    // Initialize related sections on first load (no validation yet)
     const initRelated = relatedChoice();
     if (initRelated) window.formChoice(initRelated);
 });
 
+// =========================
+// Auto-open edit modal by query string ?openId=
+// =========================
 $(document).ready(function () {
-        const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
     const openId = params.get("openId");
 
     if (openId) {
-        // Delay ensures that Select2 + UI are ready
         setTimeout(() => {
             loadEditModal(openId);
         }, 300);
-        }
-
-    });
-
+    }
+});

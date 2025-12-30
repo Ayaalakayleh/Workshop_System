@@ -352,19 +352,19 @@
     }
 
     .the-movements #deep-scratch {
-        background-image: url('../images/tajeer-car-assets/DeepScratch.png');
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
     }
 
     .the-movements #small-scratch {
-        background-image: url('../images/tajeer-car-assets/MinorScratch.png');
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
     }
 
     .the-movements #very-deep-scratch {
-        background-image: url('../images/tajeer-car-assets/VeryDeepScratch.png');
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
     }
 
     .the-movements #bend-in-body {
-        background-image: url('../images/tajeer-car-assets/CurvatureStructure.png');
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
     }
 
     /* ==========================================================
@@ -870,10 +870,11 @@
                             <div class="card-header">
                                 <h5>@Common["Label_Recall"]</h5>
                             </div>
-                            @Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
+                            <div class="card-body">
+                                @Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id = "hasRecall", @disabled = true })&nbsp;@Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
 
-                            @Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id = "hasRecall", @disabled = true })
-
+                                @Html.DropDownListFor(m => m.Recalls, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-control select2 mt-2", @id = "recallList", @disabled = true, multiple = "multiple" })
+                            </div>
                         </div>
 
 
@@ -967,6 +968,13 @@
             GetVehicleData();
         }
         $(".lc-picker-contents div:nth-child(8)").trigger("click");
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: function () {
+            return $(this).data('placeholder') || 'Select an option';
+        }
+    });
     });
 
     function GetVehicleData() {
@@ -1039,4 +1047,12 @@
             }
         });
     });
+
+    //     $(document).ready(function () {
+    //     $("#recallList").select2({
+    //         allowClear: true,
+    //         width: "100%"
+    //     });
+    // });
+
 </script>

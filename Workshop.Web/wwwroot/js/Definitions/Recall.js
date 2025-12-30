@@ -168,7 +168,7 @@ $(function () {
                 MakeID: ((typeof MakeID !== "undefined" && MakeID) ? MakeID : []).map(v => v.Text),
                 ModelID: ((typeof Vehicle !== "undefined" && Vehicle) ? Vehicle : []).map(v => v.Name),
                 Chassis: ((typeof Chasses !== "undefined" && Chasses) ? Chasses : []).map(v => v.ChassisNo),
-                Status: ((typeof VehicleRecallStatus !== "undefined" && VehicleRecallStatus) ? VehicleRecallStatus : []).map(v => v.Text)
+                RecallStatus: ((typeof VehcileStatuses !== "undefined" && VehcileStatuses) ? VehcileStatuses : []).map(v => v.Text)
             };
 
             let colStart = 1;

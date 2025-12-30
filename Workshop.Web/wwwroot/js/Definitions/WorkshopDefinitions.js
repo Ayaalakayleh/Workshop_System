@@ -34,7 +34,7 @@
             }
 
             // intl-tel-input: place after the .iti wrapper
-            var $iti = $el.closest(".iti");
+             var $iti = $el.closest(".iti");
             if ($iti.length) {
                 error.insertAfter($iti);
                 return;
@@ -53,7 +53,7 @@
                 email: true,
                 normalizer: function (value) { return $.trim(value); }
             },
-            Phone: {
+            PhoneH: {
                 required: true,
                 joPhone: true,
                 normalizer: function (value) { return $.trim(value); }
@@ -75,7 +75,7 @@
         messages: {
             PrimaryName: { required: resources.required_field },
             Email: { required: resources.required_field, email: resources.valid_email },
-            Phone: { required: resources.required_field },
+            PhoneH: { required: resources.required_field },
             PrimaryAddress: { required: resources.required_field },
             GoogleURL: { required: resources.required_field },
             CityId: { required: resources.required_field },
@@ -83,11 +83,12 @@
             SupplierId: { required: resources.required_field }
         },
         submitHandler: function (form) {
-
+            debugger
             $("#btnCreate").prop("disabled", true);
+            $("#Phone").val(itip.getNumber());
+
             var formData = new FormData(form);
             formData.append('IsActive', $("#IsActive").prop('checked'));
-
             $.ajax({
                 url: $(form).attr('action'),
                 type: 'POST',

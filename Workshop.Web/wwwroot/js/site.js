@@ -1,4 +1,5 @@
-﻿$(document).ready(function () {
+﻿var itip;
+$(document).ready(function () {
     $(".copyInput").on("blur", function () {
         var copyValue = $(this).val();
         $(".pasteInput").val(copyValue);
@@ -78,12 +79,14 @@
         }
     });
     var phoneInput = document.querySelector(".phone-number");
-    var iti = window.intlTelInput(phoneInput, {
+     iti = window.intlTelInput(phoneInput, {
         hiddenInput: "full_number",
         preferredCountries: ['sa', 'jo', 'eg'],
         autoPlaceholder: 'off',
         separateDialCode: true,
-    });
+     });
+
+    itip = window.intlTelInputGlobals.getInstance(phoneInput);
     // Completely disable DataTables alert popups
     $.fn.dataTable.ext.errMode = 'none';
 
