@@ -692,6 +692,38 @@ namespace Workshop.Web.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<JsonResult> CheckRecallCodeUnique(string code, int? excludeId = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    return Json(new { isUnique = false, message = "Code is required" });
+                }
+
+                // Get all recalls DDL
+                var allRecalls = await _apiClient.GetAllRecallsDDLAsync();
+
+                // Check if any recall has this code (excluding the current one if editing)
+                var existingRecall = allRecalls?.FirstOrDefault(r =>
+                    r.Code.Equals(code.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                    (excludeId == null || r.Id != excludeId));
+
+                bool isUnique = existingRecall == null;
+
+                return Json(new
+                {
+                    isUnique = isUnique,
+                    message = isUnique ? "Code is available" : $"Code '{code}' already exists"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { isUnique = false, message = "Error checking code uniqueness: " + ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<int> DeleteRecall(int Id)
         {

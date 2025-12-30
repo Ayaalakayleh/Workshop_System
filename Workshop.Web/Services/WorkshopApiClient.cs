@@ -2064,7 +2064,7 @@ namespace Workshop.Web.Services
         
         public async Task<IEnumerable<ReturnItems>?> GetReturnParts(int WIPId=0)  
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<ReturnItems>>("api/WIP/GetReturnParts?WIPId={WIPId}");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<ReturnItems>>($"api/WIP/GetReturnParts?WIPId={WIPId}");
 
         }
 

@@ -322,6 +322,11 @@
             }
         }
 
+        // Initialize recallList with select2 if it has selected values
+        if ($("#hasRecall").is(":checked") && $.fn.select2 && !$("#recallList").hasClass('select2-hidden-accessible')) {
+            $("#recallList").select2({ width: '100%' });
+        }
+
         if ($.fn && $.fn.dynameter) {
             $myFuelMeter = $("div#fuelMeterDiv").dynameter({
                 width: 200,
@@ -338,7 +343,7 @@
 
         $('#fuelSlider').on('input', function () {
             var val = Number($(this).val());
-            $('#fuelSliderValue').text(String(val));
+            $('#fuelSliderValue').html(String(val));
             if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
                 $myFuelMeter.changeValue(val.toFixed(1));
             } else {
@@ -374,7 +379,7 @@
 
         function setMode(type, label, cursorClass) {
             shapeType = type;
-            $('#coordinates').text(label + ' coordinates: ');
+            $('#coordinates').html(label + ' coordinates: ');
             $("#panel")
                 .removeClass("deep-scratch-cursor small-scratch-cursor very-deep-cursor bend-body-cursor")
                 .addClass(cursorClass);
@@ -451,7 +456,7 @@
 
             var hasValue = selectedId && selectedId !== "0";
             row.find('.Status')
-                .text(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
+                .html(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
 
             if (hasValue) {
                 var wo = WorkOrdersList.find(function (x) { return String(x.Id) === String(selectedId); });
@@ -476,9 +481,13 @@
         $("#hasRecall").on("change", function () {
             if ($(this).is(":checked")) {
                 $("#recallList").prop('disabled', false);
+
+                
             } else {
                 $("#recallList").prop('disabled', true);
-                $("#recallList").val("").trigger("change");
+
+
+                
             }
         });
         $("#hasRecall").trigger("change");
@@ -758,10 +767,10 @@
 
             $("#ReceivedMeter").val(Data.CurrentMeter);
             $("#VehicleOdoMeter").val(Data.CurrentMeter);
-            $("#VehicleManufacturer").text(Data.RefManufacturers.ManufacturerPrimaryName);
-            $("#VehicleClass").text(Data.RefVehicleClasses.VehicleClassPrimaryName);
-            $("#VehiclePlateNo").text(Data.PlateNumber);
-            $("#VehicleModel").text(Data.RefVehicleModels.VehicleModelPrimaryName);
+            $("#VehicleManufacturer").html(Data.RefManufacturers.ManufacturerPrimaryName);
+            $("#VehicleClass").html(Data.RefVehicleClasses.VehicleClassPrimaryName);
+            $("#VehiclePlateNo").html(Data.PlateNumber);
+            $("#VehicleModel").html(Data.RefVehicleModels.VehicleModelPrimaryName);
             $("#LastVehicleStatus").val(Data.VehicleStatusId);
 
             $.ajax({
@@ -771,9 +780,9 @@
             }).done(function (res) {
                 if (res && res.isSuccess && res.data && res.data.length > 0) {
                     var agr = res.data[0];
-                    $("#customerName").text(agr.customerName ?? "");
+                    $("#customerName").html(agr.customerName ?? "");
                 } else {
-                    $("#customerName").text("");
+                    $("#customerName").html("");
                 }
             });
 
@@ -789,7 +798,7 @@
                 $('.WorkOrderSelect, #WorkOrderId').prop('disabled', false);
                 $('.MaintenanceDesc').prop('readonly', false);
                 getVehicleWorkOrders($("#VehicleID").val(), 2, Etype);
-                $('.Status').text(RazorVars.regularMaintenance);
+                $('.Status').html(RazorVars.regularMaintenance);
             }
         });
     }
@@ -802,7 +811,42 @@
         GetVehicleData(selectedVehicleId);
         $("#ModalOutsideSearch").modal('hide');
         GetWIPByVehicleId(selectedVehicleId);
-        window.location.href = RazorVars.selectVehicleUrl + "?vehicleId=" + $("#GettingVehicleId").val();
+        // Get recalls for the selected vehicle
+        GetRecallsByVehicleId($("#GettingVehicleId").val());
+
+       // window.location.href = RazorVars.selectVehicleUrl + "?vehicleId=" + $("#GettingVehicleId").val();
+        $("#recallList").trigger("change");
+    }
+
+    function GetRecallsByVehicleId(vehicleId) {
+        if (!vehicleId) return;
+
+        // Call the backend method directly with vehicleId
+        $.ajax({
+            type: 'GET',
+            url: RazorVars.getRecallsByVehicleIdUrl + '?vehicleId=' + vehicleId,
+            dataType: 'json'
+        }).done(function (recallResult) {
+            if (recallResult && recallResult.isSuccess && recallResult.data && recallResult.data.length > 0) {
+                // Update the hasRecall checkbox
+                $("#hasRecall").prop('checked', true).trigger('change');
+
+                // Set the selected values in the recallList
+                $("#recallList").val(recallResult.data).trigger('change');
+
+                // Re-initialize select2 if needed
+                if ($.fn.select2 && !$("#recallList").hasClass('select2-hidden-accessible')) {
+                    $("#recallList").select2({ width: '100%' });
+                }
+            } else {
+                // No recalls found, ensure checkbox is unchecked
+                $("#hasRecall").prop('checked', false).trigger('change');
+                $("#recallList").val('').trigger('change');
+            }
+        }).fail(function () {
+            console.error('Failed to get recalls for vehicle');
+            $("#hasRecall").prop('checked', false).trigger('change');
+        });
     }
 
     function GetWIPByVehicleId(vehicleId) {
@@ -905,7 +949,7 @@
         $select.on('change', function () {
             var hasValue = $(this).val() && $(this).val() !== "0";
             $(this).closest('tr').find('.Status')
-                .text(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
+                .html(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
         });
 
         ChangesMaintenanceType();
@@ -963,5 +1007,3 @@
 
 
 })(jQuery);
-
-

@@ -660,7 +660,7 @@ namespace Workshop.Web.Controllers
                     var InsertAccount = await _apiClient.InsertWIPAccount(dto.AccountDetails);
                     var InsertVehicleDetails = await _apiClient.InsertWIPVehicleDetails(dto.VehicleTab);
                     var optionsUpdate = await UpdateWIPOptions(dto.Options);
-                    if (dto.Status == (int)WIPStatusEnum.G)
+                    if (dto.Status == (int)WIPStatusEnum.C)
                     {
                         await GetReturnParts(dto.Id);
                     }
@@ -1602,9 +1602,9 @@ namespace Workshop.Web.Controllers
                 dto.ClosedBy = UserId;
 
 
-                var isValid = await _apiClient.WIP_Validation(dto.Id); //1=valid
+                var isValid = await _apiClient.WIP_Validation(dto.Id); //0=valid
                 var ExternalInvoice = new AccountSalesMaster();
-                if (isValid == 1)
+                if (isValid == 0)
                 {
                     dto.ItemsList = !string.IsNullOrEmpty(dto.Items)
                      ? System.Text.Json.JsonSerializer.Deserialize<IEnumerable<BaseItemDTO>>(dto.Items)
@@ -1677,21 +1677,21 @@ namespace Workshop.Web.Controllers
                     switch (isValid)
                     {
                         case -100:
-                            return Json(new { success = false, message = "USER_CONTEXT_MISSING" });
+                            return Json(new { success = false, message = "USER CONTEXT MISSING" });
                         case -101:
-                            return Json(new { success = false, message = "WIP_NOT_FOUND" });
+                            return Json(new { success = false, message = "WIP NOT FOUND" });
                         case -102:
-                            return Json(new { success = false, message = "ALREADY_CLOSED" });
+                            return Json(new { success = false, message = "ALREADY CLOSED" });
                         case -103:
-                            return Json(new { success = false, message = "SERVICE_NOT_COMPLETED" });
+                            return Json(new { success = false, message = "SERVICE NOT COMPLETED" });
                         case -104:
-                            return Json(new { success = false, message = "SERVICE_TIME_MISSING" });
+                            return Json(new { success = false, message = "SERVICE TIME MISSING" });
                         case -105:
-                            return Json(new { success = false, message = "PARTS_RETURN_PENDING" });
+                            return Json(new { success = false, message = "PARTS RETURN PENDING" });
                         case -106:
-                            return Json(new { success = false, message = "PARTIAL_INVOICE_INCOMPLETE" });
+                            return Json(new { success = false, message = "PARTIAL INVOICE INCOMPLETE" });
                         case -107:
-                            return Json(new { success = false, message = "UPDATE_AFFECTED_UNEXPECTED_ROWS" });
+                            return Json(new { success = false, message = "UPDATE AFFECTED UNEXPECTED ROWS" });
                         case -999:
                         default:
                             return Json(new { success = false, message = "An unknown error occurred." });

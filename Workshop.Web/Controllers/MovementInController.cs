@@ -83,6 +83,7 @@ namespace Workshop.Web.Controllers
             obj.TyreCkecklist = tChecklists;
             var recalls = await _apiClient.GetAllRecallsDDLAsync();
              ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code });
+
             if(vehicleId != null)
             {
                 var vDetails = await _vehicleApiClient.VehicleDefinitions_Find(vehicleId??0);
@@ -91,10 +92,13 @@ namespace Workshop.Web.Controllers
                 {
                     obj.Recalls = (await _apiClient.GetActiveRecallsByChassis(vChassis))?.Recalls?.Select(r => r.RecallId).ToList();
                     if (obj.Recalls != null && obj.Recalls.Count > 0)
+                    {
                         obj.HasRecall = true;
+                        ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code, Selected = obj.Recalls.Contains(r.Id) });
 
+                    }
                 }
-
+                
             }
             return View(obj);
 
@@ -453,6 +457,51 @@ namespace Workshop.Web.Controllers
                 {
                     isSuccess = false,
                     data = (object)null
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetRecallsByVehicleId(int vehicleId)
+        {
+            try
+            {
+                if (vehicleId <= 0)
+                {
+                    return Json(new
+                    {
+                        isSuccess = false,
+                        message = "Valid vehicle ID is required"
+                    });
+                }
+
+                // Get vehicle details to find chassis number
+                var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_Find(vehicleId);
+                if (vehicleDetails == null || string.IsNullOrWhiteSpace(vehicleDetails.ChassisNo))
+                {
+                    return Json(new
+                    {
+                        isSuccess = false,
+                        message = "Vehicle chassis number not found"
+                    });
+                }
+
+                var recallResult = await _apiClient.GetActiveRecallsByChassis(vehicleDetails.ChassisNo);
+                var recallIds = recallResult?.Recalls?.Select(r => r.RecallId).ToList() ?? new List<int>();
+
+                return Json(new
+                {
+                    isSuccess = true,
+                    data = recallIds,
+                    hasActiveRecall = recallIds.Any()
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = ex.Message
                 });
             }
         }
