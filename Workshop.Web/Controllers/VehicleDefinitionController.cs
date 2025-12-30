@@ -251,5 +251,32 @@ namespace Workshop.Controllers
 			return Json(oVehicleClass);
 
 		}
-	}
+
+        public async Task<JsonResult> isValid(string plateNumber)
+        {
+            try
+            {
+                plateNumber = plateNumber?.Trim();
+
+                var internalVehiclesList = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+                var externalVehiclesList = await _vehicleApiClient.GetExteralVehicleName(lang);
+
+                bool internal_exists = internalVehiclesList != null && internalVehiclesList.Any(v => !string.IsNullOrWhiteSpace(v.PlateNumber) &&
+                                  string.Equals(v.PlateNumber.Trim(), plateNumber, StringComparison.OrdinalIgnoreCase));
+
+                bool external_exists = externalVehiclesList != null &&  externalVehiclesList.Any(v => !string.IsNullOrWhiteSpace(v.VehicleName) &&
+                                 v.VehicleName.IndexOf(plateNumber, StringComparison.OrdinalIgnoreCase) >= 0);
+
+
+                bool isValid = !internal_exists && !external_exists;
+
+                return Json(new { isSuccess = isValid, data = plateNumber });
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+    }
 }
