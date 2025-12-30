@@ -83,6 +83,19 @@ namespace Workshop.Web.Controllers
             obj.TyreCkecklist = tChecklists;
             var recalls = await _apiClient.GetAllRecallsDDLAsync();
              ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code });
+            if(vehicleId != null)
+            {
+                var vDetails = await _vehicleApiClient.VehicleDefinitions_Find(vehicleId??0);
+                var vChassis = vDetails.ChassisNo;
+                if (vChassis != null)
+                {
+                    obj.Recalls = (await _apiClient.GetActiveRecallsByChassis(vChassis))?.Recalls?.Select(r => r.RecallId).ToList();
+                    if (obj.Recalls != null && obj.Recalls.Count > 0)
+                        obj.HasRecall = true;
+
+                }
+
+            }
             return View(obj);
 
         }
@@ -144,18 +157,7 @@ namespace Workshop.Web.Controllers
             workOrderFilter.Id = movement.WorkOrderId;
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);
             movement.Services = new List<Item>();
-            if (!movement.IsExternal ?? true)
-            {
-                var vDetails = await _vehicleApiClient.VehicleDefinitions_Find(movement.VehicleID ?? 0);
-                var vChassis = vDetails.ChassisNo;
-                if(vChassis != null)
-                {
-                    movement.Recalls = (await _apiClient.GetActiveRecallsByChassis(vChassis))?.Recalls?.Select(r => r.RecallId).ToList();
-                    if (movement.Recalls != null && movement.Recalls.Count > 0)
-                        movement.HasRecall = true;
 
-                }
-            }
             return PartialView("OutMaintenaceCard", movement);
         }
 
