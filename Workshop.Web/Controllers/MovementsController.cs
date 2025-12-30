@@ -66,6 +66,7 @@ namespace Workshop.Web.Controllers
 
             var allVeh = movement.ColMovements;
             ViewBag.VehicleNams = (allVeh ?? new List<VehicleMovement>())
+                .DistinctBy(s => s.VehicleID)
                 .Select(s => new SelectListItem
                 {
                     Value = s.VehicleID.ToString(),
