@@ -153,11 +153,13 @@ function setPager(page, totalPagesValue, totalRecordsValue, pageSizeValue) {
         currentPage: page,
         prevText: '&laquo;',
         nextText: '&raquo;',
-        onPageClick: function (clickedPage) {
+        onPageClick: function (clickedPage, event) {
             if (clickedPage !== currentPage) {
+                event.preventDefault();
                 loadPage(clickedPage);
             }
-        }
+        },
+        hrefTextPrefix: 'javascript:void(0)'
     });
 
     $pager.find('ul').addClass('pagination');
