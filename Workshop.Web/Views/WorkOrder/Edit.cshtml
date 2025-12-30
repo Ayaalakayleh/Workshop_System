@@ -55,7 +55,7 @@
                     <div class="row">
                         <div class="col-md-6 my-1">
                             @Html.LabelFor(m => m.WorkOrderForm.AccidentDate, Common["Label_DamageDate"].Value, new { @class = "form-label" })
-                            @Html.EditorFor(m => m.WorkOrderForm.AccidentDate, new { htmlAttributes = new { @class = "form-control flat-picker", required = "required" } })
+                            @Html.EditorFor(m => m.WorkOrderForm.AccidentDate, new { htmlAttributes = new { @class = "form-control flat-picker", @id = "WorkOrderForm_AccidentDate", required = "required" } })
                             @Html.ValidationMessageFor(m => m.WorkOrderForm.AccidentDate, "", new { @class = "text-danger" })
                         </div>
                         <div class="col-md-6 my-1">
