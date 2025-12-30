@@ -478,9 +478,10 @@
                 $("#recallList").prop('disabled', false);
             } else {
                 $("#recallList").prop('disabled', true);
+                $("#recallList").val("").trigger("change");
             }
         });
-        
+        $("#hasRecall").trigger("change");
     }
 
     /* ==================================================
