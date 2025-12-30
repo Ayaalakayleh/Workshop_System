@@ -789,7 +789,7 @@ function updateVatAndTotal() {
     const total = internalTotal + transferTotal;
 
     setVatPercentageText(vatPct);
-    //setAmount("#totVAT", vatAmt);
+    setAmount("#totVAT", vatAmt);
     setAmount("#totTotal", total);
 }
 
