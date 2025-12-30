@@ -39,23 +39,6 @@ let isDrawing = false;
 let canvas, ctx;
 let enteredPin = "";
 
-
-function buildTechPhotoUrl(tech) {
-    const base = window.RazorVars?.getImageUrl || '/Base/GetImage';
-    const url = new URL(base, window.location.origin);
-
-    const fileName = tech?.fileName || '';
-    // IMPORTANT: remove leading "/" or "\" so server-side Path.Combine doesn't break
-    const basePath = (tech?.filePath || '').replace(/^~?[\\/]+/, '');
-
-    url.searchParams.set('Name', fileName);
-    url.searchParams.set('D', '17');
-    url.searchParams.set('BasePath', basePath);
-    url.searchParams.set('IsExternal', 'false');
-
-    return url.toString();
-}
-
 // ===== Utilities =====
 function updateTime() {
     const now = new Date();
@@ -85,8 +68,7 @@ function createTechnicianCard(tech, index) {
 
     const statusText = tech.status === 'available' ? i18n.nowor : tech.status === 'busy' ? (tech.time || i18n.nowor) : i18n.nowor;
 
-    const uploadsBasePath = buildTechPhotoUrl(tech);
-
+    const uploadsBasePath = `/Base/GetImage?Name=${encodeURIComponent(tech.fileName || '')}&D=17&BasePath=${encodeURIComponent(tech.filePath || '')}&IsExternal=false`;
 
     const photoContent = `<img src="${uploadsBasePath}" alt="${tech.id}" class="technician-photo">`;
 
@@ -144,7 +126,7 @@ function openPinTypeModal(technician) {
     const modalPhoto = document.getElementById('pinTypePhoto');
     if (modalPhoto) {
         if (technician.hasPhoto) {
-            modalPhoto.innerHTML = `<img src="${buildTechPhotoUrl(technician)}" alt="Technician">`;
+            modalPhoto.innerHTML = '<img src="' + (technician.filePath || '') + '" alt="Technician">';
             modalPhoto.classList.remove('no-photo');
         } else {
             modalPhoto.innerHTML = '🔧';
@@ -449,7 +431,7 @@ $(document).ready(function () {
         .done(function (data) { technicians = data || []; renderTechnicians(); })
         .fail(function (err) { console.error('Failed to load technicians', err); });
 });
-var gTechnician; 
+var gTechnician;
 async function checkPin(PIN) {
     // Try to get technician from hidden input first, fall back to selectedTechnician (set when card clicked)
     const technicianJson = document.getElementById('technicianHidden')?.value;
