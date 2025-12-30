@@ -2673,11 +2673,17 @@ namespace Workshop.Web.Services
 
             return result;
         }
-        public async Task<IEnumerable<ReservationListItemDTO>> GetAllActiveReservationsFilteredAsync(DateTime? dateFrom, DateTime? dateTo)
+        public async Task<IEnumerable<ReservationListItemDTO>>GetAllActiveReservationsFilteredAsync(DateTime? dateFrom, DateTime? dateTo)
         {
-            var response = await _httpClient.GetFromJsonAsync<IEnumerable<ReservationListItemDTO>>($"api/Reservation/GetAllActiveReservationsFilteredAsync?dateFrom={dateFrom}&dateTo={dateTo}");
+            var dateFromStr = dateFrom?.ToString("o", CultureInfo.InvariantCulture);
+            var dateToStr = dateTo?.ToString("o", CultureInfo.InvariantCulture);
 
-            return response;
+            var url =
+                $"api/Reservation/GetAllActiveReservationsFilteredAsync" +
+                $"?dateFrom={Uri.EscapeDataString(dateFromStr ?? string.Empty)}" +
+                $"&dateTo={Uri.EscapeDataString(dateToStr ?? string.Empty)}";
+
+            return await _httpClient.GetFromJsonAsync<IEnumerable<ReservationListItemDTO>>(url);
         }
         public async Task<IEnumerable<ReservationListItemDTO>> GetReservationsByIdsAsync(string ids)
         {
