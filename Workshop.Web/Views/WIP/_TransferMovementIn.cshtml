@@ -213,6 +213,7 @@
         @Html.HiddenFor(a => a.ExitDriverId, new { id = "PettyCash_ExitDriverId" })
         @Html.HiddenFor(a => a.LastVehicleStatus, new { id = "PettyCash_LastVehicleStatus" })
         @Html.HiddenFor(a => a.WorkOrderId, new { id = "PettyCash_WorkOrderId" })
+        <input type="hidden" id="PettyCash_VatRate" name="PettyCash_VatRate" value="@Model.VatRate" />
         @Html.Hidden("PettyCash_FixedServiceIds", "", new { id = "PettyCash_FixedServiceIds" })
 
         <div class="row">
@@ -319,31 +320,45 @@
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Net Amount <span class="text-danger">*</span></label>
-                    <input type="number" id="PettyCash_NetAmount" name="PettyCash_NetAmount" class="form-control" step="0.01" min="0.01" required />
+                    <label>@Common["Parts Cost"] <span class="text-danger">*</span></label>
+                    <input type="number" id="PettyCash_PartsCost" name="PettyCash_PartsCost" class="form-control" step="0.01" min="0" onchange="calculatePettyCashAmounts()" required />
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Tax Classification <span class="text-danger">*</span></label>
-                    <select id="PettyCash_TaxClassificationId" name="PettyCash_TaxClassificationId" class="form-control select2" required>
-                        <option value="">@Common["Select"]</option>
-                    </select>
+                    <label>@Common["Labor Cost"] <span class="text-danger">*</span></label>
+                    <input type="number" id="PettyCash_LaborCost" name="PettyCash_LaborCost" class="form-control" step="0.01" min="0" onchange="calculatePettyCashAmounts()" required />
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Tax Amount</label>
-                    <input type="number" id="PettyCash_Tax" name="PettyCash_Tax" class="form-control" step="0.01" readonly />
+                    <label>Total Invoice</label>
+                    <input type="number" id="PettyCash_TotalInvoice" name="PettyCash_TotalInvoice" class="form-control" step="0.01" readonly />
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Total Amount</label>
-                    <input type="number" id="PettyCash_TotalAmount" name="PettyCash_TotalAmount" class="form-control" step="0.01" readonly />
+                    <label>@Common["Vat"]</label>
+                    <input type="number" id="PettyCash_Vat" name="PettyCash_Vat" class="form-control" step="0.01" readonly />
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Net Amount</label>
+                    <input type="number" id="PettyCash_NetAmount" name="PettyCash_NetAmount" class="form-control" step="0.01" readonly />
+                </div>
+            </div>
+
+            <div class="col-6 my-5">
+                <div class="form-group">
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="PettyCash_NotTaxable" name="PettyCash_NotTaxable" onchange="calculatePettyCashAmounts()" />
+                        <label class="form-check-label" for="PettyCash_NotTaxable">Not Taxable</label>
+                    </div>
                 </div>
             </div>
 
@@ -536,8 +551,6 @@
             loadSellers();
             // Load Currencies
             loadCurrencies();
-            // Load Tax Classifications
-            loadTaxClassifications();
             // Set default expense type from AccountDefinition
             setDefaultExpenseType();
         }
@@ -572,11 +585,6 @@
                 $(this).val('');
                 showAddSellerModal();
             }
-        });
-
-        // Tax calculation
-        $('#PettyCash_NetAmount, #PettyCash_TaxClassificationId').on('input change', function() {
-            calculatePettyCashTax();
         });
 
         // Set default invoice date
@@ -668,26 +676,6 @@
         });
     }
 
-    function loadTaxClassifications() {
-        $.ajax({
-            url: '@Url.Action("GetTaxClassifications", "WIP")',
-            type: 'GET',
-            success: function (data) {
-                var $dropdown = $('#PettyCash_TaxClassificationId');
-                $dropdown.empty().append('<option value="">Select</option>');
-                if (data && data.length > 0) {
-                    $.each(data, function (i, item) {
-                        $dropdown.append($('<option>', {
-                            value: item.taxClassificationNo,
-                            text: item.name,
-                            'data-rate': item.taxRate
-                        }));
-                    });
-                }
-            }
-        });
-    }
-
     function loadRequestBalance(requestNo) {
         $.ajax({
             url: '@Url.Action("GetRequestBalance", "WIP")',
@@ -744,24 +732,24 @@
         });
     }
 
-    function calculatePettyCashTax() {
-        var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
-        var selectedOption = $('#PettyCash_TaxClassificationId option:selected');
-        var taxRate = parseFloat(selectedOption.attr('data-rate')) || 0;
+    // New function to calculate amounts using VatRate from view model
+    function calculatePettyCashAmounts() {
+        var partsCost = parseFloat($('#PettyCash_PartsCost').val()) || 0;
+        var laborCost = parseFloat($('#PettyCash_LaborCost').val()) || 0;
+        var isNotTaxable = $('#PettyCash_NotTaxable').is(':checked');
+        var vatRate = isNotTaxable ? 0 : parseFloat($('#PettyCash_VatRate').val()) || 0;
 
-        if (netAmount > 0 && taxRate > 0) {
-            // Since NetAmount is tax-inclusive, we need to calculate the tax portion
-            // Tax = NetAmount * (taxRate / (100 + taxRate))
-            var taxAmount = netAmount * (taxRate / (100 + taxRate));
-            // Total Amount (excluding tax) = NetAmount - TaxAmount
-            var totalAmount = netAmount - taxAmount;
+        // Calculate Total Invoice (Parts + Labor)
+        var totalInvoice = partsCost + laborCost;
+        $('#PettyCash_TotalInvoice').val(totalInvoice.toFixed(2));
 
-            $('#PettyCash_Tax').val(taxAmount.toFixed(2));
-            $('#PettyCash_TotalAmount').val(totalAmount.toFixed(2));
-        } else {
-            $('#PettyCash_Tax').val('0.00');
-            $('#PettyCash_TotalAmount').val(netAmount.toFixed(2));
-        }
+        // Calculate VAT Amount using VatRate
+        var vatAmount = totalInvoice * (vatRate / 100);
+        $('#PettyCash_Vat').val(vatAmount.toFixed(2));
+
+        // Calculate Net Amount (Total Invoice + VAT)
+        var netAmount = totalInvoice + vatAmount;
+        $('#PettyCash_NetAmount').val(netAmount.toFixed(2));
     }
 
     function showAddSellerModal() {
@@ -924,66 +912,54 @@
 
         var isNotTaxable = $('#NotTaxable').is(':checked');
 
+        var services = [];
 
-    var services = [];
-
-    $('.service-checkbox').each(function () {
-        services.push({
-            ServiceId: $(this).data('service-id'),
-            IsFixed: $(this).is(':checked')
+        $('.service-checkbox').each(function () {
+            services.push({
+                ServiceId: $(this).data('service-id'),
+                IsFixed: $(this).is(':checked')
+            });
         });
-    });
 
+        var itemForm = new FormData($('#TransferMovementIn').get(0));
+        
+        var movement = {
+            'VehicleID': $('#VehicleID').val(),
+            'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
+            'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
+            'WorkshopId': $('#WorkshopId').val(),
+            'ReceivedMeter': $('#ReceivedMeter').val(),
+            'MasterId': $('#MasterId').val(),
+            'ExitMeter': $('#ExitMeter').val(),
+            'FuelLevelId': $("#OutfuelLevelId").val(),
+            'ReceivedDriverId': $('#ExitDriverName').val(),
+            'ExitDriverId': $('#ExitDriverId').val(),
+            'MovementOutId': $('#MovementId').val(),
+            'InvoceNo': $('#InvoceNo').val(),
+            'TotalWorkOrder': $('#TotalWorkOrder').val(),
+            'Vat': isNotTaxable ? 0 : $("#Vat").val(),
+            'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
+            'DeductibleAmount': $("#DeductibleAmount").val(),
+            'LastVehicleStatus': $('#LastVehicleStatus').val(),
+            'ReceivedTime': $("#ReceivedTime").val(),
+            'PartsCost': $("#PartsCost").val(),
+            'LaborCost': $("#LaborCost").val(),
+            'InvoiceTypeId': $("#InvoiceTypeId").val(),
+            'WorkOrderId': $("#WorkOrderId").val(),
+            'isPart': $('#IsPart').is(':checked')
+        };
 
+        // Append each property individually
+        Object.keys(movement).forEach(function(key) {
+            if (movement[key] !== null && movement[key] !== undefined) {
+                itemForm.append(key, movement[key]);
+            }
+        });
 
-    var itemForm = new FormData($('#TransferMovementIn').get(0));
-    
-    var movement = {
-        'VehicleID': $('#VehicleID').val(),
-        'MoveOutWorkshopId': $('#MoveInWorkshopId').val(),
-        'MoveInWorkshopId': $('#MoveOutWorkshopId').val(),
-        'WorkshopId': $('#WorkshopId').val(),
-        'ReceivedMeter': $('#ReceivedMeter').val(),
-        'MasterId': $('#MasterId').val(),
-        'ExitMeter': $('#ExitMeter').val(),
-        'FuelLevelId': $("#OutfuelLevelId").val(),
-        'ReceivedDriverId': $('#ExitDriverName').val(),
-        'ExitDriverId': $('#ExitDriverId').val(),
-        'MovementOutId': $('#MovementId').val(),
-        'InvoceNo': $('#InvoceNo').val(),
-        'TotalWorkOrder': $('#TotalWorkOrder').val(),
-        'Vat': isNotTaxable ? 0 : $("#Vat").val(),
-        'ConsumptionValueOfSpareParts': $("#ConsumptionValueOfSpareParts").val(),
-        'DeductibleAmount': $("#DeductibleAmount").val(),
-        'LastVehicleStatus': $('#LastVehicleStatus').val(),
-        'ReceivedTime': $("#ReceivedTime").val(),
-        'PartsCost': $("#PartsCost").val(),
-        'LaborCost': $("#LaborCost").val(),
-        'InvoiceTypeId': $("#InvoiceTypeId").val(),
-        'WorkOrderId': $("#WorkOrderId").val(),
-        'isPart': $('#IsPart').is(':checked')
-    };
-
-    // Append each property individually
-    Object.keys(movement).forEach(function(key) {
-        if (movement[key] !== null && movement[key] !== undefined) {
-            itemForm.append(key, movement[key]);
+        for (var i = 0; i < services.length; i++) {
+            itemForm.append(`Services[${i}].ServiceId`, services[i].ServiceId);
+            itemForm.append(`Services[${i}].IsFixed`, services[i].IsFixed);
         }
-    });
-
-    for (var i = 0; i < services.length; i++) {
-        itemForm.append(`Services[${i}].ServiceId`, services[i].ServiceId);
-        itemForm.append(`Services[${i}].IsFixed`, services[i].IsFixed);
-    }
-        // if (cuspond.getFiles().length == 0 && $("#InvoceNo").val() != "" && ($("#LaborCost").val() > 0 || $("#PartsCost").val() > 0)) {
-        //         $("#Invoicefile>.filepond--drop-label").css("border", "2px solid red");
-        //         isValid = false;
-        // }
-        // if (cuspond.getFiles().length > 0) {
-        //     for (var j = 0; j < cuspond.getFiles().length; j++) {
-        //         itemForm.append('ExternalWorkshopInvoice', cuspond.getFiles().length > 0 ? cuspond.getFiles()[j].file : null);
-        //     }
-        // }
 
         if (isValid) {
             $.ajax({
@@ -1048,11 +1024,15 @@
             $('#PettyCash_InvoiceNo').removeClass('is-invalid');
         }
 
-        if (!$('#PettyCash_NetAmount').val() || parseFloat($('#PettyCash_NetAmount').val()) <= 0) {
-            $('#PettyCash_NetAmount').addClass('is-invalid');
+        // Updated validation for Parts Cost and Labor Cost
+        if (!$('#PettyCash_PartsCost').val() && !$('#PettyCash_LaborCost').val()) {
+            $('#PettyCash_PartsCost').addClass('is-invalid');
+            $('#PettyCash_LaborCost').addClass('is-invalid');
+            Swal.fire("Error", "At least one of Parts Cost or Labor Cost must be provided", "error");
             isValid = false;
         } else {
-            $('#PettyCash_NetAmount').removeClass('is-invalid');
+            $('#PettyCash_PartsCost').removeClass('is-invalid');
+            $('#PettyCash_LaborCost').removeClass('is-invalid');
         }
 
         // Check balance

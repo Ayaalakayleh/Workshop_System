@@ -35,6 +35,10 @@
         public string PettyCash_InvoiceNo { get; set; }
         public DateTime PettyCash_InvoiceDate { get; set; }
         public int PettyCash_CurrencyId { get; set; }
+        public decimal PettyCash_PartsCost { get; set; }
+        public decimal PettyCash_Vat { get; set; }
+        public decimal PettyCash_VatRate { get; set; }
+        public decimal PettyCash_LaborCost { get; set; }
         public decimal PettyCash_NetAmount { get; set; }
         public int PettyCash_TaxClassificationId { get; set; }
         public decimal PettyCash_Tax { get; set; }
@@ -43,5 +47,6 @@
         public decimal PettyCash_LastKM { get; set; }
         public string PettyCash_Description { get; set; }
         public string PettyCash_FixedServiceIds { get; set; }
+        public bool PettyCash_NotTaxable { get; set; }
     }
 }

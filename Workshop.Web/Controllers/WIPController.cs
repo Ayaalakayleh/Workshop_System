@@ -2931,12 +2931,35 @@ namespace Workshop.Web.Controllers
 
             try
             {
-                // Get the original movement to access ExitMeter
+                // Get the original movement to access ExitMeter and VatRate
                 var originalMovement = await _apiClient.GetVehicleMovementByIdAsync(model.MovementId.Value);
+
+                // Calculate amounts from PartsCost and LaborCost
+                var totalInvoice = model.PettyCash_PartsCost + model.PettyCash_LaborCost;
+                var isNotTaxable = model.PettyCash_NotTaxable;
+                var vatRate = isNotTaxable ? 0 : (model.PettyCash_VatRate);
+                var vatAmount = totalInvoice * (vatRate / 100);
+                var netAmount = totalInvoice + vatAmount;
+
+                // Find the matching TaxClassificationId based on VatRate
+                int? taxClassificationId = null;
+                if (!isNotTaxable && vatRate > 0)
+                {
+                    try
+                    {
+                        var taxClassifications = await _accountingApiClient.GetTaxClassificationListByCompanyIdAndBranchId(CompanyId, BranchId, lang);
+                        var matchingTaxClassification = taxClassifications.FirstOrDefault(tc => tc.TaxRate == vatRate);
+                        taxClassificationId = matchingTaxClassification?.TaxClassificationNo;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error finding tax classification for VatRate {VatRate}", vatRate);
+                    }
+                }
 
                 // Validate the petty cash request balance
                 var availableBalance = await _accountingApiClient.PettyCashExpenses_UserBalanceByRequest(model.PettyCash_RequestNo);
-                if (model.PettyCash_NetAmount > availableBalance)
+                if (netAmount > availableBalance)
                 {
                     resultJson.IsSuccess = false;
                     resultJson.Message = "Net amount exceeds available balance";
@@ -2955,16 +2978,19 @@ namespace Workshop.Web.Controllers
                 }
 
                 var vehicleMovement = originalMovement;
+                var workshopDetails = await _apiClient.GetWorkshopByIdAsync(vehicleMovement.MoveInWorkshopId ?? 0);
 
                 vehicleMovement.GregorianMovementEndDate = model.PettyCash_MovementDate;
                 vehicleMovement.ReceivedTime = model.PettyCash_ReceivedTime;
                 vehicleMovement.ReceivedMeter = model.PettyCash_ReceivedMeter;
                 vehicleMovement.FuelLevelId = model.PettyCash_FuelLevelId;
                 vehicleMovement.ReceivedDriverId = model.PettyCash_DriverName;
-                vehicleMovement.TotalWorkOrder = model.PettyCash_NetAmount;
-                vehicleMovement.Vat = model.PettyCash_Tax;
-                vehicleMovement.VatRate = (await _accountingApiClient.GetTaxClassificationById(model.PettyCash_TaxClassificationId))?.TaxRate;
-
+                vehicleMovement.TotalWorkOrder = netAmount; // Use calculated net amount
+                vehicleMovement.Vat = vatAmount; // Use calculated VAT amount
+                vehicleMovement.PartsCost = model.PettyCash_PartsCost;
+                vehicleMovement.LaborCost = model.PettyCash_LaborCost;
+                vehicleMovement.VatRate = vatRate; // Use VatRate from original movement
+                vehicleMovement.InvoceNo = model.PettyCash_InvoiceNo;
                 vehicleMovement.CompanyId = CompanyId;
                 vehicleMovement.CreatedBy = UserId;
                 vehicleMovement.MovementIN = true;
@@ -2974,7 +3000,7 @@ namespace Workshop.Web.Controllers
                 vehicleMovement.WorkshopId = BranchId;
                 vehicleMovement.Status = 1;
                 vehicleMovement.IsExternal = true;
-                
+
 
                 // Check vehicle movement status
                 var vehicleMovementStatus = await _apiClient.CheckVehicleMovementStatusAsync(vehicleMovement.VehicleID.Value);
@@ -2985,7 +3011,7 @@ namespace Workshop.Web.Controllers
                     return Json(resultJson);
                 }
 
-                // Insert vehicle movement (now with same data structure as TransferMoveIn)
+                // Insert vehicle movement
                 var movements = await _apiClient.InsertVehicleMovementAsync(vehicleMovement);
 
                 // Handle file upload to accounting module directory
@@ -3033,7 +3059,7 @@ namespace Workshop.Web.Controllers
                 var VehicleDetails = await _vehicleApiClient.GetVehicleDetails((int)model.VehicleID, lang);
 
                 var accountDefinition = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
-                // Create petty cash expense
+                // Create petty cash expense with calculated values
                 var pettyCashExpense = new PettyCashExpenses
                 {
                     RequestNo = model.PettyCash_RequestNo,
@@ -3044,22 +3070,42 @@ namespace Workshop.Web.Controllers
                     InvoiceDate = model.PettyCash_InvoiceDate,
                     FK_CurrencyId = model.PettyCash_CurrencyId,
                     FK_SellerId = model.PettyCash_SellerId,
-                    NetAmount = model.PettyCash_NetAmount,
-                    Tax = model.PettyCash_Tax,
-                    TotalAmount = model.PettyCash_TotalAmount,
+                    NetAmount = netAmount, // Use calculated net amount (Total Invoice + VAT)
+                    Tax = vatAmount, // Use calculated VAT amount
+                    TotalAmount = totalInvoice, // Use calculated total invoice (Parts + Labor)
                     Description = model.PettyCash_Description,
                     FK_VehicleId = VehicleDetails.FixedAsset_DimensionsId ?? 0,
                     LastKM = (int)originalMovement.ExitMeter, // Use ExitMeter from original movement
-                    KM = (int)model.PettyCash_ReceivedMeter, // Use ReceivedMeter as LastKM
+                    KM = (int)model.PettyCash_ReceivedMeter, // Use ReceivedMeter as current KM
                     CreatedBy = UserId,
                     FileName = fileName,
                     FilePath = filePath,
                     CompanyId = CompanyId,
                     BranchId = BranchId,
-                    TaxClassificationId = model.PettyCash_TaxClassificationId
+                    TaxClassificationId = taxClassificationId ?? 0 // Use matching TaxClassificationId or 0 if not found
+
                 };
 
                 var expenseId = await _accountingApiClient.PettyCashExpenses_Insert(pettyCashExpense);
+
+                MovementInvoice invoice = new MovementInvoice();
+                if (!string.IsNullOrEmpty(vehicleMovement.InvoceNo) && vehicleMovement.TotalWorkOrder != null && vehicleMovement.TotalWorkOrder > 0)
+                {
+                    invoice.MovementId = vehicleMovement.MovementId.Value;
+                    invoice.MasterId = vehicleMovement.MasterId.Value;
+                    invoice.ExternalWorkshopId = Convert.ToInt32(vehicleMovement.MoveOutWorkshopId);
+                    invoice.InvoiceNo = vehicleMovement.InvoceNo;
+                    invoice.TotalInvoice = Convert.ToDecimal(vehicleMovement.TotalWorkOrder);
+                    invoice.WorkOrderId = Convert.ToInt32(vehicleMovement.WorkOrderId);
+                    invoice.DeductibleAmount = vehicleMovement.DeductibleAmount ?? 0m;
+                    invoice.ConsumptionValueOfSpareParts = vehicleMovement.ConsumptionValueOfSpareParts ?? 0m;
+                    invoice.Vat = vehicleMovement.Vat ?? 0;
+                    invoice.PartsCost = vehicleMovement.PartsCost ?? 0;
+                    invoice.LaborCost = vehicleMovement.LaborCost ?? 0;
+                    invoice.Invoice_Date = DateTime.Now;
+
+                    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
+                }
 
                 // Update services if any are marked as fixed
                 if (!string.IsNullOrWhiteSpace(model.PettyCash_FixedServiceIds))
