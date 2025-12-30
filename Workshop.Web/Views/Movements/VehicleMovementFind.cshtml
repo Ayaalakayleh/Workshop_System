@@ -1001,8 +1001,8 @@
                     let jsonObject = JSON.parse(Data);
                     for (var i = 0; i < jsonObject.length; i++) {
                         var shapetype = jsonObject[i].type;
-                        var xcoord = jsonObject[i].x + 35;
-                        var ycoord = jsonObject[i].y + 23;
+                        var xcoord = jsonObject[i].x -20;
+                        var ycoord = jsonObject[i].y -20;
                         var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
                         $shape.css({ 'left': xcoord - 2, 'top': ycoord - 2 });
                         $("#panel").append($shape);
