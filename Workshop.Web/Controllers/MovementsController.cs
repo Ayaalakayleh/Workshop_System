@@ -257,6 +257,13 @@ namespace Workshop.Web.Controllers
             movement.TyreCkecklist = tChecklist?.ToList();
 
             var recalls = await _workshopapiClient.GetAllRecallsDDLAsync();
+            ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code });
+            
+            if(movement.Recalls == null || movement.Recalls.Count() == 0)
+            {
+                movement.Recalls = new List<int>();
+            }
+
 
             if (movement.IsExternal ?? false)
             {
@@ -264,11 +271,10 @@ namespace Workshop.Web.Controllers
                 if (vehicle != null && vehicle.ChassisNo != null)
                 {
                     var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
-                    movement.HasRecall = (vRecall != null ) && ((vRecall?.HasActiveRecall) ?? false);
+                    movement.HasRecall = (vRecall != null) && ((vRecall?.HasActiveRecall) ?? false);
+                    if(vRecall != null && vRecall.Recalls != null && vRecall.Recalls.Count > 0)
+                        movement.Recalls = vRecall?.Recalls.Select(r => r.RecallId)?.ToList();
                 }
-                //    movement.HasRecall = recalls
-                //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
-                //        .Any(v => v.Chassis == vehicle.ChassisNo || (v.MakeID == vehicle.ManufacturerId && v.ModelID == vehicle.VehicleModelId));
             }
             else
             {
@@ -277,11 +283,9 @@ namespace Workshop.Web.Controllers
                 {
                     var vRecall = (await _workshopapiClient.GetActiveRecallsByChassis(vehicle.ChassisNo));
                     movement.HasRecall = (vRecall != null) && ((vRecall?.HasActiveRecall) ?? false);
+                    if (vRecall != null && vRecall.Recalls != null && vRecall.Recalls.Count > 0)
+                        movement.Recalls = vRecall?.Recalls.Select(r => r.RecallId)?.ToList();
                 }
-                //    movement.HasRecall = recalls
-                //        .SelectMany(r => r.Vehicles ?? Enumerable.Empty<VehicleRecallDTO>())
-                //        .Any(v => v.Chassis == vehicle.ChassisNo || (v.MakeID == vehicle.ManufacturerId && v.ModelID == vehicle.VehicleModelId));
-                //}
             }
 
 

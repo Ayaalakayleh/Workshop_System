@@ -426,7 +426,7 @@
 							</div>
 							
 
-							@Html.DropDownListFor(model => model.Recalls, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-check-input", @id= "recallList", @disabled= true, multiple = "multiple"})
+							@Html.DropDownListFor(model => model.Recalls, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @id= "recallList", @disabled= true, multiple = "multiple"})
 							</fieldset>
 						<fieldset class="my-3 ui-fieldset">
 							<div class="table-wrap">
