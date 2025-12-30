@@ -112,10 +112,10 @@ $(document).ready(function () {
         $rateField.hide();
         $markupField.hide();
 
-        if (val === "Labour") {
+        if (val === "Labour" || val ==="الأجور") {
             $rateField.show();
             $markupInput.val(0);
-        } else if (val === "Parts") {
+        } else if (val === "Parts" || val ==="القطع") {
             $markupField.show();
             $rateInput.val(0);
         }
