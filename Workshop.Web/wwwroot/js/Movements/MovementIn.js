@@ -322,6 +322,11 @@
             }
         }
 
+        // Initialize recallList with select2 if it has selected values
+        if ($("#hasRecall").is(":checked") && $.fn.select2 && !$("#recallList").hasClass('select2-hidden-accessible')) {
+            $("#recallList").select2({ width: '100%' });
+        }
+
         if ($.fn && $.fn.dynameter) {
             $myFuelMeter = $("div#fuelMeterDiv").dynameter({
                 width: 200,
@@ -476,9 +481,13 @@
         $("#hasRecall").on("change", function () {
             if ($(this).is(":checked")) {
                 $("#recallList").prop('disabled', false);
+
+                
             } else {
                 $("#recallList").prop('disabled', true);
-                $("#recallList").val("").trigger("change");
+
+
+                
             }
         });
         $("#hasRecall").trigger("change");
@@ -802,7 +811,42 @@
         GetVehicleData(selectedVehicleId);
         $("#ModalOutsideSearch").modal('hide');
         GetWIPByVehicleId(selectedVehicleId);
-        window.location.href = RazorVars.selectVehicleUrl + "?vehicleId=" + $("#GettingVehicleId").val();
+        // Get recalls for the selected vehicle
+        GetRecallsByVehicleId($("#GettingVehicleId").val());
+
+       // window.location.href = RazorVars.selectVehicleUrl + "?vehicleId=" + $("#GettingVehicleId").val();
+        $("#recallList").trigger("change");
+    }
+
+    function GetRecallsByVehicleId(vehicleId) {
+        if (!vehicleId) return;
+
+        // Call the backend method directly with vehicleId
+        $.ajax({
+            type: 'GET',
+            url: RazorVars.getRecallsByVehicleIdUrl + '?vehicleId=' + vehicleId,
+            dataType: 'json'
+        }).done(function (recallResult) {
+            if (recallResult && recallResult.isSuccess && recallResult.data && recallResult.data.length > 0) {
+                // Update the hasRecall checkbox
+                $("#hasRecall").prop('checked', true).trigger('change');
+
+                // Set the selected values in the recallList
+                $("#recallList").val(recallResult.data).trigger('change');
+
+                // Re-initialize select2 if needed
+                if ($.fn.select2 && !$("#recallList").hasClass('select2-hidden-accessible')) {
+                    $("#recallList").select2({ width: '100%' });
+                }
+            } else {
+                // No recalls found, ensure checkbox is unchecked
+                $("#hasRecall").prop('checked', false).trigger('change');
+                $("#recallList").val('').trigger('change');
+            }
+        }).fail(function () {
+            console.error('Failed to get recalls for vehicle');
+            $("#hasRecall").prop('checked', false).trigger('change');
+        });
     }
 
     function GetWIPByVehicleId(vehicleId) {
@@ -963,5 +1007,3 @@
 
 
 })(jQuery);
-
-
