@@ -343,7 +343,7 @@
 
         $('#fuelSlider').on('input', function () {
             var val = Number($(this).val());
-            $('#fuelSliderValue').text(String(val));
+            $('#fuelSliderValue').html(String(val));
             if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
                 $myFuelMeter.changeValue(val.toFixed(1));
             } else {
@@ -379,7 +379,7 @@
 
         function setMode(type, label, cursorClass) {
             shapeType = type;
-            $('#coordinates').text(label + ' coordinates: ');
+            $('#coordinates').html(label + ' coordinates: ');
             $("#panel")
                 .removeClass("deep-scratch-cursor small-scratch-cursor very-deep-cursor bend-body-cursor")
                 .addClass(cursorClass);
@@ -456,7 +456,7 @@
 
             var hasValue = selectedId && selectedId !== "0";
             row.find('.Status')
-                .text(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
+                .html(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
 
             if (hasValue) {
                 var wo = WorkOrdersList.find(function (x) { return String(x.Id) === String(selectedId); });
@@ -767,10 +767,10 @@
 
             $("#ReceivedMeter").val(Data.CurrentMeter);
             $("#VehicleOdoMeter").val(Data.CurrentMeter);
-            $("#VehicleManufacturer").text(Data.RefManufacturers.ManufacturerPrimaryName);
-            $("#VehicleClass").text(Data.RefVehicleClasses.VehicleClassPrimaryName);
-            $("#VehiclePlateNo").text(Data.PlateNumber);
-            $("#VehicleModel").text(Data.RefVehicleModels.VehicleModelPrimaryName);
+            $("#VehicleManufacturer").html(Data.RefManufacturers.ManufacturerPrimaryName);
+            $("#VehicleClass").html(Data.RefVehicleClasses.VehicleClassPrimaryName);
+            $("#VehiclePlateNo").html(Data.PlateNumber);
+            $("#VehicleModel").html(Data.RefVehicleModels.VehicleModelPrimaryName);
             $("#LastVehicleStatus").val(Data.VehicleStatusId);
 
             $.ajax({
@@ -780,9 +780,9 @@
             }).done(function (res) {
                 if (res && res.isSuccess && res.data && res.data.length > 0) {
                     var agr = res.data[0];
-                    $("#customerName").text(agr.customerName ?? "");
+                    $("#customerName").html(agr.customerName ?? "");
                 } else {
-                    $("#customerName").text("");
+                    $("#customerName").html("");
                 }
             });
 
@@ -798,7 +798,7 @@
                 $('.WorkOrderSelect, #WorkOrderId').prop('disabled', false);
                 $('.MaintenanceDesc').prop('readonly', false);
                 getVehicleWorkOrders($("#VehicleID").val(), 2, Etype);
-                $('.Status').text(RazorVars.regularMaintenance);
+                $('.Status').html(RazorVars.regularMaintenance);
             }
         });
     }
@@ -949,7 +949,7 @@
         $select.on('change', function () {
             var hasValue = $(this).val() && $(this).val() !== "0";
             $(this).closest('tr').find('.Status')
-                .text(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
+                .html(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
         });
 
         ChangesMaintenanceType();
