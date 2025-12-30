@@ -71,7 +71,11 @@
 
                                     </td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => tt.GregorianMovementDate)
+                                        @tt.GregorianMovementDate?.ToString("yyyy-MM-dd")
+                                        <br />
+                                        <small class="text-muted">
+                                            @tt.ReceivedTime?.ToString(@"hh\:mm")
+                                        </small>
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => tt.GregorianMovementEndDate)
