@@ -3062,7 +3062,7 @@ namespace Workshop.Web.Controllers
                 // Create petty cash expense with calculated values
                 var pettyCashExpense = new PettyCashExpenses
                 {
-                    RequestNo = model.PettyCash_RequestNo,
+                    FK_RequestNo = model.PettyCash_RequestNo,
                     FK_TypeOfExpense = 1, // Direct
                     FK_ExpenseType = accountDefinition.PettyCashExpenseTypeId,
                     FK_EmployeeId = UserId,

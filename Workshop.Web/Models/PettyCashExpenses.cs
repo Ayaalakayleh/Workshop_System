@@ -3,7 +3,7 @@
     public class PettyCashExpenses
     {
         public int Id { get; set; }
-        public Int64 RequestNo { get; set; }
+        public Int64 FK_RequestNo { get; set; }
         public int FK_TypeOfExpense { get; set; }
         public int FK_ExpenseType { get; set; }
         public int FK_EmployeeId { get; set; }
