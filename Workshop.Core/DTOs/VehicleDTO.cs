@@ -376,6 +376,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public bool HasRecall { get; set; }
 		public int? RecallId { get; set; }
         public List<VehicleNams>? ExternalVehicleNams { get; set; }
+		public List<int>? Recalls { get; set; }
     }
 
 	public class VehicleMovementDocument

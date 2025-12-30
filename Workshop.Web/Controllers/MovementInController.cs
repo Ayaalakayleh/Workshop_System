@@ -82,7 +82,7 @@ namespace Workshop.Web.Controllers
             obj.VehicleCkecklist = vChecklists;
             obj.TyreCkecklist = tChecklists;
             var recalls = await _apiClient.GetAllRecallsDDLAsync();
-            ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code });
+             ViewBag.Recalls = recalls?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Code });
             return View(obj);
 
         }
@@ -144,6 +144,18 @@ namespace Workshop.Web.Controllers
             workOrderFilter.Id = movement.WorkOrderId;
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);
             movement.Services = new List<Item>();
+            if (!movement.IsExternal ?? true)
+            {
+                var vDetails = await _vehicleApiClient.VehicleDefinitions_Find(movement.VehicleID ?? 0);
+                var vChassis = vDetails.ChassisNo;
+                if(vChassis != null)
+                {
+                    movement.Recalls = (await _apiClient.GetActiveRecallsByChassis(vChassis))?.Recalls?.Select(r => r.RecallId).ToList();
+                    if (movement.Recalls != null && movement.Recalls.Count > 0)
+                        movement.HasRecall = true;
+
+                }
+            }
             return PartialView("OutMaintenaceCard", movement);
         }
 
@@ -340,7 +352,6 @@ namespace Workshop.Web.Controllers
                             vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
                             var PrimaryMessage = string.Format("{0} : ( {1} )", "The vehicle Under Repair", vehicleNams.Where(x => x.id == movement.VehicleID).FirstOrDefault().VehicleName);
                             var SecondaryMessage = string.Format("{0} : ( {1} )", " السيارة قيد الاصلاح", vehicleNams.Where(x => x.id == movement.VehicleID).FirstOrDefault().VehicleName);
-
                             var oNotification = new Notification()
                             {
                                 BranchId = (int)movement.BranchId,
@@ -366,32 +377,38 @@ namespace Workshop.Web.Controllers
                         }
                         if (movement.HasRecall)
                         {
-           
                             RecallDTO recall = new RecallDTO();
-                            var currectRecall = await _apiClient.GetRecallByIdAsync(movement?.RecallId ?? 0);
-                            if (!movement?.IsExternal ?? false)
+                            foreach (var item in movement?.Recalls)
                             {
-                                var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement?.VehicleID ?? 0);
-                                if(vehicle != null && vehicle.ChassisNo != null)
-                                    currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo });
-                            }
-                            else
-                            {
-                                var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement?.VehicleID ?? 0);
-                                if (vehicle != null && vehicle.ChassisNo != null)
-                                    currectRecall.Vehicles.Add(new VehicleRecallDTO { Chassis = vehicle.ChassisNo });
-                            }
-                           
+                                var currectRecall = await _apiClient.GetRecallByIdAsync(item);
+                                if (!movement?.IsExternal ?? true)
+                                {
+                                    var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement?.VehicleID ?? 0);
+                                    if (vehicle != null && vehicle.ChassisNo != null)
+                                        currectRecall.Vehicles.Add(new VehicleRecallDTO {MakeID = vehicle.ManufacturerId,
+                                            ModelID = vehicle.VehicleModelId,
+                                            Chassis = vehicle.ChassisNo });
+                                }
+                                else
+                                {
+                                    var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement?.VehicleID ?? 0);
+                                    if (vehicle != null && vehicle.ChassisNo != null)
+                                        currectRecall.Vehicles.Add(new VehicleRecallDTO
+                                        {
+                                            MakeID = vehicle.ManufacturerId,
+                                            ModelID = vehicle.VehicleModelId,
+                                            Chassis = vehicle.ChassisNo
+                                        });
+                                }
+                                UpdateRecallDTO updateRecall = new UpdateRecallDTO()
+                                {
+                                    Id = currectRecall.Id,
+                                    Vehicles = currectRecall.Vehicles
 
-                            UpdateRecallDTO updateRecall = new UpdateRecallDTO()
-                            {
-                                Id = currectRecall.Id,
-                                Vehicles = currectRecall.Vehicles
-
-                            };
-                            await _apiClient.UpdateRecallAsync(updateRecall);
+                                };
+                                await _apiClient.UpdateRecallAsync(updateRecall);
+                            }
                         }
-
                         return Json(resultJson);
                     }
                     else
