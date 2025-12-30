@@ -565,7 +565,6 @@ namespace Workshop.Web.Services
         {
             try
             {
-                userId = 298;
                 string url = $"/PettyCashRequest/PettyCashRequest_GetApproved?UserId={userId}";
                 var response = await SendRequest<List<PettyCashRequest>>(url, HttpMethod.Get);
 
