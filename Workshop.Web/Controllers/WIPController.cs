@@ -2925,6 +2925,7 @@ namespace Workshop.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> TransferMoveInPettyCash(
             [FromForm] PettyCashVehicleMovementDTO model,
+            [FromForm] List<Models.WipServiceFixDto> Services,
             [FromForm] IFormFile PettyCash_Files)
         {
             var resultJson = new TempData();
@@ -3014,6 +3015,11 @@ namespace Workshop.Web.Controllers
                 // Insert vehicle movement
                 var movements = await _apiClient.InsertVehicleMovementAsync(vehicleMovement);
 
+                if (Services != null && Services.Any())
+                {
+                    await _apiClient.UpdateWIPServicesExternalAndFixStatus(Services);
+                }
+
                 // Handle file upload to accounting module directory
                 string filePath = null, fileName = null;
                 if (PettyCash_Files != null)
@@ -3062,7 +3068,7 @@ namespace Workshop.Web.Controllers
                 // Create petty cash expense with calculated values
                 var pettyCashExpense = new PettyCashExpenses
                 {
-                    RequestNo = model.PettyCash_RequestNo,
+                    FK_RequestNo = model.PettyCash_RequestNo,
                     FK_TypeOfExpense = 1, // Direct
                     FK_ExpenseType = accountDefinition.PettyCashExpenseTypeId,
                     FK_EmployeeId = UserId,
@@ -3105,12 +3111,6 @@ namespace Workshop.Web.Controllers
                     invoice.Invoice_Date = DateTime.Now;
 
                     await _apiClient.WorkshopInvoiceInsertAsync(invoice);
-                }
-
-                // Update services if any are marked as fixed
-                if (!string.IsNullOrWhiteSpace(model.PettyCash_FixedServiceIds))
-                {
-                    await _apiClient.UpdateWIPServicesIsFixedAsync(model.PettyCash_FixedServiceIds);
                 }
 
                 resultJson.IsSuccess = true;

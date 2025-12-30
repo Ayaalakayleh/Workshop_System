@@ -1,13 +1,46 @@
 ﻿$(document).ready(function () {
-    // jQuery Validate (use RazorVars.requiredField for messages)
-    $("#serviceReminderForm").validate({
+    var $form = $("#serviceReminderForm");
+
+    var triedSubmit = false;
+
+    var $vehicle = $form.find("[name='ReminderForm.VehicleId'], #ReminderForm_VehicleId").first();
+    var $manu = $form.find("[name='ReminderForm.ManufacturerId'], #ReminderForm_ManufacturerId").first();
+    var $model = $form.find("[name='ReminderForm.VehicleModelId'], #Model, #ReminderForm_VehicleModelId").first();
+
+    function isEmptyVal(v) {
+        return v === null || v === undefined || $.trim(String(v)) === "";
+    }
+
+    var validator = $form.validate({
+        // ✅ don’t validate on typing/focus before submit
+        onkeyup: function (element) { if (triedSubmit) $(element).valid(); },
+        onfocusout: function (element) { if (triedSubmit) $(element).valid(); },
+        onclick: function (element) { if (triedSubmit) $(element).valid(); },
+
+        invalidHandler: function () {
+            // ✅ first submit attempt happened → now allow live validation
+            triedSubmit = true;
+        },
+
         rules: {
-            "ReminderForm.ManufacturerId": { required: true },
-            "ReminderForm.VehicleId": { required: true },
-            "ReminderForm.VehicleModelId": { required: true },
+            "ReminderForm.ManufacturerId": {
+                required: function () { return isEmptyVal($vehicle.val()); }
+            },
+            "ReminderForm.VehicleModelId": {
+                required: function () { return isEmptyVal($vehicle.val()); }
+            },
+            "ReminderForm.VehicleId": {
+                required: function () {
+                    var vehicleEmpty = isEmptyVal($vehicle.val());
+                    var manuEmpty = isEmptyVal($manu.val());
+                    var modelEmpty = isEmptyVal($model.val());
+                    return vehicleEmpty && (manuEmpty || modelEmpty);
+                }
+            },
             "ReminderForm.ItemId": { required: true },
             "ReminderForm.ManufacturingYear": { required: true }
         },
+
         messages: {
             "ReminderForm.ManufacturerId": { required: RazorVars.requiredField },
             "ReminderForm.VehicleId": { required: RazorVars.requiredField },
@@ -15,43 +48,29 @@
             "ReminderForm.ItemId": { required: RazorVars.requiredField },
             "ReminderForm.ManufacturingYear": { required: RazorVars.requiredField }
         },
+
         errorClass: "text-danger",
         errorElement: "span",
         highlight: function (element) { $(element).addClass("is-invalid"); },
         unhighlight: function (element) { $(element).removeClass("is-invalid"); },
-        submitHandler: function (form) {
-            $("#btnCreate").prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp;' + RazorVars.btnSaving);
-            var formData = new FormData(form);
 
-            $.ajax({
-                url: $(form).attr('action'),
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function () {
-                    Swal.fire({
-                        icon: 'success',
-                        title: RazorVars.msgSuccessTitle,
-                        confirmButtonText: RazorVars.btnOk,
-                        confirmButtonColor: '#28a745',
-                        timer: 3000,
-                        timerProgressBar: true
-                    }).then(() => { $('#serviceReminderModal').modal('hide'); location.reload(); });
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: RazorVars.ErrorHappened,
-                        confirmButtonText: RazorVars.btnTryAgain,
-                        confirmButtonColor: '#dc3545'
-                    });
-                }
-            });
+        submitHandler: function (form) {
+            // ... your ajax submit ...
             return false;
         }
     });
+
+    // ✅ only re-check these dependent fields AFTER first submit attempt
+    $vehicle.add($manu).add($model).on("change keyup", function () {
+        if (!triedSubmit) return;
+
+        validator.element($vehicle);
+        validator.element($manu);
+        validator.element($model);
+    });
 });
+
+
 
 // Dependent dropdowns (modal + search form)
 $(document).ready(function () {

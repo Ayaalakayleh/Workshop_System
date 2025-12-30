@@ -802,6 +802,7 @@
         GetVehicleData(selectedVehicleId);
         $("#ModalOutsideSearch").modal('hide');
         GetWIPByVehicleId(selectedVehicleId);
+        window.location.href = RazorVars.selectVehicleUrl + "?vehicleId=" + $("#GettingVehicleId").val();
     }
 
     function GetWIPByVehicleId(vehicleId) {

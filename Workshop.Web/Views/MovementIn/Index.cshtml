@@ -426,7 +426,7 @@
 							</div>
 							
 
-							@Html.DropDownListFor(model => model.Recalls, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-check-input", @id= "recallList", @disabled= true, multiple = "multiple"})
+							@Html.DropDownListFor(model => model.Recalls, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @id= "recallList", @disabled= true, multiple = "multiple"})
 							</fieldset>
 						<fieldset class="my-3 ui-fieldset">
 							<div class="table-wrap">
@@ -691,6 +691,7 @@
 		getDetailsUrl: '@Url.Action("GetDetails", "VehicleDefinition")',
 		vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',
 		insertNewVehicleUrl: '@Url.Action("InsertNewVehicle", "VehicleDefinition")',
+		selectVehicleUrl:'@Url.Action("Index", "MovementIn")',
 
 		vehicleWorkOrderListUrl: '@Url.Action("VehicleWorkOrderList", "WorkOrder")',
 		GetWIPByVehicleIdUrl: '@Url.Action("GetWIPByVehicleId", "WIP")',
