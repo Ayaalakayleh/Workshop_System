@@ -152,6 +152,12 @@ namespace Workshop.Web.Controllers
 
             var allowedTimesJ = JsonConvert.DeserializeObject<List<AllowedTimeDTO>>(AllowedTimesJson) ?? new List<AllowedTimeDTO>();
             int? rtsId;
+            var isExist = await _apiClient.IsRTSCodeExists(dto.RTSCode.Code,CompanyId, dto.RTSCode.Id == 0 ? null : dto.RTSCode.Id);
+
+            if (isExist)
+            {
+                return Json(new { success = false, codeExists = true });
+            }
             if (dto.RTSCode.Id == 0)
             {
                 var createDto = MapToCreateDto(dto.RTSCode);

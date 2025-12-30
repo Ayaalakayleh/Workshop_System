@@ -197,6 +197,24 @@ namespace Workshop.Infrastructure.Repositories
                 return result;
 
         }
+        public async Task<bool> CodeExistsAsync(string code, int companyId, int? excludeId = null)
+        {
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@Code", code, DbType.String);
+            parameters.Add("@CompanyId", companyId, DbType.Int32);
+            parameters.Add("@ExcludeId", excludeId, DbType.Int32);
+
+            var exists = await connection.QuerySingleAsync<int>(
+                "RTSCode_CheckCodeExists",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return exists == 1;
+        }
+
 
     }
 }
