@@ -414,12 +414,18 @@
 						</fieldset>
 
 						<fieldset class="my-3 ui-fieldset">
-							@Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id ="hasRecall" })&nbsp;@Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
-
-							@Html.DropDownListFor(model => model.RecallId, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-check-input", @id= "recallList", @disabled= true })
-							<button type="button" id="addButton" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#recallModal">
+							<div class="d-flex justify-content-between align-items-center mb-2">
+								<div>
+									@Html.CheckBoxFor(m => m.HasRecall, new { @class = "form-check-input", @id ="hasRecall" })&nbsp;@Html.LabelFor(model => model.HasRecall, @Common["Label_HasRecall"])
+								</div>
+								
+															<button type="button" id="addButton" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#recallModal">
 								<i class="fa fa-plus"></i>&nbsp;@Common["Button_AddNew"]
 							</button>
+							</div>
+							
+
+							@Html.DropDownListFor(model => model.RecallId, ViewBag.Recalls as IEnumerable<SelectListItem>, new { @class = "form-check-input", @id= "recallList", @disabled= true })
 							</fieldset>
 						<fieldset class="my-3 ui-fieldset">
 							<div class="table-wrap">
