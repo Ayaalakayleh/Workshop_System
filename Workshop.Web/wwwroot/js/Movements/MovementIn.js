@@ -25,6 +25,9 @@
 
     // prevent double submit
     var isSubmitting = false;
+    // Show WIP swal only once per vehicle (prevents spam on repeated Search clicks)
+    var wipSwalShownByVehicle = Object.create(null);
+    var wipRequestInFlightByVehicle = Object.create(null);
 
     /* ==================================================
        Small utilities
@@ -801,11 +804,24 @@
     }
 
     function GetWIPByVehicleId(vehicleId) {
+        vehicleId = Number(vehicleId || 0);
+        if (!vehicleId) return;
+
+        if (wipSwalShownByVehicle[vehicleId]) return;
+
+        if (wipRequestInFlightByVehicle[vehicleId]) return;
+        wipRequestInFlightByVehicle[vehicleId] = true;
+
         $.ajax({
             type: 'GET',
             url: RazorVars.GetWIPByVehicleIdUrl + '?id=' + vehicleId,
             dataType: 'json'
         }).done(function (result) {
+            wipRequestInFlightByVehicle[vehicleId] = false;
+
+            if (wipSwalShownByVehicle[vehicleId]) return;
+            wipSwalShownByVehicle[vehicleId] = true;
+
             Swal.fire({
                 title: 'Warning',
                 html: "You have already - " + result.data.openWIPCount + " - open WIP<br>" +
@@ -813,8 +829,11 @@
                 icon: 'warning',
                 confirmButtonText: 'OK'
             });
+        }).fail(function () {
+            wipRequestInFlightByVehicle[vehicleId] = false;
         });
     }
+
 
     function getVehicleWorkOrders(vehicleId, type, external) {
         if (vehicleId > 0) {
