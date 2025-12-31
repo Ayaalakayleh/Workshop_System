@@ -309,6 +309,17 @@ namespace Workshop.Web.Services
         {
             return await _httpClient.GetFromJsonAsync<IEnumerable<RTSCodeDTO>>($"api/RTSCode/DDL");
         }
+        public async Task<bool> IsRTSCodeExists(string code, int companyId, int? excludeId = null)
+        {
+            var url = $"api/RTSCode/isCodeExists?code={Uri.EscapeDataString(code)}&companyId={companyId}";
+
+            if (excludeId.HasValue)
+            {
+                url += $"&excludeId={excludeId.Value}";
+            }
+
+            return await _httpClient.GetFromJsonAsync<bool>(url);
+        }
 
 
         #endregion
@@ -2053,7 +2064,7 @@ namespace Workshop.Web.Services
         
         public async Task<IEnumerable<ReturnItems>?> GetReturnParts(int WIPId=0)  
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<ReturnItems>>("api/WIP/GetReturnParts?WIPId={WIPId}");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<ReturnItems>>($"api/WIP/GetReturnParts?WIPId={WIPId}");
 
         }
 

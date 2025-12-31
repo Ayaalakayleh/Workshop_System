@@ -68,7 +68,7 @@ function createTechnicianCard(tech, index) {
 
     const statusText = tech.status === 'available' ? i18n.nowor : tech.status === 'busy' ? (tech.time || i18n.nowor) : i18n.nowor;
 
-    const uploadsBasePath = `/Base/GetImage?Name=${encodeURIComponent(tech.fileName || '')}&D=17&BasePath=${encodeURIComponent(tech.filePath || '')}&IsExternal=false`;
+    const uploadsBasePath = `${window.RazorVars.getImageUrl}?Name=${encodeURIComponent(tech.fileName || '')}&D=17&BasePath=${encodeURIComponent(tech.filePath || '')}&IsExternal=false`;
 
     const photoContent = `<img src="${uploadsBasePath}" alt="${tech.id}" class="technician-photo">`;
 

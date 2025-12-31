@@ -375,8 +375,8 @@
                 debugger
                 return row.UsedQuantity === null ||
                     row.UsedQuantity === undefined ||
-                    row.UsedQuantity === "" ||
-                    row.UsedQuantity === 0;
+                    row.UsedQuantity === "" 
+                    //row.UsedQuantity === 0;
             });
 
             if (invalidItems.length > 0) {
@@ -500,7 +500,8 @@
                                 window.location.href = window.URLs.indexUrl;
                             });
                         } else {
-                            Swal.fire("Error", result.message || "An unknown error occurred.");
+                            const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
+                            Swal.fire({ icon: "error", title: "Error", text: msg });
                         }
                     }).fail(function (xhr, status, error) {
                         console.error("Error:", error);

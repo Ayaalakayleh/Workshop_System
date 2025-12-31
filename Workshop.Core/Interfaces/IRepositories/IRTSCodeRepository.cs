@@ -12,6 +12,7 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<int> AddAsync(CreateRTSCodeDTO dto);
         Task<int> UpdateAsync(UpdateRTSCodeDTO dto);
         Task<int> DeleteAsync(DeleteRTSCodeDTO dto);
+        Task<bool> CodeExistsAsync(string code, int companyId, int? excludeId = null);
 
 
     }

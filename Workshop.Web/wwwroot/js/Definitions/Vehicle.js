@@ -301,3 +301,33 @@ $(document).ready(function () {
         });
     });
 });
+
+$("#PlateNumber").on("change", function () {
+    const plateNumber = $(this).val()?.trim();
+
+    if (!plateNumber) return;
+
+    $.ajax({
+        type: "GET",
+        url: RazorVars.isValidURL,
+        dataType: "json",
+        data: { plateNumber: plateNumber }
+    }).done(function (result) {
+
+        if (!result) return;
+
+        if (result.isSuccess === false) {
+            Swal.fire({
+                icon: "warning",
+                title: "Warning",
+                html: `
+                    <div>This vehicle already exists</div>
+                    <div style="margin-top:6px;"><b>Plate Number:</b> ${result.data}</div>
+                `
+            });
+        }
+
+    }).fail(function (xhr, status, error) {
+        console.error("Error:", error, xhr.responseText);
+    });
+});

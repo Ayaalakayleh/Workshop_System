@@ -58,6 +58,12 @@ namespace Workshop.API.Controllers
             var result = await _service.DeleteAsync(dto);
             return Ok(result);
         }
+        [HttpGet("isCodeExists")]
+        public async Task<ActionResult> isCodeExists(string code, int companyId, int? excludeId = null)
+        {
+            var result = await _service.CodeExistsAsync(code, companyId, excludeId);
+            return Ok(result);
+        }
 
 
     }
