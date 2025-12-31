@@ -2505,4 +2505,58 @@
   <data name="Recall_fixed" xml:space="preserve">
     <value>Recall fixed successfully</value>
   </data>
+	<data name="Title_AccountDefinition" xml:space="preserve">
+    <value>Account Definition</value>
+  </data>
+
+	<data name="Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+
+	<data name="Label_JournalName" xml:space="preserve">
+    <value>Journal Name</value>
+  </data>
+	<data name="Label_WIPAccount" xml:space="preserve">
+    <value>WIP Account</value>
+  </data>
+	<data name="Label_MaintenanceAccount" xml:space="preserve">
+    <value>Maintenance Account</value>
+  </data>
+	<data name="Label_AccessoriesAccount" xml:space="preserve">
+    <value>Accessories Account</value>
+  </data>
+	<data name="Label_AccidentAccount" xml:space="preserve">
+    <value>Accident Account</value>
+  </data>
+	<data name="Label_MaintenanceProjectsAccount" xml:space="preserve">
+    <value>Maintenance Projects Account</value>
+  </data>
+
+	<data name="Label_InternalCostPart" xml:space="preserve">
+    <value>Internal Cost Part</value>
+  </data>
+	<data name="Label_InternalCostLabour" xml:space="preserve">
+    <value>Internal Cost Labour</value>
+  </data>
+
+	<data name="Label_ExternalCostPart" xml:space="preserve">
+    <value>External Cost Part</value>
+  </data>
+	<data name="Label_ExternalCostLabour" xml:space="preserve">
+    <value>External Cost Labour</value>
+  </data>
+
+	<data name="Label_InternalRevenuePart" xml:space="preserve">
+    <value>Internal Revenue Part</value>
+  </data>
+	<data name="Label_InternalRevenueLabour" xml:space="preserve">
+    <value>Internal Revenue Labour</value>
+  </data>
+
+	<data name="Label_InvoiceType" xml:space="preserve">
+    <value>Invoice Type</value>
+  </data>
+	<data name="Label_PettyCashExpenseType" xml:space="preserve">
+    <value>Petty Cash Expense Type</value>
+  </data>
 </root>
