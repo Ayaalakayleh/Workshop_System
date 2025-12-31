@@ -55,7 +55,91 @@
         unhighlight: function (element) { $(element).removeClass("is-invalid"); },
 
         submitHandler: function (form) {
-            // ... your ajax submit ...
+            var $f = $(form);
+            var $submitBtn = $f.find('button[type="submit"]');
+
+            // Disable submit button to prevent double submission
+            if ($submitBtn.length) {
+                $submitBtn.prop('disabled', true);
+                var originalText = $submitBtn.html();
+                $submitBtn.html('<i class="fas fa-spinner fa-spin"></i>&nbsp;' + (RazorVars.btnSaving || 'Saving...'));
+            }
+
+            $.ajax({
+                type: "POST",
+                url: $f.attr("action"),
+                data: $f.serialize(),
+                success: function (res) {
+                    if (res && res.success === false) {
+                        if (res.errors && Array.isArray(res.errors)) {
+                            var errorMessages = res.errors.map(function(err) {
+                                return err.message || err;
+                            }).join('<br/>');
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: RazorVars.ErrorHappened || 'Error',
+                                html: errorMessages,
+                                confirmButtonText: RazorVars.btnOk || 'OK',
+                                confirmButtonColor: 'var(--primary-600)'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: RazorVars.ErrorHappened || 'Error',
+                                text: res.message || 'An error occurred while saving',
+                                confirmButtonText: RazorVars.btnOk || 'OK',
+                                confirmButtonColor: 'var(--primary-600)'
+                            });
+                        }
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: RazorVars.msgSuccessTitle || 'Success',
+                        text: res.message || 'Service reminder saved successfully',
+                        confirmButtonText: RazorVars.btnOk || 'OK',
+                        confirmButtonColor: 'var(--primary-600)',
+                        timer: 3000,
+                        timerProgressBar: true
+                    }).then(function () {
+                        $('#serviceReminderModal').modal('hide');
+                        window.location.reload();
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Save error:', error);
+                    var errorMessage = 'An error occurred while saving the service reminder.';
+
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        } else if (response.errors && Array.isArray(response.errors)) {
+                            errorMessage = response.errors.map(function(err) {
+                                return err.message || err;
+                            }).join('<br/>');
+                        }
+                    } catch (e) {
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: RazorVars.ErrorHappened || 'Error',
+                        html: errorMessage,
+                        confirmButtonText: RazorVars.btnOk || 'OK',
+                        confirmButtonColor: 'var(--primary-600)'
+                    });
+                },
+                complete: function () {
+                    if ($submitBtn.length) {
+                        $submitBtn.prop('disabled', false);
+                        $submitBtn.html(originalText);
+                    }
+                }
+            });
+
             return false;
         }
     });
