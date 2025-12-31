@@ -158,34 +158,34 @@
                 if (window.Swal && typeof Swal.fire === "function") {
                     $('#AllowedTimesJson').val(
                         JSON.stringify($('#gridContainer').dxDataGrid('instance').getDataSource().items())
-                    );                    Swal.fire({
-                        icon: 'success',
-                        title: "Success",
-                        confirmButtonText: "Ok",
-                        confirmButtonColor: 'var(--primary-600)',
-                        timer: 3000,
-                        timerProgressBar: true
-                    }).then(function () {
-                        $.ajax({
-                            type: "POST",
-                            url: $f.attr("action"),
-                            data: $f.serialize(),
-                            success: function (res) {
+                    );
+                    $.ajax({
+                        type: "POST",
+                        url: $f.attr("action"),
+                        data: $f.serialize(),
+                        success: function (res) {
 
-                                if (res && res.codeExists) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'RTS Code already exists',
-                                        confirmButtonText: 'OK',
-                                        confirmButtonColor: 'var(--primary-600)'
-                                    });
-                                    return;
-                                }
-
-                                window.location.href = window.RazorVars.indexUrl;
+                            if (res && res.codeExists) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'RTS Code already exists',
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: 'var(--primary-600)'
+                                });
+                                return;
                             }
-                        });
 
+                            Swal.fire({
+                                icon: 'success',
+                                title: "Success",
+                                confirmButtonText: "Ok",
+                                confirmButtonColor: 'var(--primary-600)',
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(function () {
+                                window.location.href = window.RazorVars.indexUrl;
+                            });
+                        }
                     });
                 } else {
                     $f.data("allowSubmit", true);
