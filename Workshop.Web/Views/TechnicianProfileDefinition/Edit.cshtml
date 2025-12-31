@@ -30,6 +30,8 @@
         @using (Html.BeginForm("Edit", "TechnicianProfileDefinition", FormMethod.Post, new { enctype = "multipart/form-data", id = "workshopform" }))
         {
             @Html.HiddenFor(a => a.Id)
+            @Html.HiddenFor(a => a.FilePath)
+            @Html.HiddenFor(a => a.FileName)
             @Html.AntiForgeryToken()
 
             <div id="panel-1" class="panel">
