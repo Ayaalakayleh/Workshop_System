@@ -1308,7 +1308,7 @@ namespace Workshop.Web.Controllers
         public async Task<IActionResult> TransferMoveIn(
         [FromForm] VehicleMovement movement,
         [FromForm] List<Models.WipServiceFixDto> Services,
-        [FromForm] IFormFile file)
+        [FromForm] IFormFile file2)
         {
             var resultJson = new TempData();
 
@@ -1377,33 +1377,43 @@ namespace Workshop.Web.Controllers
                 }
 
 
+                // files uploaded in the request
+                var allFiles = Request.Form.Files;
 
+                var guid = Guid.NewGuid().ToString();
 
+                var invoiceFiles = allFiles
+                    .Where(f => string.Equals(f.Name, "ExternalWorkshopInvoice", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
 
-                //MovementInvoice invoice = new MovementInvoice();
+                if (invoiceFiles.Any())
+                {
+                    for (int i = 0; i < invoiceFiles.Count; i++)
+                    {
+                        var file = invoiceFiles[i];
 
-                // List<HttpPostedFileBase> files = Request.Files["DamageReport"];
-                //for (int i = 0; i < file.Length; i++)
-                //{
-                //    var validationResult = _fileValidationService.CheckFileTypeAndSize(file);
+                        var validationResult = _fileValidationService.CheckFileTypeAndSize(file);
+                        if (!validationResult.IsSuccess)
+                        {
+                            await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
+                            continue;
+                        }
 
-                //    //Logic should be implemented 
-                //    //if (Request.Files.GetKey(i) == "ExternalWorkshopInvoice")
-                //    if (validationResult.IsSuccess)
-                //    {
-                //        var (filePath, fileName) = await _fileService.SaveFileAsync(file, "ExternalWorkshopInvoice");
+                        var (savedRelativePath, savedFileName) =
+                            await _fileService.SaveFileAsync(file, Path.Combine("ExternalWorkshopInvoice", guid));
 
-                //        invoice.FileName = fileName;
-                //        invoice.FilePath = filePath;
-                //        invoice.MovementId = movements.MovementId.Value;
-                //        invoice.Invoice_Date = DateTime.Now;
-                //        await _apiClient.DExternalWorkshopInvoiceInsertAsync(invoice);
-                //    }
-                //    else
-                //    {
-                //        await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
-                //    }
-                //}
+                        invoice.FileName = savedFileName; 
+                        invoice.FilePath = guid;
+                        invoice.MovementId = movements.MovementId.Value;
+                        invoice.Invoice_Date = DateTime.Now;
+
+                        await _apiClient.DExternalWorkshopInvoiceInsertAsync(invoice);
+                    }
+                }
+                else
+                {
+                    await _apiClient.UpdateWorkOrderInvoicingStatusAsync((int)movement.WorkOrderId);
+                }
 
 
                 //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
