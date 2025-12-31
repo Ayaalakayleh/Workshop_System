@@ -141,7 +141,7 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                var avaliableTime = await _apiclient.GetAvailableTechniciansAsync(dTO.requestedDate, dTO.duration, BranchId);
+                var avaliableTime = await _apiclient.GetAvailableTechniciansAsync(dTO.requestedDate, dTO.duration, BranchId, true);
                 return Json(new
                 {
                     success = true,

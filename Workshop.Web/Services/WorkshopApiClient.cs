@@ -85,15 +85,16 @@ namespace Workshop.Web.Services
             });
             return response.IsSuccessStatusCode;
         }
-        public async Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId)
+        public async Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId, bool trimPastIntervals = false)
         {
             // 👇 Force invariant formatting for decimal and date
             string url = string.Format(
                 CultureInfo.InvariantCulture,
-                "api/DTechnician/GetAvailableTechniciansAsync?date={0:O}&duration={1}&branchId={2}",
+                "api/DTechnician/GetAvailableTechniciansAsync?date={0:O}&duration={1}&branchId={2}&trimPastIntervals={3}",
                 date,
                 duration,
-                branchId
+                branchId,
+                trimPastIntervals
             );
 
             return await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianAvailabilityDTO>>(url);
@@ -308,6 +309,17 @@ namespace Workshop.Web.Services
         public async Task<IEnumerable<RTSCodeDTO>?> GetAllRTSCodesDDLAsync()
         {
             return await _httpClient.GetFromJsonAsync<IEnumerable<RTSCodeDTO>>($"api/RTSCode/DDL");
+        }
+        public async Task<bool> IsRTSCodeExists(string code, int companyId, int? excludeId = null)
+        {
+            var url = $"api/RTSCode/isCodeExists?code={Uri.EscapeDataString(code)}&companyId={companyId}";
+
+            if (excludeId.HasValue)
+            {
+                url += $"&excludeId={excludeId.Value}";
+            }
+
+            return await _httpClient.GetFromJsonAsync<bool>(url);
         }
 
 
@@ -2433,6 +2445,11 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<List<ActiveRecallsByChassisResponseDto>>();
 
             return result;
+        }
+
+        public async Task<bool> CheckRecallCodeExistsAsync(string code)
+        {
+            return await _httpClient.GetFromJsonAsync<bool>($"api/Recall/CodeExists/{code}");
         }
 
 

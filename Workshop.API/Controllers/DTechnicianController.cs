@@ -67,9 +67,9 @@ namespace Workshop.API.Controllers
         }
 
         [HttpGet("GetAvailableTechniciansAsync")]
-        public async Task<IActionResult> GetAvailableTechniciansAsync([FromQuery] DateTime date, decimal duration, int BranchId)
+        public async Task<IActionResult> GetAvailableTechniciansAsync([FromQuery] DateTime date, decimal duration, int BranchId, bool trimPastIntervals = false)
         {
-            var result = await _service.GetAvailableTechniciansAsync(date, duration, BranchId);
+            var result = await _service.GetAvailableTechniciansAsync(date, duration, BranchId, trimPastIntervals);
             return Ok(result);
         }
     }

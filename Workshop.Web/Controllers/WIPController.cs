@@ -1279,7 +1279,7 @@ namespace Workshop.Web.Controllers
 
             movement.VatRate = (await _accountingApiClient.GetTaxClassificationById(workshopDetails.VatClassificationId ?? 0))?.TaxRate;
             movement.InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetAll(CompanyId, BranchId, 1, 2);
-            movement.WIPServices = (await _apiClient.GetWIPServicesByMovementIdAsync(movement.MovementInId.Value))?.Where(s => s.IsExternal).ToList();
+            movement.WIPServices = (await _apiClient.GetWIPServicesByMovementIdAsync(movement.MovementInId.Value))?.Where(s => s.IsExternal && s.Status == (int)LabourLineEnum.Tranfer).ToList();
             movement.WIPServices ??= (new List<CreateWIPServiceDTO>());
 
             // Add AccountDefinition to ViewBag for Petty Cash functionality
@@ -1932,7 +1932,7 @@ namespace Workshop.Web.Controllers
 
         public async Task<JsonResult> GetAvailableTechnicians([FromQuery] DateTime date, decimal duration)
         {
-            var technicians = await _apiClient.GetAvailableTechniciansAsync(date, duration, BranchId);
+            var technicians = await _apiClient.GetAvailableTechniciansAsync(date, duration, BranchId, true);
 
             var data = technicians.Select(t => new
             {

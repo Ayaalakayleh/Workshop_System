@@ -82,5 +82,12 @@ namespace Workshop.API.Controllers
             return Ok(result);
 
         }
+
+        [HttpGet("CodeExists/{code}")]
+        public async Task<ActionResult<bool>> CodeExists(string code)
+        {
+            var result = await _service.CodeExistsAsync(code);
+            return Ok(result);
+        }
     }
 }

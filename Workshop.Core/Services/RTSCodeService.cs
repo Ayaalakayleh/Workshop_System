@@ -43,7 +43,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.DeleteAsync(dto);
         }
-
+        public async Task<bool> CodeExistsAsync(string code, int companyId, int? excludeId = null)
+        {
+            return await _repository.CodeExistsAsync(code, companyId, excludeId);
+        }
 
     }
 

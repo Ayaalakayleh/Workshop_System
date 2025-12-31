@@ -272,9 +272,24 @@ namespace Workshop.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<bool> CodeExistsAsync(string code)
+        {
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@Code", code, DbType.String);
+
+            var result = await connection.QuerySingleAsync<bool>(
+                "Recall_CodeExists",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+
 
 
 
     }
 }
-
