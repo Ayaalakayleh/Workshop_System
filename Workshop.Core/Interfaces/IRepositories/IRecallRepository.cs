@@ -18,5 +18,6 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<ActiveRecallsByChassisResponseDto> GetActiveRecallsByChassisAsync(string chassisNo);
         Task<int> UpdateRecallVehicleStatus(string chassisNo, int statusId);
         Task<List<ActiveRecallsByChassisResponseDto>> GetActiveRecallsByChassisBulkAsync(List<string> chassisList);
+        Task<bool> CodeExistsAsync(string code);
     }
 }

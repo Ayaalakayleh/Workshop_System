@@ -59,5 +59,10 @@ namespace Workshop.Core.Services
 			return await _repository.GetActiveRecallsByChassisBulkAsync(chassisList);
 		}
 
+        public async Task<bool> CodeExistsAsync(string code)
+        {
+            return await _repository.CodeExistsAsync(code);
+        }
+
     }
 }

@@ -702,15 +702,17 @@ namespace Workshop.Web.Controllers
                     return Json(new { isUnique = false, message = "Code is required" });
                 }
 
-                // Get all recalls DDL
-                var allRecalls = await _apiClient.GetAllRecallsDDLAsync();
+                bool codeExists = await _apiClient.CheckRecallCodeExistsAsync(code.Trim());
+                bool isUnique = !codeExists;
 
-                // Check if any recall has this code (excluding the current one if editing)
-                var existingRecall = allRecalls?.FirstOrDefault(r =>
-                    r.Code.Equals(code.Trim(), StringComparison.OrdinalIgnoreCase) &&
-                    (excludeId == null || r.Id != excludeId));
-
-                bool isUnique = existingRecall == null;
+                if (excludeId.HasValue && !isUnique)
+                {
+                    var currentRecall = await _apiClient.GetRecallByIdAsync(excludeId.Value);
+                    if (currentRecall != null && currentRecall.Code != null && currentRecall.Code.Equals(code.Trim(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        isUnique = true;
+                    }
+                }
 
                 return Json(new
                 {
