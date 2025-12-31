@@ -353,7 +353,7 @@ namespace Workshop.Infrastructure.Repositories
 			var parameters = new { WorkOrderId = workOrderId };
 
 			await _database.ExecuteNonReturnProcedure(
-				"[WorkOrder].[M_WorkOrder_UpdateInvoicingStatus]",
+                "[WorkOrder].[M_WorkOrders_UpdateInvoicingStatus]",
 				parameters
 				);
 		}
