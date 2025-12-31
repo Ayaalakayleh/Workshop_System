@@ -144,7 +144,16 @@
                 </div>
             </div>
         </div>
-
+        <div class="row mt-2">
+            <div class="col-12">
+                <form role="form">
+                    <div class="form-group">
+                        <label class=" ">@Common["Upload"]</label>
+                        <input type="file" name="ExternalWorkshopInvoice" id="Invoicefile" />
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="row mt-2">
             <div class="col-12">
                 <div id="panel-1" class="panel">
@@ -192,7 +201,7 @@
                 </div>
             </div>
         </div>
-
+           
         <div class="text-center mt-4">
             <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
         </div>
@@ -495,7 +504,17 @@
             </text>
         }
     }
+         function isLoadingCheck() {
 
+            var isLoading = cuspond.getFiles().filter(x => x.status !== 2).length !== 0;
+            if (isLoading) {
+                $('#submitAccident').attr("disabled", true);
+                validPhoto = false;
+            } else {
+                $('#submitAccident').attr("disabled", false);
+                validPhoto = true;
+            }
+        }
     $(document).ready(function () {
         // Initialize FilePond for original form
         var inputElement = document.querySelector('#Invoicefile');
@@ -503,7 +522,7 @@
             cuspond = FilePond.create(inputElement, {
                 imageCropAspectRatio: '1:1',
                 acceptedFileTypes: ['image/png', 'image/jpeg', 'image/PNG', 'application/pdf'],
-                maxFileSize: fileSizeAllowed + fileSizeUnit,
+                maxFileSize: 1, //fileSizeAllowed + fileSizeUnit,
                 fileMetadataObject: {
                     'markup': [
                         [
@@ -519,6 +538,7 @@
                 },
                 allowMultiple: true,
                 maxFiles: 5,
+                    storeAsFile: true,
                 onprocessfile: (files) => { isLoadingCheck(); },
                 onaddfile: (file) => { isLoadingCheck(); },
                 onremovefile: (file) => { isLoadingCheck(); }
@@ -972,6 +992,7 @@
                 processData: false,
                 success: function (data) {
                     if (data.isSuccess) {
+                        debugger
                         Swal.fire({
                             icon: 'success',
                             title: "Done Successfully",
