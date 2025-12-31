@@ -61,7 +61,7 @@ namespace Workshop.API.Controllers
         [HttpGet("isCodeExists")]
         public async Task<ActionResult> isCodeExists(string code, int companyId, int? excludeId = null)
         {
-            var result = await _service.CodeExistsAsync(code, companyId);
+            var result = await _service.CodeExistsAsync(code, companyId, excludeId);
             return Ok(result);
         }
 
