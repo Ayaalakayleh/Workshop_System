@@ -117,7 +117,7 @@ $(function () {
 
             }, {
                 dataField: "RecallStatus",
-                caption: LABELS.Status || "Status",
+                caption: theMainLang == "en" ? "Status" : "الحالة",
                 allowEditing: false,
                 validationRules: [
   
