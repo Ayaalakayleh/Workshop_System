@@ -85,15 +85,16 @@ namespace Workshop.Web.Services
             });
             return response.IsSuccessStatusCode;
         }
-        public async Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId)
+        public async Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId, bool trimPastIntervals = false)
         {
             // 👇 Force invariant formatting for decimal and date
             string url = string.Format(
                 CultureInfo.InvariantCulture,
-                "api/DTechnician/GetAvailableTechniciansAsync?date={0:O}&duration={1}&branchId={2}",
+                "api/DTechnician/GetAvailableTechniciansAsync?date={0:O}&duration={1}&branchId={2}&trimPastIntervals={3}",
                 date,
                 duration,
-                branchId
+                branchId,
+                trimPastIntervals
             );
 
             return await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianAvailabilityDTO>>(url);

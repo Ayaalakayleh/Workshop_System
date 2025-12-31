@@ -13,6 +13,6 @@ namespace Workshop.Core.Interfaces.IServices
         Task<int> UpdateAsync(UpdateDTechnicianDto dto);
         Task<int> DeleteAsync(DeleteDTechnicianDto dto);
         Task<IEnumerable<TechnicianDTO>> GetTechniciansDDL(int Id);
-        Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId);
+        Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId, bool trimPastIntervals = false);
     }
 }

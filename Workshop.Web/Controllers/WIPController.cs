@@ -1922,7 +1922,7 @@ namespace Workshop.Web.Controllers
 
         public async Task<JsonResult> GetAvailableTechnicians([FromQuery] DateTime date, decimal duration)
         {
-            var technicians = await _apiClient.GetAvailableTechniciansAsync(date, duration, BranchId);
+            var technicians = await _apiClient.GetAvailableTechniciansAsync(date, duration, BranchId, true);
 
             var data = technicians.Select(t => new
             {

@@ -46,9 +46,56 @@ namespace Workshop.Core.Services
         {
             return await _repository.DeleteAsync(dto);
         }
-        public async Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId)
+        public async Task<IEnumerable<TechnicianAvailabilityDTO>> GetAvailableTechniciansAsync(DateTime date, decimal duration, int branchId, bool trimPastIntervals = false)
         {
-            return await _repository.GetAvailableTechniciansAsync(date, duration, branchId);
+            var technicians = await _repository.GetAvailableTechniciansAsync(date, duration, branchId);
+
+            if (!trimPastIntervals || date.Date != DateTime.Now.Date)
+            {
+                return technicians;
+            }
+
+            TimeSpan currentTime = DateTime.Now.TimeOfDay;
+
+            var result = technicians.Select(tech =>
+            {
+                var filteredIntervals = new List<FreeIntervalDTO>();
+
+                foreach (var interval in tech.FreeIntervalsList)
+                {
+                    TimeSpan startTime = TimeSpan.Parse(interval.StartFree);
+                    TimeSpan endTime = TimeSpan.Parse(interval.EndFree);
+
+                    if (endTime <= currentTime)
+                    {
+                        continue;
+                    }
+
+                    if (startTime < currentTime && endTime > currentTime)
+                    {
+                        filteredIntervals.Add(new FreeIntervalDTO
+                        {
+                            StartFree = currentTime.ToString(@"hh\:mm\:ss"),
+                            EndFree = interval.EndFree
+                        });
+                    }
+                    else if (startTime >= currentTime)
+                    {
+                        filteredIntervals.Add(interval);
+                    }
+                }
+
+                tech.FreeIntervalsList = filteredIntervals;
+                tech.FreeIntervals = filteredIntervals.Count > 0
+                    ? System.Text.Json.JsonSerializer.Serialize(filteredIntervals.Select(i => new { StartFree = i.StartFree, EndFree = i.EndFree }))
+                    : "[]";
+
+                return tech;
+            })
+            .Where(tech => tech.FreeIntervalsList.Any()) 
+            .ToList();
+
+            return result;
         }
     }
 }
