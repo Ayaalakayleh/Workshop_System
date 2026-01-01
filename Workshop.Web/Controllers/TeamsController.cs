@@ -166,7 +166,8 @@ namespace Workshop.Web.Controllers
                 }
                 else
                 {
-                    return Ok(new { success = false, result = result, message = "Team could not be deleted. It may be in use." });
+                    return Ok(new { success = false, result = result, message = lang ==  "en" ? "You cannot delete this team while technicians are assigned to it.":
+                        "لا يمكن حذف الفريق طالما يوجد فنيون مرتبطون به." });
                 }
             }
             catch (Exception ex)
