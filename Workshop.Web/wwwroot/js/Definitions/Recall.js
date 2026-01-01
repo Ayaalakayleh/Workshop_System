@@ -505,6 +505,20 @@ $(function () {
             processData: false,
             contentType: false,
             success: function (res) {
+                // Check for validation errors
+                if (res.errors && res.errors.length > 0) {
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: LABELS.Error || 'Import Failed',
+                            text: res.errors.join('\n')
+                        });
+                    } else {
+                        alert('Import failed:\n' + res.errors.join('\n'));
+                    }
+                    return;
+                }
+
                 (res.importedRows || []).forEach(r => {
                     grid.getDataSource().store().insert({
                         Id: parseInt(r.id) || counter--,

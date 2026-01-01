@@ -696,14 +696,33 @@ namespace Workshop.Web.Controllers
 
                         var vehicleRecall = new VehicleRecallDTO
                         {
-                            Id = null, 
+                            Id = null,
                             MakeID = makeID,
                             ModelID = modelID,
                             Chassis = excelChasse,
                             RecallStatus = recallStatus
                         };
 
-                        ExcelImportModel.ImportedRows.Add(vehicleRecall);
+                        // Validate model-manufacturer match
+                        bool isValid = true;
+                        if (makeID.HasValue && modelID.HasValue)
+                        {
+                            var model = models.FirstOrDefault(m => m.Id == modelID.Value);
+                            if (model != null && model.ManufacturerId != makeID.Value)
+                            {
+                                isValid = false;
+                                ExcelImportModel.Errors.Add($"Row {r - headerRow}: Model '{excelModelText}' does not match manufacturer '{excelMakeText}'.");
+                            }
+                        }
+
+                        if (isValid)
+                        {
+                            ExcelImportModel.ImportedRows.Add(vehicleRecall);
+                        }
+                        else
+                        {
+                            ExcelImportModel.RejectedRows.Add(vehicleRecall);
+                        }
                     }
                 }
 
