@@ -7,6 +7,7 @@ namespace Workshop.Web.Models
 
         public List<VehicleRecallDTO> ImportedRows { get; set; } = new List <VehicleRecallDTO>();
         public List<VehicleRecallDTO> RejectedRows { get; set; } = new List<VehicleRecallDTO>();
+        public List<string> Errors { get; set; } = new List<string>();
 
     }
 }

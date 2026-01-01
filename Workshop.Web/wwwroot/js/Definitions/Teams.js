@@ -56,6 +56,16 @@
                 contentType: false,
                 success: function (response) {
                     $("#btnCreate").prop('disabled', false).html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+                    if (response === -1) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: RazorVars.duplicateCode,
+                            text: RazorVars.duplicateTeam,
+                            confirmButtonText: RazorVars.btnOk,
+                            confirmButtonColor: '#dc3545'
+                        });
+                        return;
+                    }
                     Swal.fire({
                         icon: 'success',
                         title: resources.success_msg,

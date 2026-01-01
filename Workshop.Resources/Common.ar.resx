@@ -2505,6 +2505,60 @@
   <data name="Recall_fixed" xml:space="preserve">
     <value>تم تصليح الطلب</value>
   </data>
+  <data name="Title_AccountDefinition" xml:space="preserve">
+    <value>تعريف الحساب</value>
+  </data>
+  <data name="Label_JournalName" xml:space="preserve">
+    <value>اسم اليومية</value>
+  </data>
+  <data name="Label_WIPAccount" xml:space="preserve">
+    <value>حساب تحت التنفيذ</value>
+  </data>
+  <data name="Label_MaintenanceAccount" xml:space="preserve">
+    <value>حساب الصيانة</value>
+  </data>
+  <data name="Label_AccessoriesAccount" xml:space="preserve">
+    <value>حساب الملحقات</value>
+  </data>
+  <data name="Label_AccidentAccount" xml:space="preserve">
+    <value>حساب الحوادث</value>
+  </data>
+  <data name="Label_MaintenanceProjectsAccount" xml:space="preserve">
+    <value>حساب مشاريع الصيانة</value>
+  </data>
+  <data name="Label_InternalCostPart" xml:space="preserve">
+    <value>تكلفة داخلية - قطع</value>
+  </data>
+  <data name="Label_InternalCostLabour" xml:space="preserve">
+    <value>تكلفة داخلية - أجور</value>
+  </data>
+  <data name="Label_ExternalCostPart" xml:space="preserve">
+    <value>تكلفة خارجية - قطع</value>
+  </data>
+  <data name="Label_ExternalCostLabour" xml:space="preserve">
+    <value>تكلفة خارجية - أجور</value>
+  </data>
+  <data name="Label_InternalRevenuePart" xml:space="preserve">
+    <value>إيراد داخلي - قطع</value>
+  </data>
+  <data name="Label_InternalRevenueLabour" xml:space="preserve">
+    <value>إيراد داخلي - أجور</value>
+  </data>
+  <data name="Label_PettyCashExpenseType" xml:space="preserve">
+    <value>نوع مصروف الصندوق النثري</value>
+  </data>
+  <data name="DefaultRate" xml:space="preserve">
+    <value>المعدل الإفتراضي</value>
+  </data>
+  <data name="Label_Company" xml:space="preserve">
+    <value>الشركة</value>
+  </data>
+  <data name="Duplicate_Code" xml:space="preserve">
+    <value>كود مكرر</value>
+  </data>
+  <data name="Duplicate_Team" xml:space="preserve">
+    <value>يوجد فريق مسجل مسبقًا بنفس الكود. يرجى اختيار كود مختلف.</value>
+  </data>
   <data name="Label_Company" xml:space="preserve">
     <value>العميل (شركة)</value>
   </data>

@@ -239,10 +239,7 @@ $(function () {
 
                     if (!partialInvoicing && (!rowData.AccountType || rowData.AccountType === 0)) {
                         rowData.AccountType = accountTypeVal;
-                    } else if (partialInvoicing) {
-
-                        rowData.AccountType = null;
-                    }
+                    } 
 
                     return rowData.AccountType;
                 }
