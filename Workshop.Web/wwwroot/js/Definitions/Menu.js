@@ -313,7 +313,7 @@
                     Description: Lang == "en" ? result.primaryDescription : result.secondaryDescription,
                     Quantity: 1,
                     StandardHours: result.standardHours,
-                    Price: 0,
+                    Price: result.defaultRate,
                     Discount: 0,
                     Total: 0,
                     IsPart: false
@@ -360,7 +360,7 @@
                     Description: Lang == "en" ? result.primaryName : result.secondaryName,
                     Quantity: 1,
                     StandardHours: 1,
-                    Price: result.price,
+                    Price: result.salePrice,
                     Discount: 0,
                     Total: 0,
                     IsPart: true

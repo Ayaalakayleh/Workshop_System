@@ -2505,4 +2505,10 @@
   <data name="Recall_fixed" xml:space="preserve">
     <value>Recall fixed successfully</value>
   </data>
+  <data name="Label_Company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="Label_WithSalePrice" xml:space="preserve">
+    <value>with sale price</value>
+  </data>
 </root>
