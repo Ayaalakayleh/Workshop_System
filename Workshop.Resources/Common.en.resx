@@ -460,7 +460,7 @@
     <value>Efficiency</value>
   </data>
   <data name="DOW" xml:space="preserve">
-    <value>Day Of Week</value>
+    <value>Working Days</value>
   </data>
   <data name="SpanMidnight" xml:space="preserve">
     <value>Span Midnight</value>
@@ -2559,10 +2559,10 @@
   <data name="Duplicate_Team" xml:space="preserve">
     <value>A team with this code already exists. Please choose a different code.</value>
   </data>
-  <data name="Label_Company" xml:space="preserve">
-    <value>Company</value>
-  </data>
   <data name="Label_WithSalePrice" xml:space="preserve">
     <value>with sale price</value>
+  </data>
+  <data name="TimeFromMustBeBeforeTo" xml:space="preserve">
+    <value>Time From Must Be Before To</value>
   </data>
 </root>

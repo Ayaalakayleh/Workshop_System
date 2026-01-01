@@ -63,13 +63,43 @@ function normalizeTech(raw) {
     };
 }
 
+function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+}
+
+/**
+ * NEW: Build technician image URL exactly like the card does.
+ * This fixes broken images in modals (pin / pattern / pinType).
+ */
+function getTechImageUrl(tech) {
+    return `${window.RazorVars.getImageUrl}?Name=${encodeURIComponent(tech.fileName || '')}&D=17&BasePath=${encodeURIComponent(tech.filePath || '')}&IsExternal=false`;
+}
+
+/**
+ * NEW: Set technician photo into a container element (modal areas),
+ * using the same URL builder as the card.
+ */
+function setTechPhoto(containerEl, tech) {
+    if (!containerEl) return;
+
+    if (tech?.hasPhoto) {
+        containerEl.innerHTML = `<img src="${getTechImageUrl(tech)}" alt="Technician">`;
+        containerEl.classList.remove('no-photo');
+    } else {
+        containerEl.innerHTML = '🔧';
+        containerEl.classList.add('no-photo');
+    }
+}
+
 function createTechnicianCard(tech, index) {
     const statusClass = tech.status === 'available' ? 'available' : tech.status === 'busy' ? 'busy' : 'normal';
-
     const statusText = tech.status === 'available' ? i18n.nowor : tech.status === 'busy' ? (tech.time || i18n.nowor) : i18n.nowor;
 
-    const uploadsBasePath = `${window.RazorVars.getImageUrl}?Name=${encodeURIComponent(tech.fileName || '')}&D=17&BasePath=${encodeURIComponent(tech.filePath || '')}&IsExternal=false`;
-
+    // Card image URL (working)
+    const uploadsBasePath = getTechImageUrl(tech);
     const photoContent = `<img src="${uploadsBasePath}" alt="${tech.id}" class="technician-photo">`;
 
     return `
@@ -84,55 +114,58 @@ function createTechnicianCard(tech, index) {
     </div>`;
 }
 
-function escapeHtml(s) {
-    if (!s) return '';
-    return String(s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; });
-}
-
-function renderTechnicians() {
-    const grid = document.getElementById('techniciansGrid');
-    if (!grid) return;
-    const normalized = technicians.map(t => normalizeTech(t)).filter(Boolean);
-    technicians = normalized; // replace with normalized list
-
-    grid.innerHTML = technicians.map((tech, idx) => createTechnicianCard(tech, idx)).join('');
-    document.querySelectorAll('.technician-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            const index = parseInt(e.currentTarget.getAttribute('data-index'));
-            openPinTypeModal(technicians[index]);
-        });
-    });
-}
-
-// ===== Modals =====
-function openPinTypeModal(technician) {
-    console.log(technician);
+/**
+ * NEW: centralize "technician selection" + hidden input setup (was inside openPinTypeModal)
+ */
+function selectTechnician(technician) {
     selectedTechnician = technician;
-    const modal = document.getElementById('pinTypeModal');
-    if (!modal) return;
-    const nameEl = document.getElementById('pinTypeName');
-    if (nameEl) nameEl.textContent = `${technician.id} - ${technician.primaryName}`;
 
     const hiddenInput = document.getElementById('technicianHidden');
     if (hiddenInput) {
-        // Ensure the object sent to server includes a PIN property named 'PIN' and Id
+        // Ensure object sent to server includes a PIN property named 'PIN' and Id
         const techForServer = Object.assign({}, selectedTechnician, {
             PIN: selectedTechnician.numericPin != null ? Number(selectedTechnician.numericPin) : null,
             Id: selectedTechnician.id
         });
         hiddenInput.value = JSON.stringify(techForServer);
     }
+}
 
+function renderTechnicians() {
+    const grid = document.getElementById('techniciansGrid');
+    if (!grid) return;
+
+    const normalized = technicians.map(t => normalizeTech(t)).filter(Boolean);
+    technicians = normalized; // replace with normalized list
+
+    grid.innerHTML = technicians.map((tech, idx) => createTechnicianCard(tech, idx)).join('');
+
+    // UPDATED: click technician card => open numeric modal directly (skip pinTypeModal)
+    document.querySelectorAll('.technician-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.getAttribute('data-index'));
+            const tech = technicians[index];
+            selectTechnician(tech);
+            openNumericModal(); // directly show PIN keypad
+        });
+    });
+}
+
+// ===== Modals =====
+// NOTE: pinTypeModal is no longer used on card click, but kept in case you still want it elsewhere.
+function openPinTypeModal(technician) {
+    console.log(technician);
+    selectTechnician(technician);
+
+    const modal = document.getElementById('pinTypeModal');
+    if (!modal) return;
+
+    const nameEl = document.getElementById('pinTypeName');
+    if (nameEl) nameEl.textContent = `${technician.id} - ${technician.primaryName}`;
+
+    // FIXED: use same image url as card
     const modalPhoto = document.getElementById('pinTypePhoto');
-    if (modalPhoto) {
-        if (technician.hasPhoto) {
-            modalPhoto.innerHTML = '<img src="' + (technician.filePath || '') + '" alt="Technician">';
-            modalPhoto.classList.remove('no-photo');
-        } else {
-            modalPhoto.innerHTML = '🔧';
-            modalPhoto.classList.add('no-photo');
-        }
-    }
+    setTechPhoto(modalPhoto, technician);
 
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
@@ -148,19 +181,13 @@ function openPatternModal() {
     closePinTypeModal();
     const modal = document.getElementById('patternModal');
     if (!modal) return;
+
     const nameEl = document.getElementById('modalName');
     if (nameEl) nameEl.textContent = `${selectedTechnician.id} - ${selectedTechnician.primaryName}`;
 
+    // FIXED: use same image url as card
     const modalPhoto = document.getElementById('modalPhoto');
-    if (modalPhoto) {
-        if (selectedTechnician.hasPhoto) {
-            modalPhoto.innerHTML = '<img src="' + (selectedTechnician.filePath || '') + '" alt="Technician">';
-            modalPhoto.classList.remove('no-photo');
-        } else {
-            modalPhoto.innerHTML = '🔧';
-            modalPhoto.classList.add('no-photo');
-        }
-    }
+    setTechPhoto(modalPhoto, selectedTechnician);
 
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
@@ -175,27 +202,26 @@ function closePatternModal() {
     selectedDots = [];
 }
 
+/**
+ * UPDATED: open numeric modal directly without pinType modal
+ * FIXED: photo uses same URL as card
+ */
 function openNumericModal() {
-    closePinTypeModal();
     const modal = document.getElementById('numericModal');
     if (!modal) return;
+
     const nameEl = document.getElementById('numericName');
     if (nameEl) nameEl.textContent = `${selectedTechnician.id} - ${selectedTechnician.primaryName}`;
 
+    // FIXED: use same image url as card
     const photo = document.getElementById('numericPhoto');
-    if (photo) {
-        if (selectedTechnician.hasPhoto) {
-            photo.innerHTML = '<img src="' + (selectedTechnician.filePath || '') + '" alt="Technician">';
-            photo.classList.remove('no-photo');
-        } else {
-            photo.innerHTML = '🔧';
-            photo.classList.add('no-photo');
-        }
-    }
+    setTechPhoto(photo, selectedTechnician);
 
     enteredPin = '';
     updatePinDisplay();
-    document.getElementById('numericError').textContent = '';
+    const err = document.getElementById('numericError');
+    if (err) err.textContent = '';
+
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
 }
@@ -229,7 +255,8 @@ function handleDeletePin() {
 function handleClearPin() {
     enteredPin = '';
     updatePinDisplay();
-    const el = document.getElementById('numericError'); if (el) el.textContent = '';
+    const el = document.getElementById('numericError');
+    if (el) el.textContent = '';
 }
 
 async function checkNumericPin() {
@@ -247,7 +274,7 @@ async function checkNumericPin() {
         try {
             console.log(getTechnician());
             const technicianObj = getTechnician();
-            const resp = await fetch(window.RazorVars.clockingUrl, {
+            await fetch(window.RazorVars.clockingUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(technicianObj)
@@ -273,7 +300,7 @@ function getTechnician() {
     let technician = technicianJson ? JSON.parse(technicianJson) : null;
 
     if (!gTechnician) return {};
-    try { return gTechnician } catch (e) { return {}; }
+    try { return gTechnician; } catch (e) { return {}; }
 }
 
 // ===== Pattern Lock =====
@@ -309,6 +336,7 @@ function initializePattern() {
     canvas.addEventListener('touchmove', handleMove, { passive: false });
     canvas.addEventListener('touchend', handleEnd);
 }
+
 function drawPattern(currentX, currentY) {
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -342,11 +370,13 @@ function drawPattern(currentX, currentY) {
         }
     });
 }
+
 function getCanvasCoordinates(e) {
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches ? e.touches[0] : e;
     return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
 }
+
 function getDotAtPosition(x, y) {
     const threshold = 30;
     return patternDots.findIndex(dot => {
@@ -354,6 +384,7 @@ function getDotAtPosition(x, y) {
         return Math.sqrt(dx * dx + dy * dy) < threshold;
     });
 }
+
 function handleStart(e) {
     if (e.type === 'touchstart') e.preventDefault();
     isDrawing = true;
@@ -361,38 +392,51 @@ function handleStart(e) {
     const idx = getDotAtPosition(coords.x, coords.y);
     if (idx !== -1 && !selectedDots.includes(idx)) { selectedDots.push(idx); drawPattern(); }
 }
+
 function handleMove(e) {
-    if (!isDrawing) return; if (e.type === 'touchmove') e.preventDefault();
+    if (!isDrawing) return;
+    if (e.type === 'touchmove') e.preventDefault();
     const coords = getCanvasCoordinates(e);
     const idx = getDotAtPosition(coords.x, coords.y);
     if (idx !== -1 && !selectedDots.includes(idx)) selectedDots.push(idx);
     drawPattern(coords.x, coords.y);
 }
+
 function handleEnd() {
-    if (!isDrawing) return; isDrawing = false; drawPattern(); checkPattern();
+    if (!isDrawing) return;
+    isDrawing = false;
+    drawPattern();
+    checkPattern();
 }
+
 function checkPattern() {
     const errorDiv = document.getElementById('patternError');
     if (!selectedTechnician) return;
+
     if (selectedDots.length < 4) {
         if (errorDiv) { errorDiv.style.color = '#dc2626'; errorDiv.textContent = i18n.patternTooShort; }
-        setTimeout(resetPattern, 1500); return;
+        setTimeout(resetPattern, 1500);
+        return;
     }
 
     const expected = selectedTechnician.pattern || null;
     if (!expected) {
         if (errorDiv) { errorDiv.style.color = '#dc2626'; errorDiv.textContent = 'Pattern not set for this user.'; }
-        setTimeout(resetPattern, 1500); return;
+        setTimeout(resetPattern, 1500);
+        return;
     }
 
     const isCorrect = selectedDots.length === expected.length && selectedDots.every((d, i) => d === expected[i]);
 
     if (isCorrect) {
         if (errorDiv) { errorDiv.style.color = '#10b981'; errorDiv.textContent = i18n.patternCorrect; }
-        // Initialize session on server then redirect like numeric PIN
         try {
             const technicianObj = selectedTechnician;
-            fetch(window.RazorVars.clockingUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(technicianObj) })
+            fetch(window.RazorVars.clockingUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(technicianObj)
+            })
                 .then(() => { window.location.href = window.RazorVars.clockingUrl; })
                 .catch(err => console.error(err));
         } catch (err) { console.error(err); }
@@ -401,9 +445,16 @@ function checkPattern() {
         setTimeout(resetPattern, 1500);
     }
 }
-function resetPattern() { selectedDots = []; const err = document.getElementById('patternError'); if (err) err.textContent = ''; drawPattern(); }
+
+function resetPattern() {
+    selectedDots = [];
+    const err = document.getElementById('patternError');
+    if (err) err.textContent = '';
+    drawPattern();
+}
 
 // ===== Wire Up =====
+// NOTE: pinType modal wiring is optional now. You can remove these if you remove that modal from HTML.
 document.getElementById('closePinType')?.addEventListener('click', closePinTypeModal);
 document.getElementById('choosePattern')?.addEventListener('click', openPatternModal);
 document.getElementById('chooseNumeric')?.addEventListener('click', openNumericModal);
@@ -415,11 +466,19 @@ document.getElementById('closeNumeric')?.addEventListener('click', closeNumericM
 document.getElementById('clearPin')?.addEventListener('click', handleClearPin);
 document.getElementById('deletePin')?.addEventListener('click', handleDeletePin);
 
-document.querySelectorAll('.num-btn[data-num]').forEach(btn => { btn.addEventListener('click', () => handleNumericInput(btn.getAttribute('data-num'))); });
+document.querySelectorAll('.num-btn[data-num]').forEach(btn => {
+    btn.addEventListener('click', () => handleNumericInput(btn.getAttribute('data-num')));
+});
 
-document.getElementById('pinTypeModal')?.addEventListener('click', (e) => { if (e.target.id === 'pinTypeModal') closePinTypeModal(); });
-document.getElementById('patternModal')?.addEventListener('click', (e) => { if (e.target.id === 'patternModal') closePatternModal(); });
-document.getElementById('numericModal')?.addEventListener('click', (e) => { if (e.target.id === 'numericModal') closeNumericModal(); });
+document.getElementById('pinTypeModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'pinTypeModal') closePinTypeModal();
+});
+document.getElementById('patternModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'patternModal') closePatternModal();
+});
+document.getElementById('numericModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'numericModal') closeNumericModal();
+});
 
 updateTime();
 setInterval(updateTime, 1000);
@@ -431,14 +490,15 @@ $(document).ready(function () {
         .done(function (data) { technicians = data || []; renderTechnicians(); })
         .fail(function (err) { console.error('Failed to load technicians', err); });
 });
+
 var gTechnician;
+
 async function checkPin(PIN) {
     // Try to get technician from hidden input first, fall back to selectedTechnician (set when card clicked)
     const technicianJson = document.getElementById('technicianHidden')?.value;
     let technician = technicianJson ? JSON.parse(technicianJson) : null;
 
     if (!technician) {
-        // use the in-memory selectedTechnician object if available
         technician = selectedTechnician || null;
     }
 
@@ -446,7 +506,9 @@ async function checkPin(PIN) {
         console.warn('checkPin: no technician available to verify');
         return false;
     }
+
     gTechnician = technician;
+
     try {
         // Build payload with correct property names expected by server
         const payload = {

@@ -460,7 +460,7 @@
     <value>الكفاءة</value>
   </data>
   <data name="DOW" xml:space="preserve">
-    <value>يوم الأسبوع</value>
+    <value>أيام العمل</value>
   </data>
   <data name="SpanMidnight" xml:space="preserve">
     <value>دوام منتصف الليل</value>
@@ -2551,7 +2551,7 @@
     <value>المعدل الإفتراضي</value>
   </data>
   <data name="Label_Company" xml:space="preserve">
-    <value>الشركة</value>
+    <value>العميل (شركة)</value>
   </data>
   <data name="Duplicate_Code" xml:space="preserve">
     <value>كود مكرر</value>
@@ -2559,10 +2559,10 @@
   <data name="Duplicate_Team" xml:space="preserve">
     <value>يوجد فريق مسجل مسبقًا بنفس الكود. يرجى اختيار كود مختلف.</value>
   </data>
-  <data name="Label_Company" xml:space="preserve">
-    <value>العميل (شركة)</value>
-  </data>
   <data name="Label_WithSalePrice" xml:space="preserve">
     <value>يعرض مع سعر البيع</value>
+  </data>
+  <data name="TimeFromMustBeBeforeTo" xml:space="preserve">
+    <value>يجب أن يكون الوقت السابق قبل اللاحق</value>
   </data>
 </root>
