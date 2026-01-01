@@ -257,7 +257,7 @@ $(function () {
         var excludeId = $("#Id").val() || null;
 
         $.ajax({
-            url: '/Recall/CheckRecallCodeUnique',
+            url: window.RazorVars.CheckRecallCodeUniqueUrl,
             type: 'GET',
             data: { code: code.trim(), excludeId: excludeId },
             success: function (response) {
