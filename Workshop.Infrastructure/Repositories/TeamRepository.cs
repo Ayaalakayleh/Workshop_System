@@ -44,7 +44,11 @@ namespace Workshop.Infrastructure.Repositories
                     "Teams_Add",
                     parameters,
                     commandType: CommandType.StoredProcedure);
-                return newTeamId;
+            if (newTeamId == -1)
+            {
+                return -1; // duplicate code
+            }
+            return newTeamId;
         }
         public async Task<int> DeleteTeamAsync(int id)
         {

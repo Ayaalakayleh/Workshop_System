@@ -143,8 +143,11 @@ namespace Workshop.Web.Controllers
                     Technicians = updatedTeam.Technicians
 
                 };
-                await _teamsService.AddTeamAsync(teamToAdd);
-
+                var result = await _teamsService.AddTeamAsync(teamToAdd);
+                if (result == -1)
+                {
+                    return Json(-1); //duplicate
+                }
             }
 
             return RedirectToAction(INDEX_PAGE);
@@ -163,7 +166,8 @@ namespace Workshop.Web.Controllers
                 }
                 else
                 {
-                    return Ok(new { success = false, result = result, message = "Team could not be deleted. It may be in use." });
+                    return Ok(new { success = false, result = result, message = lang ==  "en" ? "You cannot delete this team while technicians are assigned to it.":
+                        "لا يمكن حذف الفريق طالما يوجد فنيون مرتبطون به." });
                 }
             }
             catch (Exception ex)
