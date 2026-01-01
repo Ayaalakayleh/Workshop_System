@@ -316,6 +316,7 @@ function WIPChange(controlItem) {
                         text: item.text
                     }));
                 });
+                labourControl.trigger('change');
             }
         },
         error: function () {
@@ -513,6 +514,27 @@ $(function () {
         }
     );
 });
+
+$(document).on('change', '#labourSelect', function () {
+    const txt = $('#labourSelect option:selected').text() || '';
+
+    const lastPart = txt.split('-').pop().trim();
+    const keyId = parseInt(lastPart, 10);
+
+    $('#rtsKeyIdHidden').val(isNaN(keyId) ? '' : keyId);
+});
+//$(document).on('change', '#labourSelect', function () {
+//    const val = $(this).val() || '';   
+//    const parts = val.split('|');
+
+//    const rtsId = parts[0] || '';
+//    const keyId = parts[1] || '';
+
+//    $('#ClockingForm_RTSID').val(rtsId);
+
+//    $('#rtsKeyIdHidden').val(keyId);
+//});
+
 
 // Append this to Clocking.js (or include as a separate script after it)
 // Computes "Duration From" = (now - StartedAt) - lastBreakDuration (if any) and updates the Active table every second.

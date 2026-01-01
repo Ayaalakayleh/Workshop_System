@@ -224,8 +224,10 @@ namespace Workshop.Web.Controllers
                         var schedules = await _apiClient.GetClockingFilter();
                         main.Labourlines = schedules?.Select(s => new CreateWIPServiceDTO { Id = (s.RTSId ?? 0), StandardHours = 0 }).ToList() ?? new List<CreateWIPServiceDTO>();
                     }
-                    //Check logic here again
-                    var Rlabour = main?.RTSCodes?.FirstOrDefault(s => s.Id == clocking.ClockingForm.RTSID);
+
+                    //var Rlabour = main?.RTSCodes?.FirstOrDefault(s => s.KeyId == clocking.ClockingForm.RTSID && s.WIPId == clocking.ClockingForm.WIPID);
+                    var Rlabour = main?.RTSCodes?.FirstOrDefault(s => s.RTSId == clocking.ClockingForm.RTSID && s.WIPId == clocking.ClockingForm.WIPID);
+                    
                     clocking.ClockingForm.AllowedTime = Rlabour?.StandardHours ?? 0;
 
                     main.ClockingList = main.ClockingList ?? new List<ClockingDTO>();
@@ -234,7 +236,21 @@ namespace Workshop.Web.Controllers
                     var checkForNullValues = (clocking.ClockingForm.RTSID == null || clocking.ClockingForm.WIPID == null);
                     if (!currentClocking && !checkForNullValues)
                     {
-                        
+                        var _services = await _apiClient.WIP_GetServicesById(clocking.ClockingForm.WIPID ?? 0);
+
+                        var bServiceIds = _services.Where(s => s?.Status == 19).Select(s => (KeyId: s?.KeyId ?? 0, RTSId: s?.Id ?? 0)).ToHashSet();
+
+                        main.RTSCodes ??= await _apiClient.GetClockingFilter();
+
+                        var scheduleRow = main.RTSCodes.FirstOrDefault(s =>
+                            s.WIPId == (clocking.ClockingForm.WIPID ?? 0) &&
+                            (s.RTSId ?? 0) == (clocking.ClockingForm.RTSID ?? 0) &&
+                            s.TechnicianId == (main.SelectedTechnician ?? clocking.ClockingForm.TechnicianID) &&
+                            bServiceIds.Contains((s.KeyId ?? 0, s.RTSId ?? 0))
+                        );
+
+                        clocking.ClockingForm.KeyId = scheduleRow?.KeyId ?? 0;
+
                         var result = await _apiClient.InsertClock(clocking.ClockingForm);
                         if (result != null && result > 0)
                         {
@@ -267,19 +283,25 @@ namespace Workshop.Web.Controllers
             var WIPSchedules = await _apiClient.GetClockingFilter();
 
             var bServiceIds = services
-      .Where(s => s?.Status == 19)
-      .Select(s => (KeyId: s?.KeyId ?? 0, Id: s?.Id))
-      .ToHashSet();
+              .Where(s => s?.Status == 19)
+              .Select(s => (KeyId: s?.KeyId ?? 0, Id: s?.Id))
+              .ToHashSet();
 
 
 
-            var serviceList = WIPSchedules?
+            var serviceList = WIPSchedules ?
                 .Where(s => s.WIPId == WIPId && bServiceIds.Contains((s.KeyId ?? 0, s.RTSId ?? 0)) && s.TechnicianId == main.SelectedTechnician)
-                .Select(x => new { x.RTSId, Text = lang == "en" ? x.RTSPrimaryName + " - " + x.KeyId : x.RTSSecondaryName + " - " + x.KeyId })
+                .Select(x => new 
+                {
+                    RTSId = x.RTSId ?? 0,
+                    KeyId = x.KeyId ?? 0,
+                    Text = lang == "en"
+                        ? x.RTSPrimaryName + " - " + (x.KeyId ?? 0)
+                        : x.RTSSecondaryName + " - " + (x.KeyId ?? 0)
+                })
                 .Distinct()
-                .Select(x => new SelectListItem { Value = x.RTSId.ToString(), Text = x.Text })
-                .ToList()
-                ?? new List<SelectListItem>();
+                .Select(x => new SelectListItem{ Value = x.RTSId.ToString(), Text = x.Text })
+                .ToList() ?? new List<SelectListItem>();
 
             main.LabourlinesSelectList = serviceList;
             SaveMainModel(main);
@@ -297,7 +319,7 @@ namespace Workshop.Web.Controllers
                 .Distinct()
                 .Select(x => new SelectListItem { Value = x.WIPId.ToString(), Text = x.Text })
                 .ToList() ?? new List<SelectListItem>();
-            
+
             main.WIPSSelectList = serviceList;
             main.SelectedTechnician = TechnicianID;
             SaveMainModel(main);
@@ -340,7 +362,7 @@ namespace Workshop.Web.Controllers
                 {
                     clockItem.StatusID = (int)Status.Break;
                     clockItem.EndedAt = DateTime.Now;
-                    
+
                     if (clockItem.Elapsed == null) clockItem.Elapsed = TimeSpan.Zero;
                     clockItem.Breaks = (clockItem.Breaks ?? 0) + 1;
 
@@ -429,7 +451,7 @@ namespace Workshop.Web.Controllers
             main.ClockingBreakForm = dTO.ClockingBreakForm;
             SaveMainModel(main);
             await BreakClock(dTO.ClockingBreakForm.ClockingID ?? 0, (int)Status.Break);
-            
+
             return RedirectToAction(nameof(Clocking));
         }
 
@@ -446,7 +468,7 @@ namespace Workshop.Web.Controllers
                     main?.LabourlinesSelectList?.RemoveAll(s => s.Value == item.RTSID.ToString());
                 }
 
-              
+
 
                 SaveMainModel(main);
             }
@@ -539,7 +561,7 @@ namespace Workshop.Web.Controllers
                 var technicians = await _apiClient.GetTechniciansDDL(BranchId);
                 var wipSchedules = await _apiClient.GetClockingFilter();
                 var reasons = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(5, CompanyId);
-                var rtsCodes = await _apiClient.GetAllRTSCodesDDLAsync();
+                var rtsCodes = await _apiClient.GetClockingFilter();
 
                 // Prefer the authoritative API list for the dropdown. If the session contains a previously
                 // selected single technician, ensure that technician appears in the list as well so it shows in the dropdown.
@@ -573,7 +595,7 @@ namespace Workshop.Web.Controllers
                 }
                 main.WIPSSelectList = main.WIPSSelectList ?? new List<SelectListItem>();
                 main.LabourlinesSelectList = main.LabourlinesSelectList ?? new List<SelectListItem>();
-                main.RTSCodes = rtsCodes ?? Enumerable.Empty<RTSCodeDTO>();
+                main.RTSCodes = rtsCodes ?? Enumerable.Empty<GetClockingFilter>();
                 main.Reasons = reasons ?? new List<LookupDetailsDTO>();
 
                 var clocks = (await _apiClient.GetClocksAsync())?.ToList() ?? new List<ClockingDTO>();
@@ -587,7 +609,8 @@ namespace Workshop.Web.Controllers
                 {
                     item.TechnicianName = technicians?.FirstOrDefault(t => item.TechnicianID == t.Id)?.PrimaryName;
                     item.WIPName = wipSchedules?.FirstOrDefault(w => w.WIPId == item.WIPID) is var w && w != null ? "WIP - " + w.WIPId : null;
-                    item.RTSName = rtsCodes?.FirstOrDefault(r => r.Id == item.RTSID) is var rts && rts != null ? (lang == "en" ? rts.PrimaryDescription : rts.SecondaryDescription) : null;
+                    //item.RTSName = rtsCodes?.FirstOrDefault(r => r.Id == item.RTSID) is var rts && rts != null ? (lang == "en" ? rts.PrimaryDescription : rts.SecondaryDescription) : null;
+                    item.RTSName = rtsCodes?.FirstOrDefault(r => r.RTSId == item.RTSID) is var rts && rts != null ? (lang == "en" ? rts.RTSPrimaryDescription : rts.RTSSecondaryDescription) : null;
 
                     item.StatusName = Enum.TryParse<Status>(item.StatusID.ToString(), out var st) ? st : default;
                     item.LastBreak = clocksBreaks.Where(b => b.ClockingID == item.ID).OrderByDescending(d => d.StartAt).FirstOrDefault();
@@ -635,7 +658,7 @@ namespace Workshop.Web.Controllers
                 {
                     item.TechnicianName = technicians?.FirstOrDefault(t => item.TechnicianID == t.Id)?.PrimaryName;
                     item.WIPName = wipSchedules?.FirstOrDefault(w => w.WIPId == item.WIPID) is var w2 && w2 != null ? "WIP - " + w2.WIPId : null;
-                    item.RTSName = rtsCodes?.FirstOrDefault(r => r.Id == item.RTSID) is var r2 && r2 != null ? (lang == "en" ? r2.PrimaryDescription : r2.SecondaryDescription) : null;
+                    item.RTSName = rtsCodes?.FirstOrDefault(r => r.KeyId == item.RTSID) is var r2 && r2 != null ? (lang == "en" ? r2.RTSPrimaryDescription : r2.RTSSecondaryDescription) : null;
 
                     item.StatusName = Enum.TryParse<Status>(item.StatusID.ToString(), out var st2) ? st2 : default;
                     item.Elapsed = item.EndedAt - item.StartedAt;
