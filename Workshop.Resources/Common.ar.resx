@@ -2559,4 +2559,10 @@
   <data name="Duplicate_Team" xml:space="preserve">
     <value>يوجد فريق مسجل مسبقًا بنفس الكود. يرجى اختيار كود مختلف.</value>
   </data>
+  <data name="Label_Company" xml:space="preserve">
+    <value>العميل (شركة)</value>
+  </data>
+  <data name="Label_WithSalePrice" xml:space="preserve">
+    <value>يعرض مع سعر البيع</value>
+  </data>
 </root>
