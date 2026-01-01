@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using NPOI.HPSF;
 using Workshop.Core.DTOs;
 using Workshop.Infrastructure;
 using Workshop.Web.Models;
@@ -117,26 +118,33 @@ namespace Workshop.Web.Controllers
 
             if (TechnicianPhoto != null && TechnicianPhoto.Length > 0)
             {
-                var relativePath = base._configuration["FileUpload:DirectoryPath"];
-                var guid = Guid.NewGuid().ToString();
-
-                // Combine with wwwroot to get the absolute path
-                var folderPath = Path.Combine(base._env.WebRootPath, relativePath, "TechnicianPhoto", guid);
-
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                var filename = $"{DateTime.Now.Ticks}{Path.GetExtension(TechnicianPhoto.FileName)}";
-                var fullPath = Path.Combine(folderPath, filename);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                if (TechnicianPhoto.FileName != "blob")
                 {
-                    await TechnicianPhoto.CopyToAsync(stream);
-                }
+                    var relativePath = base._configuration["FileUpload:DirectoryPath"];
+                    var guid = Guid.NewGuid().ToString();
 
-                // Save only the relative part for later public access
-                dto.FilePath = Path.Combine("TechnicianPhoto", guid).Replace("\\", "/");
-                dto.FileName = filename;
+                    // Combine with wwwroot to get the absolute path
+                    var folderPath = Path.Combine(base._env.WebRootPath, relativePath, "TechnicianPhoto", guid);
+
+                    if (!Directory.Exists(folderPath))
+                        Directory.CreateDirectory(folderPath);
+
+                    var filename = $"{DateTime.Now.Ticks}{Path.GetExtension(TechnicianPhoto.FileName)}";
+                    var fullPath = Path.Combine(folderPath, filename);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await TechnicianPhoto.CopyToAsync(stream);
+                    }
+
+                    // Save only the relative part for later public access
+                    dto.FilePath = Path.Combine("TechnicianPhoto", guid).Replace("\\", "/");
+                    dto.FileName = filename;
+                }
+            }else if (TechnicianPhoto == null && dto.Id > 0)
+            {
+                dto.FilePath = null;
+                dto.FileName = null;
             }
 
             if (dto.Id == 0)

@@ -2,6 +2,7 @@
 const VALIDATION = (typeof window !== "undefined" && window.VALIDATION) ? window.VALIDATION : {};
 
 var counter = -1;
+var importCounter = 0;
 
 $(function () {
 
@@ -117,7 +118,7 @@ $(function () {
 
             }, {
                 dataField: "RecallStatus",
-                caption: LABELS.Status || "Status",
+                caption: theMainLang == "en" ? "Status" : "الحالة",
                 allowEditing: false,
                 validationRules: [
   
@@ -168,7 +169,7 @@ $(function () {
                 MakeID: ((typeof MakeID !== "undefined" && MakeID) ? MakeID : []).map(v => v.Text),
                 ModelID: ((typeof Vehicle !== "undefined" && Vehicle) ? Vehicle : []).map(v => v.Name),
                 Chassis: ((typeof Chasses !== "undefined" && Chasses) ? Chasses : []).map(v => v.ChassisNo),
-                RecallStatus: ((typeof VehcileStatuses !== "undefined" && VehcileStatuses) ? VehcileStatuses : []).map(v => v.Text)
+                //RecallStatus: ((typeof VehcileStatuses !== "undefined" && VehcileStatuses) ? VehcileStatuses : []).map(v => v.Text)
             };
 
             let colStart = 1;
@@ -188,6 +189,7 @@ $(function () {
             if (originalLength === 0) {
                 addedDummy = true;
                 data.push({ Id: counter--, MakeID: null, ModelID: null, Chassis: '' });
+                data.push({ Id: counter--, MakeID: 0, ModelID: 0, Chassis: '' });
             }
 
             DevExpress.excelExporter.exportDataGrid({
@@ -205,6 +207,7 @@ $(function () {
             }).then(function () {
                 // Remove dummy row if added
                 if (addedDummy && data.length > originalLength) {
+                    data.pop();
                     data.pop();
                 }
                 workbook.xlsx.writeBuffer().then(function (buffer) {
@@ -502,12 +505,27 @@ $(function () {
             processData: false,
             contentType: false,
             success: function (res) {
+                // Check for validation errors
+                if (res.errors && res.errors.length > 0) {
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: LABELS.Error || 'Import Failed',
+                            text: res.errors.join('\n')
+                        });
+                    } else {
+                        alert('Import failed:\n' + res.errors.join('\n'));
+                    }
+                    return;
+                }
+
                 (res.importedRows || []).forEach(r => {
                     grid.getDataSource().store().insert({
-                        Id: parseInt(r.Id) || (counter--),
+                        Id: parseInt(r.id) || counter--,
                         MakeID: r.makeID,
                         ModelID: r.modelID,
-                        Chassis: r.chassis
+                        Chassis: r.chassis,
+                        RecallStatus: r.recallStatus
                     }).then(() => grid.refresh());
                 });
                 grid.refresh();

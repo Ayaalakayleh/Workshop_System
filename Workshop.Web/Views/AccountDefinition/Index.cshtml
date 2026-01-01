@@ -15,108 +15,185 @@
 	<div class="col-12">
 		<div id="panel-1" class="panel">
 			<div class="panel-hdr">
-				<h2 class="font-weight-bold">Account Definition</h2>
+				<h2 class="font-weight-bold">@Common["Title_AccountDefinition"]</h2>
 			</div>
 			<div class="panel-container show">
 				<div class="panel-content">
 
 					@using (Html.BeginForm("Edit", "AccountDefinition", FormMethod.Post, new { enctype = "multipart/form-data", id = "AccountDefinitionForm" }))
 					{
-						@Html.HiddenFor(x=>x.Id)
+						@Html.HiddenFor(x => x.Id)
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>Journal Name</label>
-									@Html.DropDownListFor(m => m.JournalId, new SelectList(ViewBag.TransTypeTable ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>WIP Account</label>
-									@Html.DropDownListFor(m => m.WIPAccountId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Maintenance Account</label>
-									@Html.DropDownListFor(m => m.MaintenanceAccountId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Accessories Account</label>
-									@Html.DropDownListFor(m => m.AccessoriesAccountId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Accident Account</label>
-									@Html.DropDownListFor(m => m.AccidentAccountId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Maintenance Projects Account</label>
-									@Html.DropDownListFor(m => m.MaintenanceProjectsAccountId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Internal Cost Part</label>
-									@Html.DropDownListFor(m => m.InternalCostPartId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Internal Cost Labour</label>
-									@Html.DropDownListFor(m => m.InternalCostLabourId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>External Cost Part</label>
-									@Html.DropDownListFor(m => m.ExternalCostPartId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>External Cost Labour</label>
-									@Html.DropDownListFor(m => m.ExternalCostLabourId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Internal Revenue Part</label>
-									@Html.DropDownListFor(m => m.InternalRevenuePartId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Internal Revenue Labour</label>
-									@Html.DropDownListFor(m => m.InternalRevenueLabourId, new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Invoice Type </label>
-									@Html.DropDownListFor(m => m.InvoiceTypeId, new SelectList(ViewBag.InvoiceTypes ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>PettyCash Expens Type </label>
-									@Html.DropDownListFor(m => m.PettyCashExpenseTypeId, new SelectList(ViewBag.directExpenseTypes ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control" })
-								</div>
+									<label>@Common["Label_JournalName"]</label>
+									@Html.DropDownListFor(
+									m => m.JournalId,
+																new SelectList(ViewBag.TransTypeTable ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
 							</div>
 						</div>
-						@if (PermissionHelper.UserHasPermission (Permissions.AccountDefinitions.Create))
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_WIPAccount"]</label>
+								@Html.DropDownListFor(
+																m => m.WIPAccountId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_MaintenanceAccount"]</label>
+								@Html.DropDownListFor(
+																m => m.MaintenanceAccountId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_AccessoriesAccount"]</label>
+								@Html.DropDownListFor(
+																m => m.AccessoriesAccountId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_AccidentAccount"]</label>
+								@Html.DropDownListFor(
+																m => m.AccidentAccountId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_MaintenanceProjectsAccount"]</label>
+								@Html.DropDownListFor(
+																m => m.MaintenanceProjectsAccountId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_InternalCostPart"]</label>
+								@Html.DropDownListFor(
+																m => m.InternalCostPartId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_InternalCostLabour"]</label>
+								@Html.DropDownListFor(
+																m => m.InternalCostLabourId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_ExternalCostPart"]</label>
+								@Html.DropDownListFor(
+																m => m.ExternalCostPartId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_ExternalCostLabour"]</label>
+								@Html.DropDownListFor(
+																m => m.ExternalCostLabourId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_InternalRevenuePart"]</label>
+								@Html.DropDownListFor(
+																m => m.InternalRevenuePartId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_InternalRevenueLabour"]</label>
+								@Html.DropDownListFor(
+																m => m.InternalRevenueLabourId,
+																new SelectList(ViewBag.Accounts ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_InvoiceType"]</label>
+								@Html.DropDownListFor(
+																m => m.InvoiceTypeId,
+																new SelectList(ViewBag.InvoiceTypes ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label>@Common["Label_PettyCashExpenseType"]</label>
+								@Html.DropDownListFor(
+																m => m.PettyCashExpenseTypeId,
+																new SelectList(ViewBag.directExpenseTypes ?? new List<SelectListItem>(), "Value", "Text"),
+																Common["Select"],
+																new { @class = "form-control" }
+																)
+							</div>
+						</div>
+					</div>
+
+					@if (PermissionHelper.UserHasPermission(Permissions.AccountDefinitions.Create))
 						{
 							<div class="text-center text-white my-3">
 								<button type="button" id="btnEdit" class="btn btn-info btn-w-m">
@@ -126,9 +203,7 @@
 									<i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
 								</button>
 							</div>
-						
 						}
-
 					}
 
 				</div>
@@ -137,10 +212,7 @@
 	</div>
 </div>
 
-
-
 <script>
-	
 </script>
 <script src="~/js/site.js"></script>
 <script src="~/js/definitions/AccountDefinition.js"></script>

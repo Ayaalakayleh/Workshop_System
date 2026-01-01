@@ -429,10 +429,10 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                // Deserialize grid data
-                var vehicles = JsonConvert.DeserializeObject<List<VehicleRecallDTO>>(GridData);
-                if (vehicles == null || !vehicles.Any())
-                    return View();
+            // Deserialize grid data
+            var vehicles = JsonConvert.DeserializeObject<List<VehicleRecallDTO>>(GridData);
+            if (vehicles == null || !vehicles.Any())
+                return View();
 
                 // Get data for dropdowns
                 var Makes = await GetMakes();       // List<Make> { Text, Value }
@@ -502,6 +502,7 @@ namespace Workshop.Web.Controllers
                 header.CreateCell(4).SetCellValue("ModelID");  // hidden
                 header.CreateCell(5).SetCellValue("Chassis");
                 header.CreateCell(6).SetCellValue("ChassisID");// hidden
+                header.CreateCell(7).SetCellValue("Status");
 
                 int rowCount = vehicles.Count;
 
@@ -528,6 +529,11 @@ namespace Workshop.Web.Controllers
                     string chassisText = vehicle.Chassis ?? "";
                     row.CreateCell(5).SetCellValue(chassisText);
                     row.CreateCell(6).SetCellFormula($"IF(F{i + 2}=\"\",\"\",VLOOKUP(F{i + 2},Lists!$E$1:$F${ChassisList.Count},2,FALSE))");
+
+                    // Status
+                    string statusText = vehicle.RecallStatus == (int)VehicleRecallStatus.Open ? "Open" :
+                                       vehicle.RecallStatus == (int)VehicleRecallStatus.Done ? "Done" : "";
+                    row.CreateCell(7).SetCellValue(statusText);
                 }
 
                 // ---------------------------
@@ -564,7 +570,7 @@ namespace Workshop.Web.Controllers
                 sheet.SetColumnHidden(6, true);
 
                 // Auto-size columns
-                for (int i = 0; i <= 6; i++)
+                for (int i = 0; i <= 7; i++)
                     sheet.AutoSizeColumn(i);
 
                 // ---------------------------
@@ -601,38 +607,66 @@ namespace Workshop.Web.Controllers
 
                 using (var wb = new XLWorkbook(ExcelVehicle.OpenReadStream()))
                 {
-                    var wsT = wb.Worksheet("Recall");
+                    var wsT = wb.Worksheet("Recall") ?? wb.Worksheet(1); // Try "Recall" sheet, fallback to first sheet
+                    if (wsT == null) return null;
+
+                    int headerRow = 1;
                     int startRow = 2;
-                    int lastRow = wsT.LastRowUsed()?.RowNumber() ?? startRow;
+                    var lastRowRange = wsT.LastRowUsed();
+                    int lastRow = lastRowRange != null ? lastRowRange.RowNumber() : startRow;
+
+                    Dictionary<string, int> columnMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                    // Possible column names (English and Arabic)
+                    var possibleMakeNames = new[] { "Make", "Manufacturer", "الشركة المصنِّعة", "MakeID" };
+                    var possibleModelNames = new[] { "Model", "الطراز", "ModelID" };
+                    var possibleChassisNames = new[] { "Chassis", "Chassis Number", "رقم الشاصي", "ChassisNo" };
+                    var possibleStatusNames = new[] { "Status", "حالة" };
+
+                    var lastColumnRange = wsT.LastColumnUsed();
+                    int lastCol = lastColumnRange != null ? lastColumnRange.ColumnNumber() : 0;
+                    for (int col = 1; col <= lastCol; col++)
+                    {
+                        var headerValue = wsT.Cell(headerRow, col).GetString()?.Trim();
+                        if (string.IsNullOrEmpty(headerValue)) continue;
+
+                        if (possibleMakeNames.Any(n => headerValue.Contains(n, StringComparison.OrdinalIgnoreCase)))
+                            columnMap["Make"] = col;
+                        else if (possibleModelNames.Any(n => headerValue.Contains(n, StringComparison.OrdinalIgnoreCase)))
+                            columnMap["Model"] = col;
+                        else if (possibleChassisNames.Any(n => headerValue.Contains(n, StringComparison.OrdinalIgnoreCase)))
+                            columnMap["Chassis"] = col;
+                        else if (possibleStatusNames.Any(n => headerValue.Contains(n, StringComparison.OrdinalIgnoreCase)))
+                            columnMap["Status"] = col;
+                    }
 
                     for (int r = startRow; r <= lastRow; r++)
                     {
-                        // Read all relevant cells as strings
-                        var excelID = string.IsNullOrWhiteSpace(wsT.Cell(r, 1).GetString())
-                            ? null
-                            : wsT.Cell(r, 1).GetString().Trim();
 
-                        var excelMakeText = string.IsNullOrWhiteSpace(wsT.Cell(r, 1).GetString())
-                            ? null
-                            : wsT.Cell(r, 1).GetString().Trim();
+                        string excelMakeText = null;
+                        string excelModelText = null;
+                        string excelChasse = null;
+                        string excelStatusText = null;
 
-                        var excelModelText = string.IsNullOrWhiteSpace(wsT.Cell(r, 2).GetString())
-                            ? null
-                            : wsT.Cell(r, 2).GetString().Trim();
+                        if (columnMap.TryGetValue("Make", out var makeCol))
+                            excelMakeText = wsT.Cell(r, makeCol).GetString()?.Trim();
 
-                        var excelChasse = string.IsNullOrWhiteSpace(wsT.Cell(r, 3).GetString())
-                            ? null
-                            : wsT.Cell(r, 3).GetString().Trim();
+                        if (columnMap.TryGetValue("Model", out var modelCol))
+                            excelModelText = wsT.Cell(r, modelCol).GetString()?.Trim();
 
-                        // Skip empty rows
-                        if (string.IsNullOrWhiteSpace(excelID) &&
-                            string.IsNullOrWhiteSpace(excelMakeText) &&
+                        if (columnMap.TryGetValue("Chassis", out var chassisCol))
+                            excelChasse = wsT.Cell(r, chassisCol).GetString()?.Trim();
+
+                        if (columnMap.TryGetValue("Status", out var statusCol))
+                            excelStatusText = wsT.Cell(r, statusCol).GetString()?.Trim();
+
+
+                        if (string.IsNullOrWhiteSpace(excelMakeText) &&
                             string.IsNullOrWhiteSpace(excelModelText) &&
-                            string.IsNullOrWhiteSpace(excelChasse))
+                            string.IsNullOrWhiteSpace(excelChasse) &&
+                            string.IsNullOrWhiteSpace(excelStatusText))
                             continue;
 
-
-                        // Map dropdown text to IDs
                         int? makeID = null;
                         int? modelID = null;
 
@@ -650,35 +684,45 @@ namespace Workshop.Web.Controllers
                                 modelID = modelMatch.Id;
                         }
 
-                        // Parse vehicle ID
-                        int vehicleID = 0;
-                        if (!string.IsNullOrEmpty(excelID))
-                            int.TryParse(excelID, out vehicleID);
 
-                        // Add to output
-
-                        if (makes.Any(g => g.Text == excelMakeText &&
-                            models.Any(a => a.Name == excelModelText && g.Value == a.ManufacturerId.ToString())))
+                        int? recallStatus = null;
+                        if (!string.IsNullOrEmpty(excelStatusText))
                         {
-                            ExcelImportModel.ImportedRows.Add(new VehicleRecallDTO
+                            if (excelStatusText.Equals("Open", StringComparison.OrdinalIgnoreCase))
+                                recallStatus = (int)VehicleRecallStatus.Open;
+                            else if (excelStatusText.Equals("Done", StringComparison.OrdinalIgnoreCase))
+                                recallStatus = (int)VehicleRecallStatus.Done;
+                        }
+
+                        var vehicleRecall = new VehicleRecallDTO
+                        {
+                            Id = null,
+                            MakeID = makeID,
+                            ModelID = modelID,
+                            Chassis = excelChasse,
+                            RecallStatus = recallStatus
+                        };
+
+                        // Validate model-manufacturer match
+                        bool isValid = true;
+                        if (makeID.HasValue && modelID.HasValue)
+                        {
+                            var model = models.FirstOrDefault(m => m.Id == modelID.Value);
+                            if (model != null && model.ManufacturerId != makeID.Value)
                             {
-                                Id = vehicleID,
-                                MakeID = makeID,
-                                ModelID = modelID,
-                                Chassis = excelChasse
-                            });
+                                isValid = false;
+                                ExcelImportModel.Errors.Add($"Row {r - headerRow}: Model '{excelModelText}' does not match manufacturer '{excelMakeText}'.");
+                            }
+                        }
+
+                        if (isValid)
+                        {
+                            ExcelImportModel.ImportedRows.Add(vehicleRecall);
                         }
                         else
                         {
-                            ExcelImportModel.RejectedRows.Add(new VehicleRecallDTO
-                            {
-                                Id = vehicleID,
-                                MakeID = makeID,
-                                ModelID = modelID,
-                                Chassis = excelChasse
-                            });
+                            ExcelImportModel.RejectedRows.Add(vehicleRecall);
                         }
-
                     }
                 }
 
