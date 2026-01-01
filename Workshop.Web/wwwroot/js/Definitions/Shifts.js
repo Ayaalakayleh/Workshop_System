@@ -161,7 +161,7 @@ $(function () {
                 } else {
                     Swal.fire({
                         icon: "error",
-                        title: RazorVars.required_week_days,
+                        title: RazorVars.required_field,
                         confirmButtonText: RazorVars.btnOk,
                         confirmButtonColor: "var(--primary-600)"
                     });
