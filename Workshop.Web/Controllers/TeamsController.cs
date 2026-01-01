@@ -143,8 +143,11 @@ namespace Workshop.Web.Controllers
                     Technicians = updatedTeam.Technicians
 
                 };
-                await _teamsService.AddTeamAsync(teamToAdd);
-
+                var result = await _teamsService.AddTeamAsync(teamToAdd);
+                if (result == -1)
+                {
+                    return Json(-1); //duplicate
+                }
             }
 
             return RedirectToAction(INDEX_PAGE);

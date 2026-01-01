@@ -2553,4 +2553,10 @@
   <data name="Label_Company" xml:space="preserve">
     <value>الشركة</value>
   </data>
+  <data name="Duplicate_Code" xml:space="preserve">
+    <value>كود مكرر</value>
+  </data>
+  <data name="Duplicate_Team" xml:space="preserve">
+    <value>يوجد فريق مسجل مسبقًا بنفس الكود. يرجى اختيار كود مختلف.</value>
+  </data>
 </root>
