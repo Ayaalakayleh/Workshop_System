@@ -1,5 +1,43 @@
 ﻿
 $(function () {
+    // Parse "HH:mm" or "HH:mm:ss" into minutes since midnight
+    function timeToMinutes(t) {
+        if (!t) return null;
+
+        const parts = t.split(":");
+        if (parts.length < 2) return null;
+
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+
+        if (Number.isNaN(h) || Number.isNaN(m)) return null;
+
+        return (h * 60) + m;
+    }
+
+    // Custom rule: "from" must be <= "to" (optionally only if both are filled)
+    $.validator.addMethod("timeRange", function (value, element, params) {
+        const $form = $(element).closest("form");
+
+        const fromVal = $form.find('[name="' + params.from + '"]').val();
+        const toVal = $form.find('[name="' + params.to + '"]').val();
+
+        // If both are empty → valid (let "required" handle required fields)
+        if (!fromVal && !toVal) return true;
+
+        // If one is empty → valid here (required rules decide if that's allowed)
+        if (!fromVal || !toVal) return true;
+
+        const fromMin = timeToMinutes(fromVal);
+        const toMin = timeToMinutes(toVal);
+
+        // If parsing fails, don't block here (optional) — or return false if you prefer strictness
+        if (fromMin === null || toMin === null) return true;
+
+        // invalid if from > to
+        return fromMin <= toMin;
+    }, RazorVars.invalid_time_range || "Invalid time range");
+
     // ----- Validation -----
     $("#shiftForm").validate({
         rules: {
@@ -8,9 +46,16 @@ $(function () {
             PrimaryName: { required: true },
 
             WorkingFromTime: { required: true },
-            WorkingToTime: { required: true },
+            WorkingToTime: {
+                required: true,
+                timeRange: { from: "WorkingFromTime", to: "WorkingToTime" }
+            },
+
             BreakFromTime: { required: false },
-            BreakToTime: { required: false }
+            BreakToTime: {
+                required: false,
+                timeRange: { from: "BreakFromTime", to: "BreakToTime" }
+            }
         },
         messages: {
             Code: { required: RazorVars.required_field },
@@ -18,12 +63,18 @@ $(function () {
             PrimaryName: { required: RazorVars.required_field },
 
             WorkingFromTime: { required: RazorVars.required_field },
-            WorkingToTime: { required: RazorVars.required_field },
+            WorkingToTime: {
+                required: RazorVars.required_field,
+                timeRange: RazorVars.invalid_time_range || RazorVars.time_from_must_be_before_to || "From must be before To"
+            },
+
             BreakFromTime: { required: RazorVars.required_field },
-            BreakToTime: { required: RazorVars.required_field }
+            BreakToTime: {
+                required: RazorVars.required_field,
+                timeRange: RazorVars.invalid_time_range || RazorVars.time_from_must_be_before_to || "From must be before To"
+            }
         },
 
-        // group each pair into a single validation message
         groups: {
             WorkingTimeGroup: "WorkingFromTime WorkingToTime",
             BreakTimeGroup: "BreakFromTime BreakToTime"
@@ -33,12 +84,10 @@ $(function () {
             const name = element.attr("name");
 
             if (name === "WorkingFromTime" || name === "WorkingToTime") {
-                // send the single group error to the range placeholder
                 error.appendTo("#WorkingTimeError");
             } else if (name === "BreakFromTime" || name === "BreakToTime") {
                 error.appendTo("#BreakTimeError");
             } else {
-                // normal fields
                 error.insertAfter(element);
             }
         },
@@ -48,6 +97,7 @@ $(function () {
         highlight: function (element) { $(element).addClass("is-invalid"); },
         unhighlight: function (element) { $(element).removeClass("is-invalid"); }
     });
+
 
 
     // Initial load
@@ -111,7 +161,7 @@ $(function () {
                 } else {
                     Swal.fire({
                         icon: "error",
-                        title: RazorVars.required_week_days,
+                        title: RazorVars.required_field,
                         confirmButtonText: RazorVars.btnOk,
                         confirmButtonColor: "var(--primary-600)"
                     });
@@ -257,4 +307,7 @@ function convertToDOW(sun, mon, tue, wed, thu, fri, sat) {
     if (sat) dowArray.push("SAT");
     return dowArray.join(",");
 }
+$(document).on("change", "#WorkingFromTime, #WorkingToTime, #BreakFromTime, #BreakToTime", function () {
+    $("#shiftForm").valid();
+});
 
