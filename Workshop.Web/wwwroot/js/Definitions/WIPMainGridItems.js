@@ -168,7 +168,7 @@ $(function () {
                 dataField: "Quantity",
                 caption: window.RazorVars.DXQuantity,
                 dataType: "number",
-                allowEditing: true,
+                allowEditing: false,
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
