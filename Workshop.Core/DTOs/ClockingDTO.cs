@@ -15,6 +15,7 @@ namespace Workshop.Core.DTOs
         public int? TechnicianID { get; set; }
         public int? WIPID { get; set; }
         public int? RTSID { get; set; }
+        public int? KeyId { get; set; }
         public int? StatusID { get; set; }
         public Status? StatusName { get; set; }
         public string? TechnicianName { get; set; }

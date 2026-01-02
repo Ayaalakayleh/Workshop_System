@@ -64,6 +64,10 @@
 																		new { @class = "form-control", id = "labourSelect" }
 																		)
 								</div>
+								@* @Html.Hidden("RTSKeyId", "", new { id = "rtsKeyIdHidden" }) *@
+
+								@Html.HiddenFor(cm => cm.ClockingForm.KeyId, new { id = "rtsKeyIdHidden" })
+
 
 								<div class="col-12 d-flex flex-wrap gap-2">
 									<button type="submit" class="btn btn-success" id="ClockInBtn" onclick="return setClockStatus(1)">

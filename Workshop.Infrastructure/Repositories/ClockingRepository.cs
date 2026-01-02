@@ -108,6 +108,7 @@ namespace Workshop.Infrastructure.Repositories
                 parameters.Add("@TechnicianID", dTO.TechnicianID, DbType.Int32);
                 parameters.Add("@WIPID", dTO.WIPID, DbType.Int32);
                 parameters.Add("@RTSID", dTO.RTSID, DbType.Int32);
+                parameters.Add("@KeyId", dTO.KeyId, DbType.Int32);
                 parameters.Add("@StatusID", dTO.StatusID, DbType.Int32);
                 parameters.Add("@AllowedTime", dTO.AllowedTime, DbType.Decimal);
                 parameters.Add("@CreatedBy", dTO.CreatedBy, DbType.Int32);
