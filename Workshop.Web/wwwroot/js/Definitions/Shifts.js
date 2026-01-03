@@ -1,4 +1,5 @@
-﻿
+﻿/// <reference path="techniciansprofile.js" />
+
 $(function () {
     // Parse "HH:mm" or "HH:mm:ss" into minutes since midnight
     function timeToMinutes(t) {
@@ -122,6 +123,11 @@ $(function () {
         // Use jQuery Validate result
         if (!$("#shiftForm").valid()) return;
 
+        $("#CodeError").remove();
+
+        const code = ($("#CodeInput").val() || "").trim();
+        if (!code) return;
+
         // Single-flight guard (prevents duplicates on rapid clicks / multiple binds)
         const $form = $(this);
         if ($form.data("isSubmitting")) return;
@@ -134,43 +140,62 @@ $(function () {
         // Keep DOW in sync right before submit
         updateDOWSummary();
 
-        const formData = $form.serialize();
+        $.get(RazorVars.isValidURL, { Code: code, Id: $("#ShiftId").val() || 0 })
+            .done(function (result) {
 
-        $.ajax({
-            url: RazorVars.editUrl,
-            type: "POST",
-            data: formData,
-            headers: {
-                "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
-            }
-        })
-            .done(function (response) {
-                if (response.success) {
-                    $("#shiftModal").modal("hide");
+                if (result && result.isSuccess === false) {
+                    $("#CodeInput").after(`<small id="CodeError" style="color:red;display:block;margin-top:4px;">
+                        This Shift already exists
+                    </small>`);
 
-                    Swal.fire({
-                        icon: "success",
-                        title: resources.success_msg,
-                        confirmButtonText: RazorVars.btnOk,
-                        confirmButtonColor: "var(--primary-600)",
-                        timer: 2000,
-                        timerProgressBar: true
-                    }).then(() => {
-                        loadShifts();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: RazorVars.required_field,
-                        confirmButtonText: RazorVars.btnOk,
-                        confirmButtonColor: "var(--primary-600)"
-                    });
+                    $form.data("isSubmitting", false);
+                    $submitBtn.prop("disabled", false);
+                    return;
                 }
+
+                const formData = $form.serialize();
+
+                $.ajax({
+                    url: RazorVars.editUrl,
+                    type: "POST",
+                    data: formData,
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    }
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            $("#shiftModal").modal("hide");
+
+                            Swal.fire({
+                                icon: "success",
+                                title: resources.success_msg,
+                                confirmButtonText: RazorVars.btnOk,
+                                confirmButtonColor: "var(--primary-600)",
+                                timer: 2000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                loadShifts();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: RazorVars.required_field,
+                                confirmButtonText: RazorVars.btnOk,
+                                confirmButtonColor: "var(--primary-600)"
+                            });
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire(RazorVars.swalErrorHappened, "error");
+                    })
+                    .always(function () {
+                        $form.data("isSubmitting", false);
+                        $submitBtn.prop("disabled", false);
+                    });
+
             })
             .fail(function () {
-                Swal.fire(RazorVars.swalErrorHappened, "error");
-            })
-            .always(function () {
                 $form.data("isSubmitting", false);
                 $submitBtn.prop("disabled", false);
             });
@@ -311,3 +336,21 @@ $(document).on("change", "#WorkingFromTime, #WorkingToTime, #BreakFromTime, #Bre
     $("#shiftForm").valid();
 });
 
+function isValid() {
+    const code = ($("#CodeInput").val() || "").trim();
+
+    $("#CodeError").remove();
+
+    if (!code) return;
+
+    $.get(RazorVars.isValidURL, { Code: code, Id: $("#ShiftId").val() || 0 })
+        .done(function (result) {
+            if (result && result.isSuccess === false) {
+                $("#CodeInput").after(`<small id="CodeError" style="color:red;display:block;margin-top:4px;">
+                  This Shift already exists 
+                </small>`);
+            }
+        });
+}
+
+$(document).off("input", "#CodeInput").on("input", "#CodeInput", isValid);

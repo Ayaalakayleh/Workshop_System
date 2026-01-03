@@ -189,5 +189,25 @@ namespace Workshop.Web.Controllers
         {
             return _configuration.GetValue<int>("DefaultUserId", UserId);
         }
+
+        public async Task<JsonResult> isValid(string Code, int Id = 0)
+        {
+            try
+            {
+                var ShiftsList = await _apiClient.GetAllShiftsAsync();
+
+                bool code_exists = ShiftsList != null && ShiftsList.Any(v => !string.IsNullOrWhiteSpace(v.Code) &&
+                                  string.Equals(v.Code.Trim(), Code, StringComparison.OrdinalIgnoreCase) && v.Id != Id);
+                                    
+
+                bool isValid = !code_exists;
+
+                return Json(new { isSuccess = isValid, data = Code });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
