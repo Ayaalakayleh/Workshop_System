@@ -156,7 +156,52 @@ $(function () {
                 dataType: "number",
                 //allowEditing: generalRequest == false ? true : false,
                 allowEditing: Permission_AddParts,
-                alignment: "left"
+                alignment: "left",
+                editCellTemplate: function (cellElement, cellInfo) {
+                    const row = cellInfo.data;
+
+                    const available = Number(row.AvailableQty) || 0;   
+                    const initialVal = cellInfo.value != null ? cellInfo.value : 0;
+
+                    $("<div>").dxNumberBox({
+                        value: initialVal,
+                        min: 0,
+                        max: available,
+                        showSpinButtons: true,
+                        inputAttr: { "autocomplete": "off" },
+                        onValueChanged: function (e) {
+                            let v = Number(e.value);
+
+                            if (!isFinite(v)) v = 0;
+
+                            if (v < 0) {
+                                v = 0;
+                                e.component.option("value", 0);
+                            }
+
+                            if (v > available) {
+                                v = available;
+                                e.component.option("value", available);
+                            }
+
+                            cellInfo.setValue(v);
+                            row.RequestQuantity = v;
+
+                            if ((Number(row.Quantity) || 0) > v) {
+                                row.Quantity = v;
+                                const grid = $("#mainItemsGrid").dxDataGrid("instance");
+                                const idx = grid.getRowIndexByKey(row.Id);
+                                if (idx >= 0) grid.cellValue(idx, "Quantity", v);
+                            }
+                        },
+                        onKeyDown: function (e) {
+                            if (e.event?.key === "-") e.event.preventDefault();
+                        },
+
+
+                    }).appendTo(cellElement);
+                }
+
             },
             {
                 dataField: "MaxQty",
@@ -173,22 +218,26 @@ $(function () {
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
-                    let maxQty = row.MaxQty != null ? Number(row.MaxQty) : null;
+
+                    const reqQty = Number(row.RequestQuantity) || 0;
+                    const maxQty = row.MaxQty != null ? Number(row.MaxQty) : null;
+
+                    const finalMax = (maxQty != null) ? Math.min(reqQty, maxQty) : reqQty;
 
                     const initialVal = cellInfo.value != null ? cellInfo.value : 0;
 
                     $("<div>").dxNumberBox({
                         value: initialVal,
                         min: 0,
-                        max: maxQty,
+                        max: finalMax,
                         showSpinButtons: true,
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
                             let v = Number(e.value) || 0;
 
-                            if (maxQty != null && v > maxQty) {
-                                v = maxQty;
-                                e.component.option("value", maxQty);
+                            if (v > finalMax) {
+                                v = finalMax;
+                                e.component.option("value", finalMax);
                             }
 
                             cellInfo.setValue(v);
@@ -645,12 +694,14 @@ function fillLocators(rows) {
                 row.LocatorId = row.AvailableLocators[0].locatorId;
                 row.LocatorCode = row.AvailableLocators[0].locatorCode;
                 row.AvailableQty = row.AvailableLocators[0].onHandQtyInUnit;
+                row.MaxQty = Number(row.AvailableQty) || 0;
             }
 
             const match = row.AvailableLocators.find(x => x.locatorId == row.LocatorId);
             if (match) {
                 row.LocatorCode = match.locatorCode;
                 row.AvailableQty = match.onHandQtyInUnit;
+                row.MaxQty = Number(row.AvailableQty) || 0;
             }
 
             return updateRowInGrid(row);
@@ -1448,6 +1499,7 @@ $(document).on("change", "#transferFromLocator", function () {
     window.transferRow.LocatorId = selectedId;
     window.transferRow.LocatorCode = loc ? loc.code : null;
     window.transferRow.AvailableQty = loc ? loc.qty : null;
+    window.transferRow.MaxQty = Number(window.transferRow.AvailableQty) || 0;
 
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     if (!grid) return;

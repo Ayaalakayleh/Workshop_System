@@ -136,6 +136,7 @@ function updateSelectionCount(count) {
                     LocatorId: item.locatorId,
                     LocatorCode: item.locatorCode,
                     AvailableQty: item.availableQty,
+                    MaxQty: item.availableQty,
                     WarehouseId: item.warehouseId,
 
                 }));

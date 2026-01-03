@@ -1057,7 +1057,7 @@
     <value>W</value>
   </data>
   <data name="Label_Quantity" xml:space="preserve">
-    <value>Qty</value>
+    <value>Received Qty</value>
   </data>
   <data name="Label_Price" xml:space="preserve">
     <value>Price</value>
