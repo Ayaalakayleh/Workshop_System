@@ -3248,3 +3248,6 @@ html[dir="rtl"] .toggle-pin {
     top: 10px;
     right: 10px;
 }
+#PlateNumber {
+    direction: ltr !important;
+}
