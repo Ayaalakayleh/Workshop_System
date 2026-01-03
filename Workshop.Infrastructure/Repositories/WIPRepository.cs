@@ -785,7 +785,7 @@ namespace Workshop.Infrastructure.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("Id", dto.Id);
             parameters.Add("WIPId", dto.WIPId);
-            //parameters.Add("ItemId", dto.ItemId);
+            parameters.Add("Quantity", dto.Quantity);
             parameters.Add("WarehouseId", dto.WarehouseId);
             parameters.Add("LocatorId", dto.LocatorId);
 

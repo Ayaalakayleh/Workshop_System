@@ -155,7 +155,7 @@ $(function () {
                 caption: window.RazorVars.DXRequestQuantity,
                 dataType: "number",
                 //allowEditing: generalRequest == false ? true : false,
-                allowEditing: Permission_AddParts,
+                allowEditing: true,
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
@@ -643,6 +643,15 @@ $(function () {
                     e.editorOptions.readOnly = false;
                 }
             }
+
+            if (e.parentType === "dataRow" && e.dataField === "RequestQuantity") {
+                const status = Number(e.row?.data?.Status);
+                if (status === 36 || status === 42) {
+                    e.cancel = true;
+                }
+            }
+
+                
         },
     });
 });
@@ -1022,7 +1031,7 @@ function TransferParts() {
         KeyId: `${row.Id}`,
         FK_ItemId: row.ItemId,
         FK_UnitId: row.fk_UnitId,
-        UnitQuantity: row.Quantity,
+        UnitQuantity: row.RequestQuantity,
         Price: 0,
         Total: 0,
         FK_LocatorId: row.LocatorId,

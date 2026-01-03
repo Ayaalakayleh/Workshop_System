@@ -10,6 +10,7 @@ namespace Workshop.Core.DTOs
     {
         public int Id { get; set; }
         public int WIPId { get; set; }
+        public decimal? Quantity { get; set; }
         public int WarehouseId { get; set; }
         public int LocatorId { get; set; }
     }
