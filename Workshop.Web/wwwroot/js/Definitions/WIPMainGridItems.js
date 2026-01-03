@@ -154,7 +154,8 @@ $(function () {
                 dataField: "RequestQuantity",
                 caption: window.RazorVars.DXRequestQuantity,
                 dataType: "number",
-                allowEditing: generalRequest == false ? true : false,
+                //allowEditing: generalRequest == false ? true : false,
+                allowEditing: Permission_AddParts,
                 alignment: "left"
             },
             {
@@ -168,7 +169,7 @@ $(function () {
                 dataField: "Quantity",
                 caption: window.RazorVars.DXQuantity,
                 dataType: "number",
-                allowEditing: false,
+                allowEditing: Permission_AddParts,
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
@@ -200,7 +201,7 @@ $(function () {
                 dataField: "UsedQuantity",
                 caption: window.RazorVars.DXUsedQuantity,
                 dataType: "number",
-                allowEditing: true,
+                allowEditing: Permission_Approve,
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     $("<div>").dxNumberBox({
@@ -251,18 +252,6 @@ $(function () {
                     return Number(discountedPrice.toFixed(2));
                 }
             },
-            //{
-            //    dataField: "Discount",
-            //    caption: window.RazorVars.DXDiscount,
-            //    dataType: "number",
-            //    allowEditing: true,
-            //    defaultValue: 0,
-            //    alignment: "left",
-            //    editorOptions: {
-            //        min: 0,
-            //        max: 100
-            //    }
-            //},
             {
                 dataField: "DiscountPct",
                 caption: window.RazorVars.DXDiscount,
@@ -415,7 +404,7 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return AllowActions && parseInt(e.row.data.Status) !== 42;
+                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) !== 42);
                         },
                         onClick: function (e) {
                             console.log("Approve clicked", e.row.data);
@@ -428,7 +417,7 @@ $(function () {
                         type: "danger",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return AllowActions && parseInt(e.row.data.Status) !== 42;
+                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) !== 42);
                         },
                         onClick: function (e) {
                             console.log("Reject clicked", e.row.data);
@@ -441,9 +430,11 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return AllowActions &&
+                            return Permission_Issue && (
+                                AllowActions &&
                                 parseInt(e.row.data.Status) !== 41 &&
-                                OurWarehouses.includes(parseInt(e.row.data.WarehouseId));
+                                OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                            );
                         },
                         disabled: function (e) {
                             return parseInt(e.row.data.Status) === 42;
@@ -466,10 +457,11 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
-                            debugger;
-                            return AllowActions &&
+                            return Permission_Issue && (
+                                AllowActions &&
                                 parseInt(e.row.data.Status) !== 41 &&
-                                OurWarehouses.includes(parseInt(e.row.data.WarehouseId));
+                                OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                            );
                         },
                         onClick: function (e) {
                             UndoIssueVoucher(e.row.data);
@@ -480,10 +472,12 @@ $(function () {
                         icon: "repeat",
                         type: "default",
                         visible: function (e) {
-                            return AllowActions &&
+                            return Permission_AddParts && (
+                                AllowActions &&
                                 parseInt(e.row.data.Status) !== 42 &&
                                 parseInt(e.row.data.Status) !== 41 &&
-                                !OurWarehouses.includes(parseInt(e.row.data.WarehouseId));
+                                !OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                            );
                         },
                         onClick: function (e) {
                             if (parseInt(e.row.data.Status) !== 36) {
@@ -501,8 +495,10 @@ $(function () {
                         hint: "Delete",
                         icon: "fad fa-trash",
                         visible: function (e) {
-                            return parseInt(e.row.data.Status) !== 42 &&
-                                !(wipStatus === Gone || wipStatus === Invoiced);
+                            return Permission_AddParts && (
+                                parseInt(e.row.data.Status) !== 42 &&
+                                !(wipStatus === Gone || wipStatus === Invoiced)
+                            );
                         },
                         onClick: function (e) {
                             var grid = e.component;

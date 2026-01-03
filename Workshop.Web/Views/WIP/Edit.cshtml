@@ -13,6 +13,9 @@
 	ViewData["WIPstatus"] = WIPstatus;
 	ViewData["WIPId"] = Model.Id;
 	var AddDiscount = PermissionHelper.UserHasPermission(Permissions.WIP.AddDiscount);
+	var AddParts = PermissionHelper.UserHasPermission(Permissions.WIP.AddParts);
+	var Issue = PermissionHelper.UserHasPermission(Permissions.WIP.Issue);
+	var Approve = PermissionHelper.UserHasPermission(Permissions.WIP.Approve);
 }
 @{
 	var userInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.User>(Context.Session.GetString("UserInfo"));
@@ -314,6 +317,9 @@
   var movementId = '@Model.MovementId';
   var AllowActions = @Html.Raw(Json.Serialize(ViewBag.AllowActions));
   var Permission_AddDiscount = @(AddDiscount.ToString().ToLower());
+  var Permission_AddParts = @(AddParts.ToString().ToLower());
+  var Permission_Issue = @(Issue.ToString().ToLower());
+  var Permission_Approve = @(Approve.ToString().ToLower());
 	window.URLs = {
 		indexUrl: '@Url.Action("Index", "WIP")',
 		vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',
