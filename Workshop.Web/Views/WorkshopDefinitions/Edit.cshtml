@@ -110,7 +110,7 @@
 							<div class="col-lg-3 col-md-6 col-sm-12">
 								<div class="form-group">
 									<label>@Common["Label_CityId"]<span class="text-danger required-star">*</span></label>
-									@Html.DropDownListFor(model => model.CityId, new SelectList(ViewBag.ColCity, "Id", "Name"), Common["Select"], new { @class = "form-control select2", @tabindex = 4 })
+									@Html.DropDownListFor(model => model.CityId, new SelectList(ViewBag.ColCity, "Id", "Name"), Common["Select"], new { @class = "form-control select2" })
 									<span class="field-validation-valid text-danger" data-valmsg-for="CityId" data-valmsg-replace="true"> &nbsp;</span>
 								</div>
 							</div>
@@ -140,7 +140,7 @@
 							<div class="col-lg-3 col-md-6 col-sm-12">
 								<div class="form-group">
 									<label>@Common["Label_ParentId"]</label>
-									@Html.DropDownListFor(model => model.ParentId, (IEnumerable<SelectListItem>)ViewBag.ParentWorkshops, Common["Select"], new { @class = "form-control select2", @tabindex = 4 })
+									@Html.DropDownListFor(model => model.ParentId, (IEnumerable<SelectListItem>)ViewBag.ParentWorkshops, Common["Select"], new { @class = "form-control select2" })
 								</div>
 							</div>
 							<div class="col-lg-3 col-md-6 col-sm-12">

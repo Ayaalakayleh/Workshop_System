@@ -2565,4 +2565,7 @@
   <data name="TimeFromMustBeBeforeTo" xml:space="preserve">
     <value>Time From Must Be Before To</value>
   </data>
+  <data name="Customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
 </root>
