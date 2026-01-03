@@ -7,7 +7,7 @@
     var GeneralRequest = ViewBag.GeneralRequest;
     var WIPstatus = Convert.ToInt32(ViewData["WIPstatus"]);
     var WIPId = Convert.ToInt32(ViewData["WIPId"]);
-    var permission = true;
+    var AddParts = PermissionHelper.UserHasPermission(Permissions.WIP.AddParts);
 }
 <style>
     #WarehouseDiv{
@@ -27,22 +27,17 @@
             {
                 @if (WIPstatus != (int)WIPStatusEnum.G && WIPstatus != (int)WIPStatusEnum.Invoiced)
                 {
-                    @* @if (PermissionHelper.UserHasPermission(Permissions.WIP.Approve))
+                    @if (AddParts)
                     {
-                        <button type="button" id="ApproveRequestPartsBTN" class="btn btn-success btn-sm"> &nbsp;@Common["Label_ApproveAll"]</button>
-                    } *@
-
-                    @if (PermissionHelper.UserHasPermission(Permissions.WIP.AddParts))
-                    {
-                    }
                         @if (GeneralRequest)
                         {
                             <button type="button" data-bs-toggle="modal" data-bs-target="#addPartGeneralModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp; @Common["GeneralRequest"]</button>
                         }
                         else
                         {
-                            <button type="button" id="btnAddPart" data-bs-toggle="modal" data-bs-target="#addPartModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddParts"]</button>     
+                            <button type="button" id="btnAddPart" data-bs-toggle="modal" data-bs-target="#addPartModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddParts"]</button>
                         }
+                    }
 
                 }
             }
