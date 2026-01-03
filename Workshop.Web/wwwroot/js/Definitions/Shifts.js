@@ -38,7 +38,9 @@ $(function () {
         // invalid if from > to
         return fromMin <= toMin;
     }, RazorVars.invalid_time_range || "Invalid time range");
-
+    function isFilled($form, name) {
+        return $.trim($form.find('[name="' + name + '"]').val() || "") !== "";
+    }
     // ----- Validation -----
     $("#shiftForm").validate({
         rules: {
@@ -46,18 +48,45 @@ $(function () {
             Short: { required: true },
             PrimaryName: { required: true },
 
-            WorkingFromTime: { required: true },
+            // ---- Working hours: require the other field only when one is filled ----
+            WorkingFromTime: {
+                required: {
+                    depends: function (element) {
+                        const $form = $(element).closest("form");
+                        return isFilled($form, "WorkingToTime"); // if To is filled -> From required
+                    }
+                }
+            },
             WorkingToTime: {
-                required: true,
+                required: {
+                    depends: function (element) {
+                        const $form = $(element).closest("form");
+                        return isFilled($form, "WorkingFromTime"); // if From is filled -> To required
+                    }
+                },
                 timeRange: { from: "WorkingFromTime", to: "WorkingToTime" }
             },
 
-            BreakFromTime: { required: false },
+            // ---- Break hours: same pairing logic ----
+            BreakFromTime: {
+                required: {
+                    depends: function (element) {
+                        const $form = $(element).closest("form");
+                        return isFilled($form, "BreakToTime");
+                    }
+                }
+            },
             BreakToTime: {
-                required: false,
+                required: {
+                    depends: function (element) {
+                        const $form = $(element).closest("form");
+                        return isFilled($form, "BreakFromTime");
+                    }
+                },
                 timeRange: { from: "BreakFromTime", to: "BreakToTime" }
             }
         },
+
         messages: {
             Code: { required: RazorVars.required_field },
             Short: { required: RazorVars.required_field },
