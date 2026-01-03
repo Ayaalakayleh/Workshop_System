@@ -869,7 +869,16 @@
 
     $(document).on('shown.bs.modal', '#scheduleModal', async function () {
         bindEvents();
-        $('#schStart, #schDuration')
+
+        // schStart: keep enabled so picker can open, but make it readonly (no manual typing)
+        $('#schStart')
+            .prop('disabled', false)
+            .prop('readonly', true)
+            .off('keydown.readonly paste.readonly')
+            .on('keydown.readonly paste.readonly', (e) => e.preventDefault());
+
+        // Duration stays editable
+        $('#schDuration')
             .prop('disabled', false)
             .prop('readonly', false);
 

@@ -105,7 +105,7 @@
                     </div>
                     @Html.HiddenFor(model => model.RTSId)
                     @Html.Hidden("KeyId")
-                    <div class="col-lg-4"><label class="form-label">@Common["Label_Start"]</label><input type="text" class="form-control" id="schStart"  value="08:00"></div>
+                    <div class="col-lg-4"><label class="form-label">@Common["Label_Start"]</label><input type="text" class="form-control" id="schStart" readonly></div>
                     <div class="col-lg-4"><label class="form-label">@Common["Label_DurationMins"]</label><input type="number" class="form-control" id="schDuration" min="1"  value="30"></div>
                     <div class="col-lg-4"><label class="form-label">@Common["Label_Ends"]</label><input type="time" class="form-control" id="schEnd"  readonly></div>
                     <div class="col-12"><span class="badge bg-secondary me-2" id="schJobChip">@Common["Label_Job"]</span><span class="badge bg-secondary" id="schAllowedChip">@Common["Label_Allowed"]: 0m</span></div>

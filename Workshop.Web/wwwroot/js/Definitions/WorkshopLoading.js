@@ -764,9 +764,14 @@ function initModal2() {
     if (scheduleModal2Bound) return;
     scheduleModal2Bound = true;
 
+    // ✅ schedStart: readonly (no manual typing), but still clickable for picker
+    $(els.start)
+        .prop("readonly", true)
+        .off(".readonly2")
+        .on("keydown.readonly2 paste.readonly2", (e) => e.preventDefault());
+
     // block editing ends
     $(els.ends).off(".block2").on("keydown.block2 paste.block2", (e) => e.preventDefault());
-
     // Date change -> fetch tech -> enable tech
     $(els.date).off(".sched2").on("change.sched2", async function () {
         schedule2SetStep(els, 1);

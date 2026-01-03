@@ -2565,4 +2565,7 @@
   <data name="TimeFromMustBeBeforeTo" xml:space="preserve">
     <value>يجب أن يكون الوقت السابق قبل اللاحق</value>
   </data>
+  <data name="Customer" xml:space="preserve">
+    <value>العميل</value>
+  </data>
 </root>
