@@ -183,25 +183,45 @@ $(document).ready(function () {
                 .prop('disabled', true)
                 .html('<i class="fa fa-spinner fa-spin"></i>&nbsp;' + RazorVars.btnSaving);
 
-            var formData = new FormData(form);
-
-            // attach photo from FilePond if present
-            const pondFiles = pond.getFiles();
-            if (pondFiles.length > 0) {
-                formData.append('TechnicianPhoto', pondFiles[0].file);
-            }
-
-            // if you re-enable intl-tel-input, you can set the full number:
-            // var fullPhoneNumber = iti.getNumber();
-            // formData.set('Phone', fullPhoneNumber);
+            const Code = ($("#Code").val() || "").trim();
 
             $.ajax({
-                url: $(form).attr('action'),
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function () {
+                type: "GET",
+                url: window.RazorVars.isValidURL,
+                data: { Number: Code, Id: $("#Id").val() || 0 },
+                cache: false
+            }).done(function (result) {
+
+                if (result && result.isSuccess === false) {
+                    $("#btnCreate")
+                        .prop('disabled', false)
+                        .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning",
+                        html: `
+                        <div>This Technician already exists</div>
+                        <div style="margin-top:6px;"><b>Number:</b> ${result.data}</div>
+                    `
+                    });
+                    return;
+                }
+
+                var formData = new FormData(form);
+
+                const pondFiles = pond.getFiles();
+                if (pondFiles.length > 0) {
+                    formData.append('TechnicianPhoto', pondFiles[0].file);
+                }
+
+                $.ajax({
+                    url: $(form).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                }).done(function () {
                     $("#btnCreate")
                         .prop('disabled', false)
                         .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
@@ -213,11 +233,9 @@ $(document).ready(function () {
                         confirmButtonColor: 'var(--primary-600)',
                         timer: 3000,
                         timerProgressBar: true
-                    }).then(() => {
-                        window.location.href = document.referrer;
-                    });
-                },
-                error: function () {
+                    }).then(() => window.location.href = document.referrer);
+
+                }).fail(function () {
                     $("#btnCreate")
                         .prop('disabled', false)
                         .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
@@ -228,10 +246,22 @@ $(document).ready(function () {
                         confirmButtonText: RazorVars.btnTryAgain,
                         confirmButtonColor: '#dc3545'
                     });
-                }
+                });
+
+            }).fail(function (xhr) {
+                $("#btnCreate")
+                    .prop('disabled', false)
+                    .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+                console.error("isValid failed:", xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: RazorVars.ErrorHappend,
+                    confirmButtonText: RazorVars.btnTryAgain
+                });
             });
 
-            return false;
+            return false; 
         }
     });
 
@@ -351,3 +381,22 @@ $("#IsResigned").on("change", function () {
         $("#ResignedDate").prop("disabled", true).val("");
     }
 });
+
+function isValid() {
+    const Code = ($("#Code").val() || "").trim();
+
+    $("#CodeError").remove();
+
+    if (!Code) return;
+
+    $.get(window.RazorVars.isValidURL, { Number: Code })
+        .done(function (result) {
+            if (result && result.isSuccess === false) {
+                $("#Code").after(`<small id="CodeError" style="color:red;display:block;margin-top:4px;">
+                  This Technician already exists 
+                </small>`);
+            }
+        });
+}
+
+$("#Code").on("change", isValid);

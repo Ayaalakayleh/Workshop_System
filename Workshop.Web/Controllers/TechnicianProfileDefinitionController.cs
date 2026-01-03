@@ -198,7 +198,24 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        public async Task<JsonResult> isValid(string Number)
+        {
+            try
+            {
+                var techniciansList = await _apiClient.GetTechniciansDDL(BranchId);
 
+                bool number_exists = techniciansList != null && techniciansList.Any(v => !string.IsNullOrWhiteSpace(v.Code) &&
+                                  string.Equals(v.Code.Trim(), Number, StringComparison.OrdinalIgnoreCase));
+
+                bool isValid = !number_exists;
+
+                return Json(new { isSuccess = isValid, data = Number } );
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         private CreateDTechnicianDto MapToCreateDto(TechnicianDTO dto)
         {
             return new CreateDTechnicianDto
