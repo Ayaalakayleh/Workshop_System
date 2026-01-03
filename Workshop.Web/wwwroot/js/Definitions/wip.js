@@ -5,12 +5,56 @@
 
     $(document).ready(function () {
 
-        $("#optPartialInv").change(function () {
-            if ($(this).is(":checked")) {
-                $("#tabPartialAccountBTN").show();
+        //$("#optPartialInv").change(function () {
+        //    if ($(this).is(":checked")) {
+        //        $("#tabPartialAccountBTN").show();
+        //    } else {
+        //        $("#tabPartialAccountBTN").hide();
+        //    }
+        //});
+        function togglePartialBtn() {
+            const on = $("#optPartialInv").is(":checked");
+
+            const $btn = $("#tabPartialAccountBTN");
+            if (!$btn.length) return;
+
+            const $wrap = $btn.closest("li, .nav-item, .btn-group, .d-flex, .col, .row");
+            const $target = $wrap.length ? $wrap : $btn;
+
+            if (on) {
+                $target.removeClass("d-none")
+                    .prop("hidden", false)
+                    .css("display", "")
+                    .show();
             } else {
-                $("#tabPartialAccountBTN").hide();
+                $target.addClass("d-none")
+                    .prop("hidden", true)
+                    .hide();
             }
+        }
+
+        function loadWipOptions() {
+            var Id = $('#Id').val();
+            return $.ajax({
+                type: 'GET',
+                url: window.URLs.getWIPOptionsByIdUrl,
+                dataType: 'json',
+                data: { Id: Id }
+            }).done(function (result) {
+                if (!result) return;
+
+                $("#optPartialInv").prop("checked", result.partialInvoicing == 1);
+                $("#optReturnParts").prop("checked", result.returnParts == 1);
+                $("#optRepeatRepair").prop("checked", result.repeatRepair == 1);
+                $("#optUpdateDemand").prop("checked", result.updateDemand == 1);
+            });
+        }
+
+        $(document).on("change", "#optPartialInv", togglePartialBtn);
+
+        loadWipOptions().always(function () {
+            togglePartialBtn();
+            $("#optPartialInv").trigger("change");
         });
 
         /* ------- WIP Filter + Pagination (same concept as Technicians) ------- */
@@ -37,7 +81,7 @@
                 if (!result) return;
 
                 $("#WIPListContainer").html(result);
-
+                togglePartialBtn();
                 if ($("#total_pages").val() != undefined) {
                     $("#contentPager").attr("hidden", false);
 
@@ -649,23 +693,12 @@
             });
         });
 
-        $('#tabOptionsBTN').on("click", function () {
-            var Id = $('#Id').val();
+       
 
-            $.ajax({
-                type: 'Get',
-                url: window.URLs.getWIPOptionsByIdUrl,
-                contentType: 'application/json',
-                dataType: 'json',
-                data: { Id: Id },
-                success: function (result) {
-                    if (result) {
-                        $("#optPartialInv").prop("checked", result.partialInvoicing == 1);
-                        $("#optReturnParts").prop("checked", result.returnParts == 1);
-                        $("#optRepeatRepair").prop("checked", result.repeatRepair == 1);
-                        $("#optUpdateDemand").prop("checked", result.updateDemand == 1);
-                    }
-                }
+        $('#tabOptionsBTN').on("click", function () {
+            loadWipOptions().always(function () {
+                togglePartialBtn();
+                $("#optPartialInv").trigger("change");
             });
         });
 
@@ -709,7 +742,7 @@
       
        
     });
-
+   
 })(jQuery, window, document);
 
 

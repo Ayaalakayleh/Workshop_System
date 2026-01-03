@@ -27,8 +27,8 @@
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label class="form-label">Partial @Common["Label_Currency"]</label>
-                    @Html.TextBoxFor(m => m.PartialCurrencyId, new { @class = "form-control", id = "PartialCurrencyId", disabled = "disabled" })
+                    <label class="form-label">Partial @Common["Label_Currency"]</label>  
+                    @Html.DropDownListFor(m => m.PartialCurrencyId, new SelectList(ViewBag.CurrencyList ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "PartialCurrencyId", disabled = "disabled " })
                     @Html.ValidationMessageFor(m => m.PartialCurrencyId, "", new { @class = "text-danger" })
 
                 </div>

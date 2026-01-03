@@ -3,15 +3,17 @@
         const selectedType = $(this).val();
         const match = $("#SalesType");
 
-        if (selectedType == 1) {
-            $("#CustomerId").val("").trigger("change");
-            $("#CustomerId").attr("disabled", true);
-        } else {
-            $("#CustomerId").attr("disabled", false);
-            $("#CurrencyId").attr("disabled", true);
-            $("#Vat").attr("disabled", true);
-            $("#TermsId").attr("disabled", true);
-        }
+        //if (selectedType == 1) {
+        //    $("#CustomerId").val("").trigger("change");
+        //    $("#CustomerId").attr("disabled", true);
+        //} else {
+        //    $("#CustomerId").attr("disabled", false);
+        //    $("#CurrencyId").attr("disabled", true);
+        //    $("#Vat").attr("disabled", true);
+        //    $("#TermsId").attr("disabled", true);
+        //}
+        syncCustomerDisable();
+        
 
         $.ajax({
             type: 'GET',
@@ -35,34 +37,6 @@
     });
 
 
-    $("#optPartialInv").change(function () {
-        var isPartial = $("#optPartialInv").is(":checked");
-        if (isPartial === true || isPartial === "true") {
-            const _selectedType = $("#PartialAccountType").val();
-            const realType = _selectedType == "1" ? "2" : "1";
-            const _match = $("#PartialSalesType");
-            $.ajax({
-                type: 'GET',
-                url: window.appUrls.getSalesType,
-                dataType: 'json',
-                data: { accountId: realType }
-            }).done(function (result) {
-                if (result) {
-                    _match.empty();
-                    _match.append($('<option>', { value: "", text: "Select" }));
-                    $.each(result, function (i, item) {
-                        _match.append($('<option>', {
-                            value: item.value,
-                            text: item.text
-                        }));
-                    });
-                }
-            }).fail(function (xhr, status, error) {
-                console.error("Error:", error);
-            });
-        }
-    });
-
     $(function () {
         var $cb = $("#optPartialInv");
         var $acc = $("#AccountType");
@@ -73,13 +47,18 @@
         }
 
         function applyByCheckbox() {
-            if ($cb.is(":checked")) {
-                var inv = inverse($acc.val()); 
-                $pacc.val(inv).trigger("change");
+            var base = $("#AccountType").val();
+            var partial = $("#optPartialInv").is(":checked") ? inverse(base) : base;
+
+            if ($("#PartialAccountType").val() !== partial) {
+                $("#PartialAccountType").val(partial).trigger("change");
             } else {
-                $pacc.val($acc.val()).trigger("change");
+                syncCustomerDisable();
             }
         }
+
+        $("#optPartialInv").on("change", applyByCheckbox);
+        $("#AccountType").on("change", applyByCheckbox);
 
         $cb.on("change", function () {
             applyByCheckbox();
@@ -103,28 +82,13 @@
                 }
             }
 
-            if ($(this).val() == 1) {
-                $("#CustomerId").attr("disabled", true);
-            }
+            syncCustomerDisable();
         });
 
         applyByCheckbox();
     });
 
-    var accountType_base = $("#AccountType").val();
-    if (accountType_base == 1) {
-        $("#CustomerId").attr("disabled", true);
-    } else {
-        $("#CustomerId").attr("disabled", false);
-    }
-
-
-    var accountType_Partial = $("#PartialAccountType").val();
-    if (accountType_Partial == 1) {
-        $("#PartialCustomerId").attr("disabled", true);
-    } else {
-        $("#PartialCustomerId").attr("disabled", false);
-    }
+ 
 
     $("#CustomerId").change(function () {
         var Id = $("#CustomerId").val();
@@ -148,6 +112,28 @@
             console.error("Error:", error);
         });
     });
+
+    $("#PartialCustomerId").on("change", function () {
+        var id = $("#PartialCustomerId").val();
+        if (!id) return;
+
+        $.ajax({
+            type: 'GET',
+            url: window.appUrls.getCustomerById,
+            dataType: 'json',
+            data: { Id: id }
+        }).done(function (result) {
+            if (!result) return;
+
+            // partial fields
+            $("#PartialCurrencyId").val(result.currencyId).trigger("change.select2");
+            $("#PartialVat").val(result.salesTaxGroupId).trigger("change.select2");
+            $("#PartialTermsId").val(result.oLDBPaymentType).trigger("change.select2");
+        }).fail(function (xhr, status, error) {
+            console.error("Error:", error);
+        });
+    });
+
 
 
 
@@ -177,6 +163,36 @@
     });
 
 
+    function loadSalesTypes(accountId, $ddl) {
+        const prev = $ddl.val();  
+
+        return $.ajax({
+            type: 'GET',
+            url: window.appUrls.getSalesType,
+            dataType: 'json',
+            data: { accountId: accountId }
+        }).done(function (result) {
+            $ddl.empty().append($('<option>', { value: "", text: "Select" }));
+            $.each(result || [], function (i, item) {
+                $ddl.append($('<option>', { value: item.value, text: item.text }));
+            });
+
+            if (prev) $ddl.val(prev);
+        });
+    }
+
+
+    $("#AccountType").on("change", function () {
+        const t = $(this).val();
+        loadSalesTypes(t, $("#SalesType"));
+    });
+
+    $("#PartialAccountType").on("change", function () {
+        const t = $(this).val();
+        loadSalesTypes(t, $("#PartialSalesType"));
+        syncCustomerDisable();
+    });
+
     function GetVatValueById(vatId) {
         var vatValue = 0;
         $.ajax({
@@ -200,4 +216,26 @@
         var VatAmount = GetVatValueById(vat);
         $("#VatPercentage").text("%" + parseInt(VatAmount));
     })
+
+    let firstLoad = true;
+
+    function syncCustomerDisable() {
+        const acc = String($("#AccountType").val());
+        const pacc = String($("#PartialAccountType").val());
+
+        $("#CustomerId").prop("disabled", acc === "1");
+        $("#PartialCustomerId").prop("disabled", pacc === "1");
+
+        if (!firstLoad) {
+            if (acc === "1") $("#CustomerId").val("").trigger("change.select2");
+            if (pacc === "1") $("#PartialCustomerId").val("").trigger("change");
+        }
+    }
+
+    $(function () {
+        syncCustomerDisable();
+        firstLoad = false;
+    });
+
+
 });
