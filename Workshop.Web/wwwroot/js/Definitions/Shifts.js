@@ -354,3 +354,13 @@ function isValid() {
 }
 
 $(document).off("input", "#CodeInput").on("input", "#CodeInput", isValid);
+
+$('#shiftModal').on('hidden.bs.modal', function () {
+
+    $("#CodeError").remove();
+
+    const v = $("#shiftForm").data("validator");
+    if (v) v.resetForm();
+
+    $("#shiftForm").find(".is-invalid").removeClass("is-invalid");
+});
