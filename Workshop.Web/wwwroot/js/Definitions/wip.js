@@ -908,9 +908,14 @@ $(document).ready(function () {
         });
     }
 
+    let prevPartialInv = null; 
+
     function toggleEditingByPartialInv() {
         const partialInvoicing = $("#optPartialInv").is(":checked");
         const accountTypeVal = parseInt($("#AccountType").val()) || 0;
+
+        if (prevPartialInv === null) prevPartialInv = partialInvoicing;
+        const turnedOnNow = partialInvoicing && (prevPartialInv === false);
 
         getGrids().forEach(grid => {
 
@@ -918,35 +923,31 @@ $(document).ready(function () {
             cols.forEach(col => {
                 if (col.dataField === "AccountType") {
                     col.allowEditing = partialInvoicing;
-
-                    if (partialInvoicing) {
-                        col.validationRules = [
-                            { type: "required", message: "required" }
-                        ];
-                    } else {
-                        col.validationRules = [];
-                    }
+                    col.validationRules = partialInvoicing
+                        ? [{ type: "required", message: "required" }]
+                        : [];
                 }
             });
             grid.option("columns", cols);
 
             const store = grid.getDataSource().store();
-            const rows = grid.getVisibleRows();
+            const rows = grid.getDataSource().items() || [];
 
-            rows.forEach(r => {
-                const row = r.data;
-
-                if (partialInvoicing) {
+            if (turnedOnNow) {
+                rows.forEach(row => {
                     row.AccountType = null;
-                } else {
+                    store.update(row.Id, row);
+                });
+            } else if (!partialInvoicing) {
+                rows.forEach(row => {
                     row.AccountType = accountTypeVal;
-                }
-
-                store.update(row.Id, row);
-            });
+                    store.update(row.Id, row);
+                });
+            }
 
             grid.refresh();
         });
+        prevPartialInv = partialInvoicing; 
     }
 
     $("#AccountType").on("change", updateAccountTypeValues);
