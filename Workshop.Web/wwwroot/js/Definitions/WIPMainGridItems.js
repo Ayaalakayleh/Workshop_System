@@ -278,27 +278,29 @@ $(function () {
                 allowEditing: true,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-                    var type = $("#AccountType").val();
 
-                    var discount = parseFloat($("#_DiscountPercentagePart").val());
+                    const type = (rowData.AccountType != null && rowData.AccountType !== 0 && rowData.AccountType !== "")
+                        ? String(rowData.AccountType)
+                        : String($("#AccountType").val() || "");
+
+                    let discount = parseFloat($("#_DiscountPercentagePart").val());
                     if (isNaN(discount)) discount = 0;
 
-                    var basePrice = 0;
+                    let basePrice = 0;
 
-                    if (type === '1') {
+                    if (type === "1") {
                         basePrice = parseFloat(rowData.CostPrice);
                         if (isNaN(basePrice)) basePrice = 0;
-                    } else if (type === '2') {
+
+                    } else if (type === "2") {
                         basePrice = parseFloat(rowData.SalePrice);
                         if (isNaN(basePrice)) basePrice = 0;
 
                         basePrice = basePrice - (basePrice * (discount / 100));
                     }
 
-                    var discountedPrice = Number(basePrice) || 0;
-
-                    rowData.Price = discountedPrice;
-                    return Number(discountedPrice.toFixed(2));
+                    rowData.Price = Number(basePrice) || 0;
+                    return Number(rowData.Price.toFixed(2));
                 }
             },
             {
@@ -583,6 +585,11 @@ $(function () {
         onCellValueChanged: function (e) {
             if (["Quantity", "Price", "DiscountPct", "UsedQuantity"].includes(e.column.dataField)) {
                 e.component.updateDimensions();
+            }
+
+            if (e.column.dataField === "AccountType") {
+                e.component.refresh().done(updateFieldsFromGrid);
+                return;
             }
 
             updateFieldsFromGrid();
