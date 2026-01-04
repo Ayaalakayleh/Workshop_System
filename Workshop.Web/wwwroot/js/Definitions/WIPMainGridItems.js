@@ -453,7 +453,7 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) !== 42);
+                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35);
                         },
                         onClick: function (e) {
                             console.log("Approve clicked", e.row.data);
@@ -466,7 +466,7 @@ $(function () {
                         type: "danger",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) !== 42);
+                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35);
                         },
                         onClick: function (e) {
                             console.log("Reject clicked", e.row.data);
@@ -545,7 +545,7 @@ $(function () {
                         icon: "fad fa-trash",
                         visible: function (e) {
                             return Permission_AddParts && (
-                                parseInt(e.row.data.Status) !== 42 &&
+                                parseInt(e.row.data.Status) !== 42 && parseInt(e.row.data.Status) !== 41 &&
                                 !(wipStatus === Gone || wipStatus === Invoiced)
                             );
                         },

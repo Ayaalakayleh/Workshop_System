@@ -896,4 +896,54 @@ $("#Vat").on("change", function () {
     grid.refresh();
     updateTotalLabourFieldsFromGrid();
 });
+//function wireRateAutoUpdate() {
+//    const grid = $("#mainRTSGrid").dxDataGrid("instance");
+//    if (!grid) return;
+
+//    const prevHandler = grid.option("onCellValueChanged");
+
+//    grid.option("onCellValueChanged", function (e) {
+
+//        if (typeof prevHandler === "function") prevHandler(e);
+
+//        if (e.dataField === "AccountType") {
+//            const keyId = e.key;
+//            const rtsId = e.data.Id; 
+//            if (keyId && rtsId) {
+//                getRateAmount(keyId, rtsId);
+//            }
+//        }
+//    });
+//}
+let isBulkUpdatingRates = false;
+
+function wireRateAutoUpdate() {
+    const grid = $("#mainRTSGrid").dxDataGrid("instance");
+    if (!grid) return;
+
+    const prevHandler = grid.option("onCellValueChanged");
+
+    grid.option("onCellValueChanged", function (e) {
+
+        if (typeof prevHandler === "function") prevHandler(e);
+
+        if (isBulkUpdatingRates) return;
+
+        if (e.dataField === "AccountType") {
+            const keyId = e.key;        
+            const rtsId = e.data?.Id;   
+            const accType = e.value;    
+
+            if (!keyId || !rtsId || accType == null || accType === "") return;
+
+            getRateAmount(keyId, rtsId, accType);
+        }
+    });
+}
+
+$(document).ready(function () {
+    wireRateAutoUpdate();
+});
+
+
 

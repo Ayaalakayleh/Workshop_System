@@ -802,7 +802,70 @@ $("#SalesType").on("change", function () {
 //        console.error("Error:", error);
 //    });
 //}
+function getRateAmount(keyId, RTSId) {
+    pendingRateCalls++;
+    setSaveBusy(true);
 
+    const grid = $('#mainRTSGrid').dxDataGrid('instance');
+    var model = {
+        CustomerId: parseInt($('#CustomerId').val()),
+        RTSId: parseInt(RTSId),
+        WIPId: $('#Id').val(),
+        AccountType: parseInt($('#AccountType').val()),
+        SalesType: parseInt($('#SalesType').val())
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: window.RazorVars.getLabourRateUrl,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(model)
+    }).then(function (result) {
+        if (result == null) return;
+
+        const data = grid.option("dataSource") || [];
+        const target = data.find(r => r.KeyId === keyId);
+
+        if (!target) return;
+
+        const hours = parseFloat(target.StandardHours) || 0;
+        const total = +(result * hours).toFixed(2);
+
+        target.BaseRate = result;
+        target.Rate = result;
+        target.Total = total;
+
+        const rowIndex = grid.getRowIndexByKey(keyId);
+        grid.beginUpdate();
+        try {
+            if (rowIndex >= 0) {
+                grid.cellValue(rowIndex, "BaseRate", target.BaseRate);
+                grid.cellValue(rowIndex, "Rate", target.Rate);
+                grid.cellValue(rowIndex, "Total", target.Total);
+            }
+        } finally {
+            grid.endUpdate();
+        }
+
+        const ds = grid.getDataSource();
+        const reloadPromise = ds ? ds.reload() : $.Deferred().resolve().promise();
+
+        return reloadPromise
+            .then(() => grid.saveEditData())
+            .then(() => grid.refresh(true))
+            .then(() => waitForGridIdle(grid));
+
+
+    }).always(function () {
+        pendingRateCalls--;
+
+        if (pendingRateCalls <= 0) {
+            pendingRateCalls = 0;
+            setSaveBusy(false);
+        }
+    });
+}
 
 $(document).ready(function () {
 
