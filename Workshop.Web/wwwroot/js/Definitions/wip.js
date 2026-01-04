@@ -696,9 +696,16 @@
        
 
         $('#tabOptionsBTN').on("click", function () {
+            const before = $("#optPartialInv").is(":checked");
+
             loadWipOptions().always(function () {
                 togglePartialBtn();
-                $("#optPartialInv").trigger("change");
+
+                const after = $("#optPartialInv").is(":checked");
+
+                if (before !== after) {
+                    $("#optPartialInv").trigger("change");
+                }
             });
         });
 
