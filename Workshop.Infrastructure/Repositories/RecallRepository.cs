@@ -138,7 +138,7 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@StartDate", dto.StartDate);
             parameters.Add("@IsActive", dto.IsActive);
             parameters.Add("@CreatedBy", dto.CreatedBy);
-            parameters.Add("@VehicleList", vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
+            parameters.Add("@VehicleList", vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList_v2"));
 
             var result = await connection.QuerySingleAsync<int>(
                 "Recall_Insert",
@@ -182,7 +182,7 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@IsActive", dto.IsActive);
             parameters.Add("@UpdatedBy", dto.UpdatedBy);
             parameters.Add("@VehicleList",
-                vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList"));
+                vehicleTable.AsTableValuedParameter("dbo.RecallVehicleList_v2"));
 
                 var result = await connection.QuerySingleAsync<int>(
                     "Recall_Update",
