@@ -802,16 +802,22 @@ $("#SalesType").on("change", function () {
 //        console.error("Error:", error);
 //    });
 //}
-function getRateAmount(keyId, RTSId) {
+function getRateAmount(keyId, RTSId, rowAccountType) {
     pendingRateCalls++;
     setSaveBusy(true);
 
     const grid = $('#mainRTSGrid').dxDataGrid('instance');
+
+    const effectiveAccountType =
+        (rowAccountType !== undefined && rowAccountType !== null && rowAccountType !== "")
+            ? parseInt(rowAccountType)
+            : parseInt($('#AccountType').val());
+
     var model = {
         CustomerId: parseInt($('#CustomerId').val()),
         RTSId: parseInt(RTSId),
         WIPId: $('#Id').val(),
-        AccountType: parseInt($('#AccountType').val()),
+        AccountType: effectiveAccountType,
         SalesType: parseInt($('#SalesType').val())
     };
 
@@ -822,7 +828,7 @@ function getRateAmount(keyId, RTSId) {
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(model)
     }).then(function (result) {
-        if (result == null) return;
+        if (result == null || !grid) return;
 
         const data = grid.option("dataSource") || [];
         const target = data.find(r => r.KeyId === keyId);
