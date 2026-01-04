@@ -29,6 +29,13 @@ namespace Workshop.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("GetAllRows")]
+        public async Task<IActionResult> GetAllRows([FromBody] PriceMatrixFilter dto)
+        {
+            var result = await _service.GetAllRowsAsync(dto);
+            return Ok(result);
+        }
+
         [HttpPost("GetPaged")]
         public async Task<IActionResult> GetPaged([FromBody] PriceMatrixFilter dto)
         {

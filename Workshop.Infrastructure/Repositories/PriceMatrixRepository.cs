@@ -152,6 +152,33 @@ namespace Workshop.Infrastructure.Repositories
 
         }
 
+        public async Task<List<GetPriceMatrixDTO>> GetAllRowsAsync(PriceMatrixFilter filter)
+        {
+
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@Name", filter.Name);
+            parameters.Add("@Applies", filter.AppliesTo);
+            parameters.Add("@BasisId", filter.Basis);
+
+            using var multi = await connection.QueryMultipleAsync(
+                "PriceMatrix_GetAll_AllRows", parameters, commandType: CommandType.StoredProcedure);
+
+            var prices = (await multi.ReadAsync<GetPriceMatrixDTO>()).ToList();
+            var matchValues = (await multi.ReadAsync<(int HeaderId, int RefId)>()).ToList();
+            var customerValues = (await multi.ReadAsync<(int HeaderId, int RefId)>()).ToList();
+
+            foreach (var price in prices)
+            {
+                price.MatchValue = matchValues.Where(x => x.HeaderId == price.Id).Select(x => x.RefId).ToList();
+                price.Customers = customerValues.Where(x => x.HeaderId == price.Id).Select(x => x.RefId).ToList();
+            }
+
+            return prices;
+
+        }
+
         // New paged method
         public async Task<PagedPriceMatrixResultDTO> GetAllPagedAsync(PriceMatrixFilter filter)
         {

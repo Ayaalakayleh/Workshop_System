@@ -217,6 +217,10 @@
 		loadingText: '@Html.Raw(Common["Loading"])'
 	};
 </script>
+<script>
+	window.AllCustomersOptions = @Html.Raw(Json.Serialize(ViewBag.Customers));
+	window.AvailableCustomersOptions = @Html.Raw(Json.Serialize(ViewBag.AvailableCustomers));
+</script>
 @if (Model.TotalPages > 0)
 {
 	<input id="total_pages" value="@Model.TotalPages" hidden />

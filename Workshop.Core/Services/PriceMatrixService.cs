@@ -32,6 +32,11 @@ namespace Workshop.Core.Services
             return await _repository.GetAllAsync(createPriceMatrixDTO);
         }
 
+        public async Task<List<GetPriceMatrixDTO>> GetAllRowsAsync(PriceMatrixFilter filter)
+        {
+            return await _repository.GetAllRowsAsync(filter);
+        }
+
         public async Task<int> UpdateAsync(UpdatePriceMatrixDTO updatePriceMatrixDTO)
         {
             return await _repository.UpdateAsync(updatePriceMatrixDTO);

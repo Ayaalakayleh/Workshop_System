@@ -1730,6 +1730,13 @@ namespace Workshop.Web.Services
 
         }
 
+        public async Task<List<GetPriceMatrixDTO>> GetAllRows(PriceMatrixFilter filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/PriceMatrix/GetAllRows", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<List<GetPriceMatrixDTO>>();
+        }
+
         public async Task<int?> AddPricesAsync(CreatePriceMatrixDTO dto)
         {
             var response = await _httpClient.PostAsJsonAsync($"api/PriceMatrix/Add", dto);

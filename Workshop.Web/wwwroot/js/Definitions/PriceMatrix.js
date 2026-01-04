@@ -121,8 +121,21 @@ $(document).ready(function () {
         }
     });
 });
+    function fillCustomers(list, selectedIds) {
+        const $c = $("#Customers");
+        $c.empty();
+        (list || []).forEach(x => {
+            $c.append(new Option(x.text, x.value, false, false));
+        });
+        if (selectedIds) $c.val(selectedIds);
+        $c.trigger("change");
+    }
 
 $(document).ready(function () {
+
+    $('#addButton').on('click', function () {
+        fillCustomers(window.AvailableCustomersOptions, []); 
+    });
 
     $('#addButton').on('click', function () {
         var recordId = $(this).data('id');
@@ -396,7 +409,9 @@ function loadPriceById(teamId) {
                 });
 
             }
-
+            if (!pricedata) return;
+            const selected = pricedata.customers || pricedata.customersIds || [];
+            fillCustomers(window.AllCustomersOptions, selected);
         },
         error: function () {
             alert("Failed to load team data.");

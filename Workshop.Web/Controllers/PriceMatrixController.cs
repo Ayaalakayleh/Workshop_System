@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using System.Linq;
 using Workshop.Core.DTOs;
 using Workshop.Domain.Enum;
 using Workshop.Web.Models;
@@ -38,8 +39,15 @@ namespace Workshop.Web.Controllers
           
             ViewBag.SalesType = new List<SelectListItem>();
             var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, 1, lang);
+            var pricesAll = await _apiClient.GetAllRows(new PriceMatrixFilter());
+            var usedCustomerIds = pricesAll?.SelectMany(p => p.Customers ?? new List<int>()).ToHashSet() ?? new HashSet<int>();
+
             ViewBag.Customers = allCustomers.Select(c => new SelectListItem
             { Value = c.Id.ToString(), Text = c.CustomerName }).ToList();
+
+            ViewBag.AvailableCustomers = allCustomers.Where(c => !usedCustomerIds.Contains((int)c.Id)).Select(c => new SelectListItem
+            { Value = c.Id.ToString(),Text = c.CustomerName}).ToList();
+                        
             ViewBag.MatchValues = new List<int>();
 
             if (priceMatrixModel == null)
