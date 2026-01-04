@@ -598,9 +598,12 @@ namespace Workshop.Web.Controllers
 
             try
             {
-                // Get reference data
-                var makes = await GetMakes();       // List<Make> { Text, Value }
-                var models = await GetVehicles();   // List<Vehicle> { Name, Id }
+
+                var manufacturers = await _vehicleApiClient.GetAllManufacturers(lang);
+                var manufacturerLookup = manufacturers.ToDictionary(m => m.Id, m => new { Primary = m.ManufacturerPrimaryName, Secondary = m.ManufacturerSecondaryName });
+
+                var vehicleModels = await _vehicleApiClient.GetAllVehicleModel(0, lang);
+                var modelLookup = vehicleModels.ToDictionary(m => m.Id, m => new { Primary = m.VehicleModelPrimaryName, Secondary = m.VehicleModelSecondaryName, ManufacturerId = m.ManufacturerId });
 
                 var rowsOut = new List<VehicleRecallDTO>();
                 var ExcelImportModel = new ExcelImportModel();
@@ -612,8 +615,6 @@ namespace Workshop.Web.Controllers
 
                     int headerRow = 1;
                     int startRow = 2;
-                    var lastRowRange = wsT.LastRowUsed();
-                    int lastRow = lastRowRange != null ? lastRowRange.RowNumber() : startRow;
 
                     Dictionary<string, int> columnMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
@@ -640,9 +641,13 @@ namespace Workshop.Web.Controllers
                             columnMap["Status"] = col;
                     }
 
-                    for (int r = startRow; r <= lastRow; r++)
-                    {
+                    // Process rows until we find 5 consecutive empty rows
+                    int r = startRow;
+                    int emptyRowCount = 0;
+                    const int maxEmptyRows = 5;
 
+                    while (emptyRowCount < maxEmptyRows)
+                    {
                         string excelMakeText = null;
                         string excelModelText = null;
                         string excelChasse = null;
@@ -660,30 +665,47 @@ namespace Workshop.Web.Controllers
                         if (columnMap.TryGetValue("Status", out var statusCol))
                             excelStatusText = wsT.Cell(r, statusCol).GetString()?.Trim();
 
+                        // Check if this row is empty
+                        bool isEmptyRow = string.IsNullOrWhiteSpace(excelMakeText) &&
+                                         string.IsNullOrWhiteSpace(excelModelText) &&
+                                         string.IsNullOrWhiteSpace(excelChasse) &&
+                                         string.IsNullOrWhiteSpace(excelStatusText);
 
-                        if (string.IsNullOrWhiteSpace(excelMakeText) &&
-                            string.IsNullOrWhiteSpace(excelModelText) &&
-                            string.IsNullOrWhiteSpace(excelChasse) &&
-                            string.IsNullOrWhiteSpace(excelStatusText))
+                        if (isEmptyRow)
+                        {
+                            emptyRowCount++;
+                            r++;
                             continue;
+                        }
+
+                        // Reset empty row count since we found data
+                        emptyRowCount = 0;
 
                         int? makeID = null;
                         int? modelID = null;
 
                         if (!string.IsNullOrEmpty(excelMakeText))
                         {
-                            var makeMatch = makes.FirstOrDefault(m => m.Text.Equals(excelMakeText, StringComparison.OrdinalIgnoreCase));
-                            if (makeMatch != null && int.TryParse(makeMatch.Value, out var parsedMakeID))
-                                makeID = parsedMakeID;
+                            // Try to match manufacturer by primary or secondary name
+                            var manufacturerMatch = manufacturerLookup.FirstOrDefault(m =>
+                                m.Value.Primary.Equals(excelMakeText, StringComparison.OrdinalIgnoreCase) ||
+                                m.Value.Secondary.Equals(excelMakeText, StringComparison.OrdinalIgnoreCase));
+
+                            if (manufacturerMatch.Key != 0)
+                                makeID = manufacturerMatch.Key;
                         }
 
                         if (!string.IsNullOrEmpty(excelModelText))
                         {
-                            var modelMatch = models.FirstOrDefault(m => m.Name.Equals(excelModelText, StringComparison.OrdinalIgnoreCase));
-                            if (modelMatch != null)
-                                modelID = modelMatch.Id;
-                        }
+                            // Try to match model by primary or secondary name, discarding spaces
+                            var excelModelTextNoSpaces = excelModelText.Replace(" ", "");
+                            var modelMatch = modelLookup.FirstOrDefault(m =>
+                                m.Value.Primary.Replace(" ", "").Equals(excelModelTextNoSpaces, StringComparison.OrdinalIgnoreCase) ||
+                                m.Value.Secondary.Replace(" ", "").Equals(excelModelTextNoSpaces, StringComparison.OrdinalIgnoreCase));
 
+                            if (modelMatch.Key != 0)
+                                modelID = modelMatch.Key;
+                        }
 
                         int? recallStatus = null;
                         if (!string.IsNullOrEmpty(excelStatusText))
@@ -707,8 +729,7 @@ namespace Workshop.Web.Controllers
                         bool isValid = true;
                         if (makeID.HasValue && modelID.HasValue)
                         {
-                            var model = models.FirstOrDefault(m => m.Id == modelID.Value);
-                            if (model != null && model.ManufacturerId != makeID.Value)
+                            if (modelLookup.TryGetValue(modelID.Value, out var modelInfo) && modelInfo.ManufacturerId != makeID.Value)
                             {
                                 isValid = false;
                                 ExcelImportModel.Errors.Add($"Row {r - headerRow}: Model '{excelModelText}' does not match manufacturer '{excelMakeText}'.");
@@ -723,6 +744,8 @@ namespace Workshop.Web.Controllers
                         {
                             ExcelImportModel.RejectedRows.Add(vehicleRecall);
                         }
+
+                        r++;
                     }
                 }
 
