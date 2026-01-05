@@ -104,7 +104,7 @@ $(document).ready(function () {
             theme: 'bootstrap-5',
             width: '100%',
             placeholder: function () {
-                return $sel.data('placeholder') || 'Select an option';
+                return $sel.data('placeholder') || RazorVars.select;
             }
         });
     });
@@ -120,7 +120,7 @@ $('#workOrderModal').on('shown.bs.modal', function () {
             theme: 'bootstrap-5',
             width: '100%',
             dropdownParent: $modal,
-            placeholder: $sel.data('placeholder') || 'Select an option'
+            placeholder: $sel.data('placeholder') || RazorVars.select
         });
     });
 });
