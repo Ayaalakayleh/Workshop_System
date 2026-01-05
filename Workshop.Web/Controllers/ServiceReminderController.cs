@@ -310,8 +310,8 @@ namespace Workshop.Web.Controllers
                 var manufacturers = await _vehicleApiClient.GetAllManufacturers();
                 ViewBag.manufacturers = manufacturers.Select(t => new SelectListItem { Text = lang == "en" ? t.ManufacturerPrimaryName : t.ManufacturerSecondaryName, Value = t.Id.ToString() }).ToList();
 
-                var vehicle = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
-                ViewBag.vehicle = vehicle.Select(v => new SelectListItem
+                var vehicles = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+                ViewBag.vehicle = vehicles.Select(v => new SelectListItem
                 {
                     Text = lang == "en" ? v.VehicleName : v.VehicleName,
                     Value = v.id.ToString()
