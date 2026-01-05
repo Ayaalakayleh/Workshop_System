@@ -68,7 +68,7 @@ namespace Workshop.Web.Controllers
                     t.ID == dto.InternalRevenueLabourId
             }).ToList();
 
-            var invoiceTypes = await _accountingApiClient.TypeSalesPurchases_GetAll(companyId, branchId, 1, null);
+            var invoiceTypes = await _accountingApiClient.TypeSalesPurchases_GetAll(companyId, branchId, 1, 1);
             ViewBag.InvoiceTypes = invoiceTypes.Select(t => new SelectListItem
             {
                 Text = lang == "en" ? t.PrimaryName : t.SecondaryName,
