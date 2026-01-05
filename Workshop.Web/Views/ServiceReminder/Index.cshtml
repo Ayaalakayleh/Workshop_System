@@ -175,7 +175,7 @@
                         <div class="col-md-6 mb-3">
                             <label>@Common["Label_Model"]</label>
                             @Html.DropDownListFor(model => model.ReminderForm.VehicleModelId,
-                                                        new SelectList(ViewBag.services, "Value", "Text"),
+                                                        new SelectList(ViewBag.vehiclesModels, "Value", "Text"),
                                                         "Select",
                                                         new { @class = "form-control", id = "Model" })
                         </div>
