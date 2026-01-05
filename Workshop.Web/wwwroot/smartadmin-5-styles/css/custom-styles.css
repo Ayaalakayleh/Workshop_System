@@ -1036,7 +1036,10 @@ html[dir="rtl"] .toggle-pin {
         border-left: 1px dashed rgba(255,255,255,.06);
         text-align: start;
     }
-
+#gridBody {
+    height: 357px;
+    overflow-y: auto;
+}
 /* Body rows: each technician */
 #gridBody .wl-row {
     display: grid;

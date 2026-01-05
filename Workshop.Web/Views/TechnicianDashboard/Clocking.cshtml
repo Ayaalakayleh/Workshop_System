@@ -438,6 +438,15 @@
 					initRtsPopovers();
 				});
 			});
+			$(document).ready(function(){
+									$('select').select2({
+			theme: 'bootstrap-5',
+			width: '100%',
+			placeholder: function () {
+				return $(this).data('placeholder') || 'Select an option';
+			}
+		});
+			});
 
 	</script>
 

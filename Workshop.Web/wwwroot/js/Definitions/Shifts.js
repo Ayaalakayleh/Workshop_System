@@ -47,6 +47,7 @@ $(function () {
             Code: { required: true },
             Short: { required: true },
             PrimaryName: { required: true },
+            SecondaryName: { required: true },
 
             // ---- Working hours: require the other field only when one is filled ----
             WorkingFromTime: {
@@ -91,6 +92,7 @@ $(function () {
             Code: { required: RazorVars.required_field },
             Short: { required: RazorVars.required_field },
             PrimaryName: { required: RazorVars.required_field },
+            SecondaryName: { required: RazorVars.required_field },
 
             WorkingFromTime: { required: RazorVars.required_field },
             WorkingToTime: {
