@@ -2571,4 +2571,22 @@
   <data name="TotalCost" xml:space="preserve">
     <value>إجمالي القيمة</value>
   </data>
+  <data name="Title_TransferMovement" xml:space="preserve">
+    <value>نقل حركة</value>
+  </data>
+  <data name="Label_TransferDate" xml:space="preserve">
+    <value>تاريخ النقل</value>
+  </data>
+  <data name="Button_CheckIn" xml:space="preserve">
+    <value>تحقق</value>
+  </data>
+  <data name="Label_NotTaxable" xml:space="preserve">
+    <value>غير خاضع للضريبة</value>
+  </data>
+  <data name="Label_CreditInvoice" xml:space="preserve">
+    <value>فاتورة إشعار دائن</value>
+  </data>
+  <data name="Label_PettyCashInvoice" xml:space="preserve">
+    <value>فاتورة العهد النقدية</value>
+  </data>
 </root>

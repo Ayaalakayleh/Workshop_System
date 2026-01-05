@@ -2571,4 +2571,22 @@
   <data name="TotalCost" xml:space="preserve">
     <value>Total Cost</value>
   </data>
+  <data name="Title_TransferMovement" xml:space="preserve">
+    <value>Transfer Movement</value>
+  </data>
+  <data name="Label_TransferDate" xml:space="preserve">
+    <value>Transfer Date</value>
+  </data>
+  <data name="Button_CheckIn" xml:space="preserve">
+    <value>Check In</value>
+  </data>
+  <data name="Label_NotTaxable" xml:space="preserve">
+    <value>Not Taxable</value>
+  </data>
+  <data name="Label_CreditInvoice" xml:space="preserve">
+    <value>Credit Invoice</value>
+  </data>
+  <data name="Label_PettyCashInvoice" xml:space="preserve">
+    <value>Petty Cash Invoice</value>
+  </data>
 </root>
