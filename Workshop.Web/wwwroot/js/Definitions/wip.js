@@ -696,9 +696,16 @@
        
 
         $('#tabOptionsBTN').on("click", function () {
+            const before = $("#optPartialInv").is(":checked");
+
             loadWipOptions().always(function () {
                 togglePartialBtn();
-                $("#optPartialInv").trigger("change");
+
+                const after = $("#optPartialInv").is(":checked");
+
+                if (before !== after) {
+                    $("#optPartialInv").trigger("change");
+                }
             });
         });
 
@@ -802,7 +809,76 @@ $("#SalesType").on("change", function () {
 //        console.error("Error:", error);
 //    });
 //}
+function getRateAmount(keyId, RTSId, rowAccountType) {
+    pendingRateCalls++;
+    setSaveBusy(true);
 
+    const grid = $('#mainRTSGrid').dxDataGrid('instance');
+
+    const effectiveAccountType =
+        (rowAccountType !== undefined && rowAccountType !== null && rowAccountType !== "")
+            ? parseInt(rowAccountType)
+            : parseInt($('#AccountType').val());
+
+    var model = {
+        CustomerId: parseInt($('#CustomerId').val()),
+        RTSId: parseInt(RTSId),
+        WIPId: $('#Id').val(),
+        AccountType: effectiveAccountType,
+        SalesType: parseInt($('#SalesType').val())
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: window.RazorVars.getLabourRateUrl,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(model)
+    }).then(function (result) {
+        if (result == null || !grid) return;
+
+        const data = grid.option("dataSource") || [];
+        const target = data.find(r => r.KeyId === keyId);
+
+        if (!target) return;
+
+        const hours = parseFloat(target.StandardHours) || 0;
+        const total = +(result * hours).toFixed(2);
+
+        target.BaseRate = result;
+        target.Rate = result;
+        target.Total = total;
+
+        const rowIndex = grid.getRowIndexByKey(keyId);
+        grid.beginUpdate();
+        try {
+            if (rowIndex >= 0) {
+                grid.cellValue(rowIndex, "BaseRate", target.BaseRate);
+                grid.cellValue(rowIndex, "Rate", target.Rate);
+                grid.cellValue(rowIndex, "Total", target.Total);
+            }
+        } finally {
+            grid.endUpdate();
+        }
+
+        const ds = grid.getDataSource();
+        const reloadPromise = ds ? ds.reload() : $.Deferred().resolve().promise();
+
+        return reloadPromise
+            .then(() => grid.saveEditData())
+            .then(() => grid.refresh(true))
+            .then(() => waitForGridIdle(grid));
+
+
+    }).always(function () {
+        pendingRateCalls--;
+
+        if (pendingRateCalls <= 0) {
+            pendingRateCalls = 0;
+            setSaveBusy(false);
+        }
+    });
+}
 
 $(document).ready(function () {
 
@@ -832,9 +908,14 @@ $(document).ready(function () {
         });
     }
 
+    let prevPartialInv = null; 
+
     function toggleEditingByPartialInv() {
         const partialInvoicing = $("#optPartialInv").is(":checked");
         const accountTypeVal = parseInt($("#AccountType").val()) || 0;
+
+        if (prevPartialInv === null) prevPartialInv = partialInvoicing;
+        const turnedOnNow = partialInvoicing && (prevPartialInv === false);
 
         getGrids().forEach(grid => {
 
@@ -842,35 +923,31 @@ $(document).ready(function () {
             cols.forEach(col => {
                 if (col.dataField === "AccountType") {
                     col.allowEditing = partialInvoicing;
-
-                    if (partialInvoicing) {
-                        col.validationRules = [
-                            { type: "required", message: "required" }
-                        ];
-                    } else {
-                        col.validationRules = [];
-                    }
+                    col.validationRules = partialInvoicing
+                        ? [{ type: "required", message: "required" }]
+                        : [];
                 }
             });
             grid.option("columns", cols);
 
             const store = grid.getDataSource().store();
-            const rows = grid.getVisibleRows();
+            const rows = grid.getDataSource().items() || [];
 
-            rows.forEach(r => {
-                const row = r.data;
-
-                if (partialInvoicing) {
+            if (turnedOnNow) {
+                rows.forEach(row => {
                     row.AccountType = null;
-                } else {
+                    store.update(row.Id, row);
+                });
+            } else if (!partialInvoicing) {
+                rows.forEach(row => {
                     row.AccountType = accountTypeVal;
-                }
-
-                store.update(row.Id, row);
-            });
+                    store.update(row.Id, row);
+                });
+            }
 
             grid.refresh();
         });
+        prevPartialInv = partialInvoicing; 
     }
 
     $("#AccountType").on("change", updateAccountTypeValues);

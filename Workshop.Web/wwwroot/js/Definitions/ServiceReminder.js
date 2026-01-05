@@ -180,7 +180,7 @@ $(document).ready(function () {
             );
             $.each(data, function (_, item) {
                 $modelSelect.append(
-                    $('<option>', { value: item.id, text: item.vehicleModelPrimaryName ?? item.vehicleModelSecondaryName })
+                    $('<option>', { value: item.id, text: item.name })
                 );
             });
 
@@ -198,7 +198,7 @@ $(document).ready(function () {
             );
             $.each(data, function (_, item) {
                 $_modelSelect.append(
-                    $('<option>', { value: item.id, text: item.vehicleModelPrimaryName ?? item.vehicleModelSecondaryName })
+                    $('<option>', { value: item.id, text: item.name })
                 );
             });
         });
@@ -295,7 +295,7 @@ $(document).ready(function () {
 
                 $.each(data, function (_, item) {
                     $modelSelect.append(
-                        $('<option>', { value: item.id, text: item.vehicleModelPrimaryName ?? item.vehicleModelSecondaryName })
+                        $('<option>', { value: item.id, text: item.name })
                     );
                 });
 

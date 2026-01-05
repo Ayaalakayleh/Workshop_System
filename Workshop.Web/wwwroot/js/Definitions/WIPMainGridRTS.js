@@ -159,7 +159,9 @@ $(function () {
                 allowEditing: false,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-                    var vatId = $("#Vat").val();
+                    //var vatId = $("#Vat").val();
+                    var vatId = getEffectiveVatId(rowData);
+
                     var vatValue = parseFloat(GetVatValueById(vatId)) || 0;
                     var vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;
 
@@ -340,6 +342,24 @@ $(function () {
 
             updateTotalLabourFieldsFromGrid();
         },
+        onEditorPrepared: function (e) {
+            if (e.parentType !== "dataRow" || e.dataField !== "AccountType") return;
+
+            const editorInstance = e.editorElement.dxSelectBox("instance");
+            if (!editorInstance) return;
+
+            editorInstance.option("onValueChanged", function (args) {
+                e.setValue(args.value);
+
+                const keyId = e.row.key;
+                const rtsId = e.row.data.Id;
+                const acc = args.value;
+
+                console.log("AccountType changed:", keyId, rtsId, acc);
+                getRateAmount(keyId, rtsId, acc);
+            });
+        }
+
 
 
     });
@@ -843,7 +863,8 @@ function GetVatValueById(vatId) {
     return vatValue;
 }
 function ensureDiscountedRate(rowData) {
-    const discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
+    //const discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
+    const discount = getEffectiveLabourDiscountPct(rowData);
 
     let rate = parseFloat(rowData.Rate) || 0;
     let base = parseFloat(rowData.BaseRate);
@@ -864,31 +885,30 @@ function ensureDiscountedRate(rowData) {
     return discounted;
 }
 
-$("#Vat").on("change", function () {
+$("#Vat, #PartialVat").on("change", function () {
     const grid = $("#mainRTSGrid").dxDataGrid("instance");
     if (!grid) return;
-     
-    const vatId = $("#Vat").val();
-    const vatValue = parseFloat(GetVatValueById(vatId)) || 0;
-    const vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;
 
     const rows = grid.getVisibleRows() || [];
 
     rows.forEach((r) => {
-        const data = r.data;
-        const accType = parseInt(data.AccountType) || 0;
+        const d = r.data || {};
+        const accType = parseInt(d.AccountType) || 0;
 
         if (accType === 2) {
-            const rate = ensureDiscountedRate(data);
-            const hours = parseFloat(data.StandardHours) || 0;
+            const vatId = getEffectiveVatId(d);
+            const vatValue = parseFloat(GetVatValueById(vatId)) || 0;
+            const vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;
+
+            const rate = ensureDiscountedRate(d);
+            const hours = parseFloat(d.StandardHours) || 0;
 
             const newTax = +(hours * rate * vatPercent).toFixed(2);
-
             grid.cellValue(r.rowIndex, "Tax", newTax);
-            data.Tax = newTax;
+            d.Tax = newTax;
         } else {
             grid.cellValue(r.rowIndex, "Tax", 0);
-            data.Tax = 0;
+            d.Tax = 0;
         }
     });
 
@@ -896,4 +916,97 @@ $("#Vat").on("change", function () {
     grid.refresh();
     updateTotalLabourFieldsFromGrid();
 });
+
+function getRateAmount(keyId, RTSId, rowAccountType) {
+    pendingRateCalls++;
+    setSaveBusy(true);
+    debugger
+    const grid = $('#mainRTSGrid').dxDataGrid('instance');
+
+    const effectiveAccountType = (rowAccountType != null && rowAccountType !== "")
+        ? parseInt(rowAccountType)
+        : parseInt($('#AccountType').val());
+
+    var model = {
+        CustomerId: getEffectiveCustomerId(row),
+        RTSId: parseInt(RTSId),
+        WIPId: $('#Id').val(),
+        AccountType: effectiveAccountType,
+        SalesType: parseInt($('#SalesType').val())
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: window.RazorVars.getLabourRateUrl,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(model)
+    }).then(function (result) {
+        if (result == null || !grid) return;
+
+        const data = grid.option("dataSource") || [];
+        const target = data.find(r => r.KeyId === keyId);
+        if (!target) return;
+
+        const hours = parseFloat(target.StandardHours) || 0;
+        const total = +(result * hours).toFixed(2);
+
+        target.BaseRate = result;
+        target.Rate = result;
+        target.Total = total;
+
+        const rowIndex = grid.getRowIndexByKey(keyId);
+
+        grid.beginUpdate();
+        try {
+            if (rowIndex >= 0) {
+                grid.cellValue(rowIndex, "BaseRate", target.BaseRate);
+                grid.cellValue(rowIndex, "Rate", target.Rate);
+                grid.cellValue(rowIndex, "Total", target.Total);
+            }
+        } finally {
+            grid.endUpdate();
+        }
+
+        const ds = grid.getDataSource();
+        const reloadPromise = ds ? ds.reload() : $.Deferred().resolve().promise();
+
+        return reloadPromise
+            .then(() => grid.saveEditData())
+            .then(() => grid.refresh(true))
+            .then(() => waitForGridIdle(grid));
+
+    }).always(function () {
+        pendingRateCalls--;
+        if (pendingRateCalls <= 0) {
+            pendingRateCalls = 0;
+            setSaveBusy(false);
+        }
+    });
+}
+
+function isRowExternal(rowData) {
+
+    return !!(rowData && (rowData.IsExternal === true || rowData.IsExternal === 1 || rowData.External === true));
+}
+
+function getEffectiveCustomerId(rowData) {
+    const main = parseInt($("#CustomerId").val()) || 0;
+    const partial = parseInt($("#PartialCustomerId").val()) || 0;
+
+    return isRowExternal(rowData) ? (partial || main) : (main || partial);
+}
+
+function getEffectiveVatId(rowData) {
+    const mainVat = parseInt($("#Vat").val()) || 0;
+    const partialVat = parseInt($("#PartialVat").val()) || 0;
+
+    return isRowExternal(rowData) ? (partialVat || mainVat) : (mainVat || partialVat);
+}
+function getEffectiveLabourDiscountPct(rowData) {
+    const main = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
+    const partial = parseFloat($("#_DiscountPercentageLaborPartial").val()) || 0;
+
+    return isRowExternal(rowData) ? (partial || main) : (main || partial);
+}
 

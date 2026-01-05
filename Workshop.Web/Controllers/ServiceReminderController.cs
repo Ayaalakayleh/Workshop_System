@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.AccountingDTOs;
 using Workshop.Core.DTOs.Vehicle;
+using Workshop.Resources;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
 
@@ -20,16 +22,19 @@ namespace Workshop.Web.Controllers
         private readonly VehicleApiClient _vehicleApiClient;
         private readonly AccountingApiClient _accountingApiClient;
         private readonly ERPApiClient _erpApiClient;
+        private readonly IStringLocalizer<Common> _localizer;
         private readonly string lang;
         private static readonly string INDEX_PAGE = "Index";
-        public ServiceReminderController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient serviceReminderService, 
-            VehicleApiClient vehicleApiClient, AccountingApiClient accountingApiClient, ERPApiClient erpApiClient, IMemoryCache cache) : base(cache, configuration, env)
+        public ServiceReminderController(IConfiguration configuration, IWebHostEnvironment env, WorkshopApiClient serviceReminderService,
+            VehicleApiClient vehicleApiClient, AccountingApiClient accountingApiClient, ERPApiClient erpApiClient,
+            IStringLocalizer<Common> localizer, IMemoryCache cache) : base(cache, configuration, env)
         {
             _configuration = configuration;
             _env = env;
             _serviceReminderService = serviceReminderService;
             _vehicleApiClient = vehicleApiClient;
             _accountingApiClient = accountingApiClient;
+            _localizer = localizer;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
             _erpApiClient = erpApiClient;
         }
@@ -61,7 +66,7 @@ namespace Workshop.Web.Controllers
                                  select new SelectListItem
                                  {
                                      Value = Convert.ToInt32(source).ToString(),
-                                     Text = source.ToString()
+                                     Text = GetLocalizedTimeUnitName(source, lang)
                                  }).ToList();
 
             var manufacturers = await _vehicleApiClient.GetAllManufacturers();
@@ -80,7 +85,12 @@ namespace Workshop.Web.Controllers
                 Text = lang == "en" ? v.VehicleName : v.VehicleName, // <-- fallback if not English
                 Value = v.id.ToString()
             }).ToList();
-
+            var vehiclesModels = await _vehicleApiClient.GetAllVehicleModel(0, lang);
+            ViewBag.vehiclesModels = vehiclesModels.Select(v => new SelectListItem
+            {
+                Text = lang == "en" ? v.VehicleModelPrimaryName : v.VehicleModelSecondaryName, // <-- fallback if not English
+                Value = v.Id.ToString()
+            }).ToList();
             foreach (var item in result.Reminders)
             {
                 item.VehicleName = vehicle.Where(a => a.id == item.VehicleId).Select(a => a.VehicleName).FirstOrDefault();
@@ -147,7 +157,7 @@ namespace Workshop.Web.Controllers
 
         public async Task<object> GetVehicleByManufacturerId(int manufacturerId)
         {
-            var vehicles = await _vehicleApiClient.GetAllVehicleModel(manufacturerId, "en");
+            var vehicles = await _vehicleApiClient.GetAllVehicleModel(manufacturerId, lang);
 
             return vehicles;
         }
@@ -298,7 +308,7 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.ServiceReminder.Delete)]
         public async Task<bool> Delete(int Id)
         {
-            var lang = "en";
+  
             GetServiceReminderDTO? getServiceReminderDTO = new GetServiceReminderDTO();
             getServiceReminderDTO.PageSize = 25;
             getServiceReminderDTO.PageNumber = 1;
@@ -327,6 +337,23 @@ namespace Workshop.Web.Controllers
         public static string GetCurrentLanguage()
         {
             return Thread.CurrentThread.CurrentCulture.Name;
+        }
+
+        private string GetLocalizedTimeUnitName(ServiceReminderTimeUnitEnum unit, string language)
+        {
+            switch (unit)
+            {
+                case ServiceReminderTimeUnitEnum.Days:
+                    return _localizer["Label_Day"];
+                case ServiceReminderTimeUnitEnum.Weeks:
+                    return _localizer["Label_Week"];
+                case ServiceReminderTimeUnitEnum.Months:
+                    return _localizer["Label_Month"];
+                case ServiceReminderTimeUnitEnum.Years:
+                    return _localizer["Label_Year"];
+                default:
+                    return unit.ToString();
+            }
         }
 
     }
