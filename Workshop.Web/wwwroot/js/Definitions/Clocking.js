@@ -218,6 +218,7 @@ $('#historyTable').DataTable({
         }
     }
 });
+
 // server helpers
 function setClockStatus(status) {
     document.getElementById('ClockingForm_StatusID').value = status;
@@ -523,6 +524,7 @@ $(document).on('change', '#labourSelect', function () {
 
     $('#rtsKeyIdHidden').val(isNaN(keyId) ? '' : keyId);
 });
+
 //$(document).on('change', '#labourSelect', function () {
 //    const val = $(this).val() || '';   
 //    const parts = val.split('|');
