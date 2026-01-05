@@ -701,7 +701,15 @@
 
     function OpenChangeCarModal() { $("#OpenAddVehicleModal").modal('show'); }
 
-    function ChangeWorkOrderType() { /* no-op */ }
+    $('#OpenAddVehicleModal').on('shown.bs.modal', function () {
+        $(this).find('select').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#OpenAddVehicleModal')
+        });
+    });
+
+    function ChangeWorkOrderType() {}
 
     function ChangesMaintenanceType() {
         var selectedType = $('input[name="Type"]:checked').val();

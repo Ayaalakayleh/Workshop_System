@@ -7,3 +7,6 @@
 #historyTable_filter{
     float:left
 }
+.fa-chevron-left, .fa-chevron-right {
+    transform: scaleX(-1)
+}

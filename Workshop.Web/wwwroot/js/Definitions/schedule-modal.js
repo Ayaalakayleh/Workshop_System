@@ -293,7 +293,7 @@
             width: '100%',
             dropdownParent: $('#scheduleModal'),
             minimumResultsForSearch: 0,
-            placeholder: $el.data('placeholder') || $el.attr('placeholder') || 'Select an option',
+            placeholder: $el.data('placeholder') || $el.attr('placeholder'),
             allowClear: true
         };
     }
