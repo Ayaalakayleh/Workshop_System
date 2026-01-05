@@ -2568,4 +2568,7 @@
   <data name="Customer" xml:space="preserve">
     <value>Customer</value>
   </data>
+  <data name="TotalCost" xml:space="preserve">
+    <value>Total Cost</value>
+  </data>
 </root>

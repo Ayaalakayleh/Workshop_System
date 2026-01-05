@@ -709,7 +709,7 @@
         });
     });
 
-    function ChangeWorkOrderType() { /* no-op */ }
+    function ChangeWorkOrderType() {}
 
     function ChangesMaintenanceType() {
         var selectedType = $('input[name="Type"]:checked').val();
