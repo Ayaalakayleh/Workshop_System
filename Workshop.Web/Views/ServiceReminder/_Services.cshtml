@@ -41,7 +41,7 @@
                         @DateCalculate.getDecimalDifference(item.NextPrimaryMeter, item.CurrentMeter)
                     </td>
                     <td>
-                        <button class="btn btn-info btn-sm editBtn" data-id="@item.Id" data-bs-toggle="modal" data-bs-target="#serviceReminderModal"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</button>
+                        <a href="@Url.Action("Edit", "ServiceReminder", new { id = item.Id })" class="btn btn-info btn-sm"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</a>
                         <button data-id="@item.Id" class="btn btn-danger btn-sm deleteBtn"><i class="fad fa-trash"></i>&nbsp;@Common["Delete"]</button>
                     </td>
                 </tr>

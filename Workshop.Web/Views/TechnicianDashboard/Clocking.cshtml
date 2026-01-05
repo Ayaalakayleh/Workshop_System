@@ -438,9 +438,17 @@
 					initRtsPopovers();
 				});
 			});
+			$(document).ready(function(){
+		$('select').select2({
+			theme: 'bootstrap-5',
+			width: '100%',
+			placeholder: function () {
+				return $(this).data('placeholder') || 'Select an option';
+			}
+		});
+			});
 
 	</script>
 
-	<!-- Your behavior script (now safe to use R/resources) -->
 	<script src="~/js/Definitions/Clocking.js"></script>
 </div>

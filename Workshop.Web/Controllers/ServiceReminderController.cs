@@ -163,36 +163,191 @@ namespace Workshop.Web.Controllers
         }
 
         [CustomAuthorize(Permissions.ServiceReminder.Edit)]
-        public async Task<GetServiceReminderDTO> Edit(int Id)
+        public async Task<IActionResult> Edit(int? Id)
         {
+            // Prepare ViewBag data for dropdowns (similar to Index action)
+            ViewBag.dateUnits = (from ServiceReminderTimeUnitEnum source in Enum.GetValues(typeof(ServiceReminderTimeUnitEnum))
+                                 select new SelectListItem
+                                 {
+                                     Value = Convert.ToInt32(source).ToString(),
+                                     Text = GetLocalizedTimeUnitName(source, lang)
+                                 }).ToList();
 
-            GetServiceReminderDTO? getServiceReminderDTO = new GetServiceReminderDTO();
-            getServiceReminderDTO.PageSize = 25;
-            getServiceReminderDTO.PageNumber = 1;
-            getServiceReminderDTO.NotificationsGroupIdString = getServiceReminderDTO.NotificationsGroupId != null
-          ? string.Join(",", getServiceReminderDTO.NotificationsGroupId)
-          : string.Empty;
+            var manufacturers = await _vehicleApiClient.GetAllManufacturers();
+            ViewBag.manufacturers = manufacturers.Select(t => new SelectListItem { Text = lang == "en" ? t.ManufacturerPrimaryName : t.ManufacturerSecondaryName, Value = t.Id.ToString() }).ToList();
 
-            var result = await _serviceReminderService.GetServiceReminderByIdAsync(Id);
-
-            if (!string.IsNullOrEmpty(result.NotificationsGroup))
+            var vehicle = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+            ViewBag.vehicle = vehicle.Select(v => new SelectListItem
             {
-                var ids = result.NotificationsGroup
-                                .Split(',')                       // split string into array
-                                .Select(x => int.Parse(x.Trim())) // convert each to int
-                                .ToList();
+                Text = lang == "en" ? v.VehicleName : v.VehicleName,
+                Value = v.id.ToString()
+            }).ToList();
 
-                result.NotificationsGroupId.AddRange(ids);
+            var vehiclesModels = await _vehicleApiClient.GetAllVehicleModel(0, lang);
+            ViewBag.vehiclesModels = vehiclesModels.Select(v => new SelectListItem
+            {
+                Text = lang == "en" ? v.VehicleModelPrimaryName : v.VehicleModelSecondaryName,
+                Value = v.Id.ToString()
+            }).ToList();
 
-                
+            var services = await _serviceReminderService.GetAllRTSCodesDDLAsync();
+            ViewBag.services = services.Select(v => new SelectListItem
+            {
+                Text = lang == "en" ? v.PrimaryName : v.SecondaryName,
+                Value = v.Id.ToString()
+            }).ToList();
+
+            var vehicleClasss = await _vehicleApiClient.GetAllVehicleClass();
+            ViewBag.vehicleClasss = vehicleClasss.Select(v => new SelectListItem
+            {
+                Text = lang == "en" ? v.VehicleClassPrimaryName : v.VehicleClassSecondaryName,
+                Value = v.Id.ToString()
+            }).ToList();
+
+            var groups = await _erpApiClient.GetAllNotificationGroups(lang, BranchId, CompanyId);
+            var modules = await _erpApiClient.GetAllModules();
+            ViewBag.Groups = modules.Select(g => new SelectListItem
+            {
+                Text = lang == "en" ? g.ModulePrimaryName : g.ModuleSecondaryName,
+                Value = g.Id.ToString()
+            }).ToList();
+
+            // Check if we're editing an existing record or creating a new one
+            if (Id.HasValue && Id.Value > 0)
+            {
+                // Editing existing record
+                var result = await _serviceReminderService.GetServiceReminderByIdAsync(Id.Value);
+
+                if (!string.IsNullOrEmpty(result.NotificationsGroup))
+                {
+                    var ids = result.NotificationsGroup
+                                    .Split(',')                       // split string into array
+                                    .Select(x => int.Parse(x.Trim())) // convert each to int
+                                    .ToList();
+
+                    result.NotificationsGroupId.AddRange(ids);
+                }
+
+                // Determine if UseSameStart should be checked based on existing data
+                var useSameStart = result.UseSameStart;
+                // If there's already a start date, uncheck UseSameStart so fields are visible
+                if (result.StartDate.HasValue || !string.IsNullOrEmpty(result.StartMeter.ToString()))
+                {
+                    useSameStart = false;
+                }
+
+
+
+                // Create a view model for the edit page
+                var viewModel = new ServiceReminderPageVM
+                {
+                    ReminderForm = new ServiceReminderDTO
+                    {
+                        Id = result.Id,
+                        ManufacturerId = result.ManufacturerId,
+                        VehicleId = result.VehicleId,
+                        VehicleModelId = result.VehicleModelId,
+                        ManufacturingYear = result.ManufacturingYear,
+                        VehicleGroupId = result.VehicleGroupId,
+                        ItemId = result.ItemId,
+                        Repates = result.Repates,
+                        TimeInterval = result.TimeInterval,
+                        TimeIntervalUnit = result.TimeIntervalUnit,
+                        TimeDue = result.TimeDue,
+                        TimeDueUnit = result.TimeDueUnit,
+                        PrimaryMeterInterval = result.PrimaryMeterInterval,
+                        PrimaryMeterDue = result.PrimaryMeterDue,
+                        IsManually = result.IsManually,
+                        ManualDate = result.ManualDate,
+                        ManualPrimaryMeter = result.ManualPrimaryMeter,
+                        HasNotification = result.HasNotification,
+                        NotificationsGroupId = result.NotificationsGroupId,
+                        UseSameStart = useSameStart,
+                        StartDate = result.StartDate,
+                        StartMeter = result.StartMeter
+                    }
+                };
+
+                return View(viewModel);
             }
-            return result;
+            else
+            {
+                // Creating new record - return empty form with default values
+                var viewModel = new ServiceReminderPageVM
+                {
+                    ReminderForm = new ServiceReminderDTO
+                    {
+                        Id = 0, // New record
+                        UseSameStart = true, // Default to true as per DTO
+                        IsManually = false,
+                        HasNotification = false,
+                        TimeIntervalUnit = 2, // Default to months
+                        TimeDueUnit = 2, // Default to months
+                        Repates = 1
+                    }
+                };
+
+                return View(viewModel);
+            }
         }
 
         [HttpPost]
         [CustomAuthorize(Permissions.ServiceReminder.Edit)]
         public async Task<IActionResult> Edit(ServiceReminderPageVM serviceReminderDTO)
         {
+            // Validate Manufacturing Year is required
+            if (!serviceReminderDTO.ReminderForm.ManufacturingYear.HasValue || serviceReminderDTO.ReminderForm.ManufacturingYear.Value <= 0)
+            {
+                ModelState.AddModelError("ReminderForm.ManufacturingYear", "Manufacturing Year is required.");
+                // Re-populate ViewBag data for the form
+                ViewBag.dateUnits = (from ServiceReminderTimeUnitEnum source in Enum.GetValues(typeof(ServiceReminderTimeUnitEnum))
+                                     select new SelectListItem
+                                     {
+                                         Value = Convert.ToInt32(source).ToString(),
+                                         Text = GetLocalizedTimeUnitName(source, lang)
+                                     }).ToList();
+
+                var manufacturers = await _vehicleApiClient.GetAllManufacturers();
+                ViewBag.manufacturers = manufacturers.Select(t => new SelectListItem { Text = lang == "en" ? t.ManufacturerPrimaryName : t.ManufacturerSecondaryName, Value = t.Id.ToString() }).ToList();
+
+                var vehicles = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+                ViewBag.vehicle = vehicles.Select(v => new SelectListItem
+                {
+                    Text = lang == "en" ? v.VehicleName : v.VehicleName,
+                    Value = v.id.ToString()
+                }).ToList();
+
+                var vehiclesModels = await _vehicleApiClient.GetAllVehicleModel(0, lang);
+                ViewBag.vehiclesModels = vehiclesModels.Select(v => new SelectListItem
+                {
+                    Text = lang == "en" ? v.VehicleModelPrimaryName : v.VehicleModelSecondaryName,
+                    Value = v.Id.ToString()
+                }).ToList();
+
+                var services = await _serviceReminderService.GetAllRTSCodesDDLAsync();
+                ViewBag.services = services.Select(v => new SelectListItem
+                {
+                    Text = lang == "en" ? v.PrimaryName : v.SecondaryName,
+                    Value = v.Id.ToString()
+                }).ToList();
+
+                var vehicleClasss = await _vehicleApiClient.GetAllVehicleClass();
+                ViewBag.vehicleClasss = vehicleClasss.Select(v => new SelectListItem
+                {
+                    Text = lang == "en" ? v.VehicleClassPrimaryName : v.VehicleClassSecondaryName,
+                    Value = v.Id.ToString()
+                }).ToList();
+
+                var groups = await _erpApiClient.GetAllNotificationGroups(lang, BranchId, CompanyId);
+                var modules = await _erpApiClient.GetAllModules();
+                ViewBag.Groups = modules.Select(g => new SelectListItem
+                {
+                    Text = lang == "en" ? g.ModulePrimaryName : g.ModuleSecondaryName,
+                    Value = g.Id.ToString()
+                }).ToList();
+
+                return View(serviceReminderDTO);
+            }
 
             if (serviceReminderDTO.ReminderForm.vehicleNams == null)
                 serviceReminderDTO.ReminderForm.vehicleNams = new List<VehicleNams>();
