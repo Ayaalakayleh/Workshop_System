@@ -5,7 +5,37 @@
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
 
+<style>
+        #pageContent { visibility: hidden; }
 
+        .page-loader{
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+
+        .page-loader .spinner{
+            width: 3rem;
+            height: 3rem;
+            border: .35rem solid #ccc;
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @@keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+    </style>    
+
+<div id="pageLoader" class="page-loader">
+    <div class="spinner"></div>
+</div>
+<div id="pageContent">
 <ol class="breadcrumb bg-transparent mb-3">
     <li class="breadcrumb-item">
         <a href="@Url.Action("Index", "TechnicianProfileDefinition")">@Common["Label_Technicians"]</a>
@@ -220,6 +250,7 @@
         }
     </div>
 </div>
+</div>
 <script>
      window.RazorVars =@Html.Raw(System.Text.Json.JsonSerializer.Serialize<object>(new {
             label_UploadTechnicianPhoto = Common["label_UploadTechnicianPhoto"].Value,
@@ -263,5 +294,21 @@
             loadingText = Common["Loading"].Value
         }));
 </script>
+<script>
+(function () {
+    function hideLoader() {
+        var loader = document.getElementById("pageLoader");
+        var content = document.getElementById("pageContent");
+
+        if (content) content.style.visibility = "visible";
+        if (loader) loader.style.display = "none";
+    }
+
+    window.addEventListener("load", hideLoader);
+
+    setTimeout(hideLoader, 4000);
+})();
+</script>
+
 <script src="~/js/site.js"></script>
 <script src="~/js/definitions/techniciansprofile.js"></script>

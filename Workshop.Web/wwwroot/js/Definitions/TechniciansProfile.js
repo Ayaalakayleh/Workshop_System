@@ -178,37 +178,137 @@ $(document).ready(function () {
             // Default
             error.insertAfter(element);
         },
-        submitHandler: function (form) {
-            $("#btnCreate")
-                .prop('disabled', true)
-                .html('<i class="fa fa-spinner fa-spin"></i>&nbsp;' + RazorVars.btnSaving);
+        //submitHandler: function (form) {
 
+        //    var formData = new FormData(form);
+
+        //    $("#btnCreate")
+        //        .prop('disabled', true)
+        //        .html('<i class="fa fa-spinner fa-spin"></i>&nbsp;' + RazorVars.btnSaving);
+
+        //    const Code = ($("#Code").val() || "").trim();
+
+        //    $.ajax({
+        //        type: "GET",
+        //        url: window.RazorVars.isValidURL,
+        //        data: { Number: Code, Id: $("#Id").val() || 0 },
+        //        cache: false
+        //    }).done(function (result) {
+
+        //        if (result && result.isSuccess === false) {
+        //            $("#btnCreate")
+        //                .prop('disabled', false)
+        //                .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+        //            Swal.fire({
+        //                icon: "warning",
+        //                title: "Warning",
+        //                html: `
+        //                <div>This Technician already exists</div>
+        //                <div style="margin-top:6px;"><b>Number:</b> ${result.data}</div>
+        //            `
+        //            });
+        //            return;
+        //        }
+
+
+        //        const pondFiles = pond.getFiles();
+        //        if (pondFiles.length > 0) {
+        //            formData.append('TechnicianPhoto', pondFiles[0].file);
+        //        }
+
+        //        $.ajax({
+        //            url: $(form).attr('action'),
+        //            type: 'POST',
+        //            data: formData,
+        //            processData: false,
+        //            contentType: false
+        //        }).done(function () {
+        //            $("#btnCreate")
+        //                .prop('disabled', false)
+        //                .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+        //            Swal.fire({
+        //                icon: 'success',
+        //                title: resources.success_msg,
+        //                confirmButtonText: resources.ok,
+        //                confirmButtonColor: 'var(--primary-600)',
+        //                timer: 3000,
+        //                timerProgressBar: true
+        //            }).then(() => window.location.href = document.referrer);
+
+        //        }).fail(function () {
+        //            $("#btnCreate")
+        //                .prop('disabled', false)
+        //                .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+        //            Swal.fire({
+        //                icon: 'error',
+        //                title: RazorVars.ErrorHappend,
+        //                confirmButtonText: RazorVars.btnTryAgain,
+        //                confirmButtonColor: '#dc3545'
+        //            });
+        //        });
+
+        //    })
+        //      .fail(function (xhr) {
+        //        $("#btnCreate")
+        //            .prop('disabled', false)
+        //            .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+        //        console.error("isValid failed:", xhr.responseText);
+        //        Swal.fire({
+        //            icon: 'error',
+        //            title: RazorVars.ErrorHappend,
+        //            confirmButtonText: RazorVars.btnTryAgain
+        //        });
+        //    });
+
+        //    return false;
+        //}
+        submitHandler: function (form) {
+
+            var formData = new FormData(form);
+
+            const id = parseInt($("#Id").val() || "0", 10);
             const Code = ($("#Code").val() || "").trim();
+
+            if (id > 0) {
+                return doSave(form, formData); 
+            }
 
             $.ajax({
                 type: "GET",
                 url: window.RazorVars.isValidURL,
-                data: { Number: Code, Id: $("#Id").val() || 0 },
+                data: { Number: Code, Id: 0 },
                 cache: false
             }).done(function (result) {
-
                 if (result && result.isSuccess === false) {
-                    $("#btnCreate")
-                        .prop('disabled', false)
-                        .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+                    if (result && result.isSuccess === false) {
+                        $("#btnCreate")
+                            .prop('disabled', false)
+                            .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
 
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning",
-                        html: `
-                        <div>This Technician already exists</div>
-                        <div style="margin-top:6px;"><b>Number:</b> ${result.data}</div>
-                    `
-                    });
-                    return;
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Warning",
+                            html: `
+                                    <div>This Technician already exists</div>
+                                    <div style="margin-top:6px;"><b>Number:</b> ${result.data}</div>
+                                `
+                        });
+                        return;
+                    }
+                                
                 }
+                return doSave(form, formData);
+            });
 
-                var formData = new FormData(form);
+            return false;
+
+            function doSave(form, formData) {
+                $("#btnCreate").prop('disabled', true)
+                    .html('<i class="fa fa-spinner fa-spin"></i>&nbsp;' + RazorVars.btnSaving);
 
                 const pondFiles = pond.getFiles();
                 if (pondFiles.length > 0) {
@@ -222,8 +322,7 @@ $(document).ready(function () {
                     processData: false,
                     contentType: false
                 }).done(function () {
-                    $("#btnCreate")
-                        .prop('disabled', false)
+                    $("#btnCreate").prop('disabled', false)
                         .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
 
                     Swal.fire({
@@ -236,33 +335,21 @@ $(document).ready(function () {
                     }).then(() => window.location.href = document.referrer);
 
                 }).fail(function () {
-                    $("#btnCreate")
-                        .prop('disabled', false)
+                    $("#btnCreate").prop('disabled', false)
                         .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
 
+                    console.error("isValid failed:", xhr.responseText);
                     Swal.fire({
                         icon: 'error',
                         title: RazorVars.ErrorHappend,
-                        confirmButtonText: RazorVars.btnTryAgain,
-                        confirmButtonColor: '#dc3545'
-                    });
+                        confirmButtonText: RazorVars.btnTryAgain
+                    });                   
                 });
 
-            }).fail(function (xhr) {
-                $("#btnCreate")
-                    .prop('disabled', false)
-                    .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
-
-                console.error("isValid failed:", xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: RazorVars.ErrorHappend,
-                    confirmButtonText: RazorVars.btnTryAgain
-                });
-            });
-
-            return false; 
+                return false;
+            }
         }
+
     });
 
     // live clean-up of invalid state + remove message next to proper element/container

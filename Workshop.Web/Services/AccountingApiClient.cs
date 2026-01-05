@@ -520,7 +520,7 @@ namespace Workshop.Web.Services
                     CreateBy = userId,
                     CompanyId = companyId,
                     BranchId = branchId,
-                    IsCompanyCenterialized = 0,
+                    IsCompanyCenterialized = 1,
                     VoucherType = 1                 // قيد
                 };
                 string url = $"/Transaction/ReverseTransaction";

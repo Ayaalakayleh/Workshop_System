@@ -1650,6 +1650,26 @@ namespace Workshop.Web.Controllers
 
                         }
                     }
+                    //else if (Internalinvoice.TranNo==-1)
+                    //{
+                    //    CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
+                    //    {
+                    //        WIPId = dto.Id,
+                    //        InvoiceNo =0, // max +1
+                    //        InvoiceDate = DateTime.Now,
+                    //        TransactionMasterId = 0,
+                    //        Total = 0,
+                    //        Tax = 0,
+                    //        Net = 0,
+                    //        InvoiceType = (int)AccountTypeEnum.Internal,
+                    //        AccountType = (int)AccountTypeEnum.Internal,
+                    //        CreatedBy = UserId
+                    //    };
+                    //    await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+                    //    await _apiClient.WIP_Close(dto.Id, (int)dto.ClosedBy);
+                    //    return Json(new { success = true });
+
+                    //}
                     if ((ExternalInvoice.ID > 0 || Internalinvoice.ID > 0))
                     {// Insert External Invoice
                         if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
@@ -1722,12 +1742,15 @@ namespace Workshop.Web.Controllers
 
         public async Task<TransactionMaster> _SaveInvoice(UpdateWIPDTO oWIPDTO)
         {
+
+            // Vechicle Details Internal
+            var  saveTransaction = new TransactionMaster();
             string InternalType = "";
-            var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
+            var AccountTable = await _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId);
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
             decimal? totalInternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity);
             decimal? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.Quantity);
-            var VehicleDetails = _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang).Result;
+            var VehicleDetails = await _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang);
 
             if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
             {
@@ -1735,7 +1758,20 @@ namespace Workshop.Web.Controllers
 
                 InternalType = InternalList.Code;
             }
-            var saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
+               saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
+
+            //if (totalExternal > 0|| totalInternal>0)
+            //{
+            //     saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
+
+            //}
+            //else
+            //{
+            //    saveTransaction = new TransactionMaster()
+            //    {
+            //        TranNo = -1
+            //    };
+            //}
             return saveTransaction;
 
         }
@@ -1746,6 +1782,10 @@ namespace Workshop.Web.Controllers
         [HttpPost]
         public async Task<AccountSalesMaster> SaveInvoice(UpdateWIPDTO oWIPDTO)
         {
+
+            // Vechicle Details Internal
+
+
             var result = new TempData();
 
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
@@ -1756,8 +1796,8 @@ namespace Workshop.Web.Controllers
             var accountTable = new AccountTable();
             var oAccountSalesDetails = new AccountSalesDetails();
             AccountSales oAccountSales = new AccountSales();
-            var VehicleDetails = _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang).Result;
-            var taxClass = _accountingApiClient.GetTaxClassificationById(oWIPDTO.AccountDetails.Vat ?? 1).Result;
+            var VehicleDetails = await _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang);
+            var taxClass =await _accountingApiClient.GetTaxClassificationById(oWIPDTO.AccountDetails.Vat ?? 0);
             //oWIPDTO.AccountDetails.TaxClassificationId ?? oWIPDTO.AccountDetails.PartialVat
             var items = new List<Workshop.Core.DTOs.AccountingDTOs.Item>();
             items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
@@ -1774,14 +1814,14 @@ namespace Workshop.Web.Controllers
                 {
                     if (item.Total > 0)
                     {
-                        accountId = items.Where(a => a.ItemNumber == -2).FirstOrDefault()?.ItemSalesAccountId;
+                        accountId = items.Where(a => a.ItemNumber == -6).FirstOrDefault()?.ItemSalesAccountId;
                         //accountId = accountId == null ? InvoiceType.AccountId : accountId;
                         accountTable = new AccountTable();
                         accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
                         oAccountSalesDetails = new AccountSalesDetails()
                         {
-                            ItemNumber = items.Where(a => a.ItemNumber == -2).FirstOrDefault().ItemId,
-                            UnitId = items.Where(a => a.ItemNumber == -2).FirstOrDefault().UnitId,
+                            ItemNumber = items.Where(a => a.ItemNumber == -6).FirstOrDefault().ItemId,
+                            UnitId = items.Where(a => a.ItemNumber == -6).FirstOrDefault().UnitId,
                             Discount = (int)item.Discount,
                             Description = item.LongDescription,
                             Quantity = item.StandardHours,
@@ -1818,14 +1858,14 @@ namespace Workshop.Web.Controllers
                 {
                     var mapping = await _inventoryApiClient.GetItemByIdAsync(item.ItemId);
 
-                    accountId = items.Where(a => a.ItemNumber == -1).FirstOrDefault()?.ItemSalesAccountId;
+                    accountId = items.Where(a => a.ItemNumber == -5).FirstOrDefault()?.ItemSalesAccountId;
                     //accountId = accountId == null ? InvoiceType.AccountId : accountId;
                     accountTable = new AccountTable();
                     accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
                     oAccountSalesDetails = new AccountSalesDetails()
                     {
-                        ItemNumber = items.Where(a => a.ItemNumber == -1).FirstOrDefault().ItemId,
-                        UnitId = items.Where(a => a.ItemNumber == -1).FirstOrDefault().UnitId,
+                        ItemNumber = items.Where(a => a.ItemNumber == -5).FirstOrDefault().ItemId,
+                        UnitId = items.Where(a => a.ItemNumber == -5).FirstOrDefault().UnitId,
                         Discount = (int)item.Discount,
                         Description = mapping.Name,
                         Quantity = (int)item.Quantity,
@@ -2169,7 +2209,7 @@ namespace Workshop.Web.Controllers
             InvoiceDetailsList = InvoiceDetailsList.Where(x => x.ReferanceNo == null && x.InvoiceType == 1 && x.IsReturn == false).ToList();
             foreach (var item in InvoiceDetailsList)
             {
-                if (item.AccountType == 1)
+                if (item.AccountType == 1 &&item.TransactionMasterId>0)
                 {
                     TransactionMaster ReverseTrans = new TransactionMaster()
                     {
@@ -2259,6 +2299,27 @@ namespace Workshop.Web.Controllers
                         await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
                     }
                 }
+                //if (item.AccountType == 1 && item.TransactionMasterId == 0)
+                //{
+                //    CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
+                //    {
+                //        WIPId = WIPId,
+                //        InvoiceNo = 0, // max +1
+                //        InvoiceDate = DateTime.Now,
+                //        TransactionMasterId = 0,
+                //        Total = 0,
+                //        Tax = 0,
+                //        Discount = 0,
+                //        Net = Reverse.Total,
+                //        InvoiceType = -3,
+                //        AccountType = (int)AccountTypeEnum.Internal,
+                //        CreatedBy = UserId,
+                //        OldTransactionMasterId =0 // 
+
+
+                //    };
+                //    await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+                //}
             }
 
             bool isSuccess = Reverse.ID > 0;
