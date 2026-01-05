@@ -2568,4 +2568,7 @@
   <data name="Customer" xml:space="preserve">
     <value>العميل</value>
   </data>
+  <data name="TotalCost" xml:space="preserve">
+    <value>إجمالي القيمة</value>
+  </data>
 </root>
