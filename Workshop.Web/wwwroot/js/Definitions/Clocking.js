@@ -197,8 +197,7 @@
 })(jQuery, window, document);
 $('#historyTable').DataTable({
     responsive: true,
-    pageLength: 25,
-    lengthChange: true,
+    lengthChange: false,
     language: {
         search: R.dt_search || "Search:",
         searchPlaceholder: "",
