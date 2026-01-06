@@ -30,6 +30,21 @@ $(function () {
     }
 
     // 3) DevExtreme DataGrid setup
+    const addPlaceholderIfEmpty = () => {
+        const items = grid.getDataSource().items();
+ 
+        if (items.length === 0) {
+            grid.getDataSource().store().insert({
+                Id: counter--,
+                MakeID: null,
+                ModelID: null,
+                Chassis: '',
+                RecallStatus: null,
+                isPlaceholder: true
+            }).then(() => grid.refresh());
+        }
+    };
+
     let grid = $("#gridContainer").dxDataGrid({
         dataSource: typeof VehcilesRecall !== "undefined" && VehcilesRecall ? VehcilesRecall : [],
         keyExpr: "Id",
@@ -43,6 +58,10 @@ $(function () {
             allowDeleting: true,
             useIcons: true,
             texts: { confirmDeleteMessage: null }
+        },
+        onContentReady: function(e) {
+            // Wait until grid is initialized and data is loaded
+            addPlaceholderIfEmpty();
         },
         columns: [
             { dataField: "Id", caption: LABELS.Id || "ID", visible: false },
@@ -140,6 +159,7 @@ $(function () {
         onInitNewRow: (e) => {
             e.data.Id = parseInt(e.data.Id) || counter--;
             e.data.RecallStatus = 1; // Open
+            e.data.isPlaceholder = false; // Ensure new rows are not placeholders
         },
         onRowRemoving: function (e) {
             if (!window.Swal) return;
@@ -154,7 +174,10 @@ $(function () {
             }).then((result) => {
                 if (result.isConfirmed) {
                     e.component.getDataSource().store().remove(e.key)
-                        .then(() => e.component.refresh());
+                        .then(() => {
+                            e.component.refresh();
+    
+                        });
                 }
             });
         },
@@ -182,15 +205,17 @@ $(function () {
                 colStart++;
             });
 
-            // Check if grid is empty, add dummy row if so
+            // Check if grid is empty or has only placeholder, add dummy row if so
             let data = e.component.getDataSource().items();
             const originalLength = data.length;
             let addedDummy = false;
-            if (originalLength === 0) {
-                addedDummy = true;
-                data.push({ Id: counter--, MakeID: null, ModelID: null, Chassis: '' });
-                data.push({ Id: counter--, MakeID: 0, ModelID: 0, Chassis: '' });
-            }
+            //const hasOnlyPlaceholder = data.length === 1 && data[0].isPlaceholder;
+            //if (originalLength === 0 || hasOnlyPlaceholder) {
+            //    if (hasOnlyPlaceholder) data = []; // Remove placeholder for export
+            //    addedDummy = true;
+            //    data.push({ Id: counter--, MakeID: null, ModelID: null, Chassis: '' });
+            //    data.push({ Id: counter--, MakeID: 0, ModelID: 0, Chassis: '' });
+            //}
 
             DevExpress.excelExporter.exportDataGrid({
                 worksheet: worksheet,
@@ -338,7 +363,7 @@ $(function () {
         }
 
         grid.saveEditData();
-        const gridData = grid.getDataSource().items() || [];
+        const gridData = (grid.getDataSource().items() || []).filter(r => !r.isPlaceholder);
 
         if (!gridData.length) {
             if (window.Swal) {
@@ -554,7 +579,7 @@ $(function () {
     // Download template
     $('#RecallDownload').on('click', function () {
         var formData = new FormData();
-        var gridData = grid.getDataSource().items();
+        var gridData = (grid.getDataSource().items() || []).filter(r => !r.isPlaceholder);
         formData.append("GridData", JSON.stringify(gridData));
 
         $.ajax({

@@ -200,6 +200,101 @@ $(document).ready(function() {
     // Initial preview update
     setTimeout(updateSchedulePreview, 1000); // Delay to ensure form is fully loaded
 
+    // Helper function to convert time values to days for comparison
+    function convertToDays(value, unit) {
+        switch (parseInt(unit)) {
+            case 1: // Days
+                return value;
+            case 2: // Weeks
+                return value * 7;
+            case 3: // Months (approximate as 30 days)
+                return value * 30;
+            case 4: // Years (approximate as 365 days)
+                return value * 365;
+            default:
+                return value;
+        }
+    }
+
+    // Real-time validation for Primary Meter Due vs Interval
+    function validatePrimaryMeterFields() {
+        var intervalField = $('#ReminderForm_PrimaryMeterInterval');
+        var dueField = $('#ReminderForm_PrimaryMeterDue');
+        var intervalVal = parseFloat(intervalField.val()) || 0;
+        var dueVal = parseFloat(dueField.val()) || 0;
+
+        // Remove existing error styling
+        intervalField.removeClass('is-invalid');
+        dueField.removeClass('is-invalid');
+        $('.primary-meter-error').remove();
+
+        // Check if due value exceeds interval value
+        if (dueVal > intervalVal && intervalVal > 0) {
+            // Add error styling
+            dueField.addClass('is-invalid');
+            intervalField.addClass('is-invalid');
+
+            // Add error message below the input-group containers
+            var errorMsg = '<div class="invalid-feedback primary-meter-error d-block">Primary Meter Due cannot be greater than Primary Meter Interval.</div>';
+
+            // Add error message after the Primary Meter Due input-group
+            dueField.closest('.input-group').after(errorMsg);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // Real-time validation for Time Due vs Time Interval
+    function validateTimeFields() {
+        var intervalField = $('#ReminderForm_TimeInterval');
+        var intervalUnitField = $('#ReminderForm_TimeIntervalUnit');
+        var dueField = $('#ReminderForm_TimeDue');
+        var dueUnitField = $('#ReminderForm_TimeDueUnit');
+
+        var intervalVal = parseFloat(intervalField.val()) || 0;
+        var intervalUnit = parseInt(intervalUnitField.val()) || 1;
+        var dueVal = parseFloat(dueField.val()) || 0;
+        var dueUnit = parseInt(dueUnitField.val()) || 1;
+
+        // Remove existing error styling
+        intervalField.removeClass('is-invalid');
+        dueField.removeClass('is-invalid');
+        $('.time-interval-error').remove();
+
+        // Check if due value exceeds interval value (convert both to days for comparison)
+        if (dueVal > 0 && intervalVal > 0) {
+            var intervalInDays = convertToDays(intervalVal, intervalUnit);
+            var dueInDays = convertToDays(dueVal, dueUnit);
+
+            if (dueInDays > intervalInDays) {
+                // Add error styling
+                dueField.addClass('is-invalid');
+                intervalField.addClass('is-invalid');
+
+                // Add error message below the input-group containers
+                var errorMsg = '<div class="invalid-feedback time-interval-error d-block">Time Due cannot be greater than Time Interval.</div>';
+
+                // Add error message after the Time Due input-group
+                dueField.closest('.input-group').after(errorMsg);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Bind validation to input changes
+    $('#ReminderForm_PrimaryMeterInterval, #ReminderForm_PrimaryMeterDue').on('input change', function() {
+        validatePrimaryMeterFields();
+    });
+
+    $('#ReminderForm_TimeInterval, #ReminderForm_TimeIntervalUnit, #ReminderForm_TimeDue, #ReminderForm_TimeDueUnit').on('input change', function() {
+        validateTimeFields();
+    });
+
     // Form validation - ensure Manufacturing Year is required
     $('#serviceReminderForm').on('submit', function(e) {
         var manufacturingYear = $('#ReminderForm_ManufacturingYear').val();
@@ -217,6 +312,20 @@ $(document).ready(function() {
             e.preventDefault();
             alert('Please enter a valid manufacturing year.');
             $('#ReminderForm_ManufacturingYear').focus();
+            return false;
+        }
+
+        // Validate Primary Meter constraint
+        if (!validatePrimaryMeterFields()) {
+            e.preventDefault();
+            $('#ReminderForm_PrimaryMeterDue').focus();
+            return false;
+        }
+
+        // Validate Time constraint
+        if (!validateTimeFields()) {
+            e.preventDefault();
+            $('#ReminderForm_TimeDue').focus();
             return false;
         }
     });

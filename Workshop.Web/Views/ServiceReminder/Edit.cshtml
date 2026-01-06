@@ -62,7 +62,7 @@
                             @Html.DropDownListFor(model => model.ReminderForm.ManufacturerId,
                             new SelectList(ViewBag.manufacturers, "Value", "Text"),
                                                         "Select",
-                                                        new { @class = "form-control" })
+                                                        new { @class = "form-control", disabled = isEditMode ? "disabled" : null })
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -70,7 +70,7 @@
                             @Html.DropDownListFor(model => model.ReminderForm.VehicleId,
                                                         new SelectList(ViewBag.vehicle, "Value", "Text"),
                                                         "Select",
-                                                        new { @class = "form-control" })
+                                                        new { @class = "form-control", disabled = isEditMode ? "disabled" : null })
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -78,12 +78,12 @@
                             @Html.DropDownListFor(model => model.ReminderForm.VehicleModelId,
                                                         new SelectList(ViewBag.vehiclesModels, "Value", "Text"),
                                                         "Select",
-                                                        new { @class = "form-control", id = "Model" })
+                                                        new { @class = "form-control", id = "Model", disabled = isEditMode ? "disabled" : null })
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label>@Common["Label_Year"] <span class="text-danger">*</span></label>
-                            @Html.EditorFor(model => model.ReminderForm.ManufacturingYear, new { htmlAttributes = new { @class = "form-control", @type = "number", @required = "required" } })
+                            @Html.EditorFor(model => model.ReminderForm.ManufacturingYear, new { htmlAttributes = new { @class = "form-control", @type = "number", @required = "required", disabled = isEditMode ? "disabled" : null } })
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -99,7 +99,7 @@
                             @Html.DropDownListFor(model => model.ReminderForm.ItemId,
                                                         new SelectList(ViewBag.services, "Value", "Text"),
                                                         "Select",
-                                                        new { @class = "form-control" })
+                                                        new { @class = "form-control", disabled = isEditMode ? "disabled" : null })
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -129,6 +129,8 @@
                             </div>
                         </div>
 
+
+
                         <div class="col-md-6 mb-3">
                             <label>@Common["Label_PrimaryMeterInterval"]</label>
                             <div class="input-group flex-nowrap">
@@ -148,6 +150,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="col-md-6 mb-3">
                             <div class="custom-control custom-checkbox">

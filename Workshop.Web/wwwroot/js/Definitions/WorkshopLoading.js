@@ -540,31 +540,58 @@ function renderUnscheduled() {
     });
 }
 
+function hhmm(v) {
+    if (!v) return "";
+    const s = String(v);
+    const t = s.includes("T") ? s.split("T")[1] : s;   
+    return t.slice(0, 5); // "08:00:00" -> "08:00"
+}
+
+function getTechShift(id) {
+    const a = AvailableTechnicians.find(x => Number(x.techId) === Number(id));
+    if (!a) return null;
+
+    const start = hhmm(a.startWorkingTime);
+    const end = hhmm(a.endWorkingTime);
+    if (!start || !end) return null;
+
+    return { start, end };
+}
+
+function hhmmToMinutes(s) {
+    if (!s) return 0;
+    const m = /^(\d{1,3}):(\d{2})/.exec(String(s));
+    if (!m) return 0;
+    return Number(m[1]) * 60 + Number(m[2]);
+}
+
 function renderAvailability() {
     const tbody = document.getElementById("availTbody");
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    const dayKey = getSelectedDayISO();
-    const maps = buildIntervalMaps();
-
     technicians.forEach(t => {
         const id = Number(t.id);
-        const assigned = events
-            .filter(e => Number(e.techId) === id && e.date === dayKey)
-            .reduce((a, b) => a + b.duration, 0);
+        const a = AvailableTechnicians.find(x => Number(x.techId) === id);
 
-        const w = maps.working.get(dayKey)?.get(id) || [];
-        const workingMins = w.length ? sumIntervalsMins(w) : SHIFT_MINS;
+        const shiftStart = hhmm(a?.startWorkingTime) || SHIFT_START;
+        const shiftEnd = hhmm(a?.endWorkingTime) || SHIFT_END;
+
+        let workingMins = toMinutes(shiftEnd) - toMinutes(shiftStart);
+        if (workingMins < 0) workingMins += 24 * 60;
+        if (workingMins > 12 * 60) workingMins = (24 * 60) - workingMins;
+
+        const assignedMins = hhmmToMinutes(a?.assigned);
+        const availableMins = Math.max(0, workingMins - assignedMins);
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-      <td>${t.name}</td>
-      <td>${SHIFT_START}–${SHIFT_END}</td>
-      <td>${(workingMins / 60).toFixed(1)}</td>
-      <td>${(assigned / 60).toFixed(1)}</td>
-      <td class="fw-bold">${((workingMins - assigned) / 60).toFixed(1)}</td>
-    `;
+          <td>${t.name}</td>
+          <td>${shiftStart}–${shiftEnd}</td>
+          <td>${(workingMins / 60).toFixed(1)}</td>
+          <td>${(assignedMins / 60).toFixed(1)}</td>
+          <td class="fw-bold">${(availableMins / 60).toFixed(1)}</td>
+        `;
         tbody.appendChild(tr);
     });
 }
