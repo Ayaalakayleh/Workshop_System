@@ -57,7 +57,7 @@
             columnResizingMode: "nextColumn",
 
             // Optional: let users pick columns on tablets/desktop
-            columnChooser: { enabled: true, mode: "select" },
+            columnChooser: { enabled: false, mode: "select" },
 
             // ---------- Columns ----------
             columns: [

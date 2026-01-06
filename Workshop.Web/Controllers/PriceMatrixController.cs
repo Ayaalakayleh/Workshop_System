@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
@@ -285,6 +286,19 @@ namespace Workshop.Web.Controllers
             //.Select(aItem => new { Id = aItem.ID, Name = lang == "en" ? aItem.AccountNameNo : aItem.AccountSecondaryNameNo });
             var result = await GetSalesTypeListAsync(id, CompanyId, lang);
             return result;
+
+            //var pricesAll = await _apiClient.GetAllRows(new PriceMatrixFilter())?? new List<GetPriceMatrixDTO>();
+
+            //var usedAccountIds = pricesAll.Where(p => p.AccountId.HasValue).Select(p => p.AccountId.Value).ToHashSet(); 
+                  
+            //var result = await GetSalesTypeListAsync(id, CompanyId, lang);
+
+            //var filteredResult = result
+            //    .Where(r => !usedAccountIds.Contains(int.Parse(r.Value))) 
+            //   .ToList();
+               
+
+            //return filteredResult;
 
         }
         [HttpGet]

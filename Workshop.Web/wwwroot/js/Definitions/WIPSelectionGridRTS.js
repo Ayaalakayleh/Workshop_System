@@ -87,10 +87,7 @@ function injectMainGrid(count) {
                         Id: item.id,
                         ItemId: item.id,
                         Code: item.code,
-                        Description:
-                            item.groupName && item.groupName.trim() !== ""
-                                ? item.groupName
-                                : (lang === "en" ? item.primaryName : item.secondaryName),
+                        Description: lang == "en" ? item.primaryName : item.secondaryName,
                         LongDescription: lang == "en" ? item.primaryDescription : item.secondaryDescription,
                         StandardHours: item.hours,
                         Rate: 0,
@@ -278,7 +275,9 @@ function loadMenuData() {
                     return {
                         ...x,
                         code: x.groupCode,
-                        hours: x.totalTime
+                        hours: x.totalTime,
+                        primaryName: x.groupName,
+                        secondaryName: x.groupName
                     };
                 });
 

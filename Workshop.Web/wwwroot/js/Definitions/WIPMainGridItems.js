@@ -250,7 +250,9 @@ $(function () {
                 dataField: "UsedQuantity",
                 caption: window.RazorVars.DXUsedQuantity,
                 dataType: "number",
-                allowEditing: Permission_Approve,
+                allowEditing: function (e) {
+                    return Permission_Approve && Number(e.row.data.Status) === 42;
+                },
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     $("<div>").dxNumberBox({
