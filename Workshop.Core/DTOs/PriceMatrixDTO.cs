@@ -14,7 +14,8 @@ namespace Workshop.Core.DTOs
     public class PriceMatrixDTO
     {
         public int Id { get; set; }
-        public string AppliesTo { get; set; } = string.Empty;
+        public string AppliesName { get; set; } = string.Empty;
+        public int Applies { get; set; }
 
         //public int? AccountType { get; set; }
         public int? AccountId { get; set; }
@@ -55,6 +56,7 @@ namespace Workshop.Core.DTOs
     {
         public string? Name { get; set; }
         public string? AppliesTo { get; set; }
+        public int Applies { get; set; }
         public Basis? Basis { get; set; }
         // paging
         public int? PageNumber { get; set; } = 1;

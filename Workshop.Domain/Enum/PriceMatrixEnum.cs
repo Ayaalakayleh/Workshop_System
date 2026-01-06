@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Workshop.Domain.Enum
 {
-    public enum PricingMethodEnum
+    public enum PriceMatrixEnum
     {
-        Sum,
-        Fixed
+        Labour = 1,
+        Parts = 2
     }
 }

@@ -40,14 +40,14 @@
 
 								</div>
 							</div>
-							<div class="col-md-4">
+							@* <div class="col-md-4">
 								<div class="form-group">
 
-									@Html.LabelFor(model => model.PriceMatrixFilter.AppliesTo, @Common["Label_Applies"])
-									@Html.TextBoxFor(model => model.PriceMatrixFilter.AppliesTo, new { @class = "form-control", @id = "AppliesTo", @name = "AppliesTo" })
+									@Html.LabelFor(model => model.PriceMatrixFilter.Applies, @Common["Label_Applies"])
+									@Html.TextBoxFor(model => model.PriceMatrixFilter.Applies, new { @class = "form-control", @id = "Applies", @name = "Applies" })
 
 								</div>
-							</div>
+							</div> *@
 							<div class="col-md-4">
 								<div class="form-group">
 
@@ -88,7 +88,7 @@
 								<tr>
 
 									<td>@item.Name</td>
-									<td>@item.AppliesTo</td>
+									<td>@(item.Applies == 1 ? Common["Label_Labour"] : Common["Label_Parts"]) </td>
 									<td>@((Basis)@item.BasisId)</td>
 									<td>@String.Join(", ", @item.MatchValueTextPair.Select(s => s.Value))</td>
 									<td>@item.RatePerHour.ToString("0.00")</td>
@@ -123,10 +123,10 @@
 						<div class="col-md-6 mb-3">
 							<label>@Common["Label_Applies"]</label>
 							<select class="form-control" name="Applies" id="Applies">
-
-								<option>@Common["Label_Labour"]</option>
-								<option>@Common["Label_Parts"]</option>
-
+								@foreach (var item in ViewBag.Applies)
+								{
+									<option value="@item.Value">@item.Text</option>
+								}
 							</select>
 						</div>
 						<div class="col-md-6 mb-3">

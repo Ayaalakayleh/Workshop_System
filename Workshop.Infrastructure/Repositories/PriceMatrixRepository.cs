@@ -25,7 +25,7 @@ namespace Workshop.Infrastructure.Repositories
             using var connection = _context.CreateConnection();
 
             var parameters = new DynamicParameters();
-            parameters.Add("@Applies", createPriceMatrixDTO.AppliesTo);
+            parameters.Add("@Applies", createPriceMatrixDTO.Applies);
             parameters.Add("@FK_AccountId", createPriceMatrixDTO.AccountId);
             //parameters.Add("@FK_AccountNumber", createPriceMatrixDTO.AccountNumber);
             parameters.Add("@BasisId", createPriceMatrixDTO.BasisId);
@@ -74,7 +74,7 @@ namespace Workshop.Infrastructure.Repositories
 
             var parameters = new DynamicParameters();
             parameters.Add("@Id", createPriceMatrixDTO.Id);
-            parameters.Add("@Applies", createPriceMatrixDTO.AppliesTo);
+            parameters.Add("@Applies", createPriceMatrixDTO.Applies);
             parameters.Add("@FK_AccountId", createPriceMatrixDTO.AccountId);
             //parameters.Add("@FK_AccountNumber", createPriceMatrixDTO.AccountNumber);
             parameters.Add("@BasisId", createPriceMatrixDTO.BasisId);
