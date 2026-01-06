@@ -36,7 +36,7 @@ $(function () {
         if (fromMin === null || toMin === null) return true;
 
         // invalid if from > to
-        return fromMin <= toMin;
+        return fromMin < toMin;
     }, RazorVars.invalid_time_range || "Invalid time range");
     function isFilled($form, name) {
         return $.trim($form.find('[name="' + name + '"]').val() || "") !== "";

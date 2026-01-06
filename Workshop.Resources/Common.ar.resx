@@ -2589,4 +2589,10 @@
   <data name="Label_PettyCashInvoice" xml:space="preserve">
     <value>فاتورة العهد النقدية</value>
   </data>
+  <data name="Label_PrimaryMeter" xml:space="preserve">
+    <value>العداد الرئيسي</value>
+  </data>
+  <data name="Label_IsCompleted" xml:space="preserve">
+    <value>هل تم الانتهاء؟</value>
+  </data>
 </root>

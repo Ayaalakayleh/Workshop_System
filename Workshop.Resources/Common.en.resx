@@ -2589,4 +2589,10 @@
   <data name="Label_PettyCashInvoice" xml:space="preserve">
     <value>Petty Cash Invoice</value>
   </data>
+  <data name="Label_PrimaryMeter" xml:space="preserve">
+    <value>Primary Meter</value>
+  </data>
+  <data name="Label_IsCompleted" xml:space="preserve">
+    <value>Is Completed</value>
+  </data>
 </root>

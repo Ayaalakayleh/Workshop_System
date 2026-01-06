@@ -251,9 +251,11 @@
                             currentPage: page,
                             prevText: "&laquo;",
                             nextText: "&raquo;",
-                            onPageClick: function (p) {
+                            onPageClick: function (p,e) {
+                                e.preventDefault();
                                 getData(p);
-                            }
+                            },
+                            hrefTextPrefix: 'javascript:void(0)'
                         });
 
                         $("#contentPager ul").addClass("pagination");
