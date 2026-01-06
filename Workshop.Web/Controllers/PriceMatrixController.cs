@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using System.Linq;
 using Workshop.Core.DTOs;
 using Workshop.Domain.Enum;
+using Workshop.Resources;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
 
@@ -17,13 +19,18 @@ namespace Workshop.Web.Controllers
         private readonly WorkshopApiClient _apiClient;
         private readonly VehicleApiClient _vehicleApiClient;
         private readonly string lang;
+        private readonly IStringLocalizer<Common> _common;
+        private readonly IStringLocalizer<Messages> _messages;
         public PriceMatrixController(AccountingApiClient accountingApiClient, WorkshopApiClient apiClient, 
-            VehicleApiClient vehicleApiClient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
+            VehicleApiClient vehicleApiClient, IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache, IStringLocalizer<Common> common,
+            IStringLocalizer<Messages> messages) : base(cache, configuration, env)
         {
             _accountingApiClient = accountingApiClient;
             _apiClient = apiClient;
             _vehicleApiClient = vehicleApiClient;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+            _common = common;
+            _messages = messages;
         }
 
         [CustomAuthorize(Permissions.PriceMatrix.View)]
@@ -36,7 +43,14 @@ namespace Workshop.Web.Controllers
                     Text = e.ToString()
                 }).ToList() ?? new List<SelectListItem>();
 
-          
+
+            ViewBag.Applies = Enum.GetValues(typeof(PriceMatrixEnum)).Cast<PriceMatrixEnum>()
+                .Select(e => new SelectListItem
+                {
+                    Value = ((int)e).ToString(),
+                    Text = e.ToString()
+                }).ToList();
+
             ViewBag.SalesType = new List<SelectListItem>();
             var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, 1, lang);
             var pricesAll = await _apiClient.GetAllRows(new PriceMatrixFilter());
@@ -294,7 +308,7 @@ namespace Workshop.Web.Controllers
 
         [HttpPost]
         [CustomAuthorize(Permissions.PriceMatrix.Create)]
-        public async Task<IActionResult> EditAsync(PriceMatrixDTO priceMatrixDTO, int id, int Basis, string Applies)
+        public async Task<IActionResult> EditAsync(PriceMatrixDTO priceMatrixDTO, int id, int Basis, int Applies)
         {
             if (id == 0)
             {
@@ -304,7 +318,7 @@ namespace Workshop.Web.Controllers
                 //load data
                 creatPriceMatrix.Id = id;
                 creatPriceMatrix.Name = priceMatrixDTO.Name;
-                creatPriceMatrix.AppliesTo = Applies;
+                creatPriceMatrix.Applies = Applies;
                 creatPriceMatrix.BasisId = Basis;
                 creatPriceMatrix.AccountType = priceMatrixDTO.AccountType;
                 //creatPriceMatrix.SalesType = priceMatrixDTO.SalesType;
@@ -324,7 +338,7 @@ namespace Workshop.Web.Controllers
                 UpdatePriceMatrixDTO updatePriceMatrix = new UpdatePriceMatrixDTO();
                 updatePriceMatrix.Id = id;
                 updatePriceMatrix.Name = priceMatrixDTO.Name;
-                updatePriceMatrix.AppliesTo = Applies;
+                updatePriceMatrix.Applies = Applies;
                 updatePriceMatrix.BasisId = Basis;
                 updatePriceMatrix.AccountType = priceMatrixDTO.AccountType;
                 //updatePriceMatrix.SalesType = priceMatrixDTO.SalesType;

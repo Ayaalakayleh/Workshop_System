@@ -3,7 +3,7 @@
     // jQuery Validate rules
     $("#matrixForm").validate({
         rules: {
-            AppliesTo: { required: true },
+            Applies: { required: true },
             //AccountType: { required: true },
             //AccountId: { required: true },
             Basis: { required: true },
@@ -13,7 +13,7 @@
             Name: { required: true }
         },
         messages: {
-            AppliesTo: resources.required_field,
+            Applies: resources.required_field,
             //AccountType: resources.required_field,
             //AccountId: resources.required_field,
             Basis: resources.required_field,
@@ -105,17 +105,17 @@ $(document).ready(function () {
     $markupField.hide();
 
     // On dropdown change
-    $("select[name='Applies']").on("change", function () {
+    $("#Applies").on("change", function () {
         var val = $(this).val();
 
         // Hide all first
         $rateField.hide();
         $markupField.hide();
-
-        if (val === "Labour" || val ==="الأجور") {
+        debugger
+        if (val == 1) {
             $rateField.show();
             $markupInput.val(0);
-        } else if (val === "Parts" || val ==="القطع") {
+        } else if (val == 2) {
             $markupField.show();
             $rateInput.val(0);
         }
@@ -156,7 +156,7 @@ $(document).ready(function () {
         $("#Id").val("");
         $('#MatchValue').trigger('change');
         $('#Basis').trigger('change');
-        $('#Applies').trigger('change');
+        $("#Applies").val("1").trigger("change");
         $('#AccountType').trigger('change');
         // Reset customers when adding a new price matrix (id == 0/default)
         $("#Customers").val([]).trigger('change');
@@ -185,15 +185,11 @@ $(document).ready(function () {
         });
 
     });
-    $('#addButton').on('click', function () {
-
-
-
-    });
+   
     $('#btnReset').on('click', function () {
 
         $('#_Name').val("");
-        $('#AppliesTo').val("");
+        $('#Applies').val("");
         $('#BasisId').val("");
         $('input[name="PriceMatrixFilter.PageNumber"]').val(1);
         $("#btnSearch").trigger('click');
@@ -345,7 +341,7 @@ function loadPriceById(teamId) {
                 $("#Basis").val(pricedata.basisId);
 
                 // Applies to (Labour/Parts)
-                $("#Applies").val(pricedata.appliesTo).trigger('change');
+                $("#Applies").val(pricedata.applies).trigger('change');
 
                 // Customers multiselect
                 const customerIds = pricedata.customers || pricedata.customersIds || [];

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Workshop.Domain.Enum
 {
-    public enum PricingMethodEnum
+    public enum AccountInternalMatchEnum
     {
-        Sum,
-        Fixed
+        Rented = 1,
+        Company = 2
     }
 }

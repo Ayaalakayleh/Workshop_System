@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace Workshop.Domain.Enum
 {
-    public enum PricingMethodEnum
+    public enum ReservationStatus
     {
-        Sum,
-        Fixed
+        New = 44,
+        Booked = 45,
+        Completed = 46,
+        Canceled = 47,
+        NotShow = 48,
+        UnderRepair = 49
     }
 }
