@@ -295,16 +295,45 @@ namespace Workshop.Infrastructure.Repositories
             }
         }
 
+        //public async Task<GetServiceReminderDTO?> GetServiceReminderByIdAsync(int id)
+        //{
+        //    using var connection = _context.CreateConnection();
+        //    try
+        //    {
+        //        var reminder = await connection.QuerySingleOrDefaultAsync<GetServiceReminderDTO>(
+        //            "D_ServiceReminders_ById",
+        //            new { Id = id },
+        //            commandType: CommandType.StoredProcedure
+        //        );
+        //        return reminder;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error in GetServiceReminderByIdAsync: {ex.Message}");
+        //        throw;
+        //    }
+        //}
         public async Task<GetServiceReminderDTO?> GetServiceReminderByIdAsync(int id)
         {
             using var connection = _context.CreateConnection();
+
             try
             {
-                var reminder = await connection.QuerySingleOrDefaultAsync<GetServiceReminderDTO>(
+                using var multi = await connection.QueryMultipleAsync(
                     "D_ServiceReminders_ById",
                     new { Id = id },
                     commandType: CommandType.StoredProcedure
                 );
+
+                var reminder = await multi.ReadSingleOrDefaultAsync<GetServiceReminderDTO>();
+                if (reminder == null)
+                    return null;
+
+
+                var schedules = (await multi.ReadAsync<ServiceRemindersSchedule>()).ToList();
+
+                reminder.ServiceRemindersSchedules = schedules;
+
                 return reminder;
             }
             catch (Exception ex)
@@ -313,6 +342,7 @@ namespace Workshop.Infrastructure.Repositories
                 throw;
             }
         }
+
 
         public async Task<int> UpdateServiceReminderAsync(UpdateServiceReminderDTO dto)
         {

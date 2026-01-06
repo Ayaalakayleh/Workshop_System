@@ -282,5 +282,11 @@ namespace Workshop.Web.Services
             string url = $"/VehicleDefinition/VehicleDefinitions_GetAllInternalWSVehiclesDetails?CompanyId={CompanyId}&ManufacturerId={manufacturerId}&Platenumber={platenumber}&VehicleModelId={VehicleModelId}&ChassisNo={ChassisNo}";
             return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Get);
         }
+        public async Task<List<VehicleDefinitions>> GetServiceScheduleVehicle(VehicleDefinitions vehicle)
+        {
+
+            string url = $"/VehicleDefinition/GetServiceScheduleVehicle";
+            return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Post, vehicle);
+        }
     }
 }

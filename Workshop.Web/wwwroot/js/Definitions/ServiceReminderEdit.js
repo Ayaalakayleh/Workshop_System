@@ -32,6 +32,30 @@ $(document).ready(function() {
     ShowHideChilds($("#NoticationsControl"), $("#HasNotification").prop("checked"));
     var useSameStartChecked = $("#UseSameStart").prop("checked");
     ShowHideChilds($("#StartDateControl"), !useSameStartChecked);
+
+    // Manufacturer-Model dependent dropdown
+    $("#ManufacturerId").on("change", function () {
+        var manufacturerId = $(this).val();
+        var $modelSelect = $('#VehicleModelId');
+
+        // Clear current options
+        $modelSelect.empty().append(
+            $('<option>', { value: '', text: RazorVars.placeholderSelect || 'Select' })
+        );
+
+        if (manufacturerId) {
+            // Make AJAX call to get models for selected manufacturer
+            $.get(RazorVars.getVehicleByManufacturerIdURL, { manufacturerId: manufacturerId }, function (data) {
+                $.each(data, function (_, item) {
+                    $modelSelect.append(
+                        $('<option>', { value: item.id, text: item.name })
+                    );
+                });
+            }).fail(function() {
+                console.error("Error loading vehicle models for manufacturer:", manufacturerId);
+            });
+        }
+    });
 });
 
 // Global Select2 + Bootstrap 5 setup for Edit page

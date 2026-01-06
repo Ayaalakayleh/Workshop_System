@@ -2595,4 +2595,7 @@
   <data name="Label_IsCompleted" xml:space="preserve">
     <value>Is Completed</value>
   </data>
+  <data name="NoScheduleData" xml:space="preserve">
+    <value>No schedule data available</value>
+  </data>
 </root>
