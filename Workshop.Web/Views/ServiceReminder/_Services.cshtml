@@ -7,8 +7,21 @@
 
 @{
     var lang = Workshop.Web.Controllers.ServiceReminderController.GetCurrentLanguage();
-}
 
+}
+@functions {
+    string GetTimeUnitName(int unit)
+    {
+        return unit switch
+        {
+            1 => Common["Label_Day"],
+            2 => Common["Label_Week"],
+            3 => Common["Label_Month"],
+            4 => Common["Label_Year"],
+            _ => unit.ToString()
+        };
+    }
+}
 
 <table id="data" class="table table-striped table-hover text-center w-100 main-table">
     <thead>
@@ -28,18 +41,24 @@
                 <tr>
                     <input name="Id" type="hidden" value="@item.Id" />
                     <td>@item.VehicleName</td>
-                    <td>@item.ServiceName</td>
-                    <td>@item.ReminderStatusName</td>
-                    <td>
-                        @{
-                            string datediff = DateCalculate.getDateDifference(item.NextDate ?? item.Date ?? DateTime.Now, DateTime.Now);
-                            var fromNow = Common["FromNow"];
-                            var ago = Common["Ago"];
-                        }
-                        @(item.NextDate > DateTime.Now ? datediff + " " + fromNow : (lang == "en" ? datediff + " " + ago : ago + " " + datediff))
+                    <td>@item.ServiceName
                         <br />
-                        @DateCalculate.getDecimalDifference(item.NextPrimaryMeter, item.CurrentMeter)
+                        @Common["Every"] @item.TimeInterval @GetTimeUnitName(item.TimeIntervalUnit)
+                        <br />
+                        @Common["Every"] @item.PrimaryMeterInterval  @Common["Unit_Kilometer"]
+
                     </td>
+                    <td>@item.ReminderStatusName</td>
+                                    <td>
+                                        @{
+                                            string datediff = DateCalculate.getDateDifference(item.NextDate ?? item.Date ?? DateTime.Now, DateTime.Now);
+                                            var fromNow = Common["FromNow"];
+                                            var ago = Common["Ago"];
+                                        }
+                                        @(item.NextDate > DateTime.Now ? datediff + " " + fromNow : (lang == "en" ? datediff + " " + ago : ago + " " + datediff))
+                                        <br />
+                                        @DateCalculate.getDecimalDifference(item.NextPrimaryMeter, item.CurrentMeter)
+                                    </td>
                     <td>
                         <a href="@Url.Action("Edit", "ServiceReminder", new { id = item.Id })" class="btn btn-info btn-sm"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</a>
                         <button data-id="@item.Id" class="btn btn-danger btn-sm deleteBtn"><i class="fad fa-trash"></i>&nbsp;@Common["Delete"]</button>
