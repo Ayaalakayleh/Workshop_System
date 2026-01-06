@@ -205,7 +205,6 @@ $(function () {
                 colStart++;
             });
 
-            // Check if grid is empty or has only placeholder, add dummy row if so
             let data = e.component.getDataSource().items();
             const originalLength = data.length;
             let addedDummy = false;
@@ -214,7 +213,6 @@ $(function () {
             //    if (hasOnlyPlaceholder) data = []; // Remove placeholder for export
             //    addedDummy = true;
             //    data.push({ Id: counter--, MakeID: null, ModelID: null, Chassis: '' });
-            //    data.push({ Id: counter--, MakeID: 0, ModelID: 0, Chassis: '' });
             //}
 
             DevExpress.excelExporter.exportDataGrid({
@@ -232,7 +230,6 @@ $(function () {
             }).then(function () {
                 // Remove dummy row if added
                 if (addedDummy && data.length > originalLength) {
-                    data.pop();
                     data.pop();
                 }
                 workbook.xlsx.writeBuffer().then(function (buffer) {
@@ -363,7 +360,7 @@ $(function () {
         }
 
         grid.saveEditData();
-        const gridData = (grid.getDataSource().items() || []).filter(r => !r.isPlaceholder);
+        const gridData = (grid.getDataSource().items() || []);
 
         if (!gridData.length) {
             if (window.Swal) {
