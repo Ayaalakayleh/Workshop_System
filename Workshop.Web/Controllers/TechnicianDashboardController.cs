@@ -658,7 +658,7 @@ namespace Workshop.Web.Controllers
                 {
                     item.TechnicianName = technicians?.FirstOrDefault(t => item.TechnicianID == t.Id)?.PrimaryName;
                     item.WIPName = wipSchedules?.FirstOrDefault(w => w.WIPId == item.WIPID) is var w2 && w2 != null ? "WIP - " + w2.WIPId : null;
-                    item.RTSName = rtsCodes?.FirstOrDefault(r => r.KeyId == item.RTSID) is var r2 && r2 != null ? (lang == "en" ? r2.RTSPrimaryDescription : r2.RTSSecondaryDescription) : null;
+                    item.RTSName = rtsCodes?.FirstOrDefault(r => r.RTSId == item.RTSID) is var r2 && r2 != null ? (lang == "en" ? r2.RTSPrimaryDescription : r2.RTSSecondaryDescription) : null;
 
                     item.StatusName = Enum.TryParse<Status>(item.StatusID.ToString(), out var st2) ? st2 : default;
                     item.Elapsed = item.EndedAt - item.StartedAt;

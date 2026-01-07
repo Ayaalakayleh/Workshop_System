@@ -24,6 +24,15 @@
                                 <div class="row">
 
                                     @Html.EditorFor(model => model.ReminderForm.Id, new { htmlAttributes = new { @class = "form-control", @type = "hidden", @readonly = "readonly" } })
+                                    <div class="col-md-6 mb-3">
+                                        <label>@Common["Label_Vehicle"]</label>
+                                        @Html.DropDownListFor(
+                                        model => model.ReminderForm.VehicleId,
+                                                                                new SelectList(ViewBag.vehicle, "Value", "Text"),
+                                                                                "Select",
+                                                                                new { @class = "form-control" }
+                                                                                )
+                                    </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label>@Common["Manufacturer"]</label>
@@ -35,15 +44,7 @@
                                                                                 )
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label>@Common["Label_Vehicle"]</label>
-                                        @Html.DropDownListFor(
-                                                                                model => model.ReminderForm.VehicleId,
-                                                                                new SelectList(ViewBag.vehicle, "Value", "Text"),
-                                                                                "Select",
-                                                                                new { @class = "form-control" }
-                                                                                )
-                                    </div>
+
 
                                     <div class="col-md-6 mb-3">
                                         <label>@Common["Label_Model"]</label>

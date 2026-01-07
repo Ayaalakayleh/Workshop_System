@@ -61,7 +61,16 @@
                                 <div class="row">
 
                                     @Html.EditorFor(model => model.ReminderForm.Id, new { htmlAttributes = new { @class = "form-control", @type = "hidden", @readonly = "readonly" } })
-
+                                    <div class="col-md-6 mb-3">
+                                        <label>@Common["Label_Vehicle"]</label>
+                                        @Html.HiddenFor(model => model.ReminderForm.VehicleId)
+                                        @Html.DropDownListFor(
+                                        model => model.ReminderForm.VehicleId,
+                                                                                new SelectList(ViewBag.vehicle, "Value", "Text"),
+                                                                                "Select",
+                                                                                new { @class = "form-control", disabled = "disabled" }
+                                                                                )
+                                    </div>
                                     <div class="col-md-6 mb-3">
                                         <label>@Common["Manufacturer"]</label>
                                         @Html.HiddenFor(model => model.ReminderForm.ManufacturerId)
@@ -70,17 +79,6 @@
                                                                                 new SelectList(ViewBag.manufacturers, "Value", "Text"),
                                                                                 "Select",
                                                                                 new { @class = "form-control", id = "ManufacturerId", disabled = "disabled" }
-                                                                                )
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label>@Common["Label_Vehicle"]</label>
-                                        @Html.HiddenFor(model => model.ReminderForm.VehicleId)
-                                        @Html.DropDownListFor(
-                                                                                model => model.ReminderForm.VehicleId,
-                                                                                new SelectList(ViewBag.vehicle, "Value", "Text"),
-                                                                                "Select",
-                                                                                new { @class = "form-control", disabled = "disabled" }
                                                                                 )
                                     </div>
 
