@@ -2598,4 +2598,7 @@
   <data name="NoScheduleData" xml:space="preserve">
     <value>No schedule data available</value>
   </data>
+  <data name="break_must_be_within_working" xml:space="preserve">
+    <value>Break time must be within working hours</value>
+  </data>
 </root>

@@ -15,6 +15,48 @@ $(function () {
 
         return (h * 60) + m;
     }
+    // Check if Break range is fully inside Working range (supports span-midnight)
+    $.validator.addMethod("breakWithinWorking", function (value, element, params) {
+        const $form = $(element).closest("form");
+
+        const wFromVal = $form.find('[name="' + params.workFrom + '"]').val();
+        const wToVal = $form.find('[name="' + params.workTo + '"]').val();
+        const bFromVal = $form.find('[name="' + params.breakFrom + '"]').val();
+        const bToVal = $form.find('[name="' + params.breakTo + '"]').val();
+
+        // If break isn't fully filled yet, don't block here (required/timeRange will handle)
+        if (!bFromVal || !bToVal) return true;
+
+        // If working isn't fully filled yet, don't block here (required/timeRange will handle)
+        if (!wFromVal || !wToVal) return true;
+
+        let wFrom = timeToMinutes(wFromVal);
+        let wTo = timeToMinutes(wToVal);
+        let bFrom = timeToMinutes(bFromVal);
+        let bTo = timeToMinutes(bToVal);
+
+        // If parsing fails, don't block here
+        if ([wFrom, wTo, bFrom, bTo].some(v => v === null)) return true;
+
+        const spanMidnight = $form.find('#' + params.spanMidnightId).is(':checked');
+
+        // Normalize ranges to a single timeline when spanning midnight
+        if (spanMidnight) {
+            // If working "to" is earlier/equal, it means it ends next day
+            if (wTo <= wFrom) wTo += 1440;
+
+            // Move break times to same "day segment" as working-from
+            if (bFrom < wFrom) bFrom += 1440;
+            if (bTo < wFrom) bTo += 1440;
+        } else {
+            // If not spanning midnight, and working range is weird, let other rules complain
+            if (wTo <= wFrom) return true;
+        }
+
+        // Break must be inside working window (and must still be a valid range)
+        return (bFrom >= wFrom) && (bTo <= wTo) && (bFrom < bTo);
+
+    }, RazorVars.break_must_be_within_working || "Break time must be within working hours");
 
     // Custom rule: "from" must be <= "to" (optionally only if both are filled)
     $.validator.addMethod("timeRange", function (value, element, params) {
@@ -84,8 +126,18 @@ $(function () {
                         return isFilled($form, "BreakFromTime");
                     }
                 },
-                timeRange: { from: "BreakFromTime", to: "BreakToTime" }
+                timeRange: { from: "BreakFromTime", to: "BreakToTime" },
+
+                // NEW:
+                breakWithinWorking: {
+                    workFrom: "WorkingFromTime",
+                    workTo: "WorkingToTime",
+                    breakFrom: "BreakFromTime",
+                    breakTo: "BreakToTime",
+                    spanMidnightId: "SpanMidnightInput"
+                }
             }
+
         },
 
         messages: {
@@ -103,7 +155,8 @@ $(function () {
             BreakFromTime: { required: RazorVars.required_field },
             BreakToTime: {
                 required: RazorVars.required_field,
-                timeRange: RazorVars.invalid_time_range || RazorVars.time_from_must_be_before_to || "From must be before To"
+                timeRange: RazorVars.invalid_time_range || RazorVars.time_from_must_be_before_to || "From must be before To",
+                breakWithinWorking: RazorVars.break_must_be_within_working || "Break time must be within working hours"
             }
         },
 
