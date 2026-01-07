@@ -605,6 +605,9 @@ namespace Workshop.Web.Controllers
                 var vehicleModels = await _vehicleApiClient.GetAllVehicleModel(0, lang);
                 var modelLookup = vehicleModels.ToDictionary(m => m.Id, m => new { Primary = m.VehicleModelPrimaryName, Secondary = m.VehicleModelSecondaryName, ManufacturerId = m.ManufacturerId });
 
+                var chassisList = await GetChasses();
+                var chassisLookup = chassisList.Select(c => c.ChassisNo).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
                 var rowsOut = new List<VehicleRecallDTO>();
                 var ExcelImportModel = new ExcelImportModel();
 
@@ -734,6 +737,13 @@ namespace Workshop.Web.Controllers
                                 isValid = false;
                                 ExcelImportModel.Errors.Add($"Row {r - headerRow}: Model '{excelModelText}' does not match manufacturer '{excelMakeText}'.");
                             }
+                        }
+
+                        // Validate chassis existence
+                        if (!string.IsNullOrEmpty(excelChasse) && !chassisLookup.Contains(excelChasse))
+                        {
+                            isValid = false;
+                            ExcelImportModel.Errors.Add($"Row {r - headerRow}: Chassis '{excelChasse}' does not exist in the system.");
                         }
 
                         if (isValid)
