@@ -213,7 +213,7 @@
                 addRow();
 
             } else {
-                Swal.fire("@Common["Please Enter Data"]", '', 'error');
+                Swal.fire("@Common["PleaseEnterData"]", '', 'error');
             }
         });
 
@@ -356,17 +356,17 @@
                                 CreateOrEditSuccess(data)
                             }
                             else {
-                                Swal.fire("@Common["Error"]", '', 'error');
+                                Swal.fire("@Common["ErrorHappend"]", '', 'error');
                             }
                         },
                         error: function (data) {
-                            Swal.fire("@Common["Error"]", '', 'error');
+                            Swal.fire("@Common["ErrorHappend"]", '', 'error');
                         }
                     });
 
                 }
             } else {
-                Swal.fire("@Common["Error"]", 'At least one row must be filled with data', 'error');
+                Swal.fire("@Common["ErrorHappend"]", '', 'error');
                 return false;
             }
 

@@ -2598,4 +2598,16 @@
   <data name="break_must_be_within_working" xml:space="preserve">
     <value>يجب أن تكون فترة الاستراحة خلال ساعات العمل</value>
   </data>
+  <data name="NoScheduleData" xml:space="preserve">
+    <value>لا يوجد معلومات معبأة</value>
+  </data>
+  <data name="PleaseSelectWS" xml:space="preserve">
+    <value>الرجاء إختيار الورشة</value>
+  </data>
+  <data name="PleaseEnterData" xml:space="preserve">
+    <value>قم بإدخال معلومات</value>
+  </data>
+  <data name="DoneSuccessfully" xml:space="preserve">
+    <value>تمت العملية بنجاح</value>
+  </data>
 </root>
