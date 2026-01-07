@@ -1,4 +1,18 @@
 ﻿$(document).ready(function () {
+    function checkDuplicate() {
+        const dto = {
+            Id: parseInt($('#Id').val() || "0", 10),          
+            Applies: $('#Applies').val(),
+            Basis: parseInt($('#Basis').val() || "0", 10),
+            AccountType: $('#AccountType').val(),
+        };
+
+        return $.ajax({
+            url: RazorVars.isValidUrl,
+            type: 'POST',
+            data: dto
+        });
+    }
 
     // jQuery Validate rules
     $("#matrixForm").validate({
@@ -52,44 +66,75 @@
             $("#btnCreate").prop('disabled', true)
                 .html('<i class="fa fa-spinner fa-spin"></i>&nbsp;' + RazorVars.btnSaving);
 
-            var formData = new FormData(form);
+            checkDuplicate()
+                .done(function (res) {
 
-            $.ajax({
-                url: $(form).attr('action'),
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    $("#btnCreate").prop('disabled', false)
-                        .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+                    if (!res || res.isSuccess !== true) {
+                        $("#btnCreate").prop('disabled', false)
+                            .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: resources.success_msg,
-                        confirmButtonText: RazorVars.btnOk,
-                        confirmButtonColor: 'var(--primary-600)',
-                        timer: 3000,
-                        timerProgressBar: true
-                    }).then(() => {
-                        $('#matrixModal').modal('hide');
-                        location.reload();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Duplicate record',
+                            text: 'A record with the same values already exists',
+                            confirmButtonText: RazorVars.btnOk,
+                            confirmButtonColor: 'var(--primary-600)'
+                        });
+
+                        return;
+                    }
+
+                    var formData = new FormData(form);
+
+                    $.ajax({
+                        url: $(form).attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            $("#btnCreate").prop('disabled', false)
+                                .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: resources.success_msg,
+                                confirmButtonText: RazorVars.btnOk,
+                                confirmButtonColor: 'var(--primary-600)',
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                $('#matrixModal').modal('hide');
+                                location.reload();
+                            });
+                        },
+                        error: function () {
+                            $("#btnCreate").prop('disabled', false)
+                                .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+                            Swal.fire({
+                                icon: 'error',
+                                title: RazorVars.ErrorHappend,
+                                confirmButtonText: RazorVars.btnTryAgain,
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
                     });
-                },
-                error: function () {
+                })
+                .fail(function () {
                     $("#btnCreate").prop('disabled', false)
                         .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
+
                     Swal.fire({
                         icon: 'error',
-                        title: RazorVars.ErrorHappend,
-                        confirmButtonText: RazorVars.btnTryAgain,
-                        confirmButtonColor: '#dc3545'
+                        title: 'Validation Failed',
+                        text: 'An error occurred while validating. Please try again',
+                        confirmButtonText: RazorVars.btnTryAgain
                     });
-                }
-            });
+                });
 
             return false;
         }
+
     });
 
 });
