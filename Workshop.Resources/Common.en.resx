@@ -2610,6 +2610,15 @@
   <data name="DoneSuccessfully" xml:space="preserve">
     <value>Success</value>
   </data>
+  <data name="Weeks" xml:space="preserve">
+    <value>Weeks</value>
+  </data>
+  <data name="Months" xml:space="preserve">
+    <value>Months</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Days</value>
+  </data>
   <data name="SellerinformationAlreadyExists" xml:space="preserve">
     <value>Seller with this information already exists</value>
   </data>

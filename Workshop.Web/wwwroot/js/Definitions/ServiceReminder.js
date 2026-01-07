@@ -19,18 +19,46 @@ $(document).ready(function () {
     });
 });
 
-// Delete functionality
+// Delete functionality (with SweetAlert2)
 $(document).ready(function () {
     $(document).on("click", ".deleteBtn", function () {
-        var reminderId = $(this).data("id");
 
-        $.get("/ServiceReminder/Delete", { id: reminderId }, function (data) {
-            window.location.reload();
-        }).fail(function() {
-            console.error("Error deleting reminder");
+        var $btn = $(this);
+        var reminderId = $btn.data("id");
+        var $row = $btn.closest("tr");
+
+        Swal.fire({
+            icon: "warning",
+            title: "Are you sure?",
+            text: "This will delete the reminder.",
+            showCancelButton: true,
+            confirmButtonColor: "var(--danger-800)",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            reverseButtons: true
+        }).then(function (result) {
+
+            // If user clicked Cancel -> just close (SweetAlert2 closes automatically)
+            if (!result.isConfirmed) return;
+
+            $.get("/ServiceReminder/Delete", { id: reminderId })
+                .done(function () {
+                    // Option A (best UX): remove row without reload
+                    $row.fadeOut(250, function () {
+                        $(this).remove();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Deleted",
+                            timer: 900,
+                            showConfirmButton: false
+                        });
+                    });
+                })
         });
     });
 });
+
 
 
 $(document).ready(function () {

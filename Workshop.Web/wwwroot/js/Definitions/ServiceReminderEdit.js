@@ -324,7 +324,6 @@ $(document).ready(function() {
         var manufacturingYear = $('#ReminderForm_ManufacturingYear').val();
         if (!manufacturingYear || manufacturingYear.trim() === '') {
             e.preventDefault();
-            alert('Manufacturing Year is required.');
             $('#ReminderForm_ManufacturingYear').focus();
             return false;
         }
@@ -334,7 +333,6 @@ $(document).ready(function() {
         var currentYear = new Date().getFullYear();
         if (isNaN(yearValue) || yearValue < 1900 || yearValue > currentYear + 1) {
             e.preventDefault();
-            alert('Please enter a valid manufacturing year.');
             $('#ReminderForm_ManufacturingYear').focus();
             return false;
         }
