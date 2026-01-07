@@ -13,16 +13,24 @@ function scheduleGridRepaint() {
 
 function updateRowInGrid(row) {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
-    if (!grid) return $.Deferred().resolve().promise();
-
     const store = grid.getDataSource().store();
-    return store.update(row.Id, row).then(() => {
+
+    store.update(row.Id, row).then(() => {
         const idx = grid.getRowIndexByKey(row.Id);
         if (idx >= 0) grid.repaintRows([idx]);
-        else scheduleGridRepaint();
-
-        if (typeof updateFieldsFromGrid === "function") updateFieldsFromGrid();
+        updateFieldsFromGrid();
     });
+}
+
+function getEffectiveQty(d) {
+    const rq = Number(d.RequestQuantity) || 0;
+    const q = Number(d.Quantity) || 0;
+    const baseQty = (q > 0) ? q : rq;
+
+    const u = d.UsedQuantity;
+    const hasUsed = (u !== null && u !== undefined && u !== "" && isFinite(Number(u)));
+
+    return hasUsed ? Number(u) : baseQty;
 }
 
 
@@ -255,16 +263,25 @@ $(function () {
                 },
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
+                    const row = cellInfo.data;
+
                     $("<div>").dxNumberBox({
-                        value: cellInfo.value,
+                        value: cellInfo.value,         
                         min: 0,
-                        max: cellInfo.data.Quantity,
+                        max: row.Quantity,             
                         showSpinButtons: true,
                         onValueChanged: function (e) {
-                            cellInfo.setValue(e.value);
+                            const v = e.value;
 
-                            var isLess = e.value < cellInfo.data.Quantity;
+                            cellInfo.setValue(v);
+                            row.UsedQuantity = v;        
+
+                            const isLess = (Number(v) || 0) < (Number(row.Quantity) || 0);
                             $("#optReturnParts").prop("checked", isLess);
+
+                            const grid = $("#mainItemsGrid").dxDataGrid("instance");
+                            const idx = grid.getRowIndexByKey(row.Id);
+                            if (idx >= 0) grid.repaintRows([idx]);  
 
                             updateFieldsFromGrid();
                         }
@@ -317,7 +334,8 @@ $(function () {
                     showSpinButtons: true
                 },
                 calculateCellValue: function (rowData) {
-                    const qty = +rowData.Quantity || +rowData.RequestQuantity || 0;
+                    //const qty = +rowData.Quantity || +rowData.RequestQuantity || 0;
+                    const qty = getEffectiveQty(rowData);
                     const price = +rowData.Price || 0;
                     const base = +(qty * price).toFixed(4);   
 
@@ -330,7 +348,9 @@ $(function () {
                 },
                 setCellValue: function (newData, value, currentRowData) {
                     const pct = +value || 0;
-                    const qty = +currentRowData.Quantity || +currentRowData.RequestQuantity || 0;
+                    //const qty = +currentRowData.Quantity || +currentRowData.RequestQuantity || 0;
+                    const qty = getEffectiveQty(currentRowData);
+
                     const price = +currentRowData.Price || 0;
                     const base = +(qty * price).toFixed(4);
 
@@ -363,7 +383,9 @@ $(function () {
                     var vatPercent = parseFloat(GetVatValueById(vatId)) || 0;
                     vatPercent = vatPercent > 1 ? vatPercent / 100 : vatPercent; 
 
-                    var qty = parseFloat(rowData.Quantity) || 0;
+                    //var qty = parseFloat(rowData.Quantity) || 0;
+                    var qty = getEffectiveQty(rowData);
+
                     var price = parseFloat(rowData.Price) || 0;
                     var discountPct = parseFloat(rowData.DiscountPct) || 0;
 
@@ -391,7 +413,8 @@ $(function () {
                     var tax = parseFloat(rowData.Tax) || 0;
                     var _rowDiscount = parseFloat(rowData.Discount) || 0;
                     var _rowDiscountAmt = parseFloat(rowData.Discount) || 0;
-                    var Qty = quantity > 0 ? quantity : requestQuantity;
+                    //var Qty = quantity > 0 ? quantity : requestQuantity;
+                    var Qty = getEffectiveQty(rowData);
 
                     var totalValue = (Qty * price) + tax;
                     if (_rowDiscountAmt > 0) {
@@ -589,6 +612,11 @@ $(function () {
                 e.component.updateDimensions();
             }
 
+            if (["Quantity", "Price", "DiscountPct", "UsedQuantity", "RequestQuantity"].includes(e.column.dataField)) {
+                const idx = e.row?.rowIndex;
+                if (idx != null && idx >= 0) e.component.repaintRows([idx]); 
+            }
+
             if (e.column.dataField === "AccountType") {
                 e.component.refresh().done(updateFieldsFromGrid);
                 return;
@@ -749,7 +777,9 @@ function updateFieldsFromGrid() {
 
     rows.forEach(function (r) {
         var d = r.data || {};
-        var qty = parseFloat(d.Quantity) || parseFloat(d.RequestQuantity) || 0;
+        //var qty = parseFloat(d.Quantity) || parseFloat(d.RequestQuantity) || 0;
+        var qty = getEffectiveQty(d);
+
         var price = parseFloat(d.Price) || 0;
         var disc = parseFloat(d.Discount) || 0;
         var tax = parseFloat(d.Tax) || 0;
