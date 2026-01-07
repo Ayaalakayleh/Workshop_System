@@ -75,7 +75,7 @@
                         data: {},
                         success: function (data) {
                             if (data == true) {
-                                swal("@Common["Deleted"]", "@Common["SwalDeleteText"]", "success");
+                                swal("@Html.Raw(Common["DoneSuccessfully"])", "", "success");
 
                                 $('#' + c).remove();
                                 swal.fire({
@@ -84,15 +84,15 @@
                                     }
                                 })
                             } else {
-                                swal("@Common["ErrorHappend"]", "", "error");
+                                swal("@Html.Raw(Common["ErrorHappend"])", "", "error");
                             }
                         },
                         error: function () {
-                            swal("@Common["Error"]", "@Common["SwalCancelText"]", "error");
+                            swal("@Html.Raw(Common["Error"])", "@Common["SwalCancelText"]", "error");
                         }
                     });
                 } else {
-                    swal("@Common["Cancelled"]", "", "error");
+                    swal("@Html.Raw(Common["Cancelled"])", "", "error");
                 }
             });
     };

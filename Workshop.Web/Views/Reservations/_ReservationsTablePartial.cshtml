@@ -149,18 +149,18 @@
 
 
                     Swal.fire({
-                                    title: '@Common["DoneSuccessfully"]',
+                                    title: '@Html.Raw(Common["DoneSuccessfully"])',
             icon: 'success',
-            confirmButtonText: '@Common["Ok"]',
+            confirmButtonText: '@Html.Raw(Common["Ok"])',
                     });
 
                      $('#btnSearch').click();
                 } else {
-                    Swal.fire('@Common["ErrorHappend"]', res.message || '', 'error');
+                    Swal.fire('@Html.Raw(Common["ErrorHappend"])', res.message || '', 'error');
                 }
             },
             error: function () {
-                Swal.fire('@Common["ErrorHappend"]', '', 'error');
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
             }
         });
     });
@@ -170,12 +170,12 @@
         const reservationId = $(this).data('reservationid');
 
         Swal.fire({
-            title: '@Html.Raw(@Common["Reservation_Cancelation_Header"])',
-            text: '@Html.Raw(@Common["Reservation_Cancelation"])',
+            title: '@Html.Raw(Common["Reservation_Cancelation_Header"])',
+            text: '@Html.Raw(Common["Reservation_Cancelation"])',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: '@Common["SwalDeleteConfirm"]',
-            cancelButtonText: '@Common["swalDeleteNo"]'
+            confirmButtonText: '@Html.Raw(Common["SwalDeleteConfirm"])',
+            cancelButtonText: '@Html.Raw(Common["swalDeleteNo"])'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -189,19 +189,19 @@
                     success: function (res) {
                         if (res.success) {
                                                 Swal.fire({
-                                    title: '@Common["Cancelled"]',
+                                    title: '@Html.Raw(Common["Cancelled"])',
             icon: 'success',
-            confirmButtonText: '@Common["Ok"]',
+            confirmButtonText: '@Html.Raw(Common["Ok"])',
                     });
                             //getData(currentPage);
                             $('#btnSearch').click();
 
                         } else {
-                            Swal.fire('@Common["ErrorHappend"]', res.message || '', 'error');
+                            Swal.fire('@Html.Raw(Common["ErrorHappend"])', res.message || '', 'error');
                         }
                     },
                     error: function () {
-                        Swal.fire('@Common["ErrorHappend"]', '', 'error');
+                        Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
                     }
                 });
             }

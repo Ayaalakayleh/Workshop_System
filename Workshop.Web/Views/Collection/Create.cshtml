@@ -213,7 +213,7 @@
 
 
             } else {
-                    Swal.fire("@Common["Error"]", "@Common["PleaseSelectWS"]");
+                    Swal.fire('@Html.Raw(Common["ErrorHappend"])', '@Html.Raw(Common["PleaseSelectWS"])',"error");
                     return false;
                 }
             });
@@ -244,7 +244,7 @@
                                 jsonData = data.data;
                                 apppendTable();
                             } else {
-                                Swal.fire("@Common["Error"]", data.message);
+                                Swal.fire("@Html.Raw(Common["Error"])", data.message,"error");
                             }
                             $("#Save").attr("hidden", true);
 
@@ -295,13 +295,13 @@
                 $(".the-loader").show();
 
             } else {
-                Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', "@Common["PleaseEnterData"]","error");
                 return false;
             }
 
         }
         else {
-            Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
+            Swal.fire('@Html.Raw(Common["ErrorHappend"])', "@Common["PleaseEnterData"]","error");
             return false;
         }
 
@@ -327,8 +327,8 @@
                 if (data.isSuccess == true) {
                         Swal.fire({
                         icon: 'success',
-                        title: "@Common["Success"]",
-                        confirmButtonText: "@Common["Ok"]",
+                        title: "@Html.Raw(Common["Success"])",
+                        confirmButtonText: "@Html.Raw(Common["Ok"])",
                         confirmButtonColor: 'var(--primary-600)',
                         timer: 3000,
                         timerProgressBar: true
@@ -336,13 +336,13 @@
                         window.location.href = "@Url.Action("Index", "Collection")";
                     });
                 } else {
-                    Swal.fire("@Common["Error"]", data.message);
+                    Swal.fire('@Html.Raw(Common["ErrorHappend"])', data.message,'error');
                 }
 
             },
 
             error: function () {
-                Swal.fire("@Common["Error"]", "@Common["ErrorHappend"]");
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', "@Common["ErrorHappend"]",'error');
             }
         });
     });
@@ -363,14 +363,14 @@
         })
 
         if (IsSuccess) {
-            Swal.fire("@Common["Success"]", "@Common["DoneSuccessfully"]");
+            Swal.fire("@Common["DoneSuccessfully"]", "",'success');
            // $(".check-or-uncheck").html("<i class='fas fa-check text-success'></i>");
             $(".btn.btn-danger").attr("disabled", "disabled");
             $("#Save").attr("hidden", true);
             $("#Clear").show();
 
         } else {
-            Swal.fire("@Common["Error"]", data.message);
+            Swal.fire('@Html.Raw(Common["ErrorHappend"])', data.message,'error');
         }
     }
     $("#Clear").click(function () {
@@ -500,7 +500,7 @@
                             }
                         },
                         error: function (xhr, textStatus, errorThrown) {
-                            Swal.fire("@Common["Error"]", "@Common["ErrorHappend"]");
+                            Swal.fire('@Html.Raw(Common["ErrorHappend"])', "",'error');
                             $("#Save").attr("hidden", false);
 
                         }
@@ -510,11 +510,11 @@
                 $(".the-loader").show();
 
             } else {
-                Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', "@Html.Raw(Common["PleaseEnterData"])","error");
             }
         }
         else {
-            Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
+            Swal.fire('@Html.Raw(Common["ErrorHappend"])', "@Html.Raw(Common["PleaseEnterData"])","error");
         }
     })
 

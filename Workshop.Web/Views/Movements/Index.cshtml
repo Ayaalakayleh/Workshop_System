@@ -218,7 +218,7 @@
                 }
             },
             error: function () {
-                Swal.fire('ErrorHappend', '', 'error');
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
             }
         });
     });
@@ -245,7 +245,7 @@
                 }
             },
             error: function () {
-                Swal.fire('ErrorHappend', '', 'error');
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
             }
         });
     });

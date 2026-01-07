@@ -81,7 +81,7 @@
                         data: {},
                         success: function (data) {
                             if (data == true) {
-                                swal("@Common["Deleted"]", "@Common["DoneSuccessfully"]", "success");
+                                swal("@Common["DoneSuccessfully"]", "", "success");
 
                                 $('#' + c).remove();
                                 swal.fire({
@@ -89,16 +89,12 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
-                            } else {
-                                swal("@Common["Error"]", "@Common["ErrorHappend"]", "error");
-                            }
+                            } else {}
                         },
-                        error: function () {
-                            swal("@Common["Error"]", "@Common["SwalCancelText"]", "error");
-                        }
+                        error: function () {}
                     });
                 } else {
-                    swal("@Common["Cancelled"]", "", "error");
+                    swal("@Html.Raw(Common["Cancelled"])", "", "error");
                 }
             });
     };
