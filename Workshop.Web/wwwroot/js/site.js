@@ -17,6 +17,7 @@ $(document).ready(function () {
         pageLength: 10,
         info: false,
         paging: false,
+        ordering: false,
         dom: 'tp',
         language: {
             emptyTable: resources.EmptyData
