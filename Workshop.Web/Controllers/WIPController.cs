@@ -27,7 +27,9 @@ using Workshop.Infrastructure;
 using Workshop.Web.Interfaces.Services;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
+using Microsoft.Extensions.Localization;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using Workshop.Resources;
 
 namespace Workshop.Web.Controllers
 {
@@ -42,6 +44,7 @@ namespace Workshop.Web.Controllers
         private readonly IFileService _fileService;
         private readonly IFileValidationService _fileValidationService;
         private readonly ILogger<WIPController> _logger;
+        private readonly IStringLocalizer<Common> _common;
 
         public readonly string lang;
         public WIPController(
@@ -54,6 +57,7 @@ namespace Workshop.Web.Controllers
             IWebHostEnvironment env,
             IFileService fileService,
             IFileValidationService fileValidationService,
+            IStringLocalizer<Common> common,
             ILogger<WIPController> logger
             , IMemoryCache cache) : base(cache, configuration, env)
         {
@@ -66,6 +70,7 @@ namespace Workshop.Web.Controllers
             _fileValidationService = fileValidationService;
             _erpApiClient = erpApiClient;
             _logger = logger;
+            _common = common;
         }
 
 
@@ -2965,7 +2970,8 @@ namespace Workshop.Web.Controllers
 
                 if (!isValid)
                 {
-                    return Json(new { success = false, message = "Seller with this information already exists" });
+                    var errror_msg = _common["SellerinformationAlreadyExists"];
+                    return Json(new { success = false, message = errror_msg });
                 }
 
                 var pettyCashSeller = new PettyCashSeller
@@ -2990,12 +2996,14 @@ namespace Workshop.Web.Controllers
                     });
                 }
 
-                return Json(new { success = false, message = "Failed to create seller" });
+                var msg = _common["FailedCreateSeller"];
+                return Json(new { success = false, message = msg });
             }
             catch (Exception ex)
             {
+                var msg = _common["FailedCreateSeller"];
                 _logger.LogError(ex, "Error creating petty cash seller");
-                return Json(new { success = false, message = "An error occurred while creating seller" });
+                return Json(new { success = false, message = msg });
             }
         }
 
