@@ -149,18 +149,18 @@
 
 
                     Swal.fire({
-                                    title: '@Common["Booked_Reservation"]',
+                                    title: '@Common["DoneSuccessfully"]',
             icon: 'success',
             confirmButtonText: '@Common["Ok"]',
                     });
 
                      $('#btnSearch').click();
                 } else {
-                    Swal.fire('Error', res.message || 'Failed to update reservation.', 'error');
+                    Swal.fire('@Common["ErrorHappend"]', res.message || '', 'error');
                 }
             },
             error: function () {
-                Swal.fire('Error', 'Server error occurred.', 'error');
+                Swal.fire('@Common["ErrorHappend"]', '', 'error');
             }
         });
     });
@@ -197,11 +197,11 @@
                             $('#btnSearch').click();
 
                         } else {
-                            Swal.fire('Error', res.message || 'Failed to cancel reservation.', 'error');
+                            Swal.fire('@Common["ErrorHappend"]', res.message || '', 'error');
                         }
                     },
                     error: function () {
-                        Swal.fire('Error', 'Server error occurred.', 'error');
+                        Swal.fire('@Common["ErrorHappend"]', '', 'error');
                     }
                 });
             }
