@@ -2610,4 +2610,13 @@
   <data name="DoneSuccessfully" xml:space="preserve">
     <value>تمت العملية بنجاح</value>
   </data>
+  <data name="Weeks" xml:space="preserve">
+    <value>اسابيع</value>
+  </data>
+  <data name="Months" xml:space="preserve">
+    <value>اشهر</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>ايام</value>
+  </data>
 </root>

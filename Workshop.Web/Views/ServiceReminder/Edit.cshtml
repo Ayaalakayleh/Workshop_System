@@ -199,13 +199,14 @@
                                                            class="form-control"
                                                            id="ReminderForm_StartDate"
                                                            name="ReminderForm.StartDate"
+                                                       disabled="disabled"
                                                            value="@(Model.ReminderForm.StartDate.HasValue? Model.ReminderForm.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
                                                 </div>
 
                                                 <div class="form-group">
                                                     @Html.LabelFor(model => model.ReminderForm.StartMeter, @Common["StartMeter"])
                                                     <div class="input-group flex-nowrap">
-                                                        @Html.TextBoxFor(model => model.ReminderForm.StartMeter, new { @class = "form-control", type = "number", @placeholder = @Common["StartMeter"] })
+                                                    @Html.TextBoxFor(model => model.ReminderForm.StartMeter, new { @class = "form-control", type = "number", @placeholder = @Common["StartMeter"], disabled = "disabled" })
                                                         <div class="input-group-append">
                                                             <span class="input-group-text">@Common["Unit_Kilometer"]</span>
                                                         </div>
@@ -285,17 +286,17 @@
                                                     if (totalDays >= 30)
                                                     {
                                                         timeValue = (int)Math.Round(totalDays / 30);
-                                                        timeUnit = timeValue == 1 ? Common["month"] : Common["months"];
+                                                        timeUnit = timeValue == 1 ? Common["month"] : Common["Months"];
                                                     }
                                                     else if (totalDays >= 7)
                                                     {
                                                         timeValue = (int)Math.Round(totalDays / 7);
-                                                        timeUnit = timeValue == 1 ? Common["week"] : Common["weeks"];
+                                                        timeUnit = timeValue == 1 ? Common["week"] : Common["Weeks"];
                                                     }
                                                     else
                                                     {
                                                         timeValue = (int)Math.Round(totalDays);
-                                                        timeUnit = timeValue == 1 ? Common["day"] : Common["days"];
+                                                        timeUnit = timeValue == 1 ? Common["day"] : Common["Days"];
                                                     }
 
                                                     var datediff = item.Date.Value > DateTime.Now
