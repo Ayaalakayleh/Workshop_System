@@ -2,36 +2,65 @@
 {
     public static class DateCalculate
     {
-        public static string getDateDifference(DateTime date1, DateTime date2)
+        public static string GetDateDifference(DateTime date1, DateTime date2, string lang = "en")
         {
             TimeSpan difference = date1.Date - date2.Date;
-            string result = "";
+
             int yearsDifference = Math.Abs(difference.Days / 360);
-            int weeksDifference = Math.Abs((difference.Days % 360) % 30 / 7);
             int monthsDifference = Math.Abs((difference.Days % 360) / 30);
+            int weeksDifference = Math.Abs((difference.Days % 360) % 30 / 7);
             int daysDifference = Math.Abs((difference.Days % 360) % 7);
 
+            bool isArabic = lang.ToLower() == "ar";
+
             if (yearsDifference > 0)
-                result += $"{yearsDifference} {(yearsDifference == 1 ? "Year" : "Years")} ";
+                return isArabic
+                    ? $"{yearsDifference} {(yearsDifference == 1 ? "سنة" : "سنوات")}"
+                    : $"{yearsDifference} {(yearsDifference == 1 ? "Year" : "Years")}";
 
-            else if (monthsDifference > 0)
-                result += $"{monthsDifference} {(monthsDifference == 1 ? "Month" : "Monthes")} ";
+            if (monthsDifference > 0)
+                return isArabic
+                    ? $"{monthsDifference} {(monthsDifference == 1 ? "شهر" : "أشهر")}"
+                    : $"{monthsDifference} {(monthsDifference == 1 ? "Month" : "Months")}";
 
-            else if (weeksDifference > 0)
-                result += $"{weeksDifference} {(weeksDifference == 1 ?" Week" : "Weeks")} ";
+            if (weeksDifference > 0)
+                return isArabic
+                    ? $"{weeksDifference} {(weeksDifference == 1 ? "أسبوع" : "أسابيع")}"
+                    : $"{weeksDifference} {(weeksDifference == 1 ? "Week" : "Weeks")}";
 
-            else if (daysDifference > 0)
-                result += $"{daysDifference} {(daysDifference == 1 ? "Day" : "Days")} ";
+            if (daysDifference > 0)
+                return isArabic
+                    ? $"{daysDifference} {(daysDifference == 1 ? "يوم" : "أيام")}"
+                    : $"{daysDifference} {(daysDifference == 1 ? "Day" : "Days")}";
 
-            return result;
+            return isArabic ? "اليوم" : "Today";
         }
 
 
-        public static string getDecimalDifference(decimal value1, decimal value2)
+
+        public static string GetDecimalDifference(decimal value1, decimal value2, string lang = "en")
         {
             decimal dif = value2 - value1;
-            string agoOrFromNow = value2 > value1 ? "Overdue" : "fromnow";
-            return $"{Math.Abs(dif)} {"km"} {agoOrFromNow}";
+            bool isOverdue = value2 > value1;
+
+            string unit;
+            string status;
+
+            switch (lang.ToLower())
+            {
+                case "ar":
+                    unit = "كم";
+                    status = isOverdue ? "متأخر" : "متبقي";
+                    break;
+
+                default: // English
+                    unit = "km";
+                    status = isOverdue ? "Overdue" : "From now";
+                    break;
+            }
+
+            return $"{Math.Abs(dif)} {unit} {status}";
         }
+
     }
 }

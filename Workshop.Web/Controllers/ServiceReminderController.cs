@@ -116,7 +116,7 @@ namespace Workshop.Web.Controllers
             }).ToList();
             foreach (var item in result.Reminders)
             {
-                item.ReminderStatusName = Enum.GetName(typeof (ServiceReminderStatusEnum), item.ReminderStatus);
+                item.ReminderStatusName = ToLocalizedServiceReminderStatusName((ServiceReminderStatusEnum)item.ReminderStatus, lang);
             }
             ViewBag.ServiceReminderStatus = (from ServiceReminderStatusEnum source in Enum.GetValues(typeof(ServiceReminderStatusEnum))
                                              select new SelectListItem
@@ -368,9 +368,58 @@ namespace Workshop.Web.Controllers
             vehicle.ManufacturerId = serviceReminderDTO.ReminderForm.ManufacturerId??0;
             vehicle.VehicleModelId = serviceReminderDTO.ReminderForm.VehicleModelId??0;
             vehicle.ManufacturingYear = serviceReminderDTO.ReminderForm.ManufacturingYear ?? 0;
-            var vehicles = (await _vehicleApiClient.GetServiceScheduleVehicle(vehicle));
+            
+            var vehicles = new List<VehicleDefinitions>();
+            if (serviceReminderDTO.ReminderForm.VehicleId == null)
+            {
+                vehicles = (await _vehicleApiClient.GetServiceScheduleVehicle(vehicle));
 
-            foreach (var item in vehicles)
+
+                foreach (var item in vehicles)
+                {
+                    CreateServiceReminderDTO createServiceReminderDTO = new CreateServiceReminderDTO
+                    {
+                        vehicleNams = serviceReminderDTO.ReminderForm.vehicleNams,
+                        VehicleGroupId = serviceReminderDTO.ReminderForm.VehicleGroupId,
+                        VehicleId = serviceReminderDTO.ReminderForm.VehicleId ?? item.Id, //*
+                        VehicleModelId = serviceReminderDTO.ReminderForm.VehicleModelId, //*
+                        VehicleName = vehicles.Where(item => item.Id == serviceReminderDTO.ReminderForm.VehicleId).Select(i => i.VehicleName).FirstOrDefault(),
+                        NextDuePrimaryMeter = serviceReminderDTO.ReminderForm.NextDuePrimaryMeter,
+                        NextDate = serviceReminderDTO.ReminderForm.NextDate,
+                        NextPrimaryMeter = serviceReminderDTO.ReminderForm.NextPrimaryMeter,
+                        PrimaryMeterInterval = serviceReminderDTO.ReminderForm.PrimaryMeterInterval,
+                        ColManufacturers = serviceReminderDTO.ReminderForm.ColManufacturers,
+                        CurrentMeter = vehicles.Where(item => item.Id == serviceReminderDTO.ReminderForm.VehicleId).Select(i => i.CurrentMeter).FirstOrDefault(), //serviceReminderDTO.ReminderForm.CurrentMeter,
+                        Id = serviceReminderDTO.ReminderForm.Id, //*
+                        ManufacturerId = serviceReminderDTO.ReminderForm.ManufacturerId, //*
+                        ManualPrimaryMeter = serviceReminderDTO.ReminderForm.ManualPrimaryMeter,
+                        ManualDate = DateTime.Now,
+                        ManufacturingYear = serviceReminderDTO.ReminderForm.ManufacturingYear,//*
+                        Repates = serviceReminderDTO.ReminderForm.Repates, //*
+                        Services = serviceReminderDTO.ReminderForm.Services, //*
+                        ServiceName = serviceReminderDTO.ReminderForm.ServiceName,
+                        ItemId = serviceReminderDTO.ReminderForm.ItemId,
+                        PrimaryMeterDue = serviceReminderDTO.ReminderForm.PrimaryMeterDue,
+                        TimeDue = serviceReminderDTO.ReminderForm.TimeDue, //*
+                        TimeDueUnit = serviceReminderDTO.ReminderForm.TimeDueUnit,
+                        TimeInterval = serviceReminderDTO.ReminderForm.TimeInterval, //*
+                        TimeIntervalUnit = serviceReminderDTO.ReminderForm.TimeIntervalUnit, //*
+                        IsManually = serviceReminderDTO.ReminderForm.IsManually,
+                        HasNotification = serviceReminderDTO.ReminderForm.HasNotification,
+                        StartDate = serviceReminderDTO.ReminderForm.StartDate,
+                        StartMeter = serviceReminderDTO.ReminderForm.StartMeter,
+                        UseSameStart = serviceReminderDTO.ReminderForm.UseSameStart,
+                        ReminderStatusSecondaryName = serviceReminderDTO.ReminderForm.ReminderStatusSecondaryName,
+                        ReminderStatusPrimaryName = serviceReminderDTO.ReminderForm.ReminderStatusPrimaryName,
+                        ReminderStatus = serviceReminderDTO.ReminderForm.ReminderStatus,
+                        LastCompleted = serviceReminderDTO.ReminderForm.LastCompleted,
+                        NotificationsGroupId = serviceReminderDTO.ReminderForm.NotificationsGroupId,
+                    };
+                    var response = await _serviceReminderService.AddServiceReminderAsync(createServiceReminderDTO);
+                }
+                
+            }
+            else
             {
                 CreateServiceReminderDTO createServiceReminderDTO = new CreateServiceReminderDTO
                 {
@@ -410,10 +459,9 @@ namespace Workshop.Web.Controllers
                     LastCompleted = serviceReminderDTO.ReminderForm.LastCompleted,
                     NotificationsGroupId = serviceReminderDTO.ReminderForm.NotificationsGroupId,
                 };
-
                 var response = await _serviceReminderService.AddServiceReminderAsync(createServiceReminderDTO);
             }
-           
+            
 
             return RedirectToAction("Index");
         }
@@ -542,6 +590,26 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        public static string ToLocalizedServiceReminderStatusName(ServiceReminderStatusEnum status, string lang = "en")
+        {
+            return lang.ToLower() switch
+            {
+                "ar" => status switch
+                {
+                    ServiceReminderStatusEnum.Scheduled => "مجدول",
+                    ServiceReminderStatusEnum.DueSoon => "قريب الاستحقاق",
+                    ServiceReminderStatusEnum.Overdue => "متأخر",
+                    _ => status.ToString()
+                },
 
+                _ => status switch
+                {
+                    ServiceReminderStatusEnum.Scheduled => "Scheduled",
+                    ServiceReminderStatusEnum.DueSoon => "Due Soon",
+                    ServiceReminderStatusEnum.Overdue => "Overdue",
+                    _ => status.ToString()
+                }
+            };
+        }
     }
 }

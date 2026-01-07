@@ -323,32 +323,32 @@
                                                     if (totalDays >= 30)
                                                     {
                                                         timeValue = (int)Math.Round(totalDays / 30);
-                                                        timeUnit = timeValue == 1 ? "month" : "months";
+                                                        timeUnit = timeValue == 1 ? Common["month"] : Common["months"];
                                                     }
                                                     else if (totalDays >= 7)
                                                     {
                                                         timeValue = (int)Math.Round(totalDays / 7);
-                                                        timeUnit = timeValue == 1 ? "week" : "weeks";
+                                                        timeUnit = timeValue == 1 ? Common["week"] : Common["weeks"];
                                                     }
                                                     else
                                                     {
                                                         timeValue = (int)Math.Round(totalDays);
-                                                        timeUnit = timeValue == 1 ? "day" : "days";
+                                                        timeUnit = timeValue == 1 ? Common["day"] : Common["days"];
                                                     }
 
                                                     var datediff = item.Date.Value > DateTime.Now
-                                                        ? $"{timeValue} {timeUnit} from now"
-                                                        : $"{timeValue} {timeUnit} ago";
+                                                    ? $"{timeValue} {timeUnit} {Common["FromNow"]}"
+                                                    : $"{timeValue} {timeUnit} {Common["Ago"]}";
 
                                                     <small class="text-muted">@datediff</small>
                                                 }
                                             </td>
                                             <td>
-                                                <p>@(item.PrimaryMeter.HasValue ? $"{item.PrimaryMeter.Value:F2} km" : "")</p>
+                                                <p>@(item.PrimaryMeter.HasValue ? $"{item.PrimaryMeter.Value:F2} {Common["Unit_Kilometer"]}" : "")</p>
                                                 @if (item.PrimaryMeter.HasValue && !item.IsCompleted)
                                                 {
                                                     var meterDiff = item.PrimaryMeter.Value - Model.ReminderForm.CurrentMeter;
-                                                    <small class="text-muted">@(meterDiff > 0 ? $"{meterDiff:F1} km from now" : $"{Math.Abs(meterDiff):F1} km ago")</small>
+                                                    <small class="text-muted">@(meterDiff > 0 ? $"{meterDiff:F1} {Common["Unit_Kilometer"]} {Common["FromNow"]}" : $"{Math.Abs(meterDiff):F1} {Common["Unit_Kilometer"]} {Common["Ago"]}")</small>
                                                 }
                                             </td>
                                             <td>
