@@ -54,9 +54,11 @@ namespace Workshop.Core.DTOs
 
     public class PriceMatrixFilter
     {
+        public int? Id { get; set; }
         public string? Name { get; set; }
         public string? AppliesTo { get; set; }
         public int Applies { get; set; }
+        public AccountTypeEnum AccountType { get; set; }
         public Basis? Basis { get; set; }
         // paging
         public int? PageNumber { get; set; } = 1;

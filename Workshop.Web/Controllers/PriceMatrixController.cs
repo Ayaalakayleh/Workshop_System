@@ -416,5 +416,30 @@ namespace Workshop.Web.Controllers
             }).ToList();
         }
 
+        [HttpPost]
+        public async Task<JsonResult> isValid(PriceMatrixFilter dto)
+        {
+            try
+            {
+                var priceList = await _apiClient.GetAllRows(new PriceMatrixFilter());
+
+                if (dto.Basis is null)
+                    return Json(new { isSuccess = true });
+
+                bool duplicateExists = priceList?.Any(v =>
+                    v.Applies == dto.Applies &&
+                    v.BasisId == (int)dto.Basis &&                 
+                    v.AccountType == dto.AccountType &&     
+                    v.Id != dto.Id                          
+                ) ?? false;
+
+                return Json(new { isSuccess = !duplicateExists });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { isSuccess = false, message = ex.Message });
+            }
+        }
+
     }
 }
