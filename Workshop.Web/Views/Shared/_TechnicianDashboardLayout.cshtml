@@ -1309,14 +1309,14 @@
         var clockingUrl = '@Url.Action("Clocking", "TechnicianDashboard")';
         function switchLanguage(culture) {
             // Show loading indicator
-            Swal.fire({
-                title: culture === 'ar' ? 'جاري تغيير اللغة...' : 'Changing Language...',
-                text: culture === 'ar' ? 'يرجى الانتظار' : 'Please wait...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+            // Swal.fire({
+            //     title: culture === 'ar' ? 'جاري تغيير اللغة...' : 'Changing Language...',
+            //     text: culture === 'ar' ? 'يرجى الانتظار' : 'Please wait...',
+            //     allowOutsideClick: false,
+            //     didOpen: () => {
+            //         Swal.showLoading();
+            //     }
+            // });
 
             // Send request to change language
             $.ajax({
