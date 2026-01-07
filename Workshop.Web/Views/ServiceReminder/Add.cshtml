@@ -22,8 +22,6 @@
 
                             <form id="serviceReminderForm" asp-action="Add" asp-controller="ServiceReminder" method="post">
                                 <div class="row">
-
-                                    @Html.EditorFor(model => model.ReminderForm.Id, new { htmlAttributes = new { @class = "form-control", @type = "hidden", @readonly = "readonly" } })
                                     <div class="col-md-6 mb-3">
                                         <label>@Common["Label_Vehicle"]</label>
                                         @Html.DropDownListFor(
@@ -33,7 +31,13 @@
                                                                                 new { @class = "form-control" }
                                                                                 )
                                     </div>
-
+                                    <div class="col-md-6 mb-3">
+                                        <label>@Common["Label_Year"] <span class="text-danger">*</span></label>
+                                        @Html.EditorFor(
+                                                                                model => model.ReminderForm.ManufacturingYear,
+                                                                                new { htmlAttributes = new { @class = "form-control", @type = "number", @required = "required" } }
+                                                                                )
+                                    </div>
                                     <div class="col-md-6 mb-3">
                                         <label>@Common["Manufacturer"]</label>
                                         @Html.DropDownListFor(
@@ -44,7 +48,7 @@
                                                                                 )
                                     </div>
 
-
+                                    @Html.EditorFor(model => model.ReminderForm.Id, new { htmlAttributes = new { @class = "form-control", @type = "hidden", @readonly = "readonly" } })
 
                                     <div class="col-md-6 mb-3">
                                         <label>@Common["Label_Model"]</label>
@@ -56,15 +60,9 @@
                                                                                 )
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label>@Common["Label_Year"] <span class="text-danger">*</span></label>
-                                        @Html.EditorFor(
-                                                                                model => model.ReminderForm.ManufacturingYear,
-                                                                                new { htmlAttributes = new { @class = "form-control", @type = "number", @required = "required" } }
-                                                                                )
-                                    </div>
 
-                                    <div class="col-md-6 mb-3">
+
+                                    <div class="col-12 mb-3">
                                         <label>@Common["Label_VechileType"]</label>
                                         @Html.DropDownListFor(
                                                                                 model => model.ReminderForm.VehicleGroupId,
@@ -159,7 +157,7 @@
 
                                 </div>
                                 <div class="row mt-2">
-                                    <div class="col-md-4 col-sm-12">
+                                    <div class="col-md-6 col-sm-12">
                                         <div class="form-check form-switch">
                                             @Html.CheckBoxFor(model => model.ReminderForm.IsManually, htmlAttributes: new { @class = "form-check-input", id = "IsManually" })
                                             <label class="form-check-label" for="IsManually">@Common["Manually"]</label>
@@ -182,30 +180,7 @@
                                                 </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-12">
-                                       
-                                        <div id="StartDateControl" class="custom-control collapse">
-                                                <div class="form-group">
-                                                    @Html.LabelFor(model => model.ReminderForm.StartDate, @Common["StartDate"])
-                                                    <input type="date"
-                                                           class="form-control"
-                                                           id="ReminderForm_StartDate"
-                                                           name="ReminderForm.StartDate"
-                                                           value="@(Model.ReminderForm.StartDate.HasValue? Model.ReminderForm.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
-                                                </div>
-
-                                                <div class="form-group">
-                                                    @Html.LabelFor(model => model.ReminderForm.StartMeter, @Common["StartMeter"])
-                                                    <div class="input-group flex-nowrap">
-                                                        @Html.TextBoxFor(model => model.ReminderForm.StartMeter, new { @class = "form-control", type = "number", @placeholder = @Common["StartMeter"] })
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">@Common["Unit_Kilometer"]</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12">
+                                    <div class="col-md-6 col-sm-12">
                                         <div class="form-check form-switch">
                                             @Html.CheckBoxFor(
                                                                                         model => model.ReminderForm.HasNotification,

@@ -10,46 +10,9 @@
 }
 
 <div class="row">
-    @* <div class="col-12">
-        <div id="panel-schedule" class="panel">
-            <div class="panel-hdr px-2">
-                <h2 class="font-weight-bold">@Common["SchedulePreview"]</h2>
-            </div>
-            <div class="panel-container show">
-                <div class="panel-content">
-                    <div id="schedulePreview" class="row">
-                        <div class="col-12">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i> @Common["SchedulePreviewDescription"]
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <h5>@Common["NextServiceDates"]</h5>
-                            <div id="nextServiceDates" class="list-group"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <h5>@Common["ScheduleSummary"]</h5>
-                            <div id="scheduleSummary" class="card">
-                                <div class="card-body">
-                                    <p class="card-text">
-                                        <strong>@Common["Interval"]:</strong> <span id="intervalDisplay">-</span><br>
-                                        <strong>@Common["Repeats"]:</strong> <span id="repeatsDisplay">-</span><br>
-                                        <strong>@Common["NextDue"]:</strong> <span id="nextDueDisplay">-</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> *@
     <div class="col-lg-8 col-md-6 col-sm-12">
         <div id="panel-form" class="panel">
-            <div class="panel-hdr px-2">
+            <div class="panel-hdr">
                 <h2 class="font-weight-bold">@Common["ServiceReminder"]</h2>
             </div>
             <div class="panel-container show">
@@ -67,8 +30,16 @@
                                         @Html.DropDownListFor(
                                         model => model.ReminderForm.VehicleId,
                                                                                 new SelectList(ViewBag.vehicle, "Value", "Text"),
-                                                                                "Select",
+                                                                                "@Common['Select']",
                                                                                 new { @class = "form-control", disabled = "disabled" }
+                                                                                )
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>@Common["Label_Year"] <span class="text-danger">*</span></label>
+                                        @Html.HiddenFor(model => model.ReminderForm.ManufacturingYear)
+                                        @Html.EditorFor(
+                                                                                model => model.ReminderForm.ManufacturingYear,
+                                                                                new { htmlAttributes = new { @class = "form-control", @type = "number", @required = "required", disabled = "disabled" } }
                                                                                 )
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -77,7 +48,7 @@
                                         @Html.DropDownListFor(
                                         model => model.ReminderForm.ManufacturerId,
                                                                                 new SelectList(ViewBag.manufacturers, "Value", "Text"),
-                                                                                "Select",
+                                                                                "@Common['Select']",
                                                                                 new { @class = "form-control", id = "ManufacturerId", disabled = "disabled" }
                                                                                 )
                                     </div>
@@ -93,16 +64,9 @@
                                                                                 )
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label>@Common["Label_Year"] <span class="text-danger">*</span></label>
-                                        @Html.HiddenFor(model => model.ReminderForm.ManufacturingYear)
-                                        @Html.EditorFor(
-                                                                                model => model.ReminderForm.ManufacturingYear,
-                                                                                new { htmlAttributes = new { @class = "form-control", @type = "number", @required = "required", disabled = "disabled" } }
-                                                                                )
-                                    </div>
 
-                                    <div class="col-md-6 mb-3">
+
+                                    <div class="col-12 mb-3">
                                         <label>@Common["Label_VechileType"]</label>
                                        
                                         @Html.DropDownListFor(
@@ -311,7 +275,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <p>@(item.Date.HasValue ? item.Date.Value.ToString("dd-MM-yyyy") : "")</p>
+                                                <p class="m-0">@(item.Date.HasValue ? item.Date.Value.ToString("dd-MM-yyyy") : "")</p>
                                                 @if (item.Date.HasValue && !item.IsCompleted)
                                                 {
                                                     var totalDays = Math.Abs((item.Date.Value - DateTime.Now).TotalDays);
@@ -342,7 +306,7 @@
                                                 }
                                             </td>
                                             <td>
-                                                <p>@(item.PrimaryMeter.HasValue ? $"{item.PrimaryMeter.Value:F2} {Common["Unit_Kilometer"]}" : "")</p>
+                                                <p class="m-0">@(item.PrimaryMeter.HasValue ? $"{item.PrimaryMeter.Value:F2} {Common["Unit_Kilometer"]}" : "")</p>
                                                 @if (item.PrimaryMeter.HasValue && !item.IsCompleted)
                                                 {
                                                     var meterDiff = item.PrimaryMeter.Value - Model.ReminderForm.CurrentMeter;
