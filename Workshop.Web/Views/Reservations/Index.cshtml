@@ -306,11 +306,11 @@
                         window.updateTechSchedule(response.data || []);
                     }
                 } else {
-                    Swal.fire('@Common["ErrorHappend"]', response.message, "error");
+                    Swal.fire('@Html.Raw(Common["ErrorHappend"])', response.message, "error");
                 }
             },
             error: function () {
-                Swal.fire('@Common["ErrorHappend"]', '', "error");
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', "error");
             }
         });
     }
@@ -357,7 +357,7 @@
     function loadReservationForEdit(id) {
         $.get(window.API_BASE.getReservationsByIds, { ids: id }, function (res) {
             if (!res.isSuccess || !res.data || !res.data.length) {
-                Swal.fire('ErrorHappend', '', 'error');
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
                 return;
             }
             const r = res.data[0];

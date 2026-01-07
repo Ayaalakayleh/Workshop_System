@@ -213,7 +213,7 @@
                 addRow();
 
             } else {
-                Swal.fire("@Common["PleaseEnterData"]", '', 'error');
+                Swal.fire("@Html.Raw(Common["PleaseEnterData"])", '', 'error');
             }
         });
 
@@ -224,7 +224,7 @@
             const $button = $(this);
 
             Swal.fire({
-                title: '@Message["SwalDeleteTitle"]',
+                title: '@Html.Raw(Message["SwalDeleteTitle"])',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor:"var(--danger-800)",
@@ -356,17 +356,17 @@
                                 CreateOrEditSuccess(data)
                             }
                             else {
-                                Swal.fire("@Common["ErrorHappend"]", '', 'error');
+                                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
                             }
                         },
                         error: function (data) {
-                            Swal.fire("@Common["ErrorHappend"]", '', 'error');
+                            Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
                         }
                     });
 
                 }
             } else {
-                Swal.fire("@Common["ErrorHappend"]", '', 'error');
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
                 return false;
             }
 

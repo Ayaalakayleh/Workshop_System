@@ -296,9 +296,9 @@
             if (parseInt($('#TransferExitMeter').val() || 0) < parseInt($("#OdoMeter").val() || 0)) {
                 $("#TransferExitMeter").next().children(':first-child').children(':first-child')
                     .css("border-color", "red").css("background-color", "#ffdddd");
-                Swal.fire("@Common["ErrorHappend"]",
-                    "@Common["Label_OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " +
-                    parseInt($("#OdoMeter").val()) + " " + "@Common["Label_KiloMeter"]");
+                Swal.fire('@Html.Raw(Common["ErrorHappend"])',
+                    "@Html.Raw(Common["Label_OdometerMustMatchTheVreviousReadingOrExceedsIt"])" + " : " +
+                    parseInt($("#OdoMeter").val()) + " " + "@Html.Raw(Common["Label_KiloMeter"])");
 
                 isValid = false;
 
@@ -376,8 +376,8 @@
                     if (data.isSuccess) {
                         Swal.fire({
                             icon: 'success',
-                            title: "@Common["DoneSuccessfully"]",
-                            confirmButtonText: '@Common["Ok"]',
+                            title: "@Html.Raw(Common["DoneSuccessfully"])",
+                            confirmButtonText: '@Html.Raw(Common["Ok"])',
                             confirmButtonColor: 'var(--primary-600)',
                             timer: 3000,
                             timerProgressBar: true
@@ -387,11 +387,11 @@
                         });
                     }
                     else {
-                        Swal.fire("@Common["ErrorHappend"]", data.message);
+                        Swal.fire("@Html.Raw(Common["ErrorHappend"])", data.message);
                     }
                 },
                 error: function (data) {
-                    Swal.fire("@Common["ErrorHappend"]", data.message);
+                    Swal.fire('@Html.Raw(Common["ErrorHappend"])', data.message);
                 }
             });
         }
