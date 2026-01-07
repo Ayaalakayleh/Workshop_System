@@ -296,9 +296,9 @@
             if (parseInt($('#TransferExitMeter').val() || 0) < parseInt($("#OdoMeter").val() || 0)) {
                 $("#TransferExitMeter").next().children(':first-child').children(':first-child')
                     .css("border-color", "red").css("background-color", "#ffdddd");
-                Swal.fire("@Common["Error"]",
-                    "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " +
-                    parseInt($("#OdoMeter").val()) + " " + "@Common["KiloMeter"]");
+                Swal.fire("@Common["ErrorHappend"]",
+                    "@Common["Label_OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " +
+                    parseInt($("#OdoMeter").val()) + " " + "@Common["Label_KiloMeter"]");
 
                 isValid = false;
 
@@ -376,7 +376,7 @@
                     if (data.isSuccess) {
                         Swal.fire({
                             icon: 'success',
-                            title: "Transfer request sent",
+                            title: "@Common["DoneSuccessfully"]",
                             confirmButtonText: '@Common["Ok"]',
                             confirmButtonColor: 'var(--primary-600)',
                             timer: 3000,
@@ -387,11 +387,11 @@
                         });
                     }
                     else {
-                        Swal.fire("@Common["Error"]", data.message);
+                        Swal.fire("@Common["ErrorHappend"]", data.message);
                     }
                 },
                 error: function (data) {
-                    Swal.fire("@Common["Error"]", data.message);
+                    Swal.fire("@Common["ErrorHappend"]", data.message);
                 }
             });
         }

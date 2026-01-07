@@ -785,7 +785,7 @@
         var taxNumber = $('#SellerTaxNumber').val().trim();
 
         if (!primaryName || !secondaryName) {
-            Swal.fire("Error", "Primary and Secondary names are required", "error");
+                Swal.fire('@Common["Label_FillRequired"]', "", "error");
             return;
         }
 
@@ -803,18 +803,18 @@
             dataType: "json",
             success: function (result) {
                 if (result.success) {
-                    Swal.fire("Success", "Seller created successfully: " + result.sellerName, "success");
+                        Swal.fire('@Common["DoneSuccessfully"]', "" + result.sellerName, "success");
                     $('#AddSellerModal').modal('hide');
                     // Add new seller to dropdown
                     var newOption = '<option value="' + result.sellerId + '" selected>' + result.sellerName + '</option>';
                     $('#PettyCash_SellerId option[value="-1"]').before(newOption);
                     $('#PettyCash_SellerId').val(result.sellerId);
                 } else {
-                    Swal.fire("Error", result.message, "error");
+                            Swal.fire('@Common["ErrorHappend"]', result.message, "error");
                 }
             },
             error: function () {
-                Swal.fire("Error", "Unexpected error creating seller", "error");
+                    Swal.fire('@Common["ErrorHappend"]', "", "error");
             }
         });
     }
@@ -870,7 +870,7 @@
         if (!isPart) {
             if (parseInt($('#ReceivedMeter').val()) < parseInt($("#ExitMeter").val())) {
                 $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "red").css("background-color", "#ffdddd");
-                Swal.fire("@Common["Error"]", "@Common["OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " + parseInt($("#ExitMeter").val()) + " " + "@Common["KiloMeter"]", "error");
+                    Swal.fire('@Common["ErrorHappend"]', "@Common["Label_OdometerMustMatchTheVreviousReadingOrExceedsIt"]" + " : " + parseInt($("#ExitMeter").val()) + " " + "@Common["KiloMeter"]", "error");
                 isValid = false;
             } else {
                 $("#TransferExitMeter").next().children(':first-child').children(':first-child').css("border-color", "#E5E5E5");
@@ -992,10 +992,9 @@
                 processData: false,
                 success: function (data) {
                     if (data.isSuccess) {
-                        debugger
                         Swal.fire({
                             icon: 'success',
-                            title: "Done Successfully",
+                                title: "@Common["DoneSuccessfully"]",
                             confirmButtonText: '@Common["Ok"]',
                             confirmButtonColor: 'var(--primary-600)',
                             timer: 3000,
@@ -1005,7 +1004,7 @@
                         });
                     }
                     else {
-                        Swal.fire("@Common["Error"]", data.message);
+                                Swal.fire('@Common["ErrorHappend"]', data.message);
                     }
                 }
             });
@@ -1049,7 +1048,7 @@
     if (!$('#PettyCash_PartsCost').val() && !$('#PettyCash_LaborCost').val()) {
         $('#PettyCash_PartsCost').addClass('is-invalid');
         $('#PettyCash_LaborCost').addClass('is-invalid');
-        Swal.fire("Error", "At least one of Parts Cost or Labor Cost must be provided", "error");
+            Swal.fire('@Common["ErrorHappend"]', "", "error");
         isValid = false;
     } else {
         $('#PettyCash_PartsCost').removeClass('is-invalid');
@@ -1060,7 +1059,7 @@
     var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
     var balance = parseFloat($('#PettyCash_UserBalance').text()) || 0;
     if (netAmount > balance) {
-        Swal.fire("Error", "Net amount exceeds available balance", "error");
+            Swal.fire("'@Common["ErrorHappend"]', "e", "error");
         isValid = false;
     }
 
@@ -1092,15 +1091,15 @@
                 if (data.isSuccess) {
                     Swal.fire({
                         icon: 'success',
-                        title: "Petty Cash Invoice Created Successfully",
-                        confirmButtonText: 'OK',
+                            title: "@Common["DoneSuccessfully"]",
+                            confirmButtonText: '@Common["Ok"]',
                         timer: 3000,
                         timerProgressBar: true
                     }).then(() => {
                         window.location.href = "@Url.Action("TransferMovements", "WIP")";
                     });
                 } else {
-                    Swal.fire("Error", data.message, "error");
+                        Swal.fire('@Common["ErrorHappend"]', data.message, "error");
                 }
             }
         });
