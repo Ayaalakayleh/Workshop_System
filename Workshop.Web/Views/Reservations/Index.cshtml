@@ -310,7 +310,7 @@
                 }
             },
             error: function () {
-                Swal.fire('@Common["ErrorHappend"]', '@Common["ErrorHappend"]', "error");
+                Swal.fire('@Common["ErrorHappend"]', '', "error");
             }
         });
     }
@@ -357,7 +357,7 @@
     function loadReservationForEdit(id) {
         $.get(window.API_BASE.getReservationsByIds, { ids: id }, function (res) {
             if (!res.isSuccess || !res.data || !res.data.length) {
-                Swal.fire('Error', 'Reservation not found', 'error');
+                Swal.fire('ErrorHappend', '', 'error');
                 return;
             }
             const r = res.data[0];

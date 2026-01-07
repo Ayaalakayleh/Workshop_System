@@ -213,7 +213,7 @@
 
 
             } else {
-                    Swal.fire("@Common["Error"]", "@Common["Please Select WS"]");
+                    Swal.fire("@Common["Error"]", "@Common["PleaseSelectWS"]");
                     return false;
                 }
             });
@@ -295,13 +295,13 @@
                 $(".the-loader").show();
 
             } else {
-                Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+                Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
                 return false;
             }
 
         }
         else {
-            Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+            Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
             return false;
         }
 
@@ -342,7 +342,7 @@
             },
 
             error: function () {
-                Swal.fire("@Common["Error"]", "@Common["Error Happend"]");
+                Swal.fire("@Common["Error"]", "@Common["ErrorHappend"]");
             }
         });
     });
@@ -500,7 +500,7 @@
                             }
                         },
                         error: function (xhr, textStatus, errorThrown) {
-                            Swal.fire("@Common["Error"]", "@Common["Error Happend"]");
+                            Swal.fire("@Common["Error"]", "@Common["ErrorHappend"]");
                             $("#Save").attr("hidden", false);
 
                         }
@@ -510,11 +510,11 @@
                 $(".the-loader").show();
 
             } else {
-                Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+                Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
             }
         }
         else {
-            Swal.fire("@Common["Error"]", "@Common["Please Enter Data"]");
+            Swal.fire("@Common["Error"]", "@Common["PleaseEnterData"]");
         }
     })
 

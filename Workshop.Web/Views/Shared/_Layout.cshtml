@@ -1092,12 +1092,12 @@
 <!-- Define Resources variables -->
 <script>
     function switchLanguage(culture) {
-        Swal.fire({
+@*         Swal.fire({
             title: culture === 'ar' ? 'جاري تغيير اللغة...' : 'Changing Language...',
             text: culture === 'ar' ? 'يرجى الانتظار' : 'Please wait...',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
-        });
+        }); *@
 
         $.ajax({
             url: '@Url.Action("SetLanguage", "Language")',

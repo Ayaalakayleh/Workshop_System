@@ -81,7 +81,7 @@
                         data: {},
                         success: function (data) {
                             if (data == true) {
-                                swal("@Common["Deleted"]", "@Common["SwalDeleteText"]", "success");
+                                swal("@Common["Deleted"]", "@Common["DoneSuccessfully"]", "success");
 
                                 $('#' + c).remove();
                                 swal.fire({
@@ -90,7 +90,7 @@
                                     }
                                 })
                             } else {
-                                swal("@Common["Error"]", "@Common["SwalCancelText"]", "error");
+                                swal("@Common["Error"]", "@Common["ErrorHappend"]", "error");
                             }
                         },
                         error: function () {

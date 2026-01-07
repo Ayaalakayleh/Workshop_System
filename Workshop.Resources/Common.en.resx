@@ -2595,10 +2595,19 @@
   <data name="Label_IsCompleted" xml:space="preserve">
     <value>Is Completed</value>
   </data>
+  <data name="break_must_be_within_working" xml:space="preserve">
+    <value>Break time must be within working hours</value>
+  </data>
   <data name="NoScheduleData" xml:space="preserve">
     <value>No schedule data available</value>
   </data>
-  <data name="break_must_be_within_working" xml:space="preserve">
-    <value>Break time must be within working hours</value>
+  <data name="PleaseSelectWS" xml:space="preserve">
+    <value>Please Select WS</value>
+  </data>
+  <data name="PleaseEnterData" xml:space="preserve">
+    <value>Please Enter Data</value>
+  </data>
+  <data name="DoneSuccessfully" xml:space="preserve">
+    <value>Success</value>
   </data>
 </root>
