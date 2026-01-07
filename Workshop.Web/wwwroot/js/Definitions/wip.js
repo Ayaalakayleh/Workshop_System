@@ -1081,3 +1081,23 @@ function validateGridsAccountTypeForPartialInv() {
     return true;
 }
 
+
+$("#statusId").change(function () {
+    debugger
+    var model = {
+        WIPId: $("#Id").val(),
+        StatusId: $(this).val()
+    };
+
+    return $.ajax({
+        type: 'Post',
+        url: window.URLs.UpdateWIPStatus,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(model)
+    }).done(function (result) {
+        if (!result) return;
+
+      
+    }); 
+});

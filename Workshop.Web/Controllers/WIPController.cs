@@ -2738,6 +2738,12 @@ namespace Workshop.Web.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<JsonResult> UpdateWIPStatus([FromBody] UpdateWIPStatusDTO dto)
+        {
+            int? result = await _apiClient.UpdateWIPStatus(dto);
+            return Json(result);
+        }
 
 
 
