@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CrystalReports.Engine" Version="13.0.4000" />
+  </ItemGroup>
+
 </Project>
