@@ -168,10 +168,11 @@ namespace Workshop.Web.Controllers
                         ViewBag.ReceivedMeter = movement.ReceivedMeter;
                     }
                 }
-
+                var _WIPID = 0;
 
                 if (id.HasValue && id.Value > 0)
                 {
+                    _WIPID = id.Value;
                     dto = await _apiClient.GetWIPByIdAsync(id.Value);
                     if (dto == null)
                     {
@@ -329,73 +330,75 @@ namespace Workshop.Web.Controllers
                         ViewBag.Items = new List<BaseItemDTO>();
                     }
                 }
+                 
+                ViewBag.ID = _WIPID;
 
-                // Get makes
-                try
-                {
-                    dto = dto ?? new WIPDTO();
-                    WorkOrderFilterDTO workOrderFilterDTO = new WorkOrderFilterDTO();
-                    workOrderFilterDTO.VehicleID = dto.VehicleId;
-                    workOrderFilterDTO.CompanyId = CompanyId;
-                    //workOrderFilterDTO.BranchId = BranchId;
-                    var allManufacturers = await GetMakes();
-                    var allModels = await GetModels();
-                    var workOrder = (await _apiClient.GetMWorkOrdersAsync(workOrderFilterDTO));
-                    dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id) ?? new VehicleTabDTO();
-                    dto.WorkOrderId = dto.WorkOrderId ?? workOrder?.FirstOrDefault()?.Id;
-                    var VehiclesColors = await _vehicleApiClient.GetAllColors(lang);
-                    if (dto.WorkOrderId != null && dto.WorkOrderId > 0)
+                    // Get makes
+                    try
                     {
-                        var workorder = await _apiClient.GetMWorkOrderByID(dto.WorkOrderId ?? 0);
-
-                        if (workorder?.VehicleType == (int)VehicleTypeId.Internal)
+                        dto = dto ?? new WIPDTO();
+                        WorkOrderFilterDTO workOrderFilterDTO = new WorkOrderFilterDTO();
+                        workOrderFilterDTO.VehicleID = dto.VehicleId;
+                        workOrderFilterDTO.CompanyId = CompanyId;
+                        //workOrderFilterDTO.BranchId = BranchId;
+                        var allManufacturers = await GetMakes();
+                        var allModels = await GetModels();
+                        var workOrder = (await _apiClient.GetMWorkOrdersAsync(workOrderFilterDTO));
+                        dto.VehicleTab = await _apiClient.WIP_GetVehicleDetailsById(dto.Id) ?? new VehicleTabDTO();
+                        dto.WorkOrderId = dto.WorkOrderId ?? workOrder?.FirstOrDefault()?.Id;
+                        var VehiclesColors = await _vehicleApiClient.GetAllColors(lang);
+                        if (dto.WorkOrderId != null && dto.WorkOrderId > 0)
                         {
-                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_Find(dto.VehicleId)) ?? new VehicleDefinitions();
-                            dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
-                            dto.VehicleTab.ModelId = vehicleDetails?.VehicleModelId;
-                            dto.VehicleTab.ClassId = vehicleDetails?.VehicleClassId;
-                            dto.VehicleTab.PlateNumber = vehicleDetails?.PlateNumber;
-                            dto.VehicleTab.ManufacturingYear = vehicleDetails?.ManufacturingYear;
-                            dto.VehicleTab.Color = vehicleDetails?.Color;
-                            dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
-                            dto.VehicleTab.ChassisNo = vehicleDetails?.ChassisNo;
-                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
-                            var recallResponse =await _apiClient.GetActiveRecallsByChassis(vehicleDetails?.ChassisNo);
+                            var workorder = await _apiClient.GetMWorkOrderByID(dto.WorkOrderId ?? 0);
 
-                            ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
+                            if (workorder?.VehicleType == (int)VehicleTypeId.Internal)
+                            {
+                                var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_Find(dto.VehicleId)) ?? new VehicleDefinitions();
+                                dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
+                                dto.VehicleTab.ModelId = vehicleDetails?.VehicleModelId;
+                                dto.VehicleTab.ClassId = vehicleDetails?.VehicleClassId;
+                                dto.VehicleTab.PlateNumber = vehicleDetails?.PlateNumber;
+                                dto.VehicleTab.ManufacturingYear = vehicleDetails?.ManufacturingYear;
+                                dto.VehicleTab.Color = vehicleDetails?.Color;
+                                dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
+                                dto.VehicleTab.ChassisNo = vehicleDetails?.ChassisNo;
+                                dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
+                                dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
+                                dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
+                                dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                                var recallResponse = await _apiClient.GetActiveRecallsByChassis(vehicleDetails?.ChassisNo);
 
+                                ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
+
+                            }
+                            else
+                            {
+                                var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId)) ?? new CreateVehicleDefinitionsModel();
+                                dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
+                                dto.VehicleTab.ModelId = vehicleDetails.VehicleModelId;
+                                dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
+                                dto.VehicleTab.ManufacturingYear = vehicleDetails.ManufacturingYear;
+                                dto.VehicleTab.Color = vehicleDetails.Color;
+                                dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
+                                dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
+                                dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
+                                dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
+                                dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
+                                dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+
+                            }
                         }
-                        else
-                        {
-                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId)) ?? new CreateVehicleDefinitionsModel();
-                            dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
-                            dto.VehicleTab.ModelId = vehicleDetails.VehicleModelId;
-                            dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
-                            dto.VehicleTab.ManufacturingYear = vehicleDetails.ManufacturingYear;
-                            dto.VehicleTab.Color = vehicleDetails.Color;
-                            dto.VehicleTab.ColorName = VehiclesColors?.FirstOrDefault(c => c?.Id == vehicleDetails?.Color)?.Name;
-                            dto.VehicleTab.ChassisNo = vehicleDetails.ChassisNo;
-                            dto.VehicleTab.ManufacturerPrimaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
-                            dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                        ViewBag.Makes = await GetMakesList();
+                        ViewBag.Models = await GetModelsList(dto.VehicleTab.ManufacturerId ?? 0);
+                        ViewBag.Classes = await GetClasses();
+                        ViewBag.Colors = await GetColors();
 
-                        }
                     }
-                    ViewBag.Makes = await GetMakesList();
-                    ViewBag.Models = await GetModelsList(dto.VehicleTab.ManufacturerId ?? 0);
-                    ViewBag.Classes = await GetClasses();
-                    ViewBag.Colors = await GetColors();
-
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error fetching makes");
-                    ViewBag.Makes = new List<SelectListItem>();
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error fetching makes");
+                        ViewBag.Makes = new List<SelectListItem>();
+                    }
 
                 ViewBag.GeneralRequest = Convert.ToBoolean(_configuration["GeneralRequest"] ?? "false");
 
@@ -2751,7 +2754,43 @@ namespace Workshop.Web.Controllers
         }
 
 
+        [HttpPost]
+        [CustomAuthorize(Permissions.WIP.Create)]
+        public async Task<IActionResult> Insert_Items(ItemsDTO dto)
+        {
+            try
+            {
 
+                int? result;
+
+                var success = 0;
+
+                    var newWip = new ItemsDTO
+                    {
+                        WIPId = dto.WIPId,
+                        ItemsList = dto.ItemsList
+                    };
+
+                    success = await _apiClient.WIPInsertItemsAsync(newWip) ?? 0;
+               
+
+                if (success > 0)
+                {
+                    return Json(new { success = true, wipId = success });
+                }
+                return Json(new { success = false });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    errorMessage = ex.Message,
+                    details = ex.InnerException?.Message
+                });
+            }
+        }
 
 
 

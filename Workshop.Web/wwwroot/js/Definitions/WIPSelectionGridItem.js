@@ -117,7 +117,17 @@ function updateSelectionCount(count) {
             const selectedRows = sourceGrid.getSelectedRowsData();
 
             if (selectedRows.length > 0) {
+
+                const _existingData = targetGrid.option("dataSource") || [];
+
+                let nextKeyId = 1;
+                if (_existingData.length > 0) {
+                    const maxKeyId = Math.max(..._existingData.map(r => parseInt(r.KeyId, 10) || 0));
+                    nextKeyId = maxKeyId + 1;
+                }
+
                 const transformedData = selectedRows.map(item => ({
+                    KeyId: nextKeyId++,
                     Id: item.id,
                     ItemId: item.id,
                     Code: item.code,
@@ -145,9 +155,47 @@ function updateSelectionCount(count) {
 
                 $("#addPartModal").modal("hide");
                 targetGrid.option("dataSource", newDataSource);
-            }
+                saveWipItemsAuto(transformedData);            }
         });
     }
+}
+
+function saveWipItemsAuto(itemsToInsert) {
+    const wipId = parseInt($("#Id").val() || "0");
+    if (!wipId || wipId <= 0) return;
+
+    if (!Array.isArray(itemsToInsert) || itemsToInsert.length === 0) return;
+
+    const baseItems = itemsToInsert.map(x => ({
+        WIPId: wipId,
+        KeyId: x.KeyId, 
+        ItemId: x.ItemId,
+        fk_UnitId: x.fk_UnitId,
+        Quantity: x.Quantity ?? 1,
+        RequestQuantity: x.RequestQuantity ?? x.Quantity ?? 1,
+        CostPrice: x.CostPrice ?? 0,
+        SalePrice: x.SalePrice ?? 0,
+        Discount: x.Discount ?? 0,
+        LocatorId: x.LocatorId ?? null,
+        WarehouseId: x.WarehouseId ?? null
+    }));
+
+    return $.ajax({
+        url: window.RazorVars.insertItemsUrl,
+        method: "POST",
+        dataType: "json",
+        data: {
+            WIPId: wipId,
+            ItemsList: baseItems
+        },
+        error: function () {
+            Swal.fire({
+                icon: "error",
+                title: "Failed to save items",
+                showConfirmButton: true
+            });
+        }
+    });
 }
 
 function showItemSelectionModal() {

@@ -174,6 +174,7 @@ namespace Workshop.Infrastructure.Repositories
         {
             var table = new DataTable();
             table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("KeyId", typeof(int));
             table.Columns.Add("WIPId", typeof(int));
             table.Columns.Add("RequestId", typeof(int));
             table.Columns.Add("ItemId", typeof(int));
@@ -193,7 +194,7 @@ namespace Workshop.Infrastructure.Repositories
 
             foreach (var item in Items)
             {
-                table.Rows.Add(item.Id, item.WIPId, item.RequestId, item.ItemId, item.fk_UnitId, item.WarehouseId, item.LocatorId, item.RequestQuantity, item.Quantity, item.UsedQuantity,
+                table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.RequestId, item.ItemId, item.fk_UnitId, item.WarehouseId, item.LocatorId, item.RequestQuantity, item.Quantity, item.UsedQuantity,
                    item.Price, item.CostPrice, item.SalePrice, item.Discount, item.Total, item.ModifyBy, item.AccountType);
             }
 
@@ -204,6 +205,7 @@ namespace Workshop.Infrastructure.Repositories
         {
             var table = new DataTable();
             table.Columns.Add("WIPId", typeof(int));
+            table.Columns.Add("KeyId", typeof(int));
             table.Columns.Add("RequestId", typeof(int));
             table.Columns.Add("ItemId", typeof(int));
             table.Columns.Add("fk_UnitId", typeof(int));
@@ -228,7 +230,7 @@ namespace Workshop.Infrastructure.Repositories
 
                 foreach (var i in item.Items)
                 {
-                    table.Rows.Add(item.Id, i.RequestId, i.ItemId, i.fk_UnitId, i.WarehouseId, i.LocatorId, i.RequestQuantity, i.Quantity, i.UsedQuantity,
+                    table.Rows.Add(item.Id, i.KeyId, i.RequestId, i.ItemId, i.fk_UnitId, i.WarehouseId, i.LocatorId, i.RequestQuantity, i.Quantity, i.UsedQuantity,
                         i.Price, i.CostPrice, i.SalePrice,i.Discount, i.Total, i.ModifyBy, i.AccountType);
                 }
             }

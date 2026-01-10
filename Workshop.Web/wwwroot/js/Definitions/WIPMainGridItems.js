@@ -15,8 +15,8 @@ function updateRowInGrid(row) {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     const store = grid.getDataSource().store();
 
-    store.update(row.Id, row).then(() => {
-        const idx = grid.getRowIndexByKey(row.Id);
+    store.update(row.KeyId, row).then(() => {
+        const idx = grid.getRowIndexByKey(row.KeyId);
         if (idx >= 0) grid.repaintRows([idx]);
         updateFieldsFromGrid();
     });
@@ -38,7 +38,7 @@ $(function () {
     let locatorsLoadedOnInit = false;
     $("#mainItemsGrid").dxDataGrid({
         dataSource: ItemsData,
-        keyExpr: "Id",
+        keyExpr: "KeyId",
         noDataText: resources.NoDataInTable,
         showBorders: true,
         remoteOperations: {
@@ -47,6 +47,7 @@ $(function () {
             paging: true
         },
         columns: [
+            { dataField: "KeyId", visible: false },
             { dataField: "Id", caption: "ID", visible: false, alignment: "left" },
             { dataField: "ItemId", caption: "ID", visible: false, alignment: "left" },
             {
@@ -198,7 +199,7 @@ $(function () {
                             if ((Number(row.Quantity) || 0) > v) {
                                 row.Quantity = v;
                                 const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                                const idx = grid.getRowIndexByKey(row.Id);
+                                const idx = grid.getRowIndexByKey(row.KeyId);
                                 if (idx >= 0) grid.cellValue(idx, "Quantity", v);
                             }
                         },
@@ -258,19 +259,21 @@ $(function () {
                 dataField: "UsedQuantity",
                 caption: window.RazorVars.DXUsedQuantity,
                 dataType: "number",
-                allowEditing: function (e) {
-                    return Permission_Approve && Number(e.row.data.Status) === 42;
-                },
+                allowEditing: true,
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
+                    const canEdit = Permission_Approve && Number(row.Status) === 42;
 
                     $("<div>").dxNumberBox({
                         value: cellInfo.value,         
                         min: 0,
                         max: row.Quantity,             
                         showSpinButtons: true,
+                        readOnly: !canEdit, 
+                        disabled: !canEdit,
                         onValueChanged: function (e) {
+                            if (!canEdit) return;
                             const v = e.value;
 
                             cellInfo.setValue(v);
@@ -406,7 +409,7 @@ $(function () {
                 allowEditing: false,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-                    debugger
+                     
                     var requestQuantity = parseFloat(rowData.RequestQuantity) || 0;
                     var quantity = parseFloat(rowData.Quantity) || 0;
                     var price = parseFloat(rowData.Price) || 0;
@@ -663,7 +666,7 @@ $(function () {
             }
         },
         onEditorPreparing: function (e) {                                   // need Testing
-
+            debugger
             if (e.parentType === "dataRow" && e.dataField === "DiscountPct") {
 
                 var pageAccountType = parseInt($("#AccountType").val()) || 0;
@@ -1046,7 +1049,7 @@ function IssueParts() {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function (res) {
-            debugger;
+             ;
             if (res.success) {
                 UpdatePartStatus(42, "Part Received");
             } else {
@@ -1297,7 +1300,7 @@ function CreateIssueVoucher(row) {
 
     let formData = new FormData();
 
-    debugger;
+     ;
     const detailsList = [{
         FK_ItemId: row.ItemId,
         FK_UnitId: row.fk_UnitId,
@@ -1309,7 +1312,7 @@ function CreateIssueVoucher(row) {
         FK_LocatorId: row.LocatorId,
         FK_WarehouseId: row.WarehouseId
     }];
-    debugger;
+     ;
     formData.append("Details", JSON.stringify(detailsList));
 
     var submitBtn = $("#IssueRequestPartsBTN");
@@ -1369,7 +1372,7 @@ function CreateIssueVoucher(row) {
             } else {
                 if (data && (data.success === true || data.Success === true || !data.hasOwnProperty('success'))) {
                     row.PartsIssueId = data.partsIssueId;
-                    debugger;
+                     ;
                     const grid = $("#mainItemsGrid").dxDataGrid("instance");
                     grid.getDataSource().store().update(row.Id, row).then(() => {
                         grid.refresh();

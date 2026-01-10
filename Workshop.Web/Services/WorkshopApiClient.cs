@@ -1919,6 +1919,20 @@ namespace Workshop.Web.Services
             return result != null && result.ContainsKey("id") ? result["id"] : null;
         }
 
+        public async Task<int?> WIPInsertItemsAsync(ItemsDTO dto)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Items/Create", dto);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return null;
+            }
+            var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
+            return result != null && result.ContainsKey("id") ? result["id"] : null;
+        }
+
         public async Task<int?> InsertWIPAccount(AccountDTO dto)
         {
             var response = await _httpClient.PostAsJsonAsync("api/WIP/InsertWIPAccount", dto);

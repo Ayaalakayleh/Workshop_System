@@ -42,6 +42,7 @@ namespace Workshop.Core
             services.AddScoped<IJobCardService, JobCardService>();
             services.AddScoped<IServiceReminderService, ServiceReminderService>();
             services.AddScoped<IWorkshopLoadingService, WorkshopLoadingService>();
+            services.AddScoped<IItemsService, ItemsService>();
             return services;
 
         }

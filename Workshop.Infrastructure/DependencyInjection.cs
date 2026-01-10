@@ -43,6 +43,7 @@ namespace Workshop.Infrastructure
             services.AddScoped<IReservationRepository, ReservationRepository>();
             services.AddScoped<IServiceReminderRepository, ServiceReminderRepository>();
             services.AddScoped<IAccountDefinitionRepository, AccountDefinitionRepository>();
+            services.AddScoped<IItemsRepository, ItemsRepository>();
 
 
             return services;

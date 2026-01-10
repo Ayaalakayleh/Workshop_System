@@ -92,6 +92,7 @@ namespace Workshop.Core.DTOs
         public int Id { get; set; }     
         public int ItemId { get; set; }     
         public int WIPId { get; set; }
+        public int KeyId { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string PrimaryName { get; set; }
@@ -129,6 +130,7 @@ namespace Workshop.Core.DTOs
     public class BaseItemDTO
     {
         public int Id { get; set; }
+        public int? KeyId { get; set; }
         public int WIPId { get; set; }
         public int? RequestId { get; set; }
         public int ItemId { get; set; }
