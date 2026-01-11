@@ -4,25 +4,32 @@
 @inject IStringLocalizer<Messages> Message
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
             <label>@Common["Label_WIPNo"]</label>
             <input type="text" id="WipNo" name="WipNo" class="form-control" placeholder="e.g. 000123">
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
             <label>@Common["Label_Status"]</label>
             @Html.DropDownList("Status", new SelectList(ViewBag.Status, "Value", "Text"), Common["Select"], new { @class = "form-control", id = "Status" })
         </div>
     </div>
    
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
             <label>@Common["Label_Customer"]</label>
             @* <input type="text" id="Customer" name="Customer" class="form-control" placeholder="Name / Phone"> *@
             @Html.DropDownList("CustomerId", new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CustomerId" })
-
+        </div>
+    </div>
+   
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@Common["Label_PlateNumber"]</label>
+            <input type="text" class="form-control plate-mask" id="PlateNumber_filter" maxlength="12" name="PlateNumber"
+                   placeholder="@Common["Label_PlateNumber"]" >
         </div>
     </div>
 </div>
