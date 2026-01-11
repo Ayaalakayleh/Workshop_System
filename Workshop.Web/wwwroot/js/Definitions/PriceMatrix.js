@@ -75,8 +75,8 @@
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Duplicate record',
-                            text: 'A record with the same values already exists',
+                            title: theMainLang == "en" ? 'Duplicate Record' : "سجل مكرر",
+                            text: theMainLang == "en" ? 'A record with the same values already exists' : "يوجد سجل بنفس القيم بالفعل",
                             confirmButtonText: RazorVars.btnOk,
                             confirmButtonColor: 'var(--primary-600)'
                         });
@@ -126,8 +126,7 @@
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Validation Failed',
-                        text: 'An error occurred while validating. Please try again',
+                        title: theMainLang == "en" ? 'Validation Failed' : "خطأ في المعلومات المدخلة",
                         confirmButtonText: RazorVars.btnTryAgain
                     });
                 });

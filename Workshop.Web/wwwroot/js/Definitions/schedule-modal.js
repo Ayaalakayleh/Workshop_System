@@ -217,7 +217,6 @@
             error: (xhr, _status, error) => {
                 console.error("API Error:", xhr?.responseText || error);
                 if (onError) onError(xhr);
-                else Swal.fire('Error', 'Something went wrong while fetching data.', 'error');
             }
         };
         if (data) ajaxOptions.data = isFormData ? data : JSON.stringify(data);
@@ -681,9 +680,6 @@
                 });
 
                 $chassis.trigger('change.select2');
-            },
-            error: function () {
-                Swal.fire('Error', 'Failed to load chassis.', 'error');
             }
         });
     }
@@ -853,11 +849,6 @@
                         return;
                     }
 
-                    Swal.fire('Error', 'Failed to insert reservation.', 'error');
-                },
-                error: function (xhr, _s, err) {
-                    console.error("Insert failed:", xhr?.responseText || err);
-                    Swal.fire('Error', 'Failed to insert reservation.', 'error');
                 },
                 complete: function () {
                     state.isSaving = false;

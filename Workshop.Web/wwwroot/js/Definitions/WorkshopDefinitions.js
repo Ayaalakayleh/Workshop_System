@@ -108,12 +108,22 @@
                             window.location.href = RazorVars.indexUrl;
                         });
                     } else {
-                        Swal.fire(RazorVars.swalErrorHappened, 'error');
+                        Swal.fire({
+                            icon: "error",
+                            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                            showConfirmButton: true,
+                            confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
+                        });
                         $("#btnCreate").prop("disabled", false);
                     }
                 },
                 error: function () {
-                    Swal.fire(RazorVars.swalErrorHappened, 'error');
+                    Swal.fire({
+                        icon: "error",
+                        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                        showConfirmButton: true,
+                        confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
+                    });
                     $("#btnCreate").prop("disabled", false);
                 }
             });

@@ -307,12 +307,6 @@ function loadTeamById(teamId) {
                 }
             } else {
                 console.warn("No team data found or invalid format:", data);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No Data',
-                    text: 'Team data could not be loaded.',
-                    confirmButtonText: RazorVars.btnOk || 'OK'
-                });
             }
         },
         error: function (xhr, status, error) {
@@ -323,8 +317,7 @@ function loadTeamById(teamId) {
             }
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: errorMessage,
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                 confirmButtonText: RazorVars.btnOk || 'OK',
                 confirmButtonColor: '#dc3545'
             });
@@ -372,8 +365,7 @@ function deleteTeam(teamId) {
                             : 'Team could not be deleted. It may be in use or does not exist.';
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Delete Failed',
-                            text: errorMessage,
+                            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                             confirmButtonText: RazorVars.btnOk || 'OK',
                             confirmButtonColor: '#dc3545'
                         });
@@ -387,7 +379,6 @@ function deleteTeam(teamId) {
                     Swal.fire({
                         icon: 'error',
                         title: RazorVars.ErrorHappend || 'Error',
-                        text: errorMessage,
                         confirmButtonText: RazorVars.btnOk || 'OK',
                         confirmButtonColor: '#dc3545'
                     });
@@ -410,8 +401,7 @@ $(document).on("click", "#editBtn", function (e) {
     } else {
         Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: 'Could not find team ID.',
+            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
             confirmButtonText: RazorVars.btnOk || 'OK'
         });
     }

@@ -135,7 +135,6 @@ $(document).on('click', 'button[type=reset]', function () {
         function DeleteLookup(ID) {
             Swal.fire({
                 title: RazorVars.swalDeleteTitle,
-                text: '',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: 'var(--danger-600)',

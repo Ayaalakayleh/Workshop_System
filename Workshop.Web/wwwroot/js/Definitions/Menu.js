@@ -473,8 +473,7 @@ function deleteMenu(itemID) {
             Swal.fire({
                 icon: 'success',
                 title: window.RazorVars.swalDeleted || 'Deleted Successfully',
-                text: result?.message || '',
-                confirmButtonText: 'OK'
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
 
             // Wait 2 seconds before reload
@@ -486,8 +485,7 @@ function deleteMenu(itemID) {
             Swal.fire({
                 icon: 'error',
                 title: window.RazorVars.swalErrorHappened || 'Delete Failed',
-                text: xhr.responseText || '',
-                confirmButtonText: 'OK'
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         });
 }

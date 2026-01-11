@@ -522,8 +522,8 @@ $(function () {
                             if (parseInt(e.row.data.Status) !== 36) {
                                 Swal.fire({
                                     icon: "warning",
-                                    title: "Please request approval first",
-                                    text: "You cannot issue this item until it is approved."
+                                    title: theMainLang == "en" ? 'Please request approval first' : "قم بطلب الموافقة أولاً",
+                                    text: theMainLang == "en" ? 'You cannot issue this item until it is approved.' : "لا يمكنك إصدار هذا المنتج حتى تتم الموافقة عليه.",
                                 });
                                 return;
                             }
@@ -562,8 +562,8 @@ $(function () {
                             if (parseInt(e.row.data.Status) !== 36) {
                                 Swal.fire({
                                     icon: "warning",
-                                    title: "Please request approval first",
-                                    text: "You cannot Transfer this item until it is approved."
+                                    title: theMainLang == "en" ? 'Please request approval first' : "قم بطلب الموافقة أولاً",
+                                    text: theMainLang == "en" ? 'You cannot issue this item until it is approved.' : "لا يمكنك إصدار هذا المنتج حتى تتم الموافقة عليه.",
                                 });
                                 return;
                             }
@@ -907,15 +907,15 @@ function GetReturnParts() {
         success: function (result) {
             Swal.fire({
                 icon: "success",
-                title: "Return parts send successfuly!"
+                title: theMainLang == "en" ? 'Success' : "تمت العملية بنجاح",
             });
         },
         error: function (xhr, status, error) {
             Swal.fire({
                 icon: "error",
-                title: "Error loading items data",
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                 showConfirmButton: true,
-                confirmButtonText: "ok"
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         }
     });
@@ -1012,7 +1012,6 @@ function updateStatusItem(row, statusId) {
         }
     }).fail(function (xhr, st, err) {
         console.error("Error updating status:", err);
-        Swal.fire({ icon: "error", title: "Status update failed" });
     });
 }
 
@@ -1052,8 +1051,6 @@ function IssueParts() {
              ;
             if (res.success) {
                 UpdatePartStatus(42, "Part Received");
-            } else {
-                Swal.fire("Error", "Transaction failed.", "error");
             }
         },
         error: function (err) {
@@ -1114,17 +1111,17 @@ function TransferParts() {
                     updateStatusItem(row, 41).then(() => {
                         Swal.fire({
                             icon: "success",
-                            title: "Transfer request prepared",
-                            text: "You can now proceed with stock transfer"
+                            title: theMainLang == "en" ? 'Transfer request prepared' : "تم إعداد طلب التحويل",
+                            text: theMainLang == "en" ? 'You can now proceed with stock transfer' : "يمكنك الآن المتابعة في عملية نقل المخزون",
                         });
                     });
                 });
             } else {
-                Swal.fire("Error", "Transaction failed", "error");
+                Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
             }
         }).fail(function (err) {
             console.error("Error updating status:", err);
-            Swal.fire("Error", "Transaction failed", "error");
+            Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
         }).always(function () {
             btn.prop("disabled", false).html(oldTxt);
         });
@@ -1354,19 +1351,19 @@ function CreateIssueVoucher(row) {
             if (data == -2) {
                 Swal.fire({
                     icon: 'error',
-                    title: "T.codeAlreadyExists" || 'Code already exists',
+                    title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                     confirmButtonText: resources.ok
                 });
             } else if (data == -3) {
                 Swal.fire({
                     icon: 'error',
-                    title: "T.nameAlreadyExists" || 'Name already exists',
+                    title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                     confirmButtonText: resources.ok
                 });
             } else if (data == -4) {
                 Swal.fire({
                     icon: 'error',
-                    title: "T.secondaryAlreadyExists" || 'Secondary already exists',
+                    title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                     confirmButtonText: resources.ok
                 });
             } else {
@@ -1387,7 +1384,7 @@ function CreateIssueVoucher(row) {
                         'Failed to create the GRN due to validation errors.';
                     Swal.fire({
                         icon: 'error',
-                        title: "T.validationErrorTitle " || 'Validation Error',
+                        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                         text: errorMessage,
                         confirmButtonText: 'OK'
                     });
@@ -1411,8 +1408,8 @@ function CreateIssueVoucher(row) {
             Swal.fire({
                 icon: 'error',
                 title: resources.error,
-                text: errorMessage,
-                confirmButtonText: 'OK'
+                text: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         }
     });
@@ -1431,10 +1428,10 @@ function UndoIssueVoucher(row) {
             if (res.success) {
                 Swal.fire({
                     icon: "success",
-                    title: "Undo completed"
+                    title: theMainLang == "en" ? 'Success' : "تمت العملية بنجاح"
                 }).then(() => $("#mainItemsGrid").dxDataGrid("instance")?.repaint());
             } else {
-                Swal.fire("Error", "Undo failed.", "error");
+                Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
             }
         },
         error: function (err) {
@@ -1566,7 +1563,7 @@ $("#btnConfirmTransfer").on("click", function () {
     const fromLocator = $("#transferFromLocator").val();
 
     if (!fromWh || !toWh) {
-        Swal.fire({ icon: "warning", title: "Missing data", text: "Please select both warehouses" });
+        Swal.fire({ icon: "warning", title: theMainLang == "en" ? 'Missing data' : "بعض البيانات مفقودة", text: theMainLang == "en" ? "Please select both warehouses" : "يرجى تحديد كلا المستودعين" });
         return;
     }
 
@@ -1576,7 +1573,7 @@ $("#btnConfirmTransfer").on("click", function () {
     //}
 
     if (fromWh === toWh) {
-        Swal.fire({ icon: "warning", title: "Invalid selection", text: "From and To warehouses must be different" });
+        Swal.fire({ icon: "warning", title: theMainLang == "en" ? 'Invalid Selection' : "اختيار غير صالح", text: theMainLang == "en" ? "From and To warehouses must be different" : 'يجب أن تكون مستودعات "من" و"إلى" مختلفة.' });
         return;
     }
 

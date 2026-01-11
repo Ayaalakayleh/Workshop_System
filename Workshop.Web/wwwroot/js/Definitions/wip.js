@@ -312,8 +312,7 @@
             if (hasInvalidStandardHours) {
                 Swal.fire({
                     icon: "warning",
-                    title: "Warning",
-                    text: "Service Standard Hours is required"
+                    title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
                 });
                 return;
             }
@@ -327,14 +326,16 @@
                 console.log("Edit_Post result:", result);
                 debugger
                 if (result && result.success && result.wipId) {
-                    Swal.fire("Success", "WIP " + result.wipId + " Saved Successfully!").then(() => {
-                        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-                    });
+                    if (theMainLang == "en") {
+                        Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId,"success").then(() => {
+                            window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+                        });
+                    }
+
                 } else {
                     Swal.fire({
                         icon: "error",
-                        title: "Save Failed",
-                        text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
+                        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                     });
                 }
 
@@ -381,8 +382,7 @@
             if (Services_Items.length == 0) {
                 Swal.fire({
                     icon: "warning",
-                    title: "Warning",
-                    text: "You dont have services"
+                    title: theMainLang == "en" ? "You dont have services" : "لا يوجد لديك خدمات",
                 });
                 return;
             }
@@ -394,8 +394,7 @@
             if (notCompletedService.length > 0) {
                 Swal.fire({
                     icon: "warning",
-                    title: "Warning",
-                    text: "You have uncompleted service"
+                    title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة",
                 });
                 return;
             }
@@ -409,8 +408,7 @@
             if (notCompletedItems.length > 0) {
                 Swal.fire({
                     icon: "warning",
-                    title: "Warning",
-                    text: "You have uncompleted Items"
+                    title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة"
                 });
                 return;
             }
@@ -426,8 +424,7 @@
             if (invalidItems.length > 0) {
                 Swal.fire({
                     icon: "warning",
-                    title: "Warning",
-                    text: "Used  Quantity Is Required"
+                    title: theMainLang == "en" ? "Used  Quantity Is Required" : "الكمية المستخدمة مطلوبة"
                 });
                 return;
             }
@@ -520,15 +517,15 @@
                 .done(function (res) {
 
                     if (!res.success) {
-                        Swal.fire({ icon: "error", title: "Error", text: res.error || "Failed to check pending invoices." });
+                        Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما"});
                         return;
                     }
 
                     if (res.hasPending) {
                         Swal.fire({
                             icon: "warning",
-                            title: "Pending Invoices",
-                            text: "There are external pending invoice for this WIP"
+                            title: theMainLang == "en" ? 'Pending Invoices' : "الفواتير مطلوبة",
+                            text: theMainLang == "en" ? 'There are external pending invoice for this WIP' : "توجد فواتير خارجية معلقة لهذا العمل",
                         });
                         return; 
                     }
@@ -540,12 +537,12 @@
                         data: close
                     }).done(function (result) {
                         if (result.success) {
-                            Swal.fire("Success", "WIP has been closed successfully.").then(() => {
+                            Swal.fire(theMainLang == "en" ? "WIP has been closed successfully." : "تم اغلاق العملية بنجاح", "","success").then(() => {
                                 window.location.href = window.URLs.indexUrl;
                             });
                         } else {
                             const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
-                            Swal.fire({ icon: "error", title: "Error", text: msg });
+                            Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
                         }
                     }).fail(function (xhr, status, error) {
                         console.error("Error:", error);
@@ -553,7 +550,7 @@
 
                 })
                 .fail(function () {
-                    Swal.fire({ icon: "error", title: "Error", text: "An error occurred while checking for pending invoices." });
+                    Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما"});
                 });
         });
 
@@ -1071,7 +1068,7 @@ function validateGridsAccountTypeForPartialInv() {
     if (hasError) {
         Swal.fire({
             icon: "error",
-            title: "Please Add Account Type",
+            title: theMainLang == "en" ? 'Please Add Account Type' : "الرجاء ادخال نوع الحساب",
            
         });
 

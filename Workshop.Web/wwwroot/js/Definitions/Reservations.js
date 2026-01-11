@@ -208,14 +208,6 @@
             return;
         }
 
-        if (!window.API_BASE || !window.API_BASE.getReservationsByIds) {
-            console.error("API_BASE.getReservationsByIds is not configured");
-            if (window.Swal && Swal.fire) {
-                Swal.fire('Error', 'Reservations details endpoint is not configured on the page.', 'error');
-            }
-            return;
-        }
-
         const idsCsv = idsArray
             .map(x => String(x).trim())
             .filter(Boolean)
@@ -230,14 +222,13 @@
             success: function (resp) {
                 if (!resp || resp.isSuccess === false) {
                     const msg = resp && resp.message ? resp.message : 'Failed to load reservations.';
-                    if (window.Swal && Swal.fire) Swal.fire('Error', msg, 'error');
+                    if (window.Swal && Swal.fire) Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", 'error');
                     return;
                 }
                 buildReservationDetailsModal(resp.data || []);
             },
             error: function (xhr, status, error) {
                 console.error("Error loading reservation details:", error || xhr?.responseText);
-                if (window.Swal && Swal.fire) Swal.fire('Error', 'Failed to load reservation details.', 'error');
             }
         });
     }
