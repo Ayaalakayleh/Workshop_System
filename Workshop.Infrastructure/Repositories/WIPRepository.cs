@@ -32,6 +32,7 @@ namespace Workshop.Infrastructure.Repositories
                     WIPNo = oFilter.WIPNo,
                     Status = oFilter.Status,
                     CustomerId = oFilter.CustomerId,
+                    PlateNumber = oFilter.PlateNumber,
                     PageNumber = oFilter.PageNumber,
                     WorkshopId = oFilter.WorkshopId
                 };
@@ -41,7 +42,7 @@ namespace Workshop.Infrastructure.Repositories
             {
                 throw ex;
             }
-            }
+        }
 
         public async Task<IEnumerable<CreateWIPServiceDTO>> GetAllInternalLabourLineAsync(int WIPId)
         {

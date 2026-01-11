@@ -64,11 +64,13 @@
             var WIPNo = $("#WipNo").val();
             var status = $("#Status").val();
             var CustomerId = $("#CustomerId").val();
+            var plateNumber = $("#PlateNumber_filter").val();
 
             var model = {
                 WIPNo: WIPNo,
                 Status: status,
                 CustomerId: CustomerId,
+                PlateNumber: plateNumber,
                 PageNumber: page
             };
 
@@ -121,6 +123,7 @@
             $("#WipNo").val("");
             $("#Status").val("").trigger('change');
             $("#CustomerId").val("").trigger('change');
+            $("#PlateNumber_filter").val("").trigger('change');
 
             FilterWIP(1);
         });
