@@ -181,24 +181,24 @@ function updateSelectionCount(count) {
 //        WarehouseId: x.WarehouseId ?? null
 //    }));
 
-    return $.ajax({
-        url: window.RazorVars.insertItemsUrl,
-        method: "POST",
-        dataType: "json",
-        data: {
-            WIPId: wipId,
-            ItemsList: baseItems
-        },
-        error: function () {
-            Swal.fire({
-                icon: "error",
-                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                showConfirmButton: true,
-                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
-            });
-        }
-    });
-}
+    //return $.ajax({
+    //    url: window.RazorVars.insertItemsUrl,
+    //    method: "POST",
+    //    dataType: "json",
+    //    data: {
+    //        WIPId: wipId,
+    //        ItemsList: baseItems
+    //    },
+    //    error: function () {
+    //        Swal.fire({
+    //            icon: "error",
+    //            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+    //            showConfirmButton: true,
+    //            confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
+    //        });
+    //    }
+    //});
+//}
 
 function showItemSelectionModal() {
     initializeItemSelectionGrid();
