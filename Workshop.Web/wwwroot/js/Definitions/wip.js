@@ -382,7 +382,7 @@
             const gServices = $("#mainRTSGrid").dxDataGrid("instance");
             const gItems = $("#mainItemsGrid").dxDataGrid("instance");
 
-            var ServicesJson = JSON.stringify(Services_Items);
+            var ServicesJson = JSON.stringify(gServices);
             $("#Services").val(ServicesJson);
 
             $.when(gServices.saveEditData(), gItems.saveEditData()).done(function () {
