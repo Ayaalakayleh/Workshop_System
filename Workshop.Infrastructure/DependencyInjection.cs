@@ -44,6 +44,7 @@ namespace Workshop.Infrastructure
             services.AddScoped<IServiceReminderRepository, ServiceReminderRepository>();
             services.AddScoped<IAccountDefinitionRepository, AccountDefinitionRepository>();
             services.AddScoped<IItemsRepository, ItemsRepository>();
+            services.AddScoped<IPriceWorkflowRepository, PriceWorkflowRepository>();
 
 
             return services;

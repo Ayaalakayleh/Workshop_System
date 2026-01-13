@@ -833,7 +833,7 @@ namespace Workshop.Web.Controllers
                     secondaryName = item.SecondaryName,
                     price = item.Price,
                     salePrice = item.SalePrice,
-                    costPrice = item.PurchasePrice,
+                    costPrice = item.AvgCost,
                     fK_UnitId = item.FK_UnitId,
                     fK_CategoryId = item.FK_CategoryId,
                     fK_SubCategoryId = item.FK_SubCategoryId,
@@ -1658,26 +1658,25 @@ namespace Workshop.Web.Controllers
 
                         }
                     }
-                    //else if (Internalinvoice.TranNo==-1)
-                    //{
-                    //    CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
-                    //    {
-                    //        WIPId = dto.Id,
-                    //        InvoiceNo =0, // max +1
-                    //        InvoiceDate = DateTime.Now,
-                    //        TransactionMasterId = 0,
-                    //        Total = 0,
-                    //        Tax = 0,
-                    //        Net = 0,
-                    //        InvoiceType = (int)AccountTypeEnum.Internal,
-                    //        AccountType = (int)AccountTypeEnum.Internal,
-                    //        CreatedBy = UserId
-                    //    };
-                    //    await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
-                    //    await _apiClient.WIP_Close(dto.Id, (int)dto.ClosedBy);
-                    //    return Json(new { success = true });
+                    else if (Internalinvoice.TranNo == -1)
+                    {
+                        CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
+                        {
+                            WIPId = dto.Id,
+                            InvoiceNo = 0, // max +1
+                            InvoiceDate = DateTime.Now,
+                            Total = 0,
+                            Tax = 0,
+                            Net = 0,
+                            InvoiceType = (int)AccountTypeEnum.Internal,
+                            AccountType = (int)AccountTypeEnum.Internal,
+                            CreatedBy = UserId
+                        };
+                        await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+                        await _apiClient.WIP_Close(dto.Id, (int)dto.ClosedBy);
+                        return Json(new { success = true });
 
-                    //}
+                    }
                     if ((ExternalInvoice.ID > 0 || Internalinvoice.ID > 0))
                     {// Insert External Invoice
                         if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
@@ -1760,26 +1759,26 @@ namespace Workshop.Web.Controllers
             decimal? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.Quantity);
             var VehicleDetails = await _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang);
 
-            if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
+            //if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
+            //{
+            //    var InternalList = await _apiClient.GetLookupDetailByIdAsync(oWIPDTO.AccountDetails.SalesType == null ? (int)oWIPDTO.AccountDetails.PartialSalesType : (int)oWIPDTO.AccountDetails.SalesType, 9, CompanyId);
+
+            //    InternalType = InternalList.Code;
+            //}
+            //   saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
+
+            if (totalExternal > 0 || totalInternal > 0)
             {
-                var InternalList = await _apiClient.GetLookupDetailByIdAsync(oWIPDTO.AccountDetails.SalesType == null ? (int)oWIPDTO.AccountDetails.PartialSalesType : (int)oWIPDTO.AccountDetails.SalesType, 9, CompanyId);
+                saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
 
-                InternalType = InternalList.Code;
             }
-               saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
-
-            //if (totalExternal > 0|| totalInternal>0)
-            //{
-            //     saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
-
-            //}
-            //else
-            //{
-            //    saveTransaction = new TransactionMaster()
-            //    {
-            //        TranNo = -1
-            //    };
-            //}
+            else
+            {
+                saveTransaction = new TransactionMaster()
+                {
+                    TranNo = -1
+                };
+            }
             return saveTransaction;
 
         }
@@ -2255,6 +2254,7 @@ namespace Workshop.Web.Controllers
                         await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
                     }
                 }
+
                 if (item.AccountType == 2)
                 {
                     string Notes = "The Credit note relates to invoice number :" + " " + InvoiceDetailsList.FirstOrDefault().InvoiceNo + " " + "issued on :" + " " + InvoiceDetailsList.FirstOrDefault().InvoiceDate.Value.ToString("dd/MM/yyyy") + "\n  هذا الإشعار الدائن يتعلق بالفاتورة رقم :" + 1 + " " + " الصادرة بتاريخ :" + " " + DateTime.Now.ToString("dd/MM/yyyy");
@@ -2307,27 +2307,26 @@ namespace Workshop.Web.Controllers
                         await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
                     }
                 }
-                //if (item.AccountType == 1 && item.TransactionMasterId == 0)
-                //{
-                //    CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
-                //    {
-                //        WIPId = WIPId,
-                //        InvoiceNo = 0, // max +1
-                //        InvoiceDate = DateTime.Now,
-                //        TransactionMasterId = 0,
-                //        Total = 0,
-                //        Tax = 0,
-                //        Discount = 0,
-                //        Net = Reverse.Total,
-                //        InvoiceType = -3,
-                //        AccountType = (int)AccountTypeEnum.Internal,
-                //        CreatedBy = UserId,
-                //        OldTransactionMasterId =0 // 
+
+                if (item.AccountType == 1 && item.TransactionMasterId == null)
+                {
+                    CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
+                    {
+                        WIPId = WIPId,
+                        ReferanceNo = item.InvoiceNo, // max +1
+                        InvoiceDate = DateTime.Now,
+                        Total = 0,
+                        Tax = 0,
+                        Discount = 0,
+                        Net = 0,
+                        InvoiceType = -3,
+                        AccountType = (int)AccountTypeEnum.Internal,
+                        CreatedBy = UserId,
 
 
-                //    };
-                //    await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
-                //}
+                    };
+                    await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+                }
             }
 
             bool isSuccess = Reverse.ID > 0;

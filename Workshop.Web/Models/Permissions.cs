@@ -235,5 +235,14 @@
             public const int Delete = 1971;
         }
         #endregion
+
+        #region PriceWorkflow
+        public static class PriceWorkflow
+        {
+            public const int View = 1;
+            public const int Create = 1;
+            public const int Edit = 1;
+        }
+        #endregion
     }
 }

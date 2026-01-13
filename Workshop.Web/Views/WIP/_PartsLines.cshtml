@@ -5,7 +5,8 @@
 @using Workshop.Domain.Enum;
 @{
     var GeneralRequest = ViewBag.GeneralRequest;
-    var WIPstatus = Convert.ToInt32(ViewData["WIPstatus"]);
+    var WIP_status = Convert.ToInt32(ViewData["WIPstatus"]);
+
     // var WIPId = Convert.ToInt32(ViewData["WIPId"]);
     var WIPId = Convert.ToInt32(ViewBag.ID);
     var AddParts = PermissionHelper.UserHasPermission(Permissions.WIP.AddParts);
@@ -24,9 +25,9 @@
             </div> *@
         </div>
         <div class="d-flex gap-2">
-            @if (WIPId != null && WIPId > 0)
-            {
-                @if (WIPstatus != (int)WIPStatusEnum.G && WIPstatus != (int)WIPStatusEnum.Invoiced)
+            @* @if (WIPId != null && WIPId > 0)
+            { *@
+            @if (WIP_status != (int)WIPStatusEnum.G && WIP_status != (int)WIPStatusEnum.Invoiced && WIP_status != (int)WIPStatusEnum.C)
                 {
                     @if (AddParts)
                     {
@@ -41,7 +42,7 @@
                     }
 
                 }
-            }
+            @* } *@
         </div>
     </div>
     <div class="card-body p-0">
@@ -132,7 +133,7 @@
 
 </script>
 <script>
-    const wipStatus = @WIPstatus;
+    const wipStatus = @WIP_status;
     const Gone = @((int)WIPStatusEnum.G);
     const Invoiced = @((int)WIPStatusEnum.Invoiced);
 

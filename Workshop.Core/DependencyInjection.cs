@@ -43,6 +43,7 @@ namespace Workshop.Core
             services.AddScoped<IServiceReminderService, ServiceReminderService>();
             services.AddScoped<IWorkshopLoadingService, WorkshopLoadingService>();
             services.AddScoped<IItemsService, ItemsService>();
+            services.AddScoped<IPriceWorkflowService, PriceWorkflowService>();
             return services;
 
         }

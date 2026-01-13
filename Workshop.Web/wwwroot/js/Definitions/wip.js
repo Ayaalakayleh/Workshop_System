@@ -375,191 +375,199 @@
         /* ------- Close WIP ------- */
         $("#closeBTN").on("click", function () {
 
-            var Services_Items = $("#mainRTSGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
+            //var Services_Items = $("#mainRTSGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
+            //var gridItems = $("#mainItemsGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
+
+            const gServices = $("#mainRTSGrid").dxDataGrid("instance");
+            const gItems = $("#mainItemsGrid").dxDataGrid("instance");
+
             var ServicesJson = JSON.stringify(Services_Items);
             $("#Services").val(ServicesJson);
 
-            var gridItems = $("#mainItemsGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
+            $.when(gServices.saveEditData(), gItems.saveEditData()).done(function () {
+                const Services_Items = gServices.getDataSource().items();
+                const gridItems = gItems.getDataSource().items();
 
-            if (Services_Items.length == 0) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Warning",
-                    text: "You dont have services"
-                });
-                return;
-            }
-
-            debugger
-            var notCompletedService = Services_Items.filter(function (row) {
-                return parseInt(row.Status) !== 25 && parseInt(row.Status) !== 26;
-            });
-            if (notCompletedService.length > 0) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Warning",
-                    text: "You have uncompleted service"
-                });
-                return;
-            }
-
-
-            var notCompletedItems = gridItems.filter(function (row) {
-
-                return parseInt(row.Status) !== 42;
-            });
-
-            if (notCompletedItems.length > 0) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Warning",
-                    text: "You have uncompleted Items"
-                });
-                return;
-            }
-
-            var invalidItems = gridItems.filter(function (row) {
-                debugger
-                return row.UsedQuantity === null ||
-                    row.UsedQuantity === undefined ||
-                    row.UsedQuantity === "" 
-                    //row.UsedQuantity === 0;
-            });
-
-            if (invalidItems.length > 0) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Warning",
-                    text: "Used  Quantity Is Required"
-                });
-                return;
-            }
-
-            var itemsJson = JSON.stringify(gridItems);
-            $("#Items").val(itemsJson);
-
-            var WIPId = $('#Id').val();
-            var VehId = $('#_vehicleId').val();
-            var MovId = $('#_movementId').val();
-            var accountType = $("#AccountType").val();
-            var salesType = $("#SalesType").val();
-            var customer = $("#CustomerId").val();
-            var currency = $("#CurrencyId").val();
-            var terms = $("#TermsId").val();
-            var vat = $("#Vat").val();
-            var partialAccountType = $("#PartialAccountType").val();
-            var partialSalesType = $("#PartialSalesType").val();
-            var partialCustomer = $("#PartialCustomerId").val();
-            var partialCurrency = $("#PartialCurrencyId").val();
-            var partialTerms = $("#PartialTermsId").val();
-            var partialVat = $("#PartialVat").val();
-            var status = $("#statusId").val();
-            var wipDate = $("#WipDate").val();
-            var note = $("#WipNote").val();
-            var dep = $("#DepartmentId").val();
-            var bark = $("#CarPark").val();
-            var vehServiceDesc = $("#VehServiceDesc").val();
-            var vehConcerns = $("#VehConcerns").val();
-            var vehAdvisorNotes = $("#VehAdvisorNotes").val();
-            var odometerPrevious = $('#OdoPrev').val();
-            var odometerCurrentIN = $('#OdoCurrentIn').val();
-            var odometerCurrentOUT = $('#OdoCurrentOut').val();
-            var optPartialInv = $("#optPartialInv").is(":checked");
-            var optReturnParts = $("#optReturnParts").is(":checked");
-            var optRepeatRepair = $("#optRepeatRepair").is(":checked");
-            var optUpdateDemand = $("#optUpdateDemand").is(":checked");
-
-            var accountDetails = {
-                WIPId: WIPId ?? 0,
-                AccountType: accountType,
-                SalesType: salesType,
-                CustomerId: customer,
-                CurrencyId: currency,
-                TermsId: terms,
-                Vat: vat,
-                PartialAccountType: partialAccountType,
-                PartialSalesType: partialSalesType,
-                PartialCustomerId: partialCustomer,
-                PartialCurrencyId: partialCurrency,
-                PartialTermsId: partialTerms,
-                PartialVat: partialVat
-            };
-
-            var vehicleTab = {
-                WIPId: WIPId,
-                VehServiceDesc: vehServiceDesc,
-                VehConcerns: vehConcerns,
-                VehAdvisorNotes: vehAdvisorNotes,
-                DepartmentId: dep,
-                CarPark: bark,
-                OdometerPrevious: odometerPrevious,
-                OdometerCurrentIN: odometerCurrentIN,
-                OdometerCurrentOUT: odometerCurrentOUT
-            };
-
-            var optionsTab = {
-                WIPId: WIPId,
-                PartialInvoicing: optPartialInv,
-                ReturnParts: optReturnParts,
-                RepeatRepair: optRepeatRepair,
-                UpdateDemand: optUpdateDemand
-            };
-
-            var close = {
-                Id: WIPId,
-                VehicleId: VehId,
-                MovementId: MovId,
-                Items: itemsJson,
-                Services: ServicesJson,
-                AccountDetails: accountDetails,
-                VehicleTab: vehicleTab,
-                Status: status,
-                WipDate: wipDate,
-                Note: note,
-                Options: optionsTab
-            };
-
-            hasExternalPendingInvoice(WIPId)
-                .done(function (res) {
-
-                    if (!res.success) {
-                        Swal.fire({ icon: "error", title: "Error", text: res.error || "Failed to check pending invoices." });
-                        return;
-                    }
-
-                    if (res.hasPending) {
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Pending Invoices",
-                            text: "There are external pending invoice for this WIP"
-                        });
-                        return; 
-                    }
-
-                    $.ajax({
-                        type: 'POST',
-                        url: window.URLs.closeWipUrl,
-                        dataType: 'json',
-                        data: close
-                    }).done(function (result) {
-                        if (result.success) {
-                            Swal.fire("Success", "WIP has been closed successfully.").then(() => {
-                                window.location.href = window.URLs.indexUrl;
-                            });
-                        } else {
-                            const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
-                            Swal.fire({ icon: "error", title: "Error", text: msg });
-                        }
-                    }).fail(function (xhr, status, error) {
-                        console.error("Error:", error);
+                if (Services_Items.length == 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning",
+                        text: "You dont have services"
                     });
+                    return;
+                }
 
-                })
-                .fail(function () {
-                    Swal.fire({ icon: "error", title: "Error", text: "An error occurred while checking for pending invoices." });
+                debugger
+                var notCompletedService = Services_Items.filter(function (row) {
+                    return parseInt(row.Status) !== 25 && parseInt(row.Status) !== 26;
                 });
-        });
+                if (notCompletedService.length > 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning",
+                        text: "You have uncompleted service"
+                    });
+                    return;
+                }
 
+
+                var notCompletedItems = gridItems.filter(function (row) {
+
+                    return parseInt(row.Status) !== 42;
+                });
+
+                if (notCompletedItems.length > 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning",
+                        text: "You have uncompleted Items"
+                    });
+                    return;
+                }
+
+                var invalidItems = gridItems.filter(function (row) {
+                    debugger
+                    return row.UsedQuantity === null ||
+                        row.UsedQuantity === undefined ||
+                        row.UsedQuantity === ""
+                    //row.UsedQuantity === 0;
+                });
+
+                if (invalidItems.length > 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning",
+                        text: "Used  Quantity Is Required"
+                    });
+                    return;
+                }
+
+                var itemsJson = JSON.stringify(gridItems);
+                $("#Items").val(itemsJson);
+
+                var WIPId = $('#Id').val();
+                var VehId = $('#_vehicleId').val();
+                var MovId = $('#_movementId').val();
+                var accountType = $("#AccountType").val();
+                var salesType = $("#SalesType").val();
+                var customer = $("#CustomerId").val();
+                var currency = $("#CurrencyId").val();
+                var terms = $("#TermsId").val();
+                var vat = $("#Vat").val();
+                var partialAccountType = $("#PartialAccountType").val();
+                var partialSalesType = $("#PartialSalesType").val();
+                var partialCustomer = $("#PartialCustomerId").val();
+                var partialCurrency = $("#PartialCurrencyId").val();
+                var partialTerms = $("#PartialTermsId").val();
+                var partialVat = $("#PartialVat").val();
+                var status = $("#statusId").val();
+                var wipDate = $("#WipDate").val();
+                var note = $("#WipNote").val();
+                var dep = $("#DepartmentId").val();
+                var bark = $("#CarPark").val();
+                var vehServiceDesc = $("#VehServiceDesc").val();
+                var vehConcerns = $("#VehConcerns").val();
+                var vehAdvisorNotes = $("#VehAdvisorNotes").val();
+                var odometerPrevious = $('#OdoPrev').val();
+                var odometerCurrentIN = $('#OdoCurrentIn').val();
+                var odometerCurrentOUT = $('#OdoCurrentOut').val();
+                var optPartialInv = $("#optPartialInv").is(":checked");
+                var optReturnParts = $("#optReturnParts").is(":checked");
+                var optRepeatRepair = $("#optRepeatRepair").is(":checked");
+                var optUpdateDemand = $("#optUpdateDemand").is(":checked");
+
+                var accountDetails = {
+                    WIPId: WIPId ?? 0,
+                    AccountType: accountType,
+                    SalesType: salesType,
+                    CustomerId: customer,
+                    CurrencyId: currency,
+                    TermsId: terms,
+                    Vat: vat,
+                    PartialAccountType: partialAccountType,
+                    PartialSalesType: partialSalesType,
+                    PartialCustomerId: partialCustomer,
+                    PartialCurrencyId: partialCurrency,
+                    PartialTermsId: partialTerms,
+                    PartialVat: partialVat
+                };
+
+                var vehicleTab = {
+                    WIPId: WIPId,
+                    VehServiceDesc: vehServiceDesc,
+                    VehConcerns: vehConcerns,
+                    VehAdvisorNotes: vehAdvisorNotes,
+                    DepartmentId: dep,
+                    CarPark: bark,
+                    OdometerPrevious: odometerPrevious,
+                    OdometerCurrentIN: odometerCurrentIN,
+                    OdometerCurrentOUT: odometerCurrentOUT
+                };
+
+                var optionsTab = {
+                    WIPId: WIPId,
+                    PartialInvoicing: optPartialInv,
+                    ReturnParts: optReturnParts,
+                    RepeatRepair: optRepeatRepair,
+                    UpdateDemand: optUpdateDemand
+                };
+
+                var close = {
+                    Id: WIPId,
+                    VehicleId: VehId,
+                    MovementId: MovId,
+                    Items: itemsJson,
+                    Services: ServicesJson,
+                    AccountDetails: accountDetails,
+                    VehicleTab: vehicleTab,
+                    Status: status,
+                    WipDate: wipDate,
+                    Note: note,
+                    Options: optionsTab
+                };
+
+                hasExternalPendingInvoice(WIPId)
+                    .done(function (res) {
+
+                        if (!res.success) {
+                            Swal.fire({ icon: "error", title: "Error", text: res.error || "Failed to check pending invoices." });
+                            return;
+                        }
+
+                        if (res.hasPending) {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Pending Invoices",
+                                text: "There are external pending invoice for this WIP"
+                            });
+                            return;
+                        }
+
+                        $.ajax({
+                            type: 'POST',
+                            url: window.URLs.closeWipUrl,
+                            dataType: 'json',
+                            data: close
+                        }).done(function (result) {
+                            if (result.success) {
+                                Swal.fire("Success", "WIP has been closed successfully.").then(() => {
+                                    window.location.href = window.URLs.indexUrl;
+                                });
+                            } else {
+                                const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
+                                Swal.fire({ icon: "error", title: "Error", text: msg });
+                            }
+                        }).fail(function (xhr, status, error) {
+                            console.error("Error:", error);
+                        });
+
+                    })
+                    .fail(function () {
+                        Swal.fire({ icon: "error", title: "Error", text: "An error occurred while checking for pending invoices." });
+                    });
+            });
+            
+        });
 
         /* ------- View swapping (Search cars <-> WIP form) ------- */
         const $wipFormWrapper = $('#wipFormWrapper');

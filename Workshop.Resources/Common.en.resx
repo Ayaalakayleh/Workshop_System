@@ -2625,4 +2625,10 @@
   <data name="FailedCreateSeller" xml:space="preserve">
     <value>Failed to create seller</value>
   </data>
+  <data name="PriceWorkflow" xml:space="preserve">
+    <value>Parts Price Workflow</value>
+  </data>
+  <data name="Workflow" xml:space="preserve">
+    <value>Workflow</value>
+  </data>
 </root>

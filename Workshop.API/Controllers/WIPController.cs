@@ -262,7 +262,7 @@ namespace Workshop.API.Controllers
         public async Task<ActionResult> UpdateReturnStatusById([FromQuery] int WIPId)
         {
             var updated = await _service.UpdateReturnStatusById(WIPId);
-            return Ok(new { Updated = updated });
+            return Ok(updated );
         }
 
         [HttpGet("GetOptionsById/{id}")]

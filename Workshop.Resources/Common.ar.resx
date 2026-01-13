@@ -2625,4 +2625,10 @@
   <data name="FailedCreateSeller" xml:space="preserve">
     <value>تعذر إنشاء البائع</value>
   </data>
+  <data name="PriceWorkflow" xml:space="preserve">
+    <value>سير عمل اسعار القطع</value>
+  </data>
+  <data name="Workflow" xml:space="preserve">
+    <value>سير العمل</value>
+  </data>
 </root>

@@ -134,7 +134,7 @@ function updateSelectionCount(count) {
                     Name: lang == "en" ? item.primaryName : item.secondaryName,
                     PrimaryName: item.primaryName,
                     SecondaryName: item.secondaryName,
-                    Quantity: 1,
+                    Quantity: 0,
                     RequestQuantity: 1,
                     Price: item.price ?? 0,
                     CostPrice: item.costPrice ?? 0,
@@ -155,48 +155,49 @@ function updateSelectionCount(count) {
 
                 $("#addPartModal").modal("hide");
                 targetGrid.option("dataSource", newDataSource);
-                saveWipItemsAuto(transformedData);            }
+                //saveWipItemsAuto(transformedData);           
+            }
         });
     }
 }
 
-function saveWipItemsAuto(itemsToInsert) {
-    const wipId = parseInt($("#Id").val() || "0");
-    if (!wipId || wipId <= 0) return;
+//function saveWipItemsAuto(itemsToInsert) {
+//    const wipId = parseInt($("#Id").val() || "0");
+//    if (!wipId || wipId <= 0) return;
 
-    if (!Array.isArray(itemsToInsert) || itemsToInsert.length === 0) return;
+//    if (!Array.isArray(itemsToInsert) || itemsToInsert.length === 0) return;
 
-    const baseItems = itemsToInsert.map(x => ({
-        WIPId: wipId,
-        KeyId: x.KeyId, 
-        ItemId: x.ItemId,
-        fk_UnitId: x.fk_UnitId,
-        Quantity: x.Quantity ?? 1,
-        RequestQuantity: x.RequestQuantity ?? x.Quantity ?? 1,
-        CostPrice: x.CostPrice ?? 0,
-        SalePrice: x.SalePrice ?? 0,
-        Discount: x.Discount ?? 0,
-        LocatorId: x.LocatorId ?? null,
-        WarehouseId: x.WarehouseId ?? null
-    }));
+//    const baseItems = itemsToInsert.map(x => ({
+//        WIPId: wipId,
+//        KeyId: x.KeyId, 
+//        ItemId: x.ItemId,
+//        fk_UnitId: x.fk_UnitId,
+//        Quantity: x.Quantity ?? 1,
+//        RequestQuantity: x.RequestQuantity ?? x.Quantity ?? 1,
+//        CostPrice: x.CostPrice ?? 0,
+//        SalePrice: x.SalePrice ?? 0,
+//        Discount: x.Discount ?? 0,
+//        LocatorId: x.LocatorId ?? null,
+//        WarehouseId: x.WarehouseId ?? null
+//    }));
 
-    return $.ajax({
-        url: window.RazorVars.insertItemsUrl,
-        method: "POST",
-        dataType: "json",
-        data: {
-            WIPId: wipId,
-            ItemsList: baseItems
-        },
-        error: function () {
-            Swal.fire({
-                icon: "error",
-                title: "Failed to save items",
-                showConfirmButton: true
-            });
-        }
-    });
-}
+//    return $.ajax({
+//        url: window.RazorVars.insertItemsUrl,
+//        method: "POST",
+//        dataType: "json",
+//        data: {
+//            WIPId: wipId,
+//            ItemsList: baseItems
+//        },
+//        error: function () {
+//            Swal.fire({
+//                icon: "error",
+//                title: "Failed to save items",
+//                showConfirmButton: true
+//            });
+//        }
+//    });
+//}
 
 function showItemSelectionModal() {
     initializeItemSelectionGrid();

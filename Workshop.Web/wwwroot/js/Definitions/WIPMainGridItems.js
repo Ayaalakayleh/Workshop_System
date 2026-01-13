@@ -152,7 +152,7 @@ $(function () {
                             fillLocators([row]);
 
                             const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                            grid.getDataSource().store().update(row.Id, row).then(() => {
+                            grid.getDataSource().store().update(row.KeyId, row).then(() => {
                                 grid.refresh();
                             });
                         }
@@ -283,7 +283,7 @@ $(function () {
                             $("#optReturnParts").prop("checked", isLess);
 
                             const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                            const idx = grid.getRowIndexByKey(row.Id);
+                            const idx = grid.getRowIndexByKey(row.KeyId);
                             if (idx >= 0) grid.repaintRows([idx]);  
 
                             updateFieldsFromGrid();
@@ -509,9 +509,13 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
+                            debugger
+                            const stRaw = e?.row?.data?.Status;
+                            if (stRaw === undefined || stRaw === null || stRaw === "") return false;
+
                             return Permission_Issue && (
                                 AllowActions &&
-                                parseInt(e.row.data.Status) !== 41 &&
+                                parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
                                 OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                             );
                         },
@@ -536,9 +540,12 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
+                            const stRaw = e?.row?.data?.Status;
+                            if (stRaw === undefined || stRaw === null || stRaw === "") return false;
+
                             return Permission_Issue && (
                                 AllowActions &&
-                                parseInt(e.row.data.Status) !== 41 &&
+                                parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
                                 OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                             );
                         },
@@ -990,7 +997,7 @@ function updateStatusItem(row, statusId) {
         Id: row.Id,
         StatusId: statusId
     };
-
+    debugger
     return $.ajax({
         url: window.RazorVars.updatePartStatusWithSingleItem,
         type: 'POST',
@@ -998,17 +1005,18 @@ function updateStatusItem(row, statusId) {
         dataType: 'json',
         data: JSON.stringify(dto)
     }).done(function (res) {
+        debugger
         if (res && res.success) {
            
             row.Status = statusId;
             row.StatusText = statusTextById(statusId, true);
 
-            updateRowInGrid(row).then(() => {
+            updateRowInGrid(row)
                 Swal.fire({
                     icon: "success",
                     title: statusTextById(statusId, false)
                 });
-            });
+            
         }
     }).fail(function (xhr, st, err) {
         console.error("Error updating status:", err);
@@ -1374,7 +1382,7 @@ function CreateIssueVoucher(row) {
                     row.PartsIssueId = data.partsIssueId;
                      ;
                     const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                    grid.getDataSource().store().update(row.Id, row).then(() => {
+                    grid.getDataSource().store().update(row.KeyId, row).then(() => {
                         grid.refresh();
                     });
 
@@ -1555,7 +1563,7 @@ $(document).on("change", "#transferFromLocator", function () {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     if (!grid) return;
 
-    grid.getDataSource().store().update(window.transferRow.Id, window.transferRow)
+    grid.getDataSource().store().update(window.transferRow.KeyId, window.transferRow)
         .then(() => grid.refresh());
 });
 

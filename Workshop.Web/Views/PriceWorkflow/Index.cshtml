@@ -1,0 +1,63 @@
+﻿@using Newtonsoft.Json
+@using Workshop.Core.DTOs;
+@using Workshop.Resources;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@model PriceWorkflowDTO
+
+@{
+	ViewBag.Title = Common["Price Workflow"];
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+	<div class="col-12">
+		<div id="panel-1" class="panel">
+			<div class="panel-hdr">
+				<h2 class="font-weight-bold">@Common["PriceWorkflow"]</h2>
+			</div>
+			<div class="panel-container show">
+				<div class="panel-content">
+
+					@using (Html.BeginForm("Edit", "PriceWorkflow", FormMethod.Post, new { enctype = "multipart/form-data", id = "PriceWorkflowForm" }))
+					{
+						<div class="card-body p-0">
+							<div id="PriceWorkflowGrid" class="gridContainer"></div>
+						</div>
+
+						<div class="text-center text-white my-3">
+							<button type="button" id="btnEdit" class="btn btn-info btn-w-m">
+								<i class="fa fa-edit"></i>&nbsp;@Common["Button_Edit"]
+							</button>
+						</div>
+
+						<div class="text-center text-white my-3">
+							<button type="button" id="btnCreate" class="btn btn-primary btn-w-m d-none">
+								<i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
+							</button>
+						</div>
+					}
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var Workflows = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Workflows));
+	var Data = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Data ?? new List<PriceWorkflowDTO>()));
+
+	window.URLs = {
+		editPostUrl: '@Url.Action("Edit", "PriceWorkflow")',
+		deleteUrl: '@Url.Action("Delete", "PriceWorkflow")'
+	}
+
+	 window.RazorVars = {
+		  DXPrice: '@Html.Raw(Common["Label_Price"])',
+		  DXWorkflow: '@Html.Raw(Common["Workflow"])',
+	 }
+</script>
+<script src="~/js/site.js"></script>
+<script src="~/js/definitions/PriceWorkflow.js"></script>

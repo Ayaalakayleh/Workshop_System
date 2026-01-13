@@ -2788,5 +2788,73 @@ namespace Workshop.Web.Services
         }
 
         #endregion
+
+        #region PriceWorkflow
+
+        public async Task<IEnumerable<PriceWorkflowDTO>> GetPriceWorkflowDefinitionAsync(PriceWorkflowDTO dto)
+        {
+           var response = await _httpClient.PostAsJsonAsync("api/PriceWorkflow/Get", dto);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return Enumerable.Empty<PriceWorkflowDTO>();
+            }
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<PriceWorkflowDTO>>();
+
+            return result ?? Enumerable.Empty<PriceWorkflowDTO>();
+        }
+
+        public async Task<PriceWorkflowDTO?> GetPriceWorkflowByIdAsync(int id)
+        {
+            return await _httpClient.GetFromJsonAsync<PriceWorkflowDTO>($"api/PriceWorkflow/GetById/{id}");
+        }
+
+        public async Task<int?> AddPriceWorkflowDefinitionAsync(PriceWorkflowDTO dto)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/PriceWorkflow/Add", dto);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return null;
+            }
+            var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
+            if (result == null) return null;
+            if (result.ContainsKey("Id")) return result["Id"];
+            if (result.ContainsKey("id")) return result["id"];
+            return null;
+        }
+
+        public async Task<int?> UpdatePriceWorkflowDefinitionAsync(PriceWorkflowDTO dto)
+        {
+            var response = await _httpClient.PutAsJsonAsync("api/PriceWorkflow/Update", dto);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return null;
+            }
+            var result = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
+            if (result == null) return null;
+            if (result.ContainsKey("Updated")) return result["Updated"];
+            if (result.ContainsKey("updated")) return result["updated"];
+            return null;
+        }
+
+
+        public async Task<bool> DeletePriceWorkflowDefinitionAsync(int Id)
+        {
+            var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Delete, "api/PriceWorkflow/Delete")
+            {
+                Content = JsonContent.Create(Id)
+            });
+            return response.IsSuccessStatusCode;
+        }
+
+        #endregion
     }
 }
