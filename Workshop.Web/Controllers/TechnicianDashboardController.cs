@@ -314,11 +314,23 @@ namespace Workshop.Web.Controllers
             var main = GetMainModel();
             var WIPSchedules = await _apiClient.GetClockingFilter();
 
-            var serviceList = WIPSchedules?.Where(s => s.TechnicianId == TechnicianID)
-                .Select(x => new { x.WIPId, Text = "WIP - " + x.WIPId })
-                .Distinct()
-                .Select(x => new SelectListItem { Value = x.WIPId.ToString(), Text = x.Text })
-                .ToList() ?? new List<SelectListItem>();
+            var relevantSchedules = WIPSchedules?.Where(s => s.TechnicianId == TechnicianID).ToList() ?? new List<GetClockingFilter>();
+            var wipIds = relevantSchedules.Select(s => s.WIPId).Distinct().ToList();
+
+            var filteredWipIds = new List<int?>();
+            foreach (var wipId in wipIds)
+            {
+                var services = await _apiClient.WIP_GetServicesById(wipId ?? 0);
+                var bServiceIds = services.Where(s => s?.Status == 19).Select(s => (KeyId: s?.KeyId ?? 0, RTSId: s?.Id ?? 0)).ToHashSet();
+
+                var hasMatching = relevantSchedules.Any(s => s.WIPId == wipId && bServiceIds.Contains((s.KeyId ?? 0, s.RTSId ?? 0)));
+                if (hasMatching)
+                {
+                    filteredWipIds.Add(wipId);
+                }
+            }
+
+            var serviceList = filteredWipIds.Select(x => new SelectListItem { Value = x.ToString(), Text = "WIP - " + x }).ToList();
 
             main.WIPSSelectList = serviceList;
             main.SelectedTechnician = TechnicianID;
@@ -331,11 +343,23 @@ namespace Workshop.Web.Controllers
             var main = GetMainModel();
             var WIPSchedules = await _apiClient.GetClockingFilter();
 
-            var serviceList = WIPSchedules?.Where(s => s.TechnicianId == TechnicianID)
-                .Select(x => new { x.WIPId, Text = "WIP - " + x.WIPId })
-                .Distinct()
-                .Select(x => new SelectListItem { Value = x.WIPId.ToString(), Text = x.Text })
-                .ToList() ?? new List<SelectListItem>();
+            var relevantSchedules = WIPSchedules?.Where(s => s.TechnicianId == TechnicianID).ToList() ?? new List<GetClockingFilter>();
+            var wipIds = relevantSchedules.Select(s => s.WIPId).Distinct().ToList();
+
+            var filteredWipIds = new List<int>();
+            foreach (var wipId in wipIds)
+            {
+                var services = await _apiClient.WIP_GetServicesById(wipId ?? 0);
+                var bServiceIds = services.Where(s => s?.Status == 19).Select(s => (KeyId: s?.KeyId ?? 0, RTSId: s?.Id ?? 0)).ToHashSet();
+
+                var hasMatching = relevantSchedules.Any(s => s.WIPId == wipId && bServiceIds.Contains((s.KeyId ?? 0, s.RTSId ?? 0)));
+                if (hasMatching)
+                {
+                    filteredWipIds.Add(wipId ?? 0);
+                }
+            }
+
+            var serviceList = filteredWipIds.Select(x => new SelectListItem { Value = x.ToString(), Text = "WIP - " + x }).ToList();
 
             main.WIPSSelectList = serviceList;
             main.SelectedTechnician = TechnicianID;
@@ -402,8 +426,12 @@ namespace Workshop.Web.Controllers
 
                         main?.LabourlinesSelectList?.RemoveAll(s => s.Value == main?.ClockingList?.FirstOrDefault(i => i.ID == clockItem.ID)?.RTSID.ToString());
 
-                        main?.ClockingList.RemoveAll(i => i.ID == clockItem.ID);
+                        var services = ((await _apiClient.WIP_GetServicesById(main?.ClockingList?.FirstOrDefault(i => i.ID == clockItem.ID)?.WIPID ?? 0)).Where(s => s.Status == 19));
+                        if (services.Count() <= 0)
+                            main?.WIPSSelectList?.RemoveAll(s => s.Value == main?.ClockingList?.FirstOrDefault(i => i.ID == clockItem.ID)?.WIPID.ToString());
 
+
+                        main?.ClockingList.RemoveAll(i => i.ID == clockItem.ID);
 
                         SaveMainModel(main);
                     }
@@ -466,6 +494,13 @@ namespace Workshop.Web.Controllers
                 {
                     await BreakClock(item.ID ?? 0, (int)Status.ClockOut);
                     main?.LabourlinesSelectList?.RemoveAll(s => s.Value == item.RTSID.ToString());
+
+
+                    var services = (await _apiClient.WIP_GetServicesById(main?.ClockingList?.FirstOrDefault(i => i.ID == item.ID)?.WIPID ?? 0)).Where(s => s.Status == 19);
+                    if (services.Count() <= 0)
+                        main?.WIPSSelectList?.RemoveAll(s => s.Value == main?.ClockingList?.FirstOrDefault(i => i.ID == item.ID)?.WIPID.ToString());
+
+
                 }
 
 

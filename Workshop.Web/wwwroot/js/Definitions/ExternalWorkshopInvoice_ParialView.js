@@ -142,7 +142,7 @@ function Save() {
                 Swal.fire({
                     title: RazorVars.doneMessage,
                     icon: "success",
-                    confirmButtonText: "OK"
+                    confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
                 }).then(() => window.location.reload());
             } else {
                 Swal.fire({

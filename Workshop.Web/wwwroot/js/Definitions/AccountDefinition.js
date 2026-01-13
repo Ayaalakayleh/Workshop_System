@@ -8,7 +8,7 @@
         success: function (response) {
             Swal.fire({
                 icon: 'success',
-                title: 'Saved successfully!',
+                title: theMainLang == "en"? 'Success':"تمت العملية بنجاح",
                 showConfirmButton: false,
                 timer: 2000
             });
@@ -16,8 +16,9 @@
         error: function () {
             Swal.fire({
                 icon: 'error',
-                title: 'An error occurred while saving.',
-                showConfirmButton: true
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                showConfirmButton: true,
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         }
     });

@@ -319,11 +319,7 @@ $("#PlateNumber").on("change", function () {
         if (result.isSuccess === false) {
             Swal.fire({
                 icon: "warning",
-                title: "Warning",
-                html: `
-                    <div>This vehicle already exists</div>
-                    <div style="margin-top:6px;"><b>Plate Number:</b> ${result.data}</div>
-                `
+                title: theMainLang == "en" ? 'This vehicle already exists' : "هذه المركبة موجدة بالفعل",
             });
         }
 

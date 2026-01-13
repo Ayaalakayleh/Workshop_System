@@ -290,12 +290,8 @@ $(document).ready(function () {
                             .html('<i class="fa fa-save"></i>&nbsp;' + RazorVars.btnSave);
 
                         Swal.fire({
-                            icon: "warning",
-                            title: "Warning",
-                            html: `
-                                    <div>This Technician already exists</div>
-                                    <div style="margin-top:6px;"><b>Number:</b> ${result.data}</div>
-                                `
+                            icon: "error",
+                            title: theMainLang == "en" ? 'This Technician already exists' : "هذا الفني موجود بالفعل",
                         });
                         return;
                     }

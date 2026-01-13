@@ -248,9 +248,9 @@ function loadData() {
         error: function (xhr, status, error) {
             Swal.fire({
                 icon: "error",
-                title: "Error loading items data",
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                 showConfirmButton: true,
-                confirmButtonText: "ok"
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         },
         complete: function () {
@@ -287,9 +287,9 @@ function loadMenuData() {
         error: function (xhr, status, error) {
             Swal.fire({
                 icon: "error",
-                title: "Error loading items data",
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                 showConfirmButton: true,
-                confirmButtonText: "ok"
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         },
         complete: function () {

@@ -101,7 +101,6 @@ $("#SubmitEditLookup").click(function () {
 function DeleteLookup(ID) {
     Swal.fire({
         title: RazorVars.swalDeleteTitle,
-        text: '',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: 'var(--danger-600)',

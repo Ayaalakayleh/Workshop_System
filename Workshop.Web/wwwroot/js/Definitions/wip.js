@@ -315,8 +315,7 @@
             if (hasInvalidStandardHours) {
                 Swal.fire({
                     icon: "warning",
-                    title: "Warning",
-                    text: "Service Standard Hours is required"
+                    title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
                 });
                 return;
             }
@@ -330,14 +329,16 @@
                 console.log("Edit_Post result:", result);
                 debugger
                 if (result && result.success && result.wipId) {
-                    Swal.fire("Success", "WIP " + result.wipId + " Saved Successfully!").then(() => {
-                        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-                    });
+                    if (theMainLang == "en") {
+                        Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId,"success").then(() => {
+                            window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+                        });
+                    }
+
                 } else {
                     Swal.fire({
                         icon: "error",
-                        title: "Save Failed",
-                        text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
+                        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                     });
                 }
 
@@ -388,27 +389,25 @@
                 const Services_Items = gServices.getDataSource().items();
                 const gridItems = gItems.getDataSource().items();
 
-                if (Services_Items.length == 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning",
-                        text: "You dont have services"
-                    });
-                    return;
-                }
-
-                debugger
-                var notCompletedService = Services_Items.filter(function (row) {
-                    return parseInt(row.Status) !== 25 && parseInt(row.Status) !== 26;
+            if (Services_Items.length == 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: theMainLang == "en" ? "You dont have services" : "لا يوجد لديك خدمات",
                 });
-                if (notCompletedService.length > 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning",
-                        text: "You have uncompleted service"
-                    });
-                    return;
-                }
+                return;
+            }
+
+            debugger
+            var notCompletedService = Services_Items.filter(function (row) {
+                return parseInt(row.Status) !== 25 && parseInt(row.Status) !== 26;
+            });
+            if (notCompletedService.length > 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة",
+                });
+                return;
+            }
 
 
                 var notCompletedItems = gridItems.filter(function (row) {
@@ -416,14 +415,13 @@
                     return parseInt(row.Status) !== 42;
                 });
 
-                if (notCompletedItems.length > 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning",
-                        text: "You have uncompleted Items"
-                    });
-                    return;
-                }
+            if (notCompletedItems.length > 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة"
+                });
+                return;
+            }
 
                 var invalidItems = gridItems.filter(function (row) {
                     debugger
@@ -433,14 +431,13 @@
                     //row.UsedQuantity === 0;
                 });
 
-                if (invalidItems.length > 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning",
-                        text: "Used  Quantity Is Required"
-                    });
-                    return;
-                }
+            if (invalidItems.length > 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: theMainLang == "en" ? "Used  Quantity Is Required" : "الكمية المستخدمة مطلوبة"
+                });
+                return;
+            }
 
                 var itemsJson = JSON.stringify(gridItems);
                 $("#Items").val(itemsJson);
@@ -529,45 +526,44 @@
                 hasExternalPendingInvoice(WIPId)
                     .done(function (res) {
 
-                        if (!res.success) {
-                            Swal.fire({ icon: "error", title: "Error", text: res.error || "Failed to check pending invoices." });
-                            return;
-                        }
+                    if (!res.success) {
+                        Swal.fire({ icon: "error", title: "Error", text: res.error || "Failed to check pending invoices." });
+                        return;
+                    }
 
-                        if (res.hasPending) {
-                            Swal.fire({
-                                icon: "warning",
-                                title: "Pending Invoices",
-                                text: "There are external pending invoice for this WIP"
-                            });
-                            return;
-                        }
-
-                        $.ajax({
-                            type: 'POST',
-                            url: window.URLs.closeWipUrl,
-                            dataType: 'json',
-                            data: close
-                        }).done(function (result) {
-                            if (result.success) {
-                                Swal.fire("Success", "WIP has been closed successfully.").then(() => {
-                                    window.location.href = window.URLs.indexUrl;
-                                });
-                            } else {
-                                const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
-                                Swal.fire({ icon: "error", title: "Error", text: msg });
-                            }
-                        }).fail(function (xhr, status, error) {
-                            console.error("Error:", error);
+                    if (res.hasPending) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Pending Invoices",
+                            text: "There are external pending invoice for this WIP"
                         });
+                        return; 
+                    }
 
-                    })
-                    .fail(function () {
-                        Swal.fire({ icon: "error", title: "Error", text: "An error occurred while checking for pending invoices." });
+                    $.ajax({
+                        type: 'POST',
+                        url: window.URLs.closeWipUrl,
+                        dataType: 'json',
+                        data: close
+                    }).done(function (result) {
+                        if (result.success) {
+                            Swal.fire("Success", "WIP has been closed successfully.").then(() => {
+                                window.location.href = window.URLs.indexUrl;
+                            });
+                        } else {
+                            const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
+                            Swal.fire({ icon: "error", title: "Error", text: msg });
+                        }
+                    }).fail(function (xhr, status, error) {
+                        console.error("Error:", error);
                     });
-            });
-            
+
+                })
+                .fail(function () {
+                    Swal.fire({ icon: "error", title: "Error", text: "An error occurred while checking for pending invoices." });
+                });
         });
+
 
         /* ------- View swapping (Search cars <-> WIP form) ------- */
         const $wipFormWrapper = $('#wipFormWrapper');
@@ -1082,7 +1078,7 @@ function validateGridsAccountTypeForPartialInv() {
     if (hasError) {
         Swal.fire({
             icon: "error",
-            title: "Please Add Account Type",
+            title: theMainLang == "en" ? 'Please Add Account Type' : "الرجاء ادخال نوع الحساب",
            
         });
 

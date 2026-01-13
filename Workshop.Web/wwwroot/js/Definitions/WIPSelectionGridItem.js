@@ -181,23 +181,24 @@ function updateSelectionCount(count) {
 //        WarehouseId: x.WarehouseId ?? null
 //    }));
 
-//    return $.ajax({
-//        url: window.RazorVars.insertItemsUrl,
-//        method: "POST",
-//        dataType: "json",
-//        data: {
-//            WIPId: wipId,
-//            ItemsList: baseItems
-//        },
-//        error: function () {
-//            Swal.fire({
-//                icon: "error",
-//                title: "Failed to save items",
-//                showConfirmButton: true
-//            });
-//        }
-//    });
-//}
+    return $.ajax({
+        url: window.RazorVars.insertItemsUrl,
+        method: "POST",
+        dataType: "json",
+        data: {
+            WIPId: wipId,
+            ItemsList: baseItems
+        },
+        error: function () {
+            Swal.fire({
+                icon: "error",
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                showConfirmButton: true,
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
+            });
+        }
+    });
+}
 
 function showItemSelectionModal() {
     initializeItemSelectionGrid();
@@ -226,9 +227,9 @@ function loadItemsData() {
         error: function () {
             Swal.fire({
                 icon: "error",
-                title: "Error loading items data",
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                 showConfirmButton: true,
-                confirmButtonText: "ok"
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         },
         complete: function () {
@@ -282,17 +283,17 @@ $("#btnAddPartGeneral").on("click", function () {
         success: function (result) {
             Swal.fire({
                 icon: "success",
-                title: "Successfuly request",
+                title: theMainLang == "en" ? 'Success' : "تمت العملية بنجاح",
                 showConfirmButton: true,
-                confirmButtonText: "ok"
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         },
         error: function (xhr, status, error) {
             Swal.fire({
                 icon: "error",
-                title: "Fail the request",
+                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                 showConfirmButton: true,
-                confirmButtonText: "ok"
+                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         },
         complete: function () {

@@ -168,8 +168,8 @@
                             if (res && res.codeExists) {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'RTS Code already exists',
-                                    confirmButtonText: 'OK',
+                                    title: theMainLang == "en" ? 'RTS Code already exists' : "رقم RTS موجود بالفعل",
+                                    confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
                                     confirmButtonColor: 'var(--primary-600)'
                                 });
                                 return;
@@ -178,7 +178,7 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: "Success",
-                                confirmButtonText: "Ok",
+                                confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
                                 confirmButtonColor: 'var(--primary-600)',
                                 timer: 3000,
                                 timerProgressBar: true

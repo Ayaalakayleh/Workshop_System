@@ -875,14 +875,24 @@
 
             if (wipSwalShownByVehicle[vehicleId]) return;
             wipSwalShownByVehicle[vehicleId] = true;
+            if (theMainLang == "en") {
+                Swal.fire({
+                    title: 'Warning',
+                    html: "You have already - " + result.data.openWIPCount + " - open WIP<br>" +
+                        "And - " + result.data.previous + " - WIP from last month",
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'تنبيه',
+                    html: "لديك بالفعل - " + result.data.openWIPCount + " - من أوامر العمل المفتوحة (WIP)<br>" +
+                        "ولديك - " + result.data.previous + " - من أوامر العمل (WIP) من الشهر الماضي",
+                    icon: 'warning',
+                    confirmButtonText: 'حسناً'
+                });
+            }
 
-            Swal.fire({
-                title: 'Warning',
-                html: "You have already - " + result.data.openWIPCount + " - open WIP<br>" +
-                    "And - " + result.data.previous + " - WIP from last month",
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            });
         }).fail(function () {
             wipRequestInFlightByVehicle[vehicleId] = false;
         });

@@ -29,12 +29,11 @@ $(document).ready(function () {
 
         Swal.fire({
             icon: "warning",
-            title: "Are you sure?",
-            text: "This will delete the reminder.",
+            title: theMainLang == "en" ? 'Are you sure?' : "هل أنت متأكد؟",
             showCancelButton: true,
             confirmButtonColor: "var(--danger-800)",
-            confirmButtonText: "Yes",
-            cancelButtonText: "No",
+            confirmButtonText: theMainLang == "en" ? 'Yes' : "نعم",
+            cancelButtonText: theMainLang == "en" ? 'No' : "لا",
             reverseButtons: true
         }).then(function (result) {
 
@@ -49,7 +48,7 @@ $(document).ready(function () {
 
                         Swal.fire({
                             icon: "success",
-                            title: "Deleted",
+                            title: theMainLang == "en" ? 'Deleted Successfully' : "تمت عملية الحذف بنجاح تام",
                             timer: 900,
                             showConfirmButton: false
                         });

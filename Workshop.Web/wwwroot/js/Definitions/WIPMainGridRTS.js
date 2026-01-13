@@ -660,7 +660,7 @@ $("#btnSaveSchedule").on("click", function (e) {
                 grid.refresh();
             }
             updateTotalLabourFieldsFromGrid();
-            Swal.fire("Success", "The schedule was saved successfully", "success");
+            Swal.fire(theMainLang == "en" ? 'Success' : "تمت العملية بنجاح", "", "success");
         }
     }).fail(function (xhr, status, error) {
         console.error("Error:", error);
