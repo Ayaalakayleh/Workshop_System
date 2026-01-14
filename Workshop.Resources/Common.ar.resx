@@ -2631,4 +2631,7 @@
   <data name="Workflow" xml:space="preserve">
     <value>سير العمل</value>
   </data>
+  <data name="Label_CreateWIP" xml:space="preserve">
+    <value>انشاء امر عمل </value>
+  </data>
 </root>

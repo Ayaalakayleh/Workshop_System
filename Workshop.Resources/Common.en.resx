@@ -2631,4 +2631,7 @@
   <data name="Workflow" xml:space="preserve">
     <value>Workflow</value>
   </data>
+  <data name="Label_CreateWIP" xml:space="preserve">
+    <value>Create WIP</value>
+  </data>
 </root>

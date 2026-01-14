@@ -7,9 +7,11 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using System.ComponentModel.Design;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -24,12 +26,11 @@ using Workshop.Core.DTOs.WorkshopDTOs;
 using Workshop.Core.DTOs.WorkshopMovement;
 using Workshop.Domain.Enum;
 using Workshop.Infrastructure;
+using Workshop.Resources;
 using Workshop.Web.Interfaces.Services;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
-using Microsoft.Extensions.Localization;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using Workshop.Resources;
 
 namespace Workshop.Web.Controllers
 {
@@ -222,115 +223,38 @@ namespace Workshop.Web.Controllers
                     }
 
                     // Get vehicle documents - handle nulls
-                    try
-                    {
-                        var vehicleDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(dto.VehicleId, 8);
-                        ViewBag.RegDate = vehicleDoc?.strExpiryDate ?? "N/A";
-
-                        var MOTDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(dto.VehicleId, 3);
-                        ViewBag.MOTDate = MOTDoc?.strExpiryDate ?? "N/A";
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error fetching vehicle documents for vehicle {VehicleId}", dto.VehicleId);
-                        ViewBag.RegDate = "N/A";
-                        ViewBag.MOTDate = "N/A";
-                    }
+                    var docs = await GetVehicleDocumentDatesAsync(dto.VehicleId);
+                    ViewBag.RegDate = docs.RegDate;
+                    ViewBag.MOTDate = docs.MOTDate;
 
                     // Get internal matches
-                    try
-                    {
-                        ViewBag.InternalMatches = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(9, CompanyId);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error fetching internal matches");
-                        ViewBag.InternalMatches = new List<LookupDetailsDTO>();
-                    }
+                    ViewBag.InternalMatches = await GetInternalMatchesAsync();
 
                     // Get account details
-                    dto.AccountDetails = new AccountDTO();
-                    try
-                    {
-                        dto.AccountDetails = await _apiClient.WIP_GetAccountById(dto.Id) ?? new AccountDTO();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error fetching account details for WIP {WIPId}", dto.Id);
-                        dto.AccountDetails = new AccountDTO();
-                    }
+                    dto.AccountDetails = await GetAccountDetailsAsync(dto.Id);
 
                     // Get sales type based on account type
-                    if (dto.AccountDetails != null)
-                    {
-                        try
-                        {
-                            ViewBag.SalesType = await GetSalesTypeListAsync((int)dto.AccountDetails.AccountType, CompanyId, lang);
-                            var reverseType = dto.AccountDetails.AccountType == AccountTypeEnum.Internal
-                                ? AccountTypeEnum.External
-                                : AccountTypeEnum.Internal;
+                    var salesTypes = await GetSalesTypesAsync(dto.AccountDetails);
+                    ViewBag.SalesType = salesTypes.SalesType;
+                    ViewBag.PartialSalesType = salesTypes.PartialSalesType;
 
-                            ViewBag.PartialSalesType = await GetSalesTypeListAsync((int)reverseType, CompanyId, lang);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, "Error fetching sales type");
-                            ViewBag.SalesType = new List<SelectListItem>();
-                        }
-                    }
-                    else
-                    {
-                        ViewBag.SalesType = new List<SelectListItem>();
-                    }
+
 
                     // Get services
-                    try
-                    {
-                        ViewBag.Services = await _apiClient.WIP_GetServicesById(id.Value, lang) ?? new List<CreateWIPServiceDTO>();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error fetching services for WIP {WIPId}", id.Value);
-                        ViewBag.Services = new List<CreateWIPServiceDTO>();
-                    }
+                    ViewBag.Services = await GetWipServicesAsync(id.Value);
+
 
                     // Get account details
-
                     dto.InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(dto.Id, null);
 
 
                     // Get items
-                    try
-                    {
-                        var items = await _apiClient.WIP_GetItemsById(id.Value, lang) ?? new List<CreateItemDTO>();
-                        foreach (var item in items)
-                        {
-                            try
-                            {
-                                var mapping = await _inventoryApiClient.GetItemByIdAsync(item.ItemId);
-                                if (mapping != null)
-                                {
-                                    item.Code = mapping.Code;
-                                    item.Name = lang == "en" ? mapping.PrimaryName : mapping.SecondaryName;
-                                }
-                                item.fk_UnitId = item.fk_UnitId;
-                                item.Status = item.Status;
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Error mapping item {ItemId} for WIP {WIPId}", item.ItemId, id.Value);
-                            }
-                        }
-                        ViewBag.Items = items;
-                        ViewBag.AllowActions = items != null && items.Any();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error fetching items for WIP {WIPId}", id.Value);
-                        ViewBag.Items = new List<BaseItemDTO>();
-                    }
+                    var wipItems = await GetWipItemsAsync(id.Value);
+                    ViewBag.Items = wipItems.Items;
+                    ViewBag.AllowActions = wipItems.AllowActions;
+
                 }
-                 
+
                 ViewBag.ID = _WIPID;
 
                     // Get makes
@@ -2791,11 +2715,142 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        private async Task<VehicleDocumentModel> GetVehicleDocumentDatesAsync(int vehicleId)
+        {
+            var result = new VehicleDocumentModel
+            {
+                RegDate = "N/A",
+                MOTDate = "N/A"
+            };
+
+            try
+            {
+                var vehicleDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(vehicleId, 8); // Reg
+                result.RegDate = vehicleDoc?.strExpiryDate ?? "N/A";
+
+                var motDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(vehicleId, 3); // MOT
+                result.MOTDate = motDoc?.strExpiryDate ?? "N/A";
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching vehicle documents for vehicle {VehicleId}", vehicleId);
+                return result;
+            }
+        }
+        private async Task<IEnumerable<LookupDetailsDTO>> GetInternalMatchesAsync()
+        {
+            try
+            {
+                return await _apiClient.GetAllLookupDetailsByHeaderIdAsync(9, CompanyId)?? new List<LookupDetailsDTO>();
+                       
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching internal matches");
+                return new List<LookupDetailsDTO>();
+            }
+        }
+
+        private async Task<AccountDTO> GetAccountDetailsAsync(int wipId)
+        {
+            try
+            {
+                return await _apiClient.WIP_GetAccountById(wipId) ?? new AccountDTO();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching account details for WIP {WIPId}", wipId);
+                return new AccountDTO();
+            }
+        }
+
+        private async Task<SalesTypeModel> GetSalesTypesAsync(AccountDTO accountDetails)    
+        {
+            var result = new SalesTypeModel
+            {
+                SalesType = new List<SelectListItem>(),
+                PartialSalesType = new List<SelectListItem>()
+            };
+
+            if (accountDetails == null)
+                return result;
+
+            try
+            {
+                result.SalesType = await GetSalesTypeListAsync((int)accountDetails.AccountType, CompanyId, lang) ?? new List<SelectListItem>();
+                var reverseType = accountDetails.AccountType == AccountTypeEnum.Internal ? AccountTypeEnum.External : AccountTypeEnum.Internal;
+               
+                result.PartialSalesType = await GetSalesTypeListAsync((int)reverseType, CompanyId, lang)?? new List<SelectListItem>();
+                    
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching sales type");
+                return result;
+            }
+        }
+
+        private async Task<IEnumerable<CreateWIPServiceDTO>> GetWipServicesAsync(int wipId)
+        {
+            try
+            {
+                return await _apiClient.WIP_GetServicesById(wipId, lang) ?? new List<CreateWIPServiceDTO>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching services for WIP {WIPId}", wipId);
+                return new List<CreateWIPServiceDTO>();
+            }
+        }
+
+        private async Task<WipItemsModel> GetWipItemsAsync(int wipId)
+        {
+            var result = new WipItemsModel
+            {
+                Items = new List<CreateItemDTO>(),
+                AllowActions = false
+            };
+
+            try
+            {
+                var items = (await _apiClient.WIP_GetItemsById(wipId, lang))?.ToList()?? new List<CreateItemDTO>();
+                           
+                foreach (var item in items)
+                {
+                    try
+                    {
+                        var mapping = await _inventoryApiClient.GetItemByIdAsync(item.ItemId);
+                        if (mapping != null)
+                        {
+                            item.Code = mapping.Code;
+                            item.Name = lang == "en" ? mapping.PrimaryName : mapping.SecondaryName;
+                        }
+
+                         item.fk_UnitId = item.fk_UnitId;
+                        item.Status = item.Status;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error mapping item {ItemId} for WIP {WIPId}", item.ItemId, wipId);
+                    }
+                }
+
+                result.Items = items;
+                result.AllowActions = items.Any();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching items for WIP {WIPId}", wipId);
+            }
+
+            return result;
+        }
 
 
-
-
-
+        //=====================================================================================================
         #region Petty Cash Methods
 
         [HttpGet]
