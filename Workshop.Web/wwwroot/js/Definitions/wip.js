@@ -382,12 +382,12 @@
             const gServices = $("#mainRTSGrid").dxDataGrid("instance");
             const gItems = $("#mainItemsGrid").dxDataGrid("instance");
 
-            var ServicesJson = JSON.stringify(gServices);
-            $("#Services").val(ServicesJson);
-
             $.when(gServices.saveEditData(), gItems.saveEditData()).done(function () {
                 const Services_Items = gServices.getDataSource().items();
                 const gridItems = gItems.getDataSource().items();
+
+                var ServicesJson = JSON.stringify(Services_Items);
+                $("#Services").val(ServicesJson);
 
                 if (Services_Items.length == 0) {
                     Swal.fire({
@@ -440,7 +440,7 @@
                 }
 
                     var itemsJson = JSON.stringify(gridItems);
-                    $("#Items").val(itemsJson);
+                $("#Items").val(itemsJson);
 
                     var WIPId = $('#Id').val();
                     var VehId = $('#_vehicleId').val();
@@ -1038,6 +1038,12 @@ $(document).ready(function () {
         });
     });
 
+    var st = $("#statusId").val();
+    if (st == 2032) {
+        $("#statusId").prop("disabled", true);   
+    } else {
+        $("#statusId").prop("disabled", false); 
+    }
 });
 function validateGridsAccountTypeForPartialInv() {
     const partialInvoicing = $("#optPartialInv").is(":checked");
@@ -1105,7 +1111,7 @@ $("#statusId").change(function () {
         data: JSON.stringify(model)
     }).done(function (result) {
         if (!result) return;
-
+        location.reload();
       
     }); 
 });

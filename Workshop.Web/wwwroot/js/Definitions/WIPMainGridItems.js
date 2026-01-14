@@ -1016,7 +1016,7 @@ function updateStatusItem(row, statusId) {
                     icon: "success",
                     title: statusTextById(statusId, false)
                 });
-            
+            location.reload();
         }
     }).fail(function (xhr, st, err) {
         console.error("Error updating status:", err);

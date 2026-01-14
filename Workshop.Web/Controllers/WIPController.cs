@@ -1683,13 +1683,12 @@ namespace Workshop.Web.Controllers
             decimal? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.Quantity);
             var VehicleDetails = await _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang);
 
-            //if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
-            //{
-            //    var InternalList = await _apiClient.GetLookupDetailByIdAsync(oWIPDTO.AccountDetails.SalesType == null ? (int)oWIPDTO.AccountDetails.PartialSalesType : (int)oWIPDTO.AccountDetails.SalesType, 9, CompanyId);
+            if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
+            {
+                var InternalList = await _apiClient.GetLookupDetailByIdAsync(oWIPDTO.AccountDetails.SalesType == null ? (int)oWIPDTO.AccountDetails.PartialSalesType : (int)oWIPDTO.AccountDetails.SalesType, 9, CompanyId);
 
-            //    InternalType = InternalList.Code;
-            //}
-            //   saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
+                InternalType = InternalList.Code;
+            }
 
             if (totalExternal > 0 || totalInternal > 0)
             {

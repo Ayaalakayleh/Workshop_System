@@ -36,21 +36,21 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">@Common["Title_LabourLines"]</h5>
         <div class="d-flex gap-2">
-            @if (WIPstatus != (int)WIPStatusEnum.G && WIPstatus != (int)WIPStatusEnum.Invoiced)
+            @if (WIPstatus != (int)WIPStatusEnum.G && WIPstatus != (int)WIPStatusEnum.Invoiced && WIPstatus != (int)WIPStatusEnum.C)
             {
                 @if (PermissionHelper.UserHasPermission(Permissions.WIP.AddRTS))
                 {
-                }
                     <button class="btn btn-outline-primary btn-sm" id="addRts" data-bs-toggle="modal" data-bs-target="#addRtsModal">
                         <i class="fas fa-plus"></i>&nbsp;@Common["Button_AddRTS"]
                     </button>
+                }
                 @if (PermissionHelper.UserHasPermission(Permissions.WIP.Transfer))
                 {
-                }
-                    @if(WIPstatus==0){}
                     <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#transferModal">
                         <i class="fa fa-globe-europe"></i>&nbsp; @Common["TransferVehicle"]
                     </button>
+                }
+                    
             }
         </div>
     </div>
