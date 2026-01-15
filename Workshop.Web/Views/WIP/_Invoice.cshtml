@@ -63,7 +63,7 @@
                                 <td>
                                     @if (@item.AccountType==1)
                                     {
-                                        <a href="@Url.Action("PrintInternal", "WIP")?WIPId=@item.WIPId&TransactionMasterId=@item.TransactionMasterId" class="btn btn-outline-primary btn-sm collapsed" target="_blank">
+                                        <a href="@Url.Action("PrintInternal", "WIP")?WIPId=@item.WIPId&TransactionMasterId=@item.TransactionMasterId&InvoiceNo=@item.InvoiceNo&InvoiceType=@item.InvoiceType" class="btn btn-outline-primary btn-sm collapsed" target="_blank">
                                             <i class="fas fa-print"></i> Print
 
                                         </a>
