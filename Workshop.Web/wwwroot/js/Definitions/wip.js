@@ -175,175 +175,201 @@
         }
 
         /* ------- Save ------- */
-        function saveData() {
-            const servicesGrid = $('#mainRTSGrid').dxDataGrid('instance');
-            if (servicesGrid) servicesGrid.saveEditData();
+        function getAllGridRows(grid) {
+            if (!grid) return $.Deferred().resolve([]).promise();
 
-            const itemsGrid = $('#mainItemsGrid').dxDataGrid('instance');
-            if (itemsGrid) itemsGrid.saveEditData();
-
-            // RTS - Services
-            var Services_grid = servicesGrid;
-            var Services_Items = Services_grid.getDataSource().items();
-
-            var ServicesJson = JSON.stringify(Services_Items);
-            $("#Services").val(ServicesJson);
-
-            // Items
-            var grid = itemsGrid;
-            var gridItems = grid.getDataSource().items();
-
-            var itemsJson = JSON.stringify(gridItems);
-            $("#Items").val(itemsJson);
-
-            var WIPId = $('#Id').val();
-            var WsId = 10;//$("#FK_WarehouseId").val();
-            var VehId = $('#_vehicleId').val();
-            var MovId = $('#_movementId').val();
-            var accountType = $("#AccountType").val();
-            var salesType = $("#SalesType").val();
-            var customer = $("#CustomerId").val();
-            var currency = $("#CurrencyId").val();
-            var terms = $("#TermsId").val();
-            var vat = $("#Vat").val();
-            var partialAccountType = $("#PartialAccountType").val();
-            var partialSalesType = $("#PartialSalesType").val();
-            var partialCustomer = $("#PartialCustomerId").val();
-            var partialCurrency = $("#PartialCurrencyId").val();
-            var partialTerms = $("#PartialTermsId").val();
-            var partialVat = $("#PartialVat").val();
-            var status = $("#statusId").val();
-            var wipDate = $("#WipDate").val();
-            var note = $("#WipNote").val();
-            var dep = $("#DepartmentId").val();
-            var bark = $("#CarPark").val();
-            var vehServiceDesc = $("#VehServiceDesc").val();
-            var vehConcerns = $("#VehConcerns").val();
-            var vehAdvisorNotes = $("#VehAdvisorNotes").val();
-            var odometerPrevious = $('#OdoPrev').val();
-            var odometerCurrentIN = $('#OdoCurrentIn').val();
-            var odometerCurrentOUT = $('#OdoCurrentOut').val();
-            var optPartialInv = $("#optPartialInv").is(":checked");
-            var optReturnParts = $("#optReturnParts").is(":checked");
-            var optRepeatRepair = $("#optRepeatRepair").is(":checked");
-            var optUpdateDemand = $("#optUpdateDemand").is(":checked");
-            var inv_AccountType = $("#invAccountType").val();
-            var inv_InvoiceNo = $("#InvoiceNo").val();
-            var inv_Date = $("#invDate").val();
-            var inv_Total = $("#invTotal").val();
-            var inv_Tax = $("#invTax").val();
-            var inv_Net = $("#invNet").val();
-
-            var accountDetails = {
-                WIPId: WIPId ?? 0,
-                AccountType: accountType,
-                SalesType: salesType,
-                CustomerId: customer,
-                CurrencyId: currency,
-                TermsId: terms,
-                Vat: vat,
-                PartialAccountType: partialAccountType,
-                PartialSalesType: partialSalesType,
-                PartialCustomerId: partialCustomer,
-                PartialCurrencyId: partialCurrency,
-                PartialTermsId: partialTerms,
-                PartialVat: partialVat
-            };
-
-            //var invoiceDetails = {
-            //    WIPId: WIPId ?? 0,
-            //    AccountType: inv_AccountType,
-            //    InvoiceNo: inv_InvoiceNo,
-            //    InvoiceDate: inv_Date,
-            //    Total: inv_Total,
-            //    Tax: inv_Tax,
-            //    Net: inv_Net
-            //};
-
-            var vehicleTab = {
-                WIPId: WIPId,
-                VehicleId: VehId,
-                PlateNumber: $('#VehPlate').val(),
-                ManufacturerId: $('#VehMakeModel').val(),
-                ModelId: $('#VehModel').val(),
-                ClassId: $('#VehClass').val(),
-                ManufacturingYear: $('#VehYear').val(),
-                Color: $('#VehColor').val(),
-                ChassisNo: $('#VehVIN').val(),
-                VehServiceDesc: vehServiceDesc,
-                VehConcerns: vehConcerns,
-                VehAdvisorNotes: vehAdvisorNotes,
-                DepartmentId: dep,
-                CarPark: bark,
-                OdometerPrevious: odometerPrevious,
-                OdometerCurrentIN: odometerCurrentIN,
-                OdometerCurrentOUT: odometerCurrentOUT
-            };
-
-            var optionsTab = {
-                WIPId: WIPId,
-                PartialInvoicing: optPartialInv,
-                ReturnParts: optReturnParts,
-                RepeatRepair: optRepeatRepair,
-                UpdateDemand: optUpdateDemand
-            };
-
-            var model = {
-                Id: WIPId,
-                VehicleId: VehId,
-                MovementId: MovId,
-                Items: itemsJson,
-                FK_WarehouseId: WsId,
-                Services: ServicesJson,
-                AccountDetails: accountDetails,
-                VehicleTab: vehicleTab,
-                Status: status,
-                WipDate: wipDate,
-                Note: note,
-                Options: optionsTab
-            };
-
-            var grid = $("#mainRTSGrid").dxDataGrid("instance");
-            var items = grid.getDataSource().items();
-
-            var hasInvalidStandardHours = items.some(function (row) {
-                var v = row.StandardHours;
-                if (v === null || v === undefined || String(v).trim() === "") return true;
-                return Number.isNaN(Number(v));
-            });
-
-            if (hasInvalidStandardHours) {
-                Swal.fire({
-                    icon: "warning",
-                    title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
-                });
-                return;
+            const dsOpt = grid.option("dataSource");
+            if (Array.isArray(dsOpt)) {
+                return $.Deferred().resolve(dsOpt).promise();
             }
 
-            $.ajax({
-                type: 'POST',
-                url: window.URLs.editPostUrl,
-                dataType: 'json',
-                data: model
-            }).done(function (result) {
-                console.log("Edit_Post result:", result);
-                debugger
-                if (result && result.success && result.wipId) {
-                    if (theMainLang == "en") {
-                        Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId,"success").then(() => {
-                            window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+            const ds = grid.getDataSource && grid.getDataSource();
+            if (!ds) return $.Deferred().resolve([]).promise();
+
+            const store = ds.store && ds.store();
+            if (store && typeof store.load === "function") {
+                return store.load();
+            }
+
+            return $.Deferred().resolve(ds.items ? ds.items() : []).promise();
+        }
+
+        function saveData() {
+            const servicesGrid = $('#mainRTSGrid').dxDataGrid('instance');
+            const itemsGrid = $('#mainItemsGrid').dxDataGrid('instance');
+
+            servicesGrid?.closeEditCell();
+            itemsGrid?.closeEditCell();
+
+            if (servicesGrid) servicesGrid.saveEditData();
+            if (itemsGrid) itemsGrid.saveEditData();
+
+            return $.when(
+                servicesGrid ? servicesGrid.saveEditData() : $.Deferred().resolve(),
+                itemsGrid ? itemsGrid.saveEditData() : $.Deferred().resolve()
+            ).then(function () {
+
+                return $.when(
+                    getAllGridRows(servicesGrid),
+                    getAllGridRows(itemsGrid)
+                );
+
+            }).then(function (Services_Items, gridItems) {
+
+                Services_Items = Array.isArray(Services_Items) ? Services_Items : (Services_Items?.[0] || []);
+                gridItems = Array.isArray(gridItems) ? gridItems : (gridItems?.[0] || []);
+
+                // RTS - Services
+                var Services_grid = servicesGrid;
+
+                var ServicesJson = JSON.stringify(Services_Items);
+                $("#Services").val(ServicesJson);
+
+                // Items
+                var grid = itemsGrid;
+
+                var itemsJson = JSON.stringify(gridItems);
+                $("#Items").val(itemsJson);
+
+                var WIPId = $('#Id').val();
+                var WsId = 10;//$("#FK_WarehouseId").val();
+                var VehId = $('#_vehicleId').val();
+                var MovId = $('#_movementId').val();
+                var accountType = $("#AccountType").val();
+                var salesType = $("#SalesType").val();
+                var customer = $("#CustomerId").val();
+                var currency = $("#CurrencyId").val();
+                var terms = $("#TermsId").val();
+                var vat = $("#Vat").val();
+                var partialAccountType = $("#PartialAccountType").val();
+                var partialSalesType = $("#PartialSalesType").val();
+                var partialCustomer = $("#PartialCustomerId").val();
+                var partialCurrency = $("#PartialCurrencyId").val();
+                var partialTerms = $("#PartialTermsId").val();
+                var partialVat = $("#PartialVat").val();
+                var status = $("#statusId").val();
+                var wipDate = $("#WipDate").val();
+                var note = $("#WipNote").val();
+                var dep = $("#DepartmentId").val();
+                var bark = $("#CarPark").val();
+                var vehServiceDesc = $("#VehServiceDesc").val();
+                var vehConcerns = $("#VehConcerns").val();
+                var vehAdvisorNotes = $("#VehAdvisorNotes").val();
+                var odometerPrevious = $('#OdoPrev').val();
+                var odometerCurrentIN = $('#OdoCurrentIn').val();
+                var odometerCurrentOUT = $('#OdoCurrentOut').val();
+                var optPartialInv = $("#optPartialInv").is(":checked");
+                var optReturnParts = $("#optReturnParts").is(":checked");
+                var optRepeatRepair = $("#optRepeatRepair").is(":checked");
+                var optUpdateDemand = $("#optUpdateDemand").is(":checked");
+                var inv_AccountType = $("#invAccountType").val();
+                var inv_InvoiceNo = $("#InvoiceNo").val();
+                var inv_Date = $("#invDate").val();
+                var inv_Total = $("#invTotal").val();
+                var inv_Tax = $("#invTax").val();
+                var inv_Net = $("#invNet").val();
+
+                var accountDetails = {
+                    WIPId: WIPId ?? 0,
+                    AccountType: accountType,
+                    SalesType: salesType,
+                    CustomerId: customer,
+                    CurrencyId: currency,
+                    TermsId: terms,
+                    Vat: vat,
+                    PartialAccountType: partialAccountType,
+                    PartialSalesType: partialSalesType,
+                    PartialCustomerId: partialCustomer,
+                    PartialCurrencyId: partialCurrency,
+                    PartialTermsId: partialTerms,
+                    PartialVat: partialVat
+                };
+
+                var vehicleTab = {
+                    WIPId: WIPId,
+                    VehicleId: VehId,
+                    PlateNumber: $('#VehPlate').val(),
+                    ManufacturerId: $('#VehMakeModel').val(),
+                    ModelId: $('#VehModel').val(),
+                    ClassId: $('#VehClass').val(),
+                    ManufacturingYear: $('#VehYear').val(),
+                    Color: $('#VehColor').val(),
+                    ChassisNo: $('#VehVIN').val(),
+                    VehServiceDesc: vehServiceDesc,
+                    VehConcerns: vehConcerns,
+                    VehAdvisorNotes: vehAdvisorNotes,
+                    DepartmentId: dep,
+                    CarPark: bark,
+                    OdometerPrevious: odometerPrevious,
+                    OdometerCurrentIN: odometerCurrentIN,
+                    OdometerCurrentOUT: odometerCurrentOUT
+                };
+
+                var optionsTab = {
+                    WIPId: WIPId,
+                    PartialInvoicing: optPartialInv,
+                    ReturnParts: optReturnParts,
+                    RepeatRepair: optRepeatRepair,
+                    UpdateDemand: optUpdateDemand
+                };
+
+                var model = {
+                    Id: WIPId,
+                    VehicleId: VehId,
+                    MovementId: MovId,
+                    Items: itemsJson,
+                    FK_WarehouseId: WsId,
+                    Services: ServicesJson,
+                    AccountDetails: accountDetails,
+                    VehicleTab: vehicleTab,
+                    Status: status,
+                    WipDate: wipDate,
+                    Note: note,
+                    Options: optionsTab
+                };
+
+                var grid = $("#mainRTSGrid").dxDataGrid("instance");
+                var items = grid.getDataSource().items();
+
+                var hasInvalidStandardHours = items.some(function (row) {
+                    var v = row.StandardHours;
+                    if (v === null || v === undefined || String(v).trim() === "") return true;
+                    return Number.isNaN(Number(v));
+                });
+
+                if (hasInvalidStandardHours) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
+                    });
+                    return;
+                }
+
+                return $.ajax({
+                    type: 'POST',
+                    url: window.URLs.editPostUrl,
+                    dataType: 'json',
+                    data: model
+                }).done(function (result) {
+                    console.log("Edit_Post result:", result);
+                    debugger
+                    if (result && result.success && result.wipId) {
+                        if (theMainLang == "en") {
+                            Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId, "success").then(() => {
+                                window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+                            });
+                        }
+
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                         });
                     }
 
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                    });
-                }
+                });
 
             });
-
         }
 
         /* ------- Submit ------- */
@@ -908,7 +934,7 @@ $(document).ready(function () {
                 const row = r.data;
                 if (!partialInvoicing) {
                     row.AccountType = accountTypeVal;
-                    store.update(row.Id, row);
+                    store.update(row.KeyId, row);
                 }
             });
 
@@ -944,12 +970,12 @@ $(document).ready(function () {
             if (turnedOnNow) {
                 rows.forEach(row => {
                     row.AccountType = null;
-                    store.update(row.Id, row);
+                    store.update(row.KeyId, row);
                 });
             } else if (!partialInvoicing) {
                 rows.forEach(row => {
                     row.AccountType = accountTypeVal;
-                    store.update(row.Id, row);
+                    store.update(row.KeyId, row);
                 });
             }
 

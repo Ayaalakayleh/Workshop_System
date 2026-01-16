@@ -709,7 +709,7 @@ namespace Workshop.Web.Controllers
         public async Task<JsonResult> GetAllItems(int fK_GroupId, int fK_CategoryId, int fK_SubCategoryId)
         {
             var items = await _inventoryApiClient.GetItemsWithStockAndLocation(fK_GroupId, fK_CategoryId, fK_SubCategoryId);
-
+            
             var allCategories = await _inventoryApiClient.GetAllCategoriesAsync();
             var allUnits = await _inventoryApiClient.GetAllUnitDDL();
 
@@ -2868,6 +2868,23 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        public async Task<JsonResult> GetItemUnits(int itemId)
+        {
+            var units = await _inventoryApiClient.GetItemUnitByIdAsync(itemId);
+
+            var result = units.Select(u => new
+            {
+                itemId = u.ItemId,
+                unitId = u.UnitId,
+                unitCode = u.UnitCode,
+                unitPrimaryName = u.UnitPrimaryName,
+                unitSecondaryName = u.UnitSecondaryName,
+                conversionFactor = u.ConversionFactor,
+                isBaseUnit = u.IsBaseUnit
+            }).ToList();
+
+            return Json(result);
+        }
 
         //=====================================================================================================
         #region Petty Cash Methods

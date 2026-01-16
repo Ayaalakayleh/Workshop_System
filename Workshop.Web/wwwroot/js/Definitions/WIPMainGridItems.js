@@ -1,5 +1,10 @@
 ﻿window.transferLocatorsCache = [];
- 
+
+function fixedNum(v, digits = 2) {
+    const n = Number(v);
+    return +((Number.isFinite(n) ? n : 0).toFixed(digits));
+}
+
 // --- Smooth refresh batching (one repaint for many updates) ---
 let _gridRepaintTimer = null;
 
@@ -15,10 +20,10 @@ function updateRowInGrid(row) {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     const store = grid.getDataSource().store();
 
-    store.update(row.KeyId, row).then(() => {
+    return store.update(row.KeyId, row).then(() => {
         const idx = grid.getRowIndexByKey(row.KeyId);
         if (idx >= 0) grid.repaintRows([idx]);
-        updateFieldsFromGrid();
+        safeUpdateFieldsFromGrid();
     });
 }
 
@@ -36,6 +41,7 @@ function getEffectiveQty(d) {
 
 $(function () {
     let locatorsLoadedOnInit = false;
+    let unitsLoadedOnce = false;
     $("#mainItemsGrid").dxDataGrid({
         dataSource: ItemsData,
         keyExpr: "KeyId",
@@ -133,27 +139,60 @@ $(function () {
                     }
                 },
                 editCellTemplate: function (cellElement, cellInfo) {
-                    $("<div>").dxSelectBox({
-                        dataSource: UnitsData,
-                        valueExpr: "Value",
-                        displayExpr: "Text",
-                        value: cellInfo.value,
-                        onValueChanged: function (e) {
-                            const row = cellInfo.data;
 
-                            row.fk_UnitId = e.value;
+                    const row = cellInfo.data;
+
+                    $("<div>").dxSelectBox({
+                        dataSource: row.ItemUnits || [],
+                        valueExpr: "unitId",
+                        displayExpr: function (u) {
+                            if (!u) return "";
+                            return (lang === "en") ? u.unitPrimaryName : u.unitSecondaryName;
+                        },
+                        value: row.fk_UnitId,
+
+                        onValueChanged: function (e) {
+
+                            const grid = cellInfo.component;          
+                            const rowIndex = cellInfo.row.rowIndex;   
+                            const selectedUnitId = Number(e.value) || 0;
+
+                            const oldFactor = Number(row.UnitFactor) || 1;
+
+                            row.fk_UnitId = selectedUnitId;
+
+                            const selectedUnit = (row.ItemUnits || []).find(x => x.unitId == selectedUnitId);
+                            row.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
+
+                            if (!row.BaseCostPrice || Number(row.BaseCostPrice) === 0) {
+                                row.BaseCostPrice = +((Number(row.CostPrice) || 0) * oldFactor).toFixed(2);
+                            }
+
+                            recalcCostPriceForUnit(row);
+
                             row.LocatorId = null;
                             row.LocatorCode = null;
                             row.AvailableQty = null;
                             row.AvailableLocators = [];
 
-                            cellInfo.setValue(e.value);
+                            cellInfo.setValue(selectedUnitId);
 
-                            fillLocators([row]);
+                            grid.beginUpdate();
+                            try {
+                                grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
+                                grid.cellValue(rowIndex, "Price", row.Price);
+                                grid.cellValue(rowIndex, "LocatorId", row.LocatorId);
+                            } finally {
+                                grid.endUpdate();
+                            }
 
-                            const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                            grid.getDataSource().store().update(row.KeyId, row).then(() => {
-                                grid.refresh();
+                            grid.closeEditCell();
+
+                            grid.saveEditData().then(() => {
+
+                                fillLocators([row]);
+
+                                safeUpdateFieldsFromGrid();
                             });
                         }
                     }).appendTo(cellElement);
@@ -168,6 +207,7 @@ $(function () {
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
+                    const canEdit =  Number(row.Status) != 42;
 
                     const available = Number(row.AvailableQty) || 0;   
                     const initialVal = cellInfo.value != null ? cellInfo.value : 0;
@@ -177,6 +217,8 @@ $(function () {
                         min: 0,
                         max: available,
                         showSpinButtons: true,
+                        readOnly: !canEdit,
+                        disabled: !canEdit,
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
                             let v = Number(e.value);
@@ -195,7 +237,7 @@ $(function () {
 
                             cellInfo.setValue(v);
                             row.RequestQuantity = v;
-
+                            row.Quantity = v;
                             if ((Number(row.Quantity) || 0) > v) {
                                 row.Quantity = v;
                                 const grid = $("#mainItemsGrid").dxDataGrid("instance");
@@ -227,19 +269,24 @@ $(function () {
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
+                    const canEdit = Permission_AddParts && Number(row.Status) != 42;
 
                     const reqQty = Number(row.RequestQuantity) || 0;
                     const maxQty = row.MaxQty != null ? Number(row.MaxQty) : null;
 
                     const finalMax = (maxQty != null) ? Math.min(reqQty, maxQty) : reqQty;
 
-                    const initialVal = cellInfo.value != null ? cellInfo.value : 0;
+                    const initialVal = cellInfo.value != null && Number(cellInfo.value) !== 0
+                            ? cellInfo.value
+                            : Number(row.RequestQuantity) || 0;
 
                     $("<div>").dxNumberBox({
                         value: initialVal,
                         min: 0,
                         max: finalMax,
                         showSpinButtons: true,
+                        readOnly: !canEdit,
+                        disabled: !canEdit,
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
                             let v = Number(e.value) || 0;
@@ -272,6 +319,7 @@ $(function () {
                         showSpinButtons: true,
                         readOnly: !canEdit, 
                         disabled: !canEdit,
+                        valueChangeEvent: "input",
                         onValueChanged: function (e) {
                             if (!canEdit) return;
                             const v = e.value;
@@ -286,7 +334,7 @@ $(function () {
                             const idx = grid.getRowIndexByKey(row.KeyId);
                             if (idx >= 0) grid.repaintRows([idx]);  
 
-                            updateFieldsFromGrid();
+                            safeUpdateFieldsFromGrid();
                         }
                     }).appendTo(cellElement);
                 }
@@ -311,8 +359,12 @@ $(function () {
                     let basePrice = 0;
 
                     if (type === "1") {
-                        basePrice = parseFloat(rowData.CostPrice);
-                        if (isNaN(basePrice)) basePrice = 0;
+                        //basePrice = parseFloat(rowData.CostPrice);
+                        //if (isNaN(basePrice)) basePrice = 0;
+                        const baseCost = parseFloat(rowData.BaseCostPrice ?? rowData.CostPrice) || 0;
+                        const factor = parseFloat(rowData.UnitFactor) || 1;
+
+                        basePrice = baseCost / factor;
 
                     } else if (type === "2") {
                         basePrice = parseFloat(rowData.SalePrice);
@@ -342,8 +394,11 @@ $(function () {
                     const price = +rowData.Price || 0;
                     const base = +(qty * price).toFixed(4);   
 
-                    const discAmt = +rowData.Discount.toFixed(5) || 0;
-                    if (base === 0) return 0;
+                    const discAmt = +((Number(rowData.Discount) || 0).toFixed(5));
+                    if (base === 0) {
+                        rowData.DiscountPct = 0;
+                        return 0;
+                    }
 
                     const pct = (discAmt / base) * 100;
                     rowData.DiscountPct = pct;
@@ -628,25 +683,30 @@ $(function () {
             }
 
             if (e.column.dataField === "AccountType") {
-                e.component.refresh().done(updateFieldsFromGrid);
+                e.component.refresh().done(safeUpdateFieldsFromGrid);
                 return;
             }
 
-            updateFieldsFromGrid();
+            safeUpdateFieldsFromGrid();
         },
         onRowRemoved: function () {
-            updateFieldsFromGrid();
+            safeUpdateFieldsFromGrid();
         },
         onContentReady: function (e) {
-            updateFieldsFromGrid();
+            safeUpdateFieldsFromGrid();
 
             if (!locatorsLoadedOnInit) {
                 const grid = e.component;
                 const rows = grid.getVisibleRows().map(r => r.data);
-
                 fillLocators(rows);
-
                 locatorsLoadedOnInit = true;
+            }
+
+            if (!unitsLoadedOnce) {
+                unitsLoadedOnce = true;
+                const grid = e.component;
+                const allRows = grid.getDataSource().items();
+                loadUnitsForRows(allRows);
             }
         },
         onInitNewRow: function (e) {
@@ -658,8 +718,8 @@ $(function () {
             }
         },
         onRowInserted: function (e) {
-            if (typeof updateFieldsFromGrid === "function") {
-                updateFieldsFromGrid();
+            if (typeof safeUpdateFieldsFromGrid === "function") {
+                safeUpdateFieldsFromGrid();
             }
 
             const grid = e.component;
@@ -772,9 +832,7 @@ function fillLocators(rows) {
 }
 
 
-$('#AccountType, #Vat').on('change', function () {
-    $('#mainItemsGrid').dxDataGrid('instance').refresh();
-});
+$('#AccountType, #Vat').on('change', safeRefreshMainItemsGrid);
 
 function updateFieldsFromGrid() {
     var grid = $("#mainItemsGrid").dxDataGrid("instance");
@@ -1588,3 +1646,19 @@ $("#btnConfirmTransfer").on("click", function () {
     $("#transferPartModal").modal("hide");
     TransferParts();
 });
+function safeRefreshMainItemsGrid() {
+    const grid = $("#mainItemsGrid").dxDataGrid("instance");
+    if (!grid) return;
+
+    grid.closeEditCell();
+    grid.saveEditData().then(() => grid.refresh());
+}
+
+function safeUpdateFieldsFromGrid() {
+    try {
+        updateFieldsFromGrid();
+    } catch (err) {
+        console.error("updateFieldsFromGrid crashed:", err);
+    }
+}
+

@@ -134,11 +134,14 @@ function updateSelectionCount(count) {
                     Name: lang == "en" ? item.primaryName : item.secondaryName,
                     PrimaryName: item.primaryName,
                     SecondaryName: item.secondaryName,
-                    Quantity: 0,
+                    Quantity: 1,
                     RequestQuantity: 1,
                     Price: item.price ?? 0,
+                    BaseCostPrice: item.costPrice ?? 0,
                     CostPrice: item.costPrice ?? 0,
                     SalePrice: item.salePrice ?? 0,
+                    ItemUnits: [],
+                    UnitFactor: 1,
                     Discount: 0,
                     fk_UnitId: item.fK_UnitId,
                     StatusText: "Estimate",
@@ -155,6 +158,7 @@ function updateSelectionCount(count) {
 
                 $("#addPartModal").modal("hide");
                 targetGrid.option("dataSource", newDataSource);
+                loadUnitsForRows(transformedData);
                 //saveWipItemsAuto(transformedData);           
             }
         });
@@ -169,7 +173,7 @@ function updateSelectionCount(count) {
 
 //    const baseItems = itemsToInsert.map(x => ({
 //        WIPId: wipId,
-//        KeyId: x.KeyId, 
+//        KeyId: x.KeyId,
 //        ItemId: x.ItemId,
 //        fk_UnitId: x.fk_UnitId,
 //        Quantity: x.Quantity ?? 1,
@@ -199,6 +203,83 @@ function updateSelectionCount(count) {
     //    }
     //});
 //}
+
+window.itemUnitsCache = window.itemUnitsCache || {};
+
+function fetchItemUnitsCached(itemId) {
+    if (window.itemUnitsCache[itemId]) {
+        return $.Deferred().resolve(window.itemUnitsCache[itemId]).promise();
+    }
+
+    return $.getJSON(window.RazorVars.getItemUnitsUrl, { itemId: itemId })
+        .then(function (units) {
+            units = Array.isArray(units) ? units : [];
+            window.itemUnitsCache[itemId] = units;
+            return units;
+        });
+}
+function getRowAccountType(row) {
+    const type =
+        (row.AccountType != null && row.AccountType !== 0 && row.AccountType !== "")
+            ? String(row.AccountType)
+            : String($("#AccountType").val() || "");
+    return type;
+}
+
+function recalcCostPriceForUnit(row) {
+    const type = getRowAccountType(row);
+
+    if (type === "1") {
+        const factor = Number(row.UnitFactor) || 1;
+
+        const baseCost = Number(row.BaseCostPrice) || 0;
+
+        row.CostPrice = +(baseCost / factor).toFixed(2);
+
+        row.Price = row.CostPrice;
+    }
+}
+
+function loadUnitsForRows(rows) {
+    if (!rows || !rows.length) return;
+
+    const grid = $("#mainItemsGrid").dxDataGrid("instance");
+    if (!grid) return;
+
+    const store = grid.getDataSource().store();
+
+    const tasks = rows.map(r => {
+        return fetchItemUnitsCached(r.ItemId).then(units => {
+
+            r.ItemUnits = Array.isArray(units) ? units : [];
+
+            let selectedUnit = r.ItemUnits.find(x => x.unitId == r.fk_UnitId);
+
+            if (!selectedUnit) {
+                selectedUnit = r.ItemUnits.find(x => x.isBaseUnit) || r.ItemUnits[0];
+                if (selectedUnit) {
+                    r.fk_UnitId = selectedUnit.unitId;
+                }
+            }
+
+            r.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
+
+            
+            if (!r.BaseCostPrice || Number(r.BaseCostPrice) === 0) {
+                const costNow = Number(r.CostPrice) || 0;
+                r.BaseCostPrice = +(costNow * r.UnitFactor).toFixed(2);
+            }
+
+            recalcCostPriceForUnit(r);
+
+            return store.update(r.KeyId, r);
+        });
+    });
+
+    $.when.apply($, tasks).then(function () {
+        grid.refresh();
+    });
+}
 
 function showItemSelectionModal() {
     initializeItemSelectionGrid();
