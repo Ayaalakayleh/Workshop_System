@@ -355,6 +355,10 @@
                     debugger
                     if (result && result.success && result.wipId) {
                         if (theMainLang == "en") {
+                            Swal.fire("Success", "WIP " + result.wipId + " Saved Successfully!").then(() => {
+                                window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+                            });
+                        } else {
                             Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId, "success").then(() => {
                                 window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
                             });

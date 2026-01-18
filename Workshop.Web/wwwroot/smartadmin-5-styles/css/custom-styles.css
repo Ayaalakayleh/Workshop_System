@@ -3254,3 +3254,15 @@ html[dir="rtl"] .toggle-pin {
 #PlateNumber {
     direction: ltr !important;
 }
+/* Apply ONLY to a specific grid (recommended) */
+#gridContainer .dx-datagrid .dx-row > td,
+#gridContainer .dx-datagrid .dx-header-row > td,
+#gridContainer .dx-datagrid .dx-filter-row > td,
+#gridContainer .dx-datagrid .dx-group-row > td,
+#gridContainer .dx-datagrid .dx-row > td .dx-cell-content,
+#gridContainer .dx-datagrid .dx-header-row > td .dx-datagrid-text-content,
+#gridContainer .dx-datagrid .dx-filter-row > td .dx-editor-cell,
+#gridContainer .dx-datagrid .dx-editor-cell .dx-texteditor-input {
+    text-align: start !important;
+    justify-content: flex-start !important;
+}
