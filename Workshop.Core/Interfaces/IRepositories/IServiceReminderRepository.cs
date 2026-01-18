@@ -12,6 +12,7 @@ namespace Workshop.Core.Interfaces.IRepositories
         public Task<List<ServiceReminderDue>> GetDueServiceReminders();
         public Task<List<ReminderStatus>> ServiceRemindersStatus();
         public Task<int> UpdateServiceScheduleByDamageId(ServiceScheduleModel serviceScheduleModel);
+        public Task<List<ServiceReminderDueNew>> GetDueServiceRemindersOld();
 
 
     }
