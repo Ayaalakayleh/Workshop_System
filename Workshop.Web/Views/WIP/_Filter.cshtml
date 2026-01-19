@@ -21,7 +21,7 @@
         <div class="form-group">
             <label>@Common["Label_Customer"]</label>
             @* <input type="text" id="Customer" name="Customer" class="form-control" placeholder="Name / Phone"> *@
-            @Html.DropDownList("CustomerId", new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), "Select", new { @class = "form-control", id = "CustomerId" })
+            @Html.DropDownList("CustomerId", new SelectList(ViewBag.Customers ?? new List<SelectListItem>(), "Value", "Text"), @Common["Select"], new { @class = "form-control", id = "CustomerId" })
         </div>
     </div>
    
