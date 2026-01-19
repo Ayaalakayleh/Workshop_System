@@ -117,9 +117,9 @@ namespace Workshop.Core.DTOs
 		public string? RequestMaintenanceSecondaryName { get; set; }
 
 		public DateTime? IntimationDate { get; set; }
-		public decimal InsuredValue { get; set; }
-		public string DriverName { get; set; }
-		public string DriverId { get; set; }
+		public decimal? InsuredValue { get; set; }
+		public string? DriverName { get; set; }
+		public string? DriverId { get; set; }
 
 		// Navigation properties as DTOs
 		public List<DMaintenanceCardDTO>? DMaintenanceCards { get; set; } = new List<DMaintenanceCardDTO>();
