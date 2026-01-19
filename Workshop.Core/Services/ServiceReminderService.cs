@@ -49,6 +49,12 @@ namespace Workshop.Core.Services
         {
             return _repository.UpdateServiceScheduleByDamageId(serviceScheduleModel);
         }
+        public Task<List<ServiceReminderDueNew>> GetDueServiceRemindersOld()
+        {
+            return _repository.GetDueServiceRemindersOld();
+
+        }
+
     }
 
 }

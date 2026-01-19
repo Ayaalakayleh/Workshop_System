@@ -450,6 +450,26 @@ namespace Workshop.Infrastructure.Repositories
             }
 
         }
+        public async Task<List<ServiceReminderDueNew>> GetDueServiceRemindersOld()
+        {
+            using var connection = _context.CreateConnection();
+
+            try
+            {
+                var result = await connection.QueryAsync<ServiceReminderDueNew>(
+                    "D_ServiceReminders_GetDueServiceRemindersFromOld",
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetDueServiceRemindersFromOld: {ex.Message}");
+                throw;
+            }
+        }
+
 
     }
 }
