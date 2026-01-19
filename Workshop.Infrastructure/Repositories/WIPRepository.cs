@@ -829,6 +829,15 @@ namespace Workshop.Infrastructure.Repositories
             };
             return await _database.ExecuteGetAllStoredProcedure<WIPInvoiceDTO>("WIP_Invoice_GetById", parameters);
         }
+
+        public async Task<IEnumerable<WIPInvoiceDTO?>> WIP_Invoice_GetVehicleById(int? VehicleId)
+        {
+            var parameters = new { 
+                VehicleId = VehicleId
+            };
+            return await _database.ExecuteGetAllStoredProcedure<WIPInvoiceDTO>("WIP_Invoice_GetByVehicleId", parameters);
+        }
+
         public async Task<IEnumerable<WipInvoiceDetailDTO>> WIP_InvoiceDetails_GetByHeaderId(int headerId)
         {
             var parameters = new
