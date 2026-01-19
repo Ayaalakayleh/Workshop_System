@@ -65,6 +65,9 @@ namespace Workshop.Core.DTOs.Insurance
 
 		public decimal InsurancePricing { get; set; }
 		public decimal ExternalWSPrice { get; set; }
+		public decimal InsurancePricingParts { get; set; }
+		public decimal ExternalWSPriceParts { get; set; }
+
 		public int ExternalWsId { get; set; }
 
 		public int CollectionPathStatusId { get; set; }
