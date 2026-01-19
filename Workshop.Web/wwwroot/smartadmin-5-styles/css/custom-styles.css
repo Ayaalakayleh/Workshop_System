@@ -3254,7 +3254,32 @@ html[dir="rtl"] .toggle-pin {
 #PlateNumber {
     direction: ltr !important;
 }
-/* Apply ONLY to a specific grid (recommended) */
+/*Start fix change Lang/Branch on mobile menu*/
+@media (max-width: 576px) {
+    .header-icon .dropdown-menu,
+    .dropdown-header .dropdown-menu {
+        right: 0 !important;
+        left: auto !important;
+        max-width: calc(100vw - 20px) !important;
+    }
+
+    .dropdown-menu .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        float: none !important;
+        width: 100% !important;
+        margin-top: .25rem !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        padding-left: 12px;
+        display: none;
+    }
+    .dropdown-submenu.show > .dropdown-menu {
+        display: block !important;
+    }
+}
+/*End fix change Lang/Branch on mobile menu*/
+/* Make The DevExpress Tables have a right Aligmnet on Arabic */
 #gridContainer .dx-datagrid .dx-row > td,
 #gridContainer .dx-datagrid .dx-header-row > td,
 #gridContainer .dx-datagrid .dx-filter-row > td,
@@ -3266,3 +3291,125 @@ html[dir="rtl"] .toggle-pin {
     text-align: start !important;
     justify-content: flex-start !important;
 }
+/* Start Dark Mode Customization */
+.select2-container--bootstrap-5.select2-container--disabled .select2-selection, .select2-container--bootstrap-5.select2-container--disabled.select2-container--focus .select2-selection {
+    background-color: var(--bs-secondary-bg);
+    opacity: 1;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    
+}
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: var(--bs-body-color)
+}
+.select2-container--bootstrap-5 .select2-selection {
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color)
+}
+.select2-container--bootstrap-5 .select2-dropdown {
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    color: var(--bs-body-color)
+}
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+    color: var(--bs-body-color)
+}
+/* DataTables Dark Mode Fix */
+html[data-bs-theme="dark"] table.dataTable {
+    color: var(--bs-body-color);
+}
+
+    html[data-bs-theme="dark"] table.dataTable tbody tr {
+        background-color: transparent;
+    }
+
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter {
+    color: var(--bs-body-color);
+}
+
+html[data-bs-theme="dark"] .dataTables_wrapper input,
+html[data-bs-theme="dark"] .dataTables_wrapper select {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border-color: var(--bs-border-color);
+}
+/* intlTelInput Dark Mode Fix */
+html[data-bs-theme="dark"] .iti__country-list {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+html[data-bs-theme="dark"] .iti__country {
+    color: var(--bs-body-color);
+}
+
+    html[data-bs-theme="dark"] .iti__country.iti__highlight {
+        background-color: rgba(var(--bs-primary-rgb), 0.2);
+    }
+
+html[data-bs-theme="dark"] .iti__dial-code {
+    color: var(--bs-secondary-color);
+}
+.dx-pager .dx-pages .dx-page-indexes{
+    display:block !important
+}
+html[data-bs-theme="dark"] .swal2-popup {
+    background: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-bs-theme="dark"] .swal2-title,
+html[data-bs-theme="dark"] .swal2-html-container {
+    color: var(--bs-body-color) !important;
+}
+
+html[data-bs-theme="dark"] .swal2-close {
+    color: var(--bs-body-color) !important;
+}
+
+html[data-bs-theme="dark"] .swal2-footer {
+    border-top: 1px solid var(--bs-border-color) !important;
+    color: var(--bs-secondary-color) !important;
+}
+html[data-bs-theme="dark"] .swal2-input,
+html[data-bs-theme="dark"] .swal2-textarea,
+html[data-bs-theme="dark"] .swal2-select {
+    background: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+    html[data-bs-theme="dark"] .swal2-input:focus,
+    html[data-bs-theme="dark"] .swal2-textarea:focus,
+    html[data-bs-theme="dark"] .swal2-select:focus {
+        border-color: rgba(var(--bs-primary-rgb), 0.6) !important;
+        box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25) !important;
+    }
+html[data-bs-theme="dark"] .swal2-styled.swal2-confirm {
+    background: var(--bs-primary) !important;
+    color: #fff !important;
+}
+
+html[data-bs-theme="dark"] .swal2-styled.swal2-cancel {
+    background: var(--bs-secondary) !important;
+    color: #fff !important;
+}
+html[data-bs-theme="dark"] .swal2-validation-message {
+    background: rgba(var(--bs-danger-rgb), 0.12) !important;
+    color: var(--bs-body-color) !important;
+    border: 1px solid rgba(var(--bs-danger-rgb), 0.35) !important;
+}
+html[data-bs-theme="dark"] .swal2-toast {
+    background: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+    border: 1px solid var(--bs-border-color) !important;
+}
+.dx-pager .dx-pages{
+    text-align:center
+}
+/* End Dark Mode Customization */

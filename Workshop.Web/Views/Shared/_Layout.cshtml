@@ -6,7 +6,7 @@
 @inject IStringLocalizer<Messages> MessagesLocalizer
 
 <!DOCTYPE html>
-<html data-bs-theme="light"
+<html data-bs-theme="light|dark"
       class="set-nav-dark set-nav-full set-nav-fixed"
       dir="@(System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("ar") ? "rtl" : "ltr")"
       lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
@@ -47,10 +47,15 @@
     @* <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-touchspin/4.3.0/jquery.bootstrap-touchspin.min.css" rel="stylesheet" /> *@
     <!-- Flatpickr CSS -->
     <link href="~/smartadmin-5-styles/cdn/css/flatpicker.css" rel="stylesheet" />
+
+    
+
     <!-- DX CSS -->
     @* <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.1.3/css/dx.light.css"> *@
     <link href="~/smartadmin-5-styles/plugins/data-grid/css/dx.common.css" rel="stylesheet" />
-    <link href="~/smartadmin-5-styles/plugins/data-grid/css/dx.light.css" rel="stylesheet" />
+    <link id="dx-theme-style"
+      rel="stylesheet"
+      href="~/smartadmin-5-styles/plugins/data-grid/css/dx.light.css" />
     @* <link href="~/smartadmin-5-styles/cdn/css/dx.css" rel="stylesheet" /> *@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.css" />
 
@@ -1034,13 +1039,6 @@
         <div class="backdrop" data-action="toggle-swap" data-toggleclass="open" data-target="aside.js-drawer-settings"></div>
     </div>
 
-    <!-- Export dependencies -->
-    @*  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script> 
-*@
-
     <script src="~/smartadmin-5-styles/cdn/js/validate.js"></script>
     <script src="~/smartadmin-5-styles/cdn/js/validate-new.js"></script>
     <!-- Select2 JS -->
@@ -1049,8 +1047,7 @@
     <script src="~/smartadmin-5-styles/cdn/js/flatpicker.js"></script>
     <!-- SweetAlert 2 JS -->
     <script src="~/smartadmin-5-styles/cdn/js/sweetalert2.js"></script>
-    <!-- DX JS -->
-    @* <script src="~/smartadmin-5-styles/cdn/js/dx.js"></script> *@
+    <!-- DevExpress JS -->
     <script src="https://cdn3.devexpress.com/jslib/23.2.4/js/jszip.min.js"></script>
     <script src="~/smartadmin-5-styles/plugins/data-grid/js/dx.all.js"></script>
     <script src="~/smartadmin-5-styles/plugins/data-grid/js/exceljs.js"></script>
@@ -1193,7 +1190,118 @@
             }
         }, true);
     })();
+    /*Start fix change Lang/Branch on mobile menu*/
+    document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".dropdown-menu .dropdown-toggle").forEach((toggle) => {
 
+    toggle.addEventListener("click", (e) => {
+      if (window.innerWidth > 576) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const parentLi = toggle.closest(".dropdown-submenu") || toggle.parentElement;
+      const submenu = toggle.nextElementSibling;
+
+      if (!submenu || !submenu.classList.contains("dropdown-menu")) return;
+
+      parentLi.classList.toggle("show");
+      submenu.classList.toggle("show");
+    });
+  });
+  document.querySelectorAll(".dropdown").forEach((dd) => {
+    dd.addEventListener("hidden.bs.dropdown", () => {
+      dd.querySelectorAll(".dropdown-submenu.show").forEach((el) => el.classList.remove("show"));
+      dd.querySelectorAll(".dropdown-menu.show").forEach((el) => {
+        if (el.closest(".dropdown-submenu")) el.classList.remove("show");
+      });
+    });
+  });
+
+});
+    /*End fix change Lang/Branch on mobile menu*/
+
+
+   /* Start Apply RTL and Dark mode on the DevExpress */
+document.addEventListener("DOMContentLoaded", function () {
+
+    const htmlRoot = document.documentElement;
+
+    if (window.DevExpress?.localization) {
+        DevExpress.localization.locale(htmlRoot.lang || "en");
+    }
+
+    const dxThemeLink = document.getElementById("dx-theme-style");
+
+    const DX_LIGHT = "/smartadmin-5-styles/plugins/data-grid/css/dx.light.css";
+    const DX_DARK = "/smartadmin-5-styles/plugins/data-grid/css/dx.dark.css";
+
+    let lastTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
+    let lastDir = htmlRoot.getAttribute("dir") || "ltr";
+
+    function isDark() {
+        return (htmlRoot.getAttribute("data-bs-theme") || "light") === "dark";
+    }
+
+    function isRTL() {
+        return (htmlRoot.getAttribute("dir") || "ltr").toLowerCase() === "rtl";
+    }
+
+    function repaintAllDxDataGrids() {
+        if (!window.DevExpress?.ui?.dxDataGrid) return;
+
+        document.querySelectorAll(".dx-datagrid").forEach(el => {
+            const grid = DevExpress.ui.dxDataGrid.getInstance(el);
+            if (grid) grid.repaint();
+        });
+    }
+
+    function applyDxTheme() {
+        if (!dxThemeLink) return;
+        dxThemeLink.href = isDark() ? DX_DARK : DX_LIGHT;
+        setTimeout(repaintAllDxDataGrids, 50);
+    }
+
+    function applyDxRTL() {
+        if (!window.DevExpress) return;
+
+        const rtl = isRTL();
+
+        DevExpress.config({ rtlEnabled: rtl });
+
+        if (window.DevExpress?.ui?.dxDataGrid) {
+            document.querySelectorAll(".dx-datagrid").forEach(el => {
+                const grid = DevExpress.ui.dxDataGrid.getInstance(el);
+                if (grid) grid.option("rtlEnabled", rtl);
+            });
+        }
+
+        repaintAllDxDataGrids();
+    }
+
+    applyDxTheme();
+    applyDxRTL();
+
+    new MutationObserver(() => {
+        const newTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
+        const newDir = htmlRoot.getAttribute("dir") || "ltr";
+
+        if (newTheme !== lastTheme) {
+            applyDxTheme();
+            lastTheme = newTheme;
+        }
+
+        if (newDir !== lastDir) {
+            applyDxRTL();
+            lastDir = newDir;
+        }
+    }).observe(htmlRoot, {
+        attributes: true,
+        attributeFilter: ["data-bs-theme", "dir"]
+    });
+
+});
+/* End Apply RTL and Dark mode on the DevExpress */
 </script>
 
 @await RenderSectionAsync("Scripts", required: false)
