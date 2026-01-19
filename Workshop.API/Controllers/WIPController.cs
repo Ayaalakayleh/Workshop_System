@@ -528,6 +528,15 @@ namespace Workshop.API.Controllers
             if (result == null) return new List<WIPInvoiceDTO>();
             return Ok(result);
         }
+
+        [HttpGet("WIPInvoiceGetByVehicleId")]
+        public async Task<ActionResult<IEnumerable<WIPInvoiceDTO?>>> WIP_Invoice_GetVehicleById([FromQuery] int? VehicleId)
+        {
+            var result = await _service.WIP_Invoice_GetVehicleById(VehicleId);
+            if (result == null) return new List<WIPInvoiceDTO>();
+            return Ok(result);
+        }
+
         [HttpGet("WipInvoiceByHeaderId")]
         public async Task<IActionResult> WIP_InvoiceDetails_GetByHeaderId(int headerId)
         {

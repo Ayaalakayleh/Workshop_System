@@ -59,6 +59,7 @@ namespace Workshop.Core.Interfaces.IServices
         Task<int> WIP_UpdatePartWarehouseForSingleItem(UpdateSinglePartWarehouseDTO dto);
         Task<int> WIP_Invoice_Insert(CreateWIPInvoiceDTO dto);
         Task<IEnumerable<WIPInvoiceDTO?>> WIP_Invoice_GetById(int? id, int? TransactionMasterId);
+        Task<IEnumerable<WIPInvoiceDTO?>> WIP_Invoice_GetVehicleById(int? VehicleId);
         Task<IEnumerable<CreateWIPServiceDTO>> GetAllInternalLabourLineAsync(int WIPId);
         Task<IEnumerable<CreateItemDTO>> GetAllInternalPartsLineAsync(int WIPId);
         Task<int> UpdateWIPStatus(UpdateWIPStatusDTO dto);

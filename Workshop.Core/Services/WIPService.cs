@@ -270,6 +270,11 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_Invoice_GetById(id, TransactionMasterId);
         }
+        
+        public async Task<IEnumerable<WIPInvoiceDTO?>> WIP_Invoice_GetVehicleById(int? VehicleId)
+        {
+            return await _repository.WIP_Invoice_GetVehicleById(VehicleId);
+        }
 
         public async Task<IEnumerable<CreateWIPServiceDTO>> GetAllInternalLabourLineAsync(int WIPId)
         {
