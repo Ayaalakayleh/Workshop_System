@@ -550,5 +550,12 @@ namespace Workshop.API.Controllers
             var result = await _service.UpdateWIPServicesExternalAndFixStatusAsync(services);
             return Ok(result);
         }
+        [HttpPost("WIP_HasOpenByVehicle")]
+        public async Task<IActionResult> WIP_HasOpenByVehicle(int vehicleId, bool isExternal)
+        {
+            var result = await _service.WIP_HasOpenByVehicleAsync(vehicleId, isExternal);
+            return Ok(result);
+
+        }
     }
 }
