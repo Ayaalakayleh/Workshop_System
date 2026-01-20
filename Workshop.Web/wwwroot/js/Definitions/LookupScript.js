@@ -197,10 +197,10 @@ $(document).on('click', 'button[type=reset]', function () {
                 '<span class="field-error"></span>' +
                 '</td>' +
             '<td>' +
-                '<button type="button" class="btn btn-primary btn-sm submitLookup" hidden>' +
+                '<button type="button" class="btn btn-primary btn-sm btn-w-m my-1 submitLookup" hidden>' +
                     '<i class="fa fa-save"></i>&nbsp;' + RazorVars.save +
                     '</button>&nbsp;' +
-                '<button type="button" onclick="search()" class="btn btn-secondary text-white btn-sm" data-id="0">' +
+                '<button type="button" onclick="search()" class="btn btn-secondary text-white btn-sm btn-w-m my-1" data-id="0">' +
                     '<i class="fa fa-times"></i>&nbsp;' + RazorVars.cancel +
                     '</button>' +
                 '</td>' +

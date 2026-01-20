@@ -2637,4 +2637,13 @@
   <data name="Button_Print" xml:space="preserve">
     <value>طباعة</value>
   </data>
+  <data name="Title_WorkshopSystem" xml:space="preserve">
+    <value>نظام الورشة</value>
+  </data>
+  <data name="CodeIsAvailable" xml:space="preserve">
+    <value>الرمز متاح</value>
+  </data>
+  <data name="CodeAlreadyExists" xml:space="preserve">
+    <value>هذا الرمز موجود بالفعل</value>
+  </data>
 </root>

@@ -2637,4 +2637,13 @@
   <data name="Button_Print" xml:space="preserve">
     <value>Print</value>
   </data>
+  <data name="Title_WorkshopSystem" xml:space="preserve">
+    <value>WorkshopSystem</value>
+  </data>
+  <data name="CodeIsAvailable" xml:space="preserve">
+    <value>Code is available</value>
+  </data>
+  <data name="CodeAlreadyExists" xml:space="preserve">
+    <value>Code Already Exists</value>
+  </data>
 </root>

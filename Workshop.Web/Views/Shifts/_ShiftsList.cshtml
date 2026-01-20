@@ -72,5 +72,18 @@
 {
     <input id="total_pages" value="@(Model.Count() > 0 ? Math.Ceiling((decimal)Model.ToList()[0].TotalCount / 25) : 0)" hidden />
 } *@
-
-<script src="~/js/definitions/ShiftsPager.js"></script>
+<script>
+        $('.main-table').DataTable({
+        responsive: true,
+        pageLength: 10,
+        info: false,
+        paging: false,
+        ordering: false,
+        dom: 'tp',
+        language: {
+            emptyTable: resources.EmptyData
+        }
+    });
+</script>
+@* 
+<script src="~/js/definitions/ShiftsPager.js"></script> *@

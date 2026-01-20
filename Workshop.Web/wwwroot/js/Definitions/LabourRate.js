@@ -161,10 +161,10 @@ $(".add-record").on('click', function (e) {
 <td><input type="text" name="DescriptionEn" class="form-control" maxlength="250"/></td>\
 <td><input type="text" name="DescriptionAr" class="form-control" maxlength="250"/></td>\
 <td> \
-  <button type="submit" class="btn btn-primary btn-sm submitLookup" onclick="return validateLookupForm();" hidden> \
+  <button type="submit" class="btn btn-primary btn-sm submitLookup btn-w-m my-1" onclick="return validateLookupForm();" hidden> \
     <i class="fa fa-save"></i>&nbsp; Save \
   </button> \
-  <button type="button" class="btn btn-secondary text-white btn-sm delete-record" data-id="0">\
+  <button type="button" class="btn btn-secondary text-white btn-sm delete-record btn-w-m my-1" data-id="0">\
     <i class="fa fa-times"></i>&nbsp;Cancel\
   </button> \
 </td></tr>');

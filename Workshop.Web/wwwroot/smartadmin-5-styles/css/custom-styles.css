@@ -2410,7 +2410,7 @@ html[dir="rtl"] .toggle-pin {
 /* Existing #new_quickAccess rules kept as-is from here... */
 #new_quickAccess .app-page-title {
     background: rgba( 255, 255, 255, 0.25 );
-    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.25);
     backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
     border-radius: 10px;
@@ -3412,4 +3412,86 @@ html[data-bs-theme="dark"] .swal2-toast {
 .dx-pager .dx-pages{
     text-align:center
 }
+html[data-bs-theme="dark"] .filepond--root {
+
+    --fp-bg: #242933;
+    --fp-surface: #2c323d;
+    --fp-border: #3b4352;
+    --fp-text: #e7e9ee;
+    --fp-muted: #aab2c0;
+    --fp-accent: rgba(var(--bs-primary-rgb), 0.22);
+}
+
+
+html[data-bs-theme="dark"] .filepond--panel-root {
+    background-color: var(--fp-bg) !important;
+    border: 1px solid var(--fp-border) !important;
+}
+
+
+html[data-bs-theme="dark"] .filepond--drop-label {
+    color: var(--fp-text) !important;
+}
+
+html[data-bs-theme="dark"] .filepond--label-action {
+    color: rgba(var(--bs-primary-rgb), 0.95) !important;
+    text-decoration: underline;
+}
+
+
+html[data-bs-theme="dark"] .filepond--item-panel {
+    background-color: var(--fp-surface) !important;
+    border: 1px solid var(--fp-border) !important;
+}
+
+html[data-bs-theme="dark"] .filepond--file,
+html[data-bs-theme="dark"] .filepond--file-info-main,
+html[data-bs-theme="dark"] .filepond--file-status-main {
+    color: var(--fp-text) !important;
+}
+
+html[data-bs-theme="dark"] .filepond--file-info-sub,
+html[data-bs-theme="dark"] .filepond--file-status-sub {
+    color: var(--fp-muted) !important;
+}
+
+
+html[data-bs-theme="dark"] .filepond--progress-indicator {
+    background: rgba(var(--bs-primary-rgb), 0.35) !important;
+}
+
+
+html[data-bs-theme="dark"] .filepond--file-action-button {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--fp-text) !important;
+    border: 1px solid var(--fp-border) !important;
+}
+
+    html[data-bs-theme="dark"] .filepond--file-action-button:hover {
+        background: rgba(var(--bs-primary-rgb), 0.18) !important;
+        border-color: rgba(var(--bs-primary-rgb), 0.40) !important;
+    }
+
+html[data-bs-theme="dark"] .filepond--image-preview-overlay {
+    background: linear-gradient( rgba(36, 41, 51, 0.20), rgba(36, 41, 51, 0.65) ) !important;
+}
+
+html[data-bs-theme="dark"] .filepond--credits {
+    color: var(--fp-muted) !important;
+}
+
 /* End Dark Mode Customization */
+@media (max-width: 450px) {
+    #new_quickAccess .app-page-title img{
+        width:12rem
+    }
+    #LookupForm{
+        overflow-x:auto
+    }
+    .panel-hdr .h2, .panel-hdr h2{
+        line-height:1.5rem
+    }
+    .panel{
+        padding-top:2.5%
+    }
+}
