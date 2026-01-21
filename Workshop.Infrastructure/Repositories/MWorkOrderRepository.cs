@@ -999,7 +999,25 @@ namespace Workshop.Infrastructure.Repositories
 			return result;
 		}
 
+        public async Task<List<PendingClaimAccidentWorkOrderDTO>> GetPendingClaimsAccidentWorkOrdersAsync(int? requestMaintinenceStatusId = null)
+        {
+            try
+            {
+                using var connection = _context.CreateConnection();
 
-	}
+                var result = await connection.QueryAsync<PendingClaimAccidentWorkOrderDTO>(
+                    "WorkOrder.SP_GetPendingClaimsAccidentWorkOrders",
+                    new { RequestMaintinenceStatusId = requestMaintinenceStatusId },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in GetPendingClaimsAccidentWorkOrdersAsync", ex);
+            }
+        }
+    }
 
 }
