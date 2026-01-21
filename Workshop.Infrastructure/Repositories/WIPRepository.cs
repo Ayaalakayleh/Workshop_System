@@ -864,6 +864,20 @@ namespace Workshop.Infrastructure.Repositories
                 parameters
             );
         }
+        public async Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal)
+        {
+            var parameters = new
+            {
+                VehicleId = vehicleId,
+                IsExternal = isExternal
+            };
+
+            return await _database.ExecuteGetByIdProcedure<bool>(
+                "WIP_HasOpenByVehicle",
+                parameters
+            );
+        }
+
 
 
     }
