@@ -298,6 +298,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.UpdateWIPServicesExternalAndFixStatusAsync(services);
         }
+        public async Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal)
+        {
+            return await _repository.WIP_HasOpenByVehicleAsync(vehicleId, isExternal);
+        }
 
     }
 }
