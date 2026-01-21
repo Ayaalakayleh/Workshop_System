@@ -3479,19 +3479,24 @@ html[data-bs-theme="dark"] .filepond--image-preview-overlay {
 html[data-bs-theme="dark"] .filepond--credits {
     color: var(--fp-muted) !important;
 }
-
+#new_quickAccess .app-page-title .page-title-icon {
+    background-color: var(--light)
+}
 /* End Dark Mode Customization */
 @media (max-width: 450px) {
-    #new_quickAccess .app-page-title img{
-        width:12rem
+    #new_quickAccess .app-page-title img {
+        width: 12rem
     }
-    #LookupForm{
-        overflow-x:auto
+
+    #LookupForm {
+        overflow-x: auto
     }
-    .panel-hdr .h2, .panel-hdr h2{
-        line-height:1.5rem
+
+    .panel-hdr .h2, .panel-hdr h2 {
+        line-height: 1.5rem
     }
-    .panel{
-        padding-top:2.5%
+
+    .panel {
+        padding-top: 2.5%
     }
 }
