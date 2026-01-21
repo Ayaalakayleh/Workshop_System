@@ -282,10 +282,6 @@
         opacity: 1;
     }
 
-.table tr th {
-    background-color: var(--primary-700);
-    color: #fff
-}
 
 input[type="color"] {
     height: 2.3rem
@@ -308,7 +304,6 @@ input[type="color"] {
 }
 
 .current-time {
-    color: rgba(255, 255, 255, 0.95);
     font-size: 1.6rem;
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -664,7 +659,6 @@ input[type="color"] {
 .technician-modal-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1f2937;
     margin-bottom: 8px;
 }
 
@@ -811,7 +805,7 @@ input[type="color"] {
     }
 
 .numeric-modal-content {
-    background: #ffffff;
+    background: var(--app-drawer-background);
     border-radius: 24px;
     padding: 40px 30px;
     max-width: 450px;
@@ -1138,7 +1132,7 @@ html[dir="rtl"] .toggle-pin {
 
 /* Page chrome */
 .reservations-card {
-    background: #fff;
+    background: var(--app-panel-bg,#fff);
     border: 1px solid #e9eef5;
     border-radius: 14px;
     padding: 16px;
@@ -1167,7 +1161,6 @@ html[dir="rtl"] .toggle-pin {
 
     .segmented button {
         padding: 6px 12px;
-        background: #fff;
         border: 0;
         font-weight: 600
     }
@@ -1183,8 +1176,7 @@ html[dir="rtl"] .toggle-pin {
 
 .view-title {
     font-size: 1.05rem;
-    font-weight: 700;
-    color: #111827
+    font-weight: 700
 }
 
 /* Scroll/table base */
@@ -1203,15 +1195,10 @@ html[dir="rtl"] .toggle-pin {
     width: 100%
 }*/
 
-.resv-grid thead th {
-    background: #fff
-}
-
 .resv-grid thead .time-cell,
 .resv-grid tbody .time-cell {
     position: sticky;
     left: 0;
-    background: #fff;
     z-index: 9
 }
 
@@ -1234,14 +1221,12 @@ html[dir="rtl"] .toggle-pin {
 .resv-grid thead .head-row-1 th {
     position: sticky;
     top: 0;
-    background: #fff;
     z-index: 7;
 }
 
 .resv-grid thead .head-row-2 th {
     position: sticky;
     top: var(--resv-head-row1-height);
-    background: #fff;
     z-index: 6;
 }
 
@@ -1250,7 +1235,6 @@ html[dir="rtl"] .toggle-pin {
     top: 0;
     left: 0;
     z-index: 10;
-    background: #fff;
 }
 
 .day-group .day-card {
@@ -3104,9 +3088,6 @@ html[dir="rtl"] .toggle-pin {
     margin: .5rem 0
 }*/
 
-.resv-grid th {
-    color: #444 !important
-}
 
 #serviceReminderModal .input-group > .form-control,
 #serviceReminderModal .input-group > .form-floating, .input-group > .form-select {
@@ -3137,7 +3118,7 @@ html[dir="rtl"] .toggle-pin {
 }
 
 .modal .resv-modal-plate {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     letter-spacing: 0.04em;
 }
@@ -3169,14 +3150,12 @@ html[dir="rtl"] .toggle-pin {
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #6b7280;
     font-weight: 600;
 }
 
 .modal .resv-value {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #111827;
 }
 
 /* Description block */
@@ -3189,7 +3168,6 @@ html[dir="rtl"] .toggle-pin {
 
 .modal .resv-description {
     font-size: 0.9rem;
-    color: #111827;
 }
 
 /* Accordion version tweaks – scoped */
@@ -3271,7 +3249,14 @@ html[dir="rtl"] .toggle-pin {
 .demo-container::before {
     display: none !important;
 }
-
+.table thead tr th{
+    background-color:var(--primary-600);
+    color:#fff
+}
+.table.resv-grid thead tr th {
+    background-color: var(--bg-body);
+    color: var(--bs-body-color);
+}
 /*Start fix change Lang/Branch on mobile menu*/
 @media (max-width: 576px) {
     .header-icon .dropdown-menu,
@@ -3292,6 +3277,7 @@ html[dir="rtl"] .toggle-pin {
         padding-left: 12px;
         display: none;
     }
+
     .dropdown-submenu.show > .dropdown-menu {
         display: block !important;
     }
@@ -3502,13 +3488,34 @@ html[data-bs-theme="dark"] .filepond--credits {
 #new_quickAccess .app-page-title .page-title-icon {
     background-color: var(--light)
 }
+html[data-bs-theme="dark"] .modal .resv-field {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(59, 130, 246, 0.03));
+    border: 1px solid rgba(148, 163, 184, 0.3)
+}
+html[data-bs-theme="dark"] .modal .resv-description-card,
+html[data-bs-theme="dark"] .vehicle-hero__card {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(59, 130, 246, 0.03));
+    border: 1px solid rgba(148, 163, 184, 0.3)
+}
+html[data-bs-theme="dark"] .segmented button.active {
+    background-color: var(--bg-body)
+}
+html[data-bs-theme="dark"] .the-movements .status-button__icon,
+html[data-bs-theme="dark"] .the-movements .status-button__chip {
+    background-color: #444;
+    box-shadow: none;
+    border:none
+}
+html[data-bs-theme="dark"] .the-movements table.table thead th {
+    background: linear-gradient(180deg, #cacaca 0%, #6c6c6c 100%)
+}
 /* End Dark Mode Customization */
 @media (max-width: 450px) {
     #new_quickAccess .app-page-title img {
         width: 12rem
     }
 
-    #LookupForm, #MaintenanceCard {
+    #LookupForm, #MaintenanceCard, .table-mobile {
         overflow-x: auto
     }
 
@@ -3519,14 +3526,26 @@ html[data-bs-theme="dark"] .filepond--credits {
     .panel {
         padding-top: 2.5%
     }
-    .the-movements .scratch-inner{
-        width:unset;
+
+    .the-movements .scratch-inner {
+        width: unset;
     }
-    .scratch-wrap{
-        overflow:hidden;
-        overflow-x:auto
+
+    .scratch-wrap {
+        overflow: hidden;
+        overflow-x: auto
     }
-    .scratch-controls button{
-        margin:.5rem 0
+
+    .scratch-controls button {
+        margin: .5rem 0
+    }
+
+    .viewbar {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .reservations-card .d-flex.align-items-center.gap-2 {
+        flex-direction: column
     }
 }
