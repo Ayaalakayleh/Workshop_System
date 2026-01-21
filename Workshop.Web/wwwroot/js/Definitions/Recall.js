@@ -404,12 +404,10 @@ $(function () {
                         Swal.fire({
                             icon: 'success',
                             title: LABELS.RecallSaveTitle || 'Success',
-                            text: LABELS.RecallSaveText || 'Recall has been saved successfully.'
                         }).then(() => {
                             window.location.href = window.RazorVars.indexUrl;
                         });
                     } else {
-                        alert('Recall has been saved successfully.');
                         window.location.href =window.RazorVars.indexUrl;
                     }
                     return;
@@ -456,7 +454,6 @@ $(function () {
                         Swal.fire({
                             icon: 'success',
                             title: LABELS.RecallSaveTitle || 'Success',
-                            text: message || LABELS.RecallSaveText || 'Recall has been saved successfully.'
                         }).then(() => {
                             window.location.href = window.RazorVars.indexUrl;
                         });
@@ -628,7 +625,6 @@ $(document).ready(function () {
             if (confirm('Are you sure?')) deleteRecall(id);
             return;
         }
-
         Swal.fire({
             title: LABELS.DeleteConfirmTitle || 'Confirm',
             text: LABELS.DeleteConfirmText || 'Are you sure you want to delete?',

@@ -1,4 +1,7 @@
-﻿﻿.st-toolbar {
+﻿::selection{
+    background-color:var(--primary-300)
+}
+﻿.st-toolbar {
     display: none
 }
 
@@ -3225,7 +3228,23 @@ html[dir="rtl"] .toggle-pin {
 .select2-container--default .select2-selection--single.is-invalid:hover {
     border-color: #dc3545 !important;
 }
+#techpageContent {
+    visibility: hidden;
+}
 
+.tech-page-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+}
+
+    .tech-page-loader img {
+        width: 250px
+    }
 .the-accouting-loader {
     display: none;
     justify-content: center;

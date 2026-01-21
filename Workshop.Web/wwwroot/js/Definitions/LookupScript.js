@@ -226,7 +226,7 @@ $(document).on('click', 'button[type=reset]', function () {
     return $row.find('td').eq(tdIndex).find('span.field-error');
   }
 
-        var requiredMsg = (window.resources && resources.required_field) || 'Required';
+            var requiredMsg = theMainLang == "en" ? "This Field is Required" : "هذا الحقل مطلوب";
 
         // Collect fields (column indices: 1:Code, 2:PrimaryName, 3:SecondaryName)
         var $code      = $row.find('input[name="Code"]');

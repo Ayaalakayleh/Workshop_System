@@ -1858,7 +1858,7 @@
     <value>حفظ</value>
   </data>
   <data name="Label_SuccessTitle" xml:space="preserve">
-    <value>تم بنجاح</value>
+    <value>تمت العملية بنجاح</value>
   </data>
   <data name="Label_Ok" xml:space="preserve">
     <value>موافق</value>
