@@ -243,7 +243,7 @@ $(document).ready(function () {
                 dataSource: window.dataSource || [],
                 series: [{ argumentField: 'StatusName', valueField: 'StatusValue' }],
                 title: (RazorVars.totalText || 'Total') + ': ' + (window.Total || 0),
-                export: { enabled: true },
+                export: { enabled: false },
                 legend: {
                     verticalAlignment: 'bottom',
                     horizontalAlignment: 'center',

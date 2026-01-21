@@ -2646,4 +2646,10 @@
   <data name="CodeAlreadyExists" xml:space="preserve">
     <value>Code Already Exists</value>
   </data>
+  <data name="Label_ManualMeterInterval" xml:space="preserve">
+    <value>Manual Meter Interval</value>
+  </data>
+  <data name="Notify" xml:space="preserve">
+    <value>Notify</value>
+  </data>
 </root>

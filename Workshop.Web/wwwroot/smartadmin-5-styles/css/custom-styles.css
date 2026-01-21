@@ -322,7 +322,7 @@ input[type="color"] {
 }
 
 .technician-card {
-    background: #ffffff;
+    background: var(--bs-card-cap-bg);
     border-radius: 16px;
     padding: 24px 20px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -330,7 +330,7 @@ input[type="color"] {
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    border: 2px solid transparent;
+    border: 2px solid var(--bs-border-color);
 }
 
     .technician-card::before {
@@ -357,7 +357,7 @@ input[type="color"] {
 
     .technician-card.normal::before {
         opacity: 1;
-        background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+        background: var(--primary-600)
     }
 
     .technician-card:hover {
@@ -399,8 +399,7 @@ input[type="color"] {
     }
 
     .status-badge.normal {
-        background-color: #7c3aed;
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        background-color: var(--primary-600);
     }
 
 @keyframes pulse {
@@ -437,7 +436,7 @@ input[type="color"] {
 }
 
 .technician-card.normal .technician-icon {
-    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    background: var(--primary-10);
     box-shadow: 0 4px 16px rgba(124, 58, 237, 0.1);
 }
 
@@ -464,7 +463,6 @@ input[type="color"] {
 .technician-id {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1f2937;
     margin-bottom: 10px;
     letter-spacing: -0.2px;
 }
@@ -1557,8 +1555,6 @@ html[dir="rtl"] .toggle-pin {
 }
 
     .the-movements .panel {
-        border: 0;
-        background: #fff;
         border-radius: var(--radius);
         box-shadow: var(--shadow);
     }
@@ -1597,7 +1593,6 @@ html[dir="rtl"] .toggle-pin {
 
     /* ===== VEHICLE HERO ===== */
     .the-movements .vehicle-hero__card {
-        background: radial-gradient(120% 120% at 0% 0%, #f7f7fd 0%, #ffffff 52%) no-repeat #fff;
         border-radius: 18px;
         box-shadow: var(--shadow);
         padding: 18px;
@@ -3273,6 +3268,10 @@ html[dir="rtl"] .toggle-pin {
 #PlateNumber {
     direction: ltr !important;
 }
+.demo-container::before {
+    display: none !important;
+}
+
 /*Start fix change Lang/Branch on mobile menu*/
 @media (max-width: 576px) {
     .header-icon .dropdown-menu,
@@ -3347,12 +3346,14 @@ html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter {
     color: var(--bs-body-color);
 }
-
 html[data-bs-theme="dark"] .dataTables_wrapper input,
 html[data-bs-theme="dark"] .dataTables_wrapper select {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
     border-color: var(--bs-border-color);
+}
+.dx-fieldset-header {
+    display: none !important;
 }
 /* intlTelInput Dark Mode Fix */
 html[data-bs-theme="dark"] .iti__country-list {
@@ -3507,7 +3508,7 @@ html[data-bs-theme="dark"] .filepond--credits {
         width: 12rem
     }
 
-    #LookupForm {
+    #LookupForm, #MaintenanceCard {
         overflow-x: auto
     }
 
@@ -3517,5 +3518,15 @@ html[data-bs-theme="dark"] .filepond--credits {
 
     .panel {
         padding-top: 2.5%
+    }
+    .the-movements .scratch-inner{
+        width:unset;
+    }
+    .scratch-wrap{
+        overflow:hidden;
+        overflow-x:auto
+    }
+    .scratch-controls button{
+        margin:.5rem 0
     }
 }

@@ -24,7 +24,6 @@
 
     .the-movements .panel {
         border: 0;
-        background: #fff;
         border-radius: 14px;
         box-shadow: 0 6px 18px rgba(20,20,40,.08);
     }
@@ -45,10 +44,10 @@
     }
 
     .the-movements fieldset {
-        border: 2px dashed var(--theme-primary-50);
+        border: 2px dashed var(--bs-card-border-color);
         padding: 1rem 1.25rem;
         border-radius: 12px;
-        background: #fff;
+        background: var(--bs-card-cap-bg);
     }
 
     .the-movements legend {
@@ -86,7 +85,6 @@
 
     /* ==== Vehicle hero – premium header (bigger car image + button-style status) ==== */
     .the-movements .vehicle-hero__card {
-        background: radial-gradient(120% 120% at 0% 0%, #f7f7fd 0%, #ffffff 52%) no-repeat #fff;
         border-radius: 18px;
         box-shadow: 0 8px 24px rgba(23,23,40,.07);
         padding: 22px 24px;
@@ -128,7 +126,7 @@
     }
 
     .the-movements .vehicle-hero__icon {
-        background: #ffffff;
+        background: var(--bg-body);
         border: 1px solid #eef0f6;
         border-radius: 18px;
         padding: 14px;
@@ -178,7 +176,7 @@
     }
 
     .the-movements .vehicle-hero__fact {
-        background: #fff;
+        background: var(--bg-body);
         border: 1px solid #eef0f6;
         border-radius: 12px;
         padding: 10px 12px;
@@ -202,7 +200,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        background: #fcfcff;
+        background: var(--bg-body);
         border: 1px dashed #e5e7f3;
         padding: 9px 12px;
         border-radius: 12px;
@@ -221,7 +219,7 @@
 
         .the-movements .meta-item b {
             margin-left: auto;
-            color: #111827;
+            color: var(--bg-border-color);
             font-weight: 800;
             font-size: .95rem;
         }
@@ -242,8 +240,8 @@
     .the-movements .vehicle-hero__notes p {
         margin: 0;
         color: #334155;
-        background: #fff;
-        border: 1px solid #eef0f6;
+        background: var(--bg-body);
+        border: 1px solid var(--bs-border-color);
         border-radius: 12px;
         padding: 10px 12px;
     }
@@ -257,8 +255,8 @@
 
     .the-movements .status-button {
         width: 100%;
-        border: 0;
-        background: #fff;
+        background: var(--bg-body);
+        border:1px solid var(--bs-border-color);
         cursor: pointer;
         border-radius: 18px;
         padding: 16px 14px;
@@ -735,8 +733,8 @@
                                                 <div id="panel" class="scratch-inner"></div>
                                             </div>
                                             <div class="text-center mt-3">
-                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button" disabled><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
-                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m" id="clear-button" disabled><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
+                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m my-1" id="undo-button" disabled><i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]</button>
+                                                <button type="button" class="btn btn-secondary btn-sm btn-w-m my-1" id="clear-button" disabled><i class="fa fa-times"></i>&nbsp;@Common["Label_Clear"]</button>
                                             </div>
                                             <div id="coordinates" class="d-none"></div>
                                         </div>
@@ -890,11 +888,11 @@
                                     }
                                     if (true && Model.LastMovementDetails.HasWorkorder == 0)
                                     {
-                                        <a href="@Url.Action("CreateJobCard", "WIP", new { movementId = Model.MovementId })" class="btn btn-success btn-w-m"><i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]</a>
+                                        <a href="@Url.Action("CreateJobCard", "WIP", new { movementId = Model.MovementId })" class="btn btn-success btn-w-m my-1"><i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]</a>
                                     }
                                     if (true)
                                     {
-                                        <a class="btn btn-warning add-record btn-w-m" href="@Url.Action("MovementOut", "MovementOut", new { MovementId = Model.MovementId })">
+                                        <a class="btn btn-warning add-record btn-w-m my-1" href="@Url.Action("MovementOut", "MovementOut", new { MovementId = Model.MovementId })">
                                             <i class="fal fa-exchange-alt"></i> @Common["Label_MovementOut"]
                                         </a>
                                     }
