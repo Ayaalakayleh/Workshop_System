@@ -174,4 +174,53 @@ $(document).ready(function () {
             });
         }, 0);
     });
+
 })(jQuery);
+/* Change Flatpicker theme to Dark*/
+document.addEventListener("DOMContentLoaded", function () {
+
+    const CSS_ID = "flatpickr-dark-theme";
+    const CSS_HREF = "https://npmcdn.com/flatpickr/dist/themes/dark.css";
+
+    const htmlRoot = document.documentElement;
+    let lastTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
+
+    function addDarkCss() {
+        if (!document.getElementById(CSS_ID)) {
+            const link = document.createElement("link");
+            link.id = CSS_ID;
+            link.rel = "stylesheet";
+            link.href = CSS_HREF;
+            document.head.appendChild(link);
+        }
+    }
+
+    function removeDarkCss() {
+        const existing = document.getElementById(CSS_ID);
+        if (existing) existing.remove();
+    }
+
+    function syncFlatpickrTheme(theme) {
+        if (theme === "dark") {
+            addDarkCss();
+        } else {
+            removeDarkCss();
+        }
+    }
+
+    // ✅ Apply theme ON LOAD (important part)
+    syncFlatpickrTheme(lastTheme);
+
+    // ✅ Keep watching for changes
+    new MutationObserver(() => {
+        const newTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
+        if (newTheme === lastTheme) return;
+
+        syncFlatpickrTheme(newTheme);
+        lastTheme = newTheme;
+    }).observe(htmlRoot, {
+        attributes: true,
+        attributeFilter: ["data-bs-theme"]
+    });
+
+});

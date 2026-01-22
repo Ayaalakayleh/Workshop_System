@@ -127,6 +127,15 @@ namespace Workshop.Core.DTOs
         DueSoon = 2,
         Overdue = 3,
     }
+    public class ServiceReminderDueNew
+    {
+        public int VehicleId { get; set; }
+        public int ItemId { get; set; }
+        public DateTime Date { get; set; }
+        public DateTime DueDate { get; set; }
+        public decimal PrimaryMeter { get; set; }
+        public decimal DuePrimaryMeter { get; set; }
+    }
 
 }
 

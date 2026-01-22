@@ -367,36 +367,10 @@ namespace Workshop.Web.Controllers
 
 
                 // Get units
-                try
-                {
-                    var units = await _inventoryApiClient.GetAllUnitDDL();
-                    ViewBag.Units = units?.Select(t => new SelectListItem
-                    {
-                        Text = lang == "en" ? t.primaryName : t.secondaryName,
-                        Value = t.Id.ToString()
-                    }).ToList() ?? new List<SelectListItem>();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error fetching units");
-                    ViewBag.Units = new List<SelectListItem>();
-                }
+                ViewBag.Units = await GetUnitsSelectListAsync();
 
                 // Get warehouses
-                try
-                {
-                    var Warehouses = await _inventoryApiClient.GetAllWarehousesDDL(null, 1);
-                    ViewBag.Warehouses = Warehouses?.Select(t => new SelectListItem
-                    {
-                        Text = lang == "en" ? t.PrimaryName : t.SecondaryName,
-                        Value = t.Id.ToString()
-                    }).ToList() ?? new List<SelectListItem>();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error fetching warehouses");
-                    ViewBag.Warehouses = new List<SelectListItem>();
-                }
+                ViewBag.Warehouses = await GetWarehousesSelectListAsync();
 
                 // Get VAT classification
                 try
@@ -479,7 +453,7 @@ namespace Workshop.Web.Controllers
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
 
                         selectedCustomerId = activeAgreement?.CustomerId;
-                        var status = (activeAgreement?.AgreementId > 0) ? "Open" : "No Agreement";
+                        var status = (activeAgreement?.AgreementId > 0) ? _common["Open"] : _common["NoAgreement"];
 
 
                         ViewBag.AgreementStatus = status;
@@ -742,7 +716,7 @@ namespace Workshop.Web.Controllers
         public async Task<JsonResult> GetAllItems(int fK_GroupId, int fK_CategoryId, int fK_SubCategoryId)
         {
             var items = await _inventoryApiClient.GetItemsWithStockAndLocation(fK_GroupId, fK_CategoryId, fK_SubCategoryId);
-
+            
             var allCategories = await _inventoryApiClient.GetAllCategoriesAsync();
             var allUnits = await _inventoryApiClient.GetAllUnitDDL();
 
@@ -2252,7 +2226,7 @@ namespace Workshop.Web.Controllers
                         InvoiceType = -3,
                         AccountType = (int)AccountTypeEnum.Internal,
                         CreatedBy = UserId,
-
+                        InvoiceNo=0
 
                     };
                     await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
@@ -2277,13 +2251,21 @@ namespace Workshop.Web.Controllers
 
             return View();
         }
-        public async Task<ActionResult> PrintInternal(int WIPId, int TransactionMasterId)
+        public async Task<ActionResult> PrintInternal(int WIPId, int TransactionMasterId,int InvoiceNo,int InvoiceType)
         {
             var PrintInternalDTO = new PrintInternalDTO();
             var InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(WIPId, TransactionMasterId);
-            PrintInternalDTO.WipInvoiceDetail = await _apiClient.WipInvoiceByHeaderId(InvoiceDetailsList.FirstOrDefault().Id);
-            //PrintInternalDTO.Service = await _apiClient.GetAllInternalLabourLineAsync(WIPId);
-            //PrintInternalDTO.Items = await _apiClient.GetAllInternalPartsLineAsync(WIPId);
+            if (TransactionMasterId==0)
+            {
+                PrintInternalDTO.WipInvoiceDetail = await _apiClient.WipInvoiceByHeaderId(InvoiceDetailsList.Where(x=>x.InvoiceNo== InvoiceNo && x.InvoiceType== InvoiceType).FirstOrDefault().Id);
+                InvoiceDetailsList = InvoiceDetailsList.Where(x => x.InvoiceNo == InvoiceNo && x.InvoiceType == InvoiceType).ToList();
+            }
+            else
+            {
+                PrintInternalDTO.WipInvoiceDetail = await _apiClient.WipInvoiceByHeaderId(InvoiceDetailsList.FirstOrDefault().Id);
+
+            }
+
             PrintInternalDTO.InvoiceDetails = InvoiceDetailsList.FirstOrDefault();
             foreach (var item in PrintInternalDTO.WipInvoiceDetail)
             {
@@ -2855,6 +2837,61 @@ namespace Workshop.Web.Controllers
             return result;
         }
 
+        private async Task<List<SelectListItem>> GetUnitsSelectListAsync()
+        {
+            try
+            {
+                var units = await _inventoryApiClient.GetAllUnitDDL();
+
+                return units?.Select(t => new SelectListItem
+                {
+                    Text = lang == "en" ? t.primaryName : t.secondaryName,
+                    Value = t.Id.ToString()
+                }).ToList() ?? new List<SelectListItem>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching units");
+                return new List<SelectListItem>();
+            }
+        }
+
+        private async Task<List<SelectListItem>> GetWarehousesSelectListAsync()
+        {
+            try
+            {
+                var warehouses = await _inventoryApiClient.GetAllWarehousesDDL(null, 1);
+
+                return warehouses?.Select(t => new SelectListItem
+                {
+                    Text = lang == "en" ? t.PrimaryName : t.SecondaryName,
+                    Value = t.Id.ToString()
+                }).ToList() ?? new List<SelectListItem>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching warehouses");
+                return new List<SelectListItem>();
+            }
+        }
+
+        public async Task<JsonResult> GetItemUnits(int itemId)
+        {
+            var units = await _inventoryApiClient.GetItemUnitByIdAsync(itemId);
+
+            var result = units.Select(u => new
+            {
+                itemId = u.ItemId,
+                unitId = u.UnitId,
+                unitCode = u.UnitCode,
+                unitPrimaryName = u.UnitPrimaryName,
+                unitSecondaryName = u.UnitSecondaryName,
+                conversionFactor = u.ConversionFactor,
+                isBaseUnit = u.IsBaseUnit
+            }).ToList();
+
+            return Json(result);
+        }
 
         //=====================================================================================================
         #region Petty Cash Methods

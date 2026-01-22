@@ -166,6 +166,10 @@ namespace Workshop.Infrastructure.Repositories
 				parameters.Add("@HasChassisDamage", workOrder.HasChassisDamage);
 				parameters.Add("@CanRepaired", workOrder.CanRepaired);
 				parameters.Add("@HasTransmissionDamage", workOrder.HasTransmissionDamage);
+				parameters.Add("@IntimationDate", workOrder.IntimationDate);
+				parameters.Add("@InsuredValue", workOrder.InsuredValue);
+				parameters.Add("@DriverId", workOrder.DriverId);
+				parameters.Add("@DriverName", workOrder.DriverName);
 				//parameters.Add("@WorkOrderNo", filter.WorkOrderNo);
 
 
@@ -241,6 +245,10 @@ namespace Workshop.Infrastructure.Repositories
 				parameters.Add("@CanRepaired", workOrder.CanRepaired);
 				parameters.Add("@MasterId", workOrder.MasterId);
 				parameters.Add("@IsFinished", workOrder.IsFinished);
+				parameters.Add("@IntimationDate", workOrder.IntimationDate);
+				parameters.Add("@InsuredValue", workOrder.InsuredValue);
+				parameters.Add("@DriverId", workOrder.DriverId);
+				parameters.Add("@DriverName", workOrder.DriverName);
 				var result = await connection.QueryAsync<MWorkOrderDTO>(
 					"WorkOrder.M_WorkOrders_Update",
 					parameters
@@ -328,6 +336,8 @@ namespace Workshop.Infrastructure.Repositories
 				ExternalWsId = insuranceClaimHistory.ExternalWsId,
 				InsurancePricing = insuranceClaimHistory.InsurancePricing,
 				FinanceConfirmationFilePath = insuranceClaimHistory.FinanceConfirmationFilePath,
+				InsurancePricingParts = insuranceClaimHistory.InsurancePricingParts,
+				ExternalWSPriceParts = insuranceClaimHistory.ExternalWSPriceParts,
 
 			};
 
@@ -989,7 +999,25 @@ namespace Workshop.Infrastructure.Repositories
 			return result;
 		}
 
+        public async Task<List<PendingClaimAccidentWorkOrderDTO>> GetPendingClaimsAccidentWorkOrdersAsync(int? requestMaintinenceStatusId = null)
+        {
+            try
+            {
+                using var connection = _context.CreateConnection();
 
-	}
+                var result = await connection.QueryAsync<PendingClaimAccidentWorkOrderDTO>(
+                    "WorkOrder.SP_GetPendingClaimsAccidentWorkOrders",
+                    new { RequestMaintinenceStatusId = requestMaintinenceStatusId },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in GetPendingClaimsAccidentWorkOrdersAsync", ex);
+            }
+        }
+    }
 
 }

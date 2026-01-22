@@ -57,5 +57,6 @@ namespace Workshop.Core.Interfaces.IRepositories
 		Task<List<WorkOrderInsuranceDetails>> GetInsuranceDetails(int companyId, DateTime? fromDate, DateTime? toDate);
 		Task<IEnumerable<VehicleWorkOrdersSummery>> GetWorkOrdersSummeryByVehicleIdAsync(int vehicleId, int companyId);
 		Task<string?> GetLastMaintenanceMovementStrikeAsync(int vehicleId);
-	}
+        Task<List<PendingClaimAccidentWorkOrderDTO>> GetPendingClaimsAccidentWorkOrdersAsync(int? requestMaintinenceStatusId = null);
+    }
 }

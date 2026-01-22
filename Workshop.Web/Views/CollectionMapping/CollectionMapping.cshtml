@@ -74,42 +74,44 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="table-mobile">
+                                <table id="collection-mapping-table" class="table table-bordered table-hover w-100 text-center mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th>@Common["Label_ColumnName"]</th>
+                                            <th>@Common["Label_AdditionColumnName"]</th>
+                                            <th>@Common["Label_MappingColumnDB"]</th>
+                                            <th>@Common["Label_MappingColumnIndex"]</th>
+                                            <th>@Common["Label_IsVatIncluded"]</th>
+                                            <th>@Common["Label_AdditionData"]</th>
+                                            <th id="action">@Html.DisplayName(@Common["Label_Actions"])</th>
+                                        </tr>
+                                    </thead>
 
-                            <table id="collection-mapping-table" class="table table-bordered table-hover w-100 text-center mt-3">
-                                <thead>
-                                    <tr>
-                                        <th>@Common["Label_ColumnName"]</th>
-                                        <th>@Common["Label_AdditionColumnName"]</th>
-                                        <th>@Common["Label_MappingColumnDB"]</th>
-                                        <th>@Common["Label_MappingColumnIndex"]</th>
-                                        <th>@Common["Label_IsVatIncluded"]</th>
-                                        <th>@Common["Label_AdditionData"]</th>
-                                        <th id="action">@Html.DisplayName(@Common["Label_Actions"])</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="collection-mapping-table-body">
-                                    <tr>
-                                        <td><input type="text" class="form-control Column_Name text-input"></td>
-                                        <td><input type="text" class="form-control Addition_Cullman_Name text-input"></td>
-                                        <td>
-                                            <select class="form-control dropdown" onchange="Dropdownchange(this)"></select>
-                                        </td>
-                                        <td><input type="number" class="form-control text-input Mapping_Column_Index"></td>
-                                        <td>
-                                            <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input checkbox" id="customSwitch">
-                                                <label class="custom-control-label" for="customSwitch"></label>
-                                            </div>
-                                        </td>
-                                        <td><input type="text" class="form-control text-input"></td>
-                                        <td>
-                                            <button type="button" class="btn btn-success btn-sm add-row my-1"><i class="fa fa-plus"></i>&nbsp;@Common["Button_Add"]</button>
-                                            <button type="button" class="btn btn-danger btn-sm delete-row my-1"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    <tbody id="collection-mapping-table-body">
+                                        <tr>
+                                            <td><input type="text" class="form-control Column_Name text-input"></td>
+                                            <td><input type="text" class="form-control Addition_Cullman_Name text-input"></td>
+                                            <td>
+                                                <select class="form-control dropdown" onchange="Dropdownchange(this)"></select>
+                                            </td>
+                                            <td><input type="number" class="form-control text-input Mapping_Column_Index"></td>
+                                            <td>
+                                                <div class="custom-control custom-switch">
+                                                    <input type="checkbox" class="custom-control-input checkbox" id="customSwitch">
+                                                    <label class="custom-control-label" for="customSwitch"></label>
+                                                </div>
+                                            </td>
+                                            <td><input type="text" class="form-control text-input"></td>
+                                            <td>
+                                                <button type="button" class="btn btn-success btn-sm add-row my-1"><i class="fa fa-plus"></i>&nbsp;@Common["Button_Add"]</button>
+                                                <button type="button" class="btn btn-danger btn-sm delete-row my-1"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
 
                         </div>
 

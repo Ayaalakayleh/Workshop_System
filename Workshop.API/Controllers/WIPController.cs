@@ -528,6 +528,15 @@ namespace Workshop.API.Controllers
             if (result == null) return new List<WIPInvoiceDTO>();
             return Ok(result);
         }
+
+        [HttpGet("WIPInvoiceGetByVehicleId")]
+        public async Task<ActionResult<IEnumerable<WIPInvoiceDTO?>>> WIP_Invoice_GetVehicleById([FromQuery] int? VehicleId)
+        {
+            var result = await _service.WIP_Invoice_GetVehicleById(VehicleId);
+            if (result == null) return new List<WIPInvoiceDTO>();
+            return Ok(result);
+        }
+
         [HttpGet("WipInvoiceByHeaderId")]
         public async Task<IActionResult> WIP_InvoiceDetails_GetByHeaderId(int headerId)
         {
@@ -540,6 +549,13 @@ namespace Workshop.API.Controllers
         {
             var result = await _service.UpdateWIPServicesExternalAndFixStatusAsync(services);
             return Ok(result);
+        }
+        [HttpPost("WIP_HasOpenByVehicle")]
+        public async Task<IActionResult> WIP_HasOpenByVehicle(int vehicleId, bool isExternal)
+        {
+            var result = await _service.WIP_HasOpenByVehicleAsync(vehicleId, isExternal);
+            return Ok(result);
+
         }
     }
 }

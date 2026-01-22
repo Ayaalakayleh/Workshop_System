@@ -108,24 +108,33 @@
 </div>
 
 <script>
-    window.LABELS = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(new {
-        Id = Common["Label_ID"].Value,
-        Make = Common["Label_Make"].Value,
-        Model = Common["Label_Model"].Value,
-        Chassis = Common["Label_Chassis"].Value,
-        Action = Common["Label_Action"].Value,
-        NoData = Common["Label_NoData"].Value,
-        DeleteConfirmTitle = Common["Label_Confirm"].Value,
-        // If you keep the message in Messages.resx, it’s fine—pull it here:
-        DeleteConfirmText = Message["Message_DeleteConfirm"].Value,
-        Yes = Common["Label_Yes"].Value,
-        No = Common["Label_No"].Value,
+window.LABELS = @Html.Raw(JsonConvert.SerializeObject(new {
+    Id = Common["Label_ID"].Value,
+    Make = Common["Label_Make"].Value,
+    Model = Common["Label_Model"].Value,
+    Chassis = Common["Label_Chassis"].Value,
+    Action = Common["Label_Action"].Value,
+    NoData = Common["Label_NoData"].Value,
 
-        // FilePond (contains HTML; JSON keeps it intact, no &lt;...&gt;)
-        FilepondIdle = Common["Label_FilepondIdle"].Value,
-        FileTypeExcelOnly = Common["Validation_FileTypeExcel"].Value,
-        FileRequired = Common["Validation_FileRequired"].Value
-    } ));
+    DeleteConfirmTitle = Common["Label_Confirm"].Value,
+    DeleteConfirmText = Message["Message_DeleteConfirm"].Value,
+    Yes = Common["Label_Yes"].Value,
+    No = Common["Label_No"].Value,
+
+    // ✅ add these because you use them in recall.js
+    Error = Common["Label_Error"].Value,
+    RecallSaveTitle = Common["Label_Success"].Value,
+    RecallSaveText = Message["Message_SaveSuccess"].Value,
+
+    ImportSuccessTitle = Common["Label_Imported"].Value,
+    ImportSuccessText = Message["Message_ImportSuccess"].Value,
+    ImportErrorText = Message["Message_ImportError"].Value,
+
+    FilepondIdle = Common["Label_FilepondIdle"].Value,
+    FileTypeExcelOnly = Common["Validation_FileTypeExcel"].Value,
+    FileRequired = Common["Validation_FileRequired"].Value
+}));
+
 
     window.VALIDATION = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(new {
         Required   = Common["Validation_Required"].Value,
@@ -149,6 +158,7 @@
         CheckRecallCodeUniqueUrl: '@Url.Action("CheckRecallCodeUnique", "Recall")'
     });
 </script>
+
 <script src="~/js/definitions/recall.js"></script>
 <script src="~/js/site.js"></script>
 

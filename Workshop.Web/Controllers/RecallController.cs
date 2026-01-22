@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using NPOI.HPSF;
 using NPOI.SS.UserModel;
@@ -11,6 +12,7 @@ using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
+using Workshop.Resources;
 
 namespace Workshop.Web.Controllers
 {
@@ -23,8 +25,9 @@ namespace Workshop.Web.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
         public readonly string lang;
+        private readonly IStringLocalizer<Common> _common;
         public RecallController(WorkshopApiClient apiClient, ERPApiClient erpApiClient, IConfiguration configuration, 
-            IWebHostEnvironment env, VehicleApiClient vehicleApiClient, IMemoryCache cache) : base(cache, configuration, env)
+            IWebHostEnvironment env, VehicleApiClient vehicleApiClient, IMemoryCache cache, IStringLocalizer<Common> common) : base(cache, configuration, env)
         {
             _apiClient = apiClient;
             _erpApiClient = erpApiClient;
@@ -32,6 +35,7 @@ namespace Workshop.Web.Controllers
             _env = env;
             _vehicleApiClient = vehicleApiClient;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+            _common = common;
         }
 
         [CustomAuthorize(Permissions.Recall.View)]
@@ -776,7 +780,7 @@ namespace Workshop.Web.Controllers
             {
                 if (string.IsNullOrWhiteSpace(code))
                 {
-                    return Json(new { isUnique = false, message = "Code is required" });
+                    return Json(new { isUnique = false, message = _common["Label_RequiredField"] });
                 }
 
                 bool codeExists = await _apiClient.CheckRecallCodeExistsAsync(code.Trim());
@@ -794,12 +798,14 @@ namespace Workshop.Web.Controllers
                 return Json(new
                 {
                     isUnique = isUnique,
-                    message = isUnique ? "Code is available" : $"Code '{code}' already exists"
-                });
+                    message = isUnique
+    ? _common["CodeIsAvailable"]
+    : string.Format(_common["CodeAlreadyExists"], code)
+            });
             }
             catch (Exception ex)
             {
-                return Json(new { isUnique = false, message = "Error checking code uniqueness: " + ex.Message });
+                return Json(new { isUnique = false, message = _common["ErrorHappend"] + ex.Message });
             }
         }
 

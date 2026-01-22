@@ -10,7 +10,7 @@
         <div class="panel-content">
             <div id="categoriesFilter">
                 <div class="row">
-                    <div class="col-md-4 col-sm-12 col-xs-12">
+                    <div class="col-xl-4 col-lg-6 col-md-12">
                         <div class="form-group">
                             <label>@Common["LookupCategories"]</label>
                             <div class="input-group">
@@ -44,7 +44,7 @@
             <div id="lookupsList">
                 @using (Html.BeginForm("LookupCreate", "LookupManagement", FormMethod.Post, new { @id = "LookupForm" }))
                 {
-                    <table class="table table-bordered table-hover table-striped w-100 text-center" id="tbl_posts">
+                    <table class="table table-bordered table-hover table-striped w-100 text" id="tbl_posts">
                         <thead>
                             <tr>
                                 <th>@Common["Code"]</th>
@@ -54,9 +54,7 @@
                             </tr>
                         </thead>
                         <tbody id="tbl_lookup_body">
-                            @{
-                                Html.RenderPartial("_LookupDetailsList");
-                            }
+                            @{Html.RenderPartial("_LookupDetailsList");}
                         </tbody>
                     </table>
                 }

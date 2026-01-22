@@ -71,5 +71,12 @@ namespace Workshop.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetDueServiceRemindersOld")]
+        public async Task<ActionResult> GetDueServiceRemindersOld()
+        {
+            var result = await _service.GetDueServiceRemindersOld();
+            return Ok(result);
+        }
+
     }
 }

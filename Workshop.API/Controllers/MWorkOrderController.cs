@@ -447,5 +447,18 @@ namespace Workshop.API.Controllers
 			return Ok(strikes);
 		}
 
-	}
+        [HttpGet("GetPendingClaimsAccidentWorkOrders")]
+        public async Task<ActionResult<List<PendingClaimAccidentWorkOrderDTO>>> GetPendingClaimsAccidentWorkOrders(int? requestMaintinenceStatusId = null)
+        {
+            try
+            {
+                var data = await _mWorkOrderService.GetPendingClaimsAccidentWorkOrdersAsync(requestMaintinenceStatusId);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+    }
 }

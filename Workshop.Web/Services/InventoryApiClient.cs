@@ -1,5 +1,6 @@
 ﻿using Azure;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using NPOI.Util;
 using System.Text;
 using System.Text.Json;
 using Workshop.Core.DTOs;
@@ -276,6 +277,11 @@ namespace Workshop.Web.Services
             return await SendRequest<int>(url, HttpMethod.Patch, dto, requireAuth: false);
         }
 
-        
+        public async Task<IEnumerable<ItemUnitsDTO>> GetItemUnitByIdAsync(int Id)
+        {
+            string url = $"Item/Units/{Id}";
+            return await SendRequest<IEnumerable<ItemUnitsDTO>>(url, HttpMethod.Get, null, requireAuth: false);
+
+        }
     }
 }

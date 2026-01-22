@@ -98,8 +98,10 @@ namespace Workshop.Core.DTOs
 		public string? SecondPartyFaultFilePath { get; set; }
 		public string? CollectionProofFilePath { get; set; }
 		public decimal ExternalWsprice { get; set; }
+		public decimal ExternalWSPriceParts { get; set; }
 		public int? ExternalWsId { get; set; }
 		public decimal InsurancePricing { get; set; }
+		public decimal InsurancePricingParts { get; set; }
 		public string? FinanceConfirmationFilePath { get; set; }
 		public string? ClaimAmoountFilePath { get; set; }
 		public bool HasEngineDamage { get; set; }
@@ -113,6 +115,12 @@ namespace Workshop.Core.DTOs
 		public string? CollectionPathSecondaryName { get; set; }
 		public string? RequestMaintenancePrimaryName { get; set; }
 		public string? RequestMaintenanceSecondaryName { get; set; }
+
+		public DateTime? IntimationDate { get; set; }
+		public decimal? InsuredValue { get; set; }
+		public string? DriverName { get; set; }
+		public string? DriverId { get; set; }
+
 		// Navigation properties as DTOs
 		public List<DMaintenanceCardDTO>? DMaintenanceCards { get; set; } = new List<DMaintenanceCardDTO>();
 		public List<DWorkOrderReportDTO>? DWorkOrderReports { get; set; } = new List<DWorkOrderReportDTO>();
@@ -214,4 +222,18 @@ namespace Workshop.Core.DTOs
 		public bool IsExternal { set; get; }
 
 	}
+
+
+    public class PendingClaimAccidentWorkOrderDTO
+    {
+        public int? WorkOrderNo { get; set; }
+        public string? AccidentNo { get; set; }
+        public int FK_AgreementId { get; set; }
+        public int? ClaimStatus { get; set; }
+        public int? RequestMaintinenceStatusId { get; set; }
+        public string? Primaryname { get; set; }
+        public string? SeconderyName { get; set; }
+        public int VehicleId { get; set; }
+        public bool? IsExternal { get; set; }
+    }
 }

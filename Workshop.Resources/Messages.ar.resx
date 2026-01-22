@@ -129,6 +129,9 @@
   <data name="InvalidPhoneNumber" xml:space="preserve">
     <value>رقم الهاتف غير صحيح</value>
   </data>
+  <data name="Message_DeleteConfirm" xml:space="preserve">
+    <value>هل أنت متأكد؟</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>لا</value>
   </data>

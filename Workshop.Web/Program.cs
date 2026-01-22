@@ -95,11 +95,33 @@ builder.Services.AddControllersWithViews(options =>
 var app = builder.Build();
 var accessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 PermissionHelper.Configure(accessor);
-// Configure the HTTP request pipeline.
+
+// ----------- GLOBAL EXCEPTION LOGGING -------------
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        var logger = context.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("GlobalException");
+
+        logger.LogError(ex,
+            "Unhandled MVC exception. TraceId={TraceId} Path={Path}",
+            context.TraceIdentifier,
+            context.Request.Path);
+
+        throw;
+    }
+});
+
+// MVC ERROR PAGE
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios.
     app.UseHsts();
 }
 
@@ -118,4 +140,19 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Authentication}/{action=Index}/{id?}");
 app.UseHangfireDashboard("/hangfire");
-app.Run();
+
+
+// ------------------- Run -------------------
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    var logger = app.Services
+        .GetRequiredService<ILoggerFactory>()
+        .CreateLogger("Host");
+
+    logger.LogCritical(ex, "MVC host terminated unexpectedly");
+    throw;
+}

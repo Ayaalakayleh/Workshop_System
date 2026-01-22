@@ -39,8 +39,8 @@
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.LookupCode - @item.LookupPrimaryName</td>
-                    <td>@(item.IsExternal ? "External" : "Internal")</td>
-                    <td class="d-flex gap-1 justify-content-center">
+                    <td>@(item.IsExternal? Common["Label_External"] : Common["Label_Internal"])</td>
+                    <td>
                         <a href="@Url.Action("Edit", "WIP", new { id = item.Id })"
                            class="btn btn-success btn-sm btn-open-wip"
                            data-wip-id="@item.Id">
@@ -49,7 +49,7 @@
                         <a href="@Url.Action("RepairOrderRequest", "WIP", new { id = item.Id })"
                            class="btn btn-info btn-sm btn-open-wip"
                            data-wip-id="@item.Id" target="_blank" rel="noopener noreferrer">
-                            <i class="fad fa-folder-open"></i>&nbsp;Print
+                            <i class="fad fa-print"></i>&nbsp;@Common["Button_Print"]
                         </a>
                     </td>
                 </tr>
@@ -150,5 +150,16 @@
             }
         }, true);
     })();
+        $('.main-table').DataTable({
+        responsive: true,
+        pageLength: 10,
+        info: false,
+        paging: false,
+        ordering: false,
+        dom: 'tp',
+        language: {
+            emptyTable: resources.EmptyData
+        }
+    });
 </script>
 
