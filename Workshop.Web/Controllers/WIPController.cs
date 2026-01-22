@@ -340,7 +340,14 @@ namespace Workshop.Web.Controllers
                 {
                     ViewBag.AccountTypes = new List<SelectListItem>();
                 }
-
+                // Get WIP service
+                
+                var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(15, CompanyId);
+                ViewBag.VehcileServices = VehcileServices?.Select(t => new SelectListItem
+                {
+                    Text = lang == "en" ?  t.PrimaryName : t.SecondaryName,
+                    Value = t.Id.ToString()
+                }).ToList() ?? new List<SelectListItem>();
                 // Get WIP status
                 try
                 {

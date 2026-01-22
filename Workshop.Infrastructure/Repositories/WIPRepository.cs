@@ -133,6 +133,7 @@ namespace Workshop.Infrastructure.Repositories
                 WIPId = dto.WIPId,
                 DepartmentId = dto.DepartmentId,
                 CarPark = dto.CarPark,
+                VehServiceId = dto.VehServiceId,
                 VehServiceDesc = dto.VehServiceDesc,
                 VehConcerns = dto.VehConcerns,
                 VehAdvisorNotes = dto.VehAdvisorNotes,

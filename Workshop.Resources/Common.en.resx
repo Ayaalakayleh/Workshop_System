@@ -2625,13 +2625,67 @@
   <data name="FailedCreateSeller" xml:space="preserve">
     <value>Failed to create seller</value>
   </data>
-  <data name="PriceWorkflow" xml:space="preserve">
-    <value>Parts Price Workflow</value>
+  <data name="ReportHeader_WIP" xml:space="preserve">
+    <value>WIP</value>
   </data>
-  <data name="Workflow" xml:space="preserve">
-    <value>Workflow</value>
+  <data name="ReportHeader_InvoiceDate" xml:space="preserve">
+    <value>Invoice Date</value>
   </data>
-  <data name="Label_CreateWIP" xml:space="preserve">
-    <value>Create WIP</value>
+  <data name="ReportHeader_InvoiceNumber" xml:space="preserve">
+    <value>Invoice Number</value>
+  </data>
+  <data name="ReportHeader_CompanyCode" xml:space="preserve">
+    <value>Company Code</value>
+  </data>
+  <data name="ReportHeader_Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="ReportHeader_Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="ReportHeader_CustomerName" xml:space="preserve">
+    <value>Customer Name</value>
+  </data>
+  <data name="ReportHeader_TotalAmount" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+  <data name="ReportHeader_TotalLabours" xml:space="preserve">
+    <value>Total Labours</value>
+  </data>
+  <data name="ReportHeader_TotalParts" xml:space="preserve">
+    <value>Total Parts</value>
+  </data>
+  <data name="ReportHeader_VIN" xml:space="preserve">
+    <value>VIN</value>
+  </data>
+  <data name="ReportHeader_PlateNumber" xml:space="preserve">
+    <value>Plate Number</value>
+  </data>
+  <data name="ReportHeader_ManufactureYear" xml:space="preserve">
+    <value>Manufacture Year</value>
+  </data>
+  <data name="ReportHeader_OPNumber" xml:space="preserve">
+    <value>OP Number</value>
+  </data>
+  <data name="ReportHeader_OPName" xml:space="preserve">
+    <value>OP Name</value>
+  </data>
+  <data name="ReportHeader_ServiceCode" xml:space="preserve">
+    <value>Service Code</value>
+  </data>
+  <data name="ReportHeader_ServiceDescription" xml:space="preserve">
+    <value>Service Description</value>
+  </data>
+  <data name="ReportHeader_CustomerId" xml:space="preserve">
+    <value>Customer Id</value>
+  </data>
+  <data name="ReportHeader_TotalLubes" xml:space="preserve">
+    <value>Total Lubes</value>
+  </data>
+  <data name="ReportHeader_TotalPaints" xml:space="preserve">
+    <value>Total Paints</value>
+  </data>
+  <data name="ReportHeader_Manufacturer" xml:space="preserve">
+    <value>Manufacturer</value>
   </data>
 </root>

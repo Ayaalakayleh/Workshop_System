@@ -90,6 +90,8 @@ namespace Workshop.Web.Controllers
                 VehicleClassIds = oRTSCodeDTO.VehicleClassIds,
                 Id = Id ?? 0,
                 DefaultRate = oRTSCodeDTO.DefaultRate,
+                IsOil = oRTSCodeDTO.IsOil,
+                IsPaint = oRTSCodeDTO.IsPaint
 
             };
             var skills = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(1, CompanyId);
@@ -286,6 +288,8 @@ namespace Workshop.Web.Controllers
                 VehicleClassIds = dto.VehicleClassIds,
                 CompanyId = CompanyId,
                 DefaultRate = dto.DefaultRate,
+                IsOil = dto.IsOil,
+                IsPaint = dto.IsPaint
 
             };
         }
@@ -309,7 +313,9 @@ namespace Workshop.Web.Controllers
                 EffectiveDate = dto.EffectiveDate,
                 FranchiseIds = dto.FranchiseIds,
                 VehicleClassIds = dto.VehicleClassIds,
-                DefaultRate = dto.DefaultRate
+                DefaultRate = dto.DefaultRate,
+                IsOil = dto.IsOil,
+                IsPaint = dto.IsPaint
 
             };
         }

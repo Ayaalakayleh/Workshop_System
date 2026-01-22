@@ -217,6 +217,7 @@
             var note = $("#WipNote").val();
             var dep = $("#DepartmentId").val();
             var bark = $("#CarPark").val();
+            var vehServiceId = $("#VehServiceId").val();
             var vehServiceDesc = $("#VehServiceDesc").val();
             var vehConcerns = $("#VehConcerns").val();
             var vehAdvisorNotes = $("#VehAdvisorNotes").val();
@@ -270,6 +271,7 @@
                 ManufacturingYear: $('#VehYear').val(),
                 Color: $('#VehColor').val(),
                 ChassisNo: $('#VehVIN').val(),
+                VehServiceId: vehServiceId,
                 VehServiceDesc: vehServiceDesc,
                 VehConcerns: vehConcerns,
                 VehAdvisorNotes: vehAdvisorNotes,
@@ -491,6 +493,7 @@
 
                     var vehicleTab = {
                         WIPId: WIPId,
+                        VehServiceDesc: vehServiceDesc,
                         VehServiceDesc: vehServiceDesc,
                         VehConcerns: vehConcerns,
                         VehAdvisorNotes: vehAdvisorNotes,

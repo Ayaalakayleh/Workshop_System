@@ -1,0 +1,62 @@
+@model IEnumerable<Workshop.Core.DTOs.MonthlyRepairCostReportDTO>
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<table class="table table-bordered table-hover text-center w-100 main-table">
+    <thead>
+        <tr>
+            <th>@Common["WIP"]</th>
+            <th>@Common["Invoice Date"]</th>
+            <th>@Common["Invoice Number"]</th>
+            <th>@Common["Company Code"]</th>
+            <th>@Common["Account"]</th>
+            <th>@Common["Department"]</th>
+            <th>@Common["Customer Name"]</th>
+            <th>@Common["Total Amount"]</th>
+            <th>@Common["Total Labours"]</th>
+            <th>@Common["Total Parts"]</th>
+            <th>@Common["VIN"]</th>
+            <th>@Common["Plate Number"]</th>
+            <th>@Common["Manufacture Year"]</th>
+            <th>@Common["OP Number"]</th>
+            <th>@Common["OP Name"]</th>
+            <th>@Common["Service Code"]</th>
+            <th>@Common["Service Description"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.WIP</td>
+                    <td>@item.InvoiceDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.InvoiceNumber</td>
+                    <td>@item.CompanyCode</td>
+                    <td>@item.Account</td>
+                    <td>@item.Department</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.TotalAmount?.ToString("N2")</td>
+                    <td>@item.TotalLabours?.ToString("N2")</td>
+                    <td>@item.TotalParts?.ToString("N2")</td>
+                    <td>@item.VIN</td>
+                    <td>@item.PlateNumber</td>
+                    <td>@item.ManufactureYear</td>
+                    <td>@item.OPNumber</td>
+                    <td>@item.OPName</td>
+                    <td>@item.VehServiceCode</td>
+                    <td>@item.VehServiceDesc</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="17">@Common["NoData"]</td>
+            </tr>
+        }
+    </tbody>
+</table>
