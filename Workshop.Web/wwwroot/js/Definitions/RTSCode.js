@@ -6,14 +6,14 @@
         // ===== i18n fallback =====
         var requiredText =
             (window.RazorVars && RazorVars.required_field) ||
-            (window.resources && window.resources.required_field) ||
-            "This field is required";
+                (window.resources && window.resources.required_field) ||
+                theMainLang == "en" ? "This field is required" : "هذا الحقل إلزامي";
 
         window.resources = window.resources || {};
         window.resources.required_field = window.resources.required_field || requiredText;
 
-        var successMsg = (window.resources && window.resources.success_msg) || "Saved successfully";
-        var okText = (window.resources && window.resources.ok) || "OK";
+        var successMsg = (window.resources && window.resources.success_msg) || theMainLang == "en" ? "Done Successfully" : "تمت العملية بنجاح";
+        var okText = (window.resources && window.resources.ok) || theMainLang == "en" ? "Ok" : "حسناً"
 
         // ===== soft assertions =====
         function assertLibs() {
@@ -334,7 +334,13 @@
                     if (data > 0) {
                         location.reload();
                     } else {
-                        console.error('Unable to delete the code.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: theMainLang == "en" ? 'Delete Not Allowed' : "لا يمكنك الحذف",
+                            text: theMainLang == "en" ? 'You cannot delete it because it is already in use.' : "لا يمكنك حذفه لإنه مستخدم بالفعل",
+                            confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
+                            confirmButtonColor: 'var(--primary-600)'
+                        });
                     }
                 },
                 error: function () {

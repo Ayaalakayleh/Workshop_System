@@ -36,6 +36,23 @@ const HHMMSS_to_min = (s) => {
     if (!Number.isFinite(h) || !Number.isFinite(min)) return NaN;
     return h * 60 + min;
 };
+// ====== RTL placement helper for wl-bg overlays ======
+function isRTL() {
+    const lang = (window.theMainLang || theMainLang || "en").toLowerCase();
+    return lang.startsWith("ar");
+}
+
+function setOverlayPlacement(div, leftValue, widthValue) {
+    div.style.width = widthValue;
+
+    if (isRTL()) {
+        div.style.right = leftValue;   // same % but from right
+        div.style.left = "auto";
+    } else {
+        div.style.left = leftValue;
+        div.style.right = "auto";
+    }
+}
 
 function toMinutes(hhmm) { return HHMMSS_to_min(hhmm); }
 function fromMinutes(mins) { const h = Math.floor(mins / 60), m = mins % 60; return `${pad2(h)}:${pad2(m)}`; }
@@ -418,7 +435,7 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
     const { visibleWorking, visibleBusy, reservedMerged } =
         computeVisibleWorkingByStatus(rawWorking, rawReserved);
 
-    // Normal working (default)
+    // Normal working
     visibleWorking.forEach(w => {
         const div = document.createElement("div");
         div.className = "wl-bg working";
@@ -429,13 +446,13 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         div.style.zIndex = "1";
 
         const pos = lanePosFromMinutes(w.start, w.end);
-        div.style.left = pos.left;
-        div.style.width = pos.width;
+        setOverlayPlacement(div, pos.left, pos.width);
+
         div.title = `${tech.name} • Working ${fromMinutes(w.start)}–${fromMinutes(w.end)}`;
         lane.appendChild(div);
     });
 
-    // Busy (when isWorking === true)
+    // Busy
     visibleBusy.forEach(b => {
         const div = document.createElement("div");
         div.className = "wl-bg busy";
@@ -443,16 +460,16 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         div.style.top = "0";
         div.style.bottom = "0";
         div.style.pointerEvents = "none";
-        div.style.zIndex = "1"; // same layer, but appended after -> appears on top of working
+        div.style.zIndex = "1";
 
         const pos = lanePosFromMinutes(b.start, b.end);
-        div.style.left = pos.left;
-        div.style.width = pos.width;
+        setOverlayPlacement(div, pos.left, pos.width);
+
         div.title = `${tech.name} • Busy ${fromMinutes(b.start)}–${fromMinutes(b.end)}`;
         lane.appendChild(div);
     });
 
-    // Reserved stays above everything
+    // Reserved
     reservedMerged.forEach(r => {
         const div = document.createElement("div");
         div.className = "wl-bg reserved";
@@ -463,12 +480,13 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         div.style.zIndex = "2";
 
         const pos = lanePosFromMinutes(r.start, r.end);
-        div.style.left = pos.left;
-        div.style.width = pos.width;
+        setOverlayPlacement(div, pos.left, pos.width);
+
         div.title = `${tech.name} • Reserved ${fromMinutes(r.start)}–${fromMinutes(r.end)}`;
         lane.appendChild(div);
     });
 }
+
 
 
 function makePeriodElement(e) {

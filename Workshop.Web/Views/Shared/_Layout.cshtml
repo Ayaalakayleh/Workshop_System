@@ -1229,8 +1229,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const htmlRoot = document.documentElement;
     const dxThemeLink = document.getElementById("dx-theme-style");
-    const DX_LIGHT = "/smartadmin-5-styles/plugins/data-grid/css/dx.light.css";
-    const DX_DARK  = "/smartadmin-5-styles/plugins/data-grid/css/dx.dark.css";
+    const DX_LIGHT = '@Url.Content("~/smartadmin-5-styles/plugins/data-grid/css/dx.light.css")';
+    const DX_DARK  = '@Url.Content("~/smartadmin-5-styles/plugins/data-grid/css/dx.dark.css")';
 
     function isDark() {
         return (htmlRoot.getAttribute("data-bs-theme") || "light") === "dark";

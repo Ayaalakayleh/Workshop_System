@@ -1,4 +1,7 @@
-﻿﻿.st-toolbar {
+﻿::selection{
+    background-color:var(--primary-300)
+}
+﻿.st-toolbar {
     display: none
 }
 
@@ -279,10 +282,6 @@
         opacity: 1;
     }
 
-.table tr th {
-    background-color: var(--primary-700);
-    color: #fff
-}
 
 input[type="color"] {
     height: 2.3rem
@@ -305,7 +304,6 @@ input[type="color"] {
 }
 
 .current-time {
-    color: rgba(255, 255, 255, 0.95);
     font-size: 1.6rem;
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -319,7 +317,7 @@ input[type="color"] {
 }
 
 .technician-card {
-    background: #ffffff;
+    background: var(--bs-card-cap-bg);
     border-radius: 16px;
     padding: 24px 20px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -327,7 +325,7 @@ input[type="color"] {
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    border: 2px solid transparent;
+    border: 2px solid var(--bs-border-color);
 }
 
     .technician-card::before {
@@ -354,7 +352,7 @@ input[type="color"] {
 
     .technician-card.normal::before {
         opacity: 1;
-        background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+        background: var(--primary-600)
     }
 
     .technician-card:hover {
@@ -396,8 +394,7 @@ input[type="color"] {
     }
 
     .status-badge.normal {
-        background-color: #7c3aed;
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        background-color: var(--primary-600);
     }
 
 @keyframes pulse {
@@ -434,7 +431,7 @@ input[type="color"] {
 }
 
 .technician-card.normal .technician-icon {
-    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    background: var(--primary-10);
     box-shadow: 0 4px 16px rgba(124, 58, 237, 0.1);
 }
 
@@ -461,7 +458,6 @@ input[type="color"] {
 .technician-id {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1f2937;
     margin-bottom: 10px;
     letter-spacing: -0.2px;
 }
@@ -663,7 +659,6 @@ input[type="color"] {
 .technician-modal-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1f2937;
     margin-bottom: 8px;
 }
 
@@ -810,7 +805,7 @@ input[type="color"] {
     }
 
 .numeric-modal-content {
-    background: #ffffff;
+    background: var(--app-drawer-background);
     border-radius: 24px;
     padding: 40px 30px;
     max-width: 450px;
@@ -1137,7 +1132,7 @@ html[dir="rtl"] .toggle-pin {
 
 /* Page chrome */
 .reservations-card {
-    background: #fff;
+    background: var(--app-panel-bg,#fff);
     border: 1px solid #e9eef5;
     border-radius: 14px;
     padding: 16px;
@@ -1166,7 +1161,6 @@ html[dir="rtl"] .toggle-pin {
 
     .segmented button {
         padding: 6px 12px;
-        background: #fff;
         border: 0;
         font-weight: 600
     }
@@ -1182,8 +1176,7 @@ html[dir="rtl"] .toggle-pin {
 
 .view-title {
     font-size: 1.05rem;
-    font-weight: 700;
-    color: #111827
+    font-weight: 700
 }
 
 /* Scroll/table base */
@@ -1202,15 +1195,10 @@ html[dir="rtl"] .toggle-pin {
     width: 100%
 }*/
 
-.resv-grid thead th {
-    background: #fff
-}
-
 .resv-grid thead .time-cell,
 .resv-grid tbody .time-cell {
     position: sticky;
     left: 0;
-    background: #fff;
     z-index: 9
 }
 
@@ -1233,14 +1221,12 @@ html[dir="rtl"] .toggle-pin {
 .resv-grid thead .head-row-1 th {
     position: sticky;
     top: 0;
-    background: #fff;
     z-index: 7;
 }
 
 .resv-grid thead .head-row-2 th {
     position: sticky;
     top: var(--resv-head-row1-height);
-    background: #fff;
     z-index: 6;
 }
 
@@ -1249,7 +1235,6 @@ html[dir="rtl"] .toggle-pin {
     top: 0;
     left: 0;
     z-index: 10;
-    background: #fff;
 }
 
 .day-group .day-card {
@@ -1554,8 +1539,6 @@ html[dir="rtl"] .toggle-pin {
 }
 
     .the-movements .panel {
-        border: 0;
-        background: #fff;
         border-radius: var(--radius);
         box-shadow: var(--shadow);
     }
@@ -1581,7 +1564,7 @@ html[dir="rtl"] .toggle-pin {
         border: 2px dashed var(--primary-50, #e9eafb);
         padding: clamp(.75rem, 1.2vw, 1rem);
         border-radius: 14px;
-        background: #fff;
+        background: var(--bg-body)
     }
 
     .the-movements legend {
@@ -1594,7 +1577,6 @@ html[dir="rtl"] .toggle-pin {
 
     /* ===== VEHICLE HERO ===== */
     .the-movements .vehicle-hero__card {
-        background: radial-gradient(120% 120% at 0% 0%, #f7f7fd 0%, #ffffff 52%) no-repeat #fff;
         border-radius: 18px;
         box-shadow: var(--shadow);
         padding: 18px;
@@ -1645,7 +1627,7 @@ html[dir="rtl"] .toggle-pin {
 }
 
 .the-movements .vehicle-hero__fact {
-    background: #fff;
+    background: var(--bg-body);
     border: 1px solid #eef0f6;
     border-radius: 12px;
     padding: 10px 12px;
@@ -1669,7 +1651,7 @@ html[dir="rtl"] .toggle-pin {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #fcfcff;
+    background: var(--bg-body);
     border: 1px dashed #e5e7f3;
     padding: 9px 12px;
     border-radius: 12px;
@@ -1713,7 +1695,7 @@ html[dir="rtl"] .toggle-pin {
     border: 1px solid #e6e9f2;
     border-radius: 12px;
     padding: 10px 12px;
-    background: #fff;
+    background: var(--secondary-50);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1745,7 +1727,7 @@ html[dir="rtl"] .toggle-pin {
 
 /* customer card */
 .the-movements .customer-card {
-    background: #fff;
+    background: var(--bg-body);
     border: 1px solid #eef0f6;
     border-radius: 18px;
     padding: 14px;
@@ -1760,11 +1742,10 @@ html[dir="rtl"] .toggle-pin {
     flex: 0 0 64px;
     height: 64px;
     border-radius: 16px;
-    background: #f3f4ff;
+    background: var(--bg-body);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
 
     .the-movements .customer-card__icon i {
@@ -1775,7 +1756,6 @@ html[dir="rtl"] .toggle-pin {
 .the-movements .customer-card__body h4 {
     font-size: .95rem;
     margin: 0 0 .25rem;
-    color: #111827;
 }
 
 .the-movements .customer-card__body .val {
@@ -3106,9 +3086,6 @@ html[dir="rtl"] .toggle-pin {
     margin: .5rem 0
 }*/
 
-.resv-grid th {
-    color: #444 !important
-}
 
 #serviceReminderModal .input-group > .form-control,
 #serviceReminderModal .input-group > .form-floating, .input-group > .form-select {
@@ -3139,7 +3116,7 @@ html[dir="rtl"] .toggle-pin {
 }
 
 .modal .resv-modal-plate {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     letter-spacing: 0.04em;
 }
@@ -3171,14 +3148,12 @@ html[dir="rtl"] .toggle-pin {
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #6b7280;
     font-weight: 600;
 }
 
 .modal .resv-value {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #111827;
 }
 
 /* Description block */
@@ -3191,7 +3166,6 @@ html[dir="rtl"] .toggle-pin {
 
 .modal .resv-description {
     font-size: 0.9rem;
-    color: #111827;
 }
 
 /* Accordion version tweaks – scoped */
@@ -3225,7 +3199,23 @@ html[dir="rtl"] .toggle-pin {
 .select2-container--default .select2-selection--single.is-invalid:hover {
     border-color: #dc3545 !important;
 }
+#techpageContent {
+    visibility: hidden;
+}
 
+.tech-page-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+}
+
+    .tech-page-loader img {
+        width: 250px
+    }
 .the-accouting-loader {
     display: none;
     justify-content: center;
@@ -3254,6 +3244,17 @@ html[dir="rtl"] .toggle-pin {
 #PlateNumber {
     direction: ltr !important;
 }
+.demo-container::before {
+    display: none !important;
+}
+.table thead tr th{
+    background-color:var(--primary-600);
+    color:#fff
+}
+.table.resv-grid thead tr th {
+    background-color: var(--bg-body);
+    color: var(--bs-body-color);
+}
 /*Start fix change Lang/Branch on mobile menu*/
 @media (max-width: 576px) {
     .header-icon .dropdown-menu,
@@ -3274,6 +3275,7 @@ html[dir="rtl"] .toggle-pin {
         padding-left: 12px;
         display: none;
     }
+
     .dropdown-submenu.show > .dropdown-menu {
         display: block !important;
     }
@@ -3328,12 +3330,14 @@ html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter {
     color: var(--bs-body-color);
 }
-
 html[data-bs-theme="dark"] .dataTables_wrapper input,
 html[data-bs-theme="dark"] .dataTables_wrapper select {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
     border-color: var(--bs-border-color);
+}
+.dx-fieldset-header {
+    display: none !important;
 }
 /* intlTelInput Dark Mode Fix */
 html[data-bs-theme="dark"] .iti__country-list {
@@ -3479,19 +3483,74 @@ html[data-bs-theme="dark"] .filepond--image-preview-overlay {
 html[data-bs-theme="dark"] .filepond--credits {
     color: var(--fp-muted) !important;
 }
-
+#new_quickAccess .app-page-title .page-title-icon {
+    background-color: var(--light)
+}
+html[data-bs-theme="dark"] .modal .resv-field {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(59, 130, 246, 0.03));
+    border: 1px solid rgba(148, 163, 184, 0.3)
+}
+html[data-bs-theme="dark"] .modal .resv-description-card,
+html[data-bs-theme="dark"] .vehicle-hero__card {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(59, 130, 246, 0.03));
+    border: 1px solid rgba(148, 163, 184, 0.3)
+}
+html[data-bs-theme="dark"] .segmented button.active {
+    background-color: var(--bg-body)
+}
+html[data-bs-theme="dark"] .the-movements .status-button__icon,
+html[data-bs-theme="dark"] .the-movements .status-button__chip {
+    background-color: #444;
+    box-shadow: none;
+    border:none
+}
+html[data-bs-theme="dark"] .vehicle-card {
+    background-color:#444
+}
+html[data-bs-theme="dark"] .spec-label {
+    color:#ccc
+}
+html[data-bs-theme="dark"] div.dm-wrapperDiv div.dm-innerDiv {
+    background-color: #242933;
+    border-bottom-color: #242933;
+}
 /* End Dark Mode Customization */
 @media (max-width: 450px) {
-    #new_quickAccess .app-page-title img{
-        width:12rem
+    #new_quickAccess .app-page-title img {
+        width: 12rem
     }
-    #LookupForm{
-        overflow-x:auto
+
+    #LookupForm, #MaintenanceCard, .table-mobile {
+        overflow-x: auto
     }
-    .panel-hdr .h2, .panel-hdr h2{
-        line-height:1.5rem
+
+    .panel-hdr .h2, .panel-hdr h2 {
+        line-height: 1.5rem
     }
-    .panel{
-        padding-top:2.5%
+
+    .panel {
+        padding-top: 2.5%
+    }
+
+    .the-movements .scratch-inner {
+        width: unset;
+    }
+
+    .scratch-wrap {
+        overflow: hidden;
+        overflow-x: auto
+    }
+
+    .scratch-controls button {
+        margin: .5rem 0
+    }
+
+    .viewbar {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .reservations-card .d-flex.align-items-center.gap-2 {
+        flex-direction: column
     }
 }
