@@ -331,7 +331,7 @@
     <value>Try Again</value>
   </data>
   <data name="Ok" xml:space="preserve">
-    <value>OK</value>
+    <value>Ok</value>
   </data>
   <data name="msgSuccessTitle" xml:space="preserve">
     <value>The operation was successful</value>
@@ -2651,5 +2651,32 @@
   </data>
   <data name="Notify" xml:space="preserve">
     <value>Notify</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="NoAgreement" xml:space="preserve">
+    <value>No Agreement</value>
+  </data>
+  <data name="Label_Invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="Label_PartialAccount" xml:space="preserve">
+    <value>Partial Account</value>
+  </data>
+  <data name="NoServiceHistoryFound" xml:space="preserve">
+    <value>No Service History Found</value>
+  </data>
+  <data name="NoInvoicesFound" xml:space="preserve">
+    <value>No Invoices Found</value>
+  </data>
+  <data name="Label_Net" xml:space="preserve">
+    <value>Net</value>
+  </data>
+  <data name="Label_Discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="Label_ReferanceNo" xml:space="preserve">
+    <value>Referance No.</value>
   </data>
 </root>

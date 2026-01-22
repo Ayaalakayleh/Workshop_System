@@ -39,7 +39,7 @@
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.LookupCode - @item.LookupPrimaryName</td>
-                    <td>@(item.IsExternal ? "External" : "Internal")</td>
+                    <td>@(item.IsExternal? Common["Label_External"] : Common["Label_Internal"])</td>
                     <td>
                         <a href="@Url.Action("Edit", "WIP", new { id = item.Id })"
                            class="btn btn-success btn-sm btn-open-wip"

@@ -446,7 +446,7 @@ namespace Workshop.Web.Controllers
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
 
                         selectedCustomerId = activeAgreement?.CustomerId;
-                        var status = (activeAgreement?.AgreementId > 0) ? "Open" : "No Agreement";
+                        var status = (activeAgreement?.AgreementId > 0) ? _common["Open"] : _common["NoAgreement"];
 
 
                         ViewBag.AgreementStatus = status;
