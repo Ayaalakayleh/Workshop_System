@@ -197,10 +197,10 @@ $(document).on('click', 'button[type=reset]', function () {
                 '<span class="field-error"></span>' +
                 '</td>' +
             '<td>' +
-                '<button type="button" class="btn btn-primary btn-sm submitLookup" hidden>' +
+                '<button type="button" class="btn btn-primary btn-sm btn-w-m my-1 submitLookup" hidden>' +
                     '<i class="fa fa-save"></i>&nbsp;' + RazorVars.save +
                     '</button>&nbsp;' +
-                '<button type="button" onclick="search()" class="btn btn-secondary text-white btn-sm" data-id="0">' +
+                '<button type="button" onclick="search()" class="btn btn-secondary text-white btn-sm btn-w-m my-1" data-id="0">' +
                     '<i class="fa fa-times"></i>&nbsp;' + RazorVars.cancel +
                     '</button>' +
                 '</td>' +
@@ -226,7 +226,7 @@ $(document).on('click', 'button[type=reset]', function () {
     return $row.find('td').eq(tdIndex).find('span.field-error');
   }
 
-        var requiredMsg = (window.resources && resources.required_field) || 'Required';
+            var requiredMsg = theMainLang == "en" ? "This Field is Required" : "هذا الحقل مطلوب";
 
         // Collect fields (column indices: 1:Code, 2:PrimaryName, 3:SecondaryName)
         var $code      = $row.find('input[name="Code"]');

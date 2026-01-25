@@ -241,6 +241,7 @@ namespace Workshop.Core.DTOs
         public int WIPId { get; set; }
         public int VehicleId { get; set; }
         public string? VehServiceDesc { get; set; }
+        public int? VehServiceId { get; set; }
         public string? VehConcerns { get; set; }
         public string? VehAdvisorNotes { get; set; }
         public int? DepartmentId { get; set; }

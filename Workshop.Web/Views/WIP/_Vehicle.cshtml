@@ -113,6 +113,18 @@
 				<div class="card-header"><h5 class="mb-0">@Common["Title_VehicleDetails"]</h5></div>
 				<div class="card-body">
 					<div class="row g-3">
+
+						
+						<div class="col-12"><label class="form-label">@Common["Label_ServiceCode"]</label>
+
+							@Html.DropDownListFor(
+														model => model.VehServiceId,
+														(IEnumerable<SelectListItem>)ViewBag.VehcileServices,
+														new { @class = "form-control", @id = "VehServiceId" }
+														)
+
+
+							</div>
 						<div class="col-12"><label class="form-label">@Common["Label_ServiceDescription"]</label><textarea class="form-control" rows="3" id="VehServiceDesc"></textarea></div>
 						<div class="col-12"><label class="form-label">@Common["Label_CustomerConcerns"]</label><textarea class="form-control" rows="3" id="VehConcerns"></textarea></div>
 						<div class="col-12"><label class="form-label">@Common["Label_AdvisorNotes"]</label><textarea class="form-control" rows="3" id="VehAdvisorNotes"></textarea></div>

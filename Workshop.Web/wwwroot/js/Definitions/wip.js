@@ -231,43 +231,44 @@
                 var itemsJson = JSON.stringify(gridItems);
                 $("#Items").val(itemsJson);
 
-                var WIPId = $('#Id').val();
-                var WsId = 10;//$("#FK_WarehouseId").val();
-                var VehId = $('#_vehicleId').val();
-                var MovId = $('#_movementId').val();
-                var accountType = $("#AccountType").val();
-                var salesType = $("#SalesType").val();
-                var customer = $("#CustomerId").val();
-                var currency = $("#CurrencyId").val();
-                var terms = $("#TermsId").val();
-                var vat = $("#Vat").val();
-                var partialAccountType = $("#PartialAccountType").val();
-                var partialSalesType = $("#PartialSalesType").val();
-                var partialCustomer = $("#PartialCustomerId").val();
-                var partialCurrency = $("#PartialCurrencyId").val();
-                var partialTerms = $("#PartialTermsId").val();
-                var partialVat = $("#PartialVat").val();
-                var status = $("#statusId").val();
-                var wipDate = $("#WipDate").val();
-                var note = $("#WipNote").val();
-                var dep = $("#DepartmentId").val();
-                var bark = $("#CarPark").val();
-                var vehServiceDesc = $("#VehServiceDesc").val();
-                var vehConcerns = $("#VehConcerns").val();
-                var vehAdvisorNotes = $("#VehAdvisorNotes").val();
-                var odometerPrevious = $('#OdoPrev').val();
-                var odometerCurrentIN = $('#OdoCurrentIn').val();
-                var odometerCurrentOUT = $('#OdoCurrentOut').val();
-                var optPartialInv = $("#optPartialInv").is(":checked");
-                var optReturnParts = $("#optReturnParts").is(":checked");
-                var optRepeatRepair = $("#optRepeatRepair").is(":checked");
-                var optUpdateDemand = $("#optUpdateDemand").is(":checked");
-                var inv_AccountType = $("#invAccountType").val();
-                var inv_InvoiceNo = $("#InvoiceNo").val();
-                var inv_Date = $("#invDate").val();
-                var inv_Total = $("#invTotal").val();
-                var inv_Tax = $("#invTax").val();
-                var inv_Net = $("#invNet").val();
+            var WIPId = $('#Id').val();
+            var WsId = 10;//$("#FK_WarehouseId").val();
+            var VehId = $('#_vehicleId').val();
+            var MovId = $('#_movementId').val();
+            var accountType = $("#AccountType").val();
+            var salesType = $("#SalesType").val();
+            var customer = $("#CustomerId").val();
+            var currency = $("#CurrencyId").val();
+            var terms = $("#TermsId").val();
+            var vat = $("#Vat").val();
+            var partialAccountType = $("#PartialAccountType").val();
+            var partialSalesType = $("#PartialSalesType").val();
+            var partialCustomer = $("#PartialCustomerId").val();
+            var partialCurrency = $("#PartialCurrencyId").val();
+            var partialTerms = $("#PartialTermsId").val();
+            var partialVat = $("#PartialVat").val();
+            var status = $("#statusId").val();
+            var wipDate = $("#WipDate").val();
+            var note = $("#WipNote").val();
+            var dep = $("#DepartmentId").val();
+            var bark = $("#CarPark").val();
+            var vehServiceId = $("#VehServiceId").val();
+            var vehServiceDesc = $("#VehServiceDesc").val();
+            var vehConcerns = $("#VehConcerns").val();
+            var vehAdvisorNotes = $("#VehAdvisorNotes").val();
+            var odometerPrevious = $('#OdoPrev').val();
+            var odometerCurrentIN = $('#OdoCurrentIn').val();
+            var odometerCurrentOUT = $('#OdoCurrentOut').val();
+            var optPartialInv = $("#optPartialInv").is(":checked");
+            var optReturnParts = $("#optReturnParts").is(":checked");
+            var optRepeatRepair = $("#optRepeatRepair").is(":checked");
+            var optUpdateDemand = $("#optUpdateDemand").is(":checked");
+            var inv_AccountType = $("#invAccountType").val();
+            var inv_InvoiceNo = $("#InvoiceNo").val();
+            var inv_Date = $("#invDate").val();
+            var inv_Total = $("#invTotal").val();
+            var inv_Tax = $("#invTax").val();
+            var inv_Net = $("#invNet").val();
 
                 var accountDetails = {
                     WIPId: WIPId ?? 0,
@@ -285,25 +286,35 @@
                     PartialVat: partialVat
                 };
 
-                var vehicleTab = {
-                    WIPId: WIPId,
-                    VehicleId: VehId,
-                    PlateNumber: $('#VehPlate').val(),
-                    ManufacturerId: $('#VehMakeModel').val(),
-                    ModelId: $('#VehModel').val(),
-                    ClassId: $('#VehClass').val(),
-                    ManufacturingYear: $('#VehYear').val(),
-                    Color: $('#VehColor').val(),
-                    ChassisNo: $('#VehVIN').val(),
-                    VehServiceDesc: vehServiceDesc,
-                    VehConcerns: vehConcerns,
-                    VehAdvisorNotes: vehAdvisorNotes,
-                    DepartmentId: dep,
-                    CarPark: bark,
-                    OdometerPrevious: odometerPrevious,
-                    OdometerCurrentIN: odometerCurrentIN,
-                    OdometerCurrentOUT: odometerCurrentOUT
-                };
+            //var invoiceDetails = {
+            //    WIPId: WIPId ?? 0,
+            //    AccountType: inv_AccountType,
+            //    InvoiceNo: inv_InvoiceNo,
+            //    InvoiceDate: inv_Date,
+            //    Total: inv_Total,
+            //    Tax: inv_Tax,
+            //    Net: inv_Net
+            //};
+
+            var vehicleTab = {
+                WIPId: WIPId,
+                VehicleId: VehId,
+                PlateNumber: $('#VehPlate').val(),
+                ManufacturerId: $('#VehMakeModel').val(),
+                ModelId: $('#VehModel').val(),
+                ClassId: $('#VehClass').val(),
+                ManufacturingYear: $('#VehYear').val(),
+                Color: $('#VehColor').val(),
+                ChassisNo: $('#VehVIN').val(),
+                VehServiceDesc: vehServiceDesc,
+                VehConcerns: vehConcerns,
+                VehAdvisorNotes: vehAdvisorNotes,
+                DepartmentId: dep,
+                CarPark: bark,
+                OdometerPrevious: odometerPrevious,
+                OdometerCurrentIN: odometerCurrentIN,
+                OdometerCurrentOUT: odometerCurrentOUT
+            };
 
                 var optionsTab = {
                     WIPId: WIPId,
@@ -521,6 +532,7 @@
 
                     var vehicleTab = {
                         WIPId: WIPId,
+                        VehServiceDesc: vehServiceDesc,
                         VehServiceDesc: vehServiceDesc,
                         VehConcerns: vehConcerns,
                         VehAdvisorNotes: vehAdvisorNotes,

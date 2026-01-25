@@ -64,5 +64,6 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<int> UpdateWIPStatus(UpdateWIPStatusDTO dto);
         Task<IEnumerable<WipInvoiceDetailDTO>> WIP_InvoiceDetails_GetByHeaderId(int headerId);
         Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services);
+        Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal);
     }
 }

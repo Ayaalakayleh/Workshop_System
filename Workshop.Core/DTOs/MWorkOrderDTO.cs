@@ -225,4 +225,18 @@ namespace Workshop.Core.DTOs
 		public bool IsExternal { set; get; }
 
 	}
+
+
+    public class PendingClaimAccidentWorkOrderDTO
+    {
+        public int? WorkOrderNo { get; set; }
+        public string? AccidentNo { get; set; }
+        public int FK_AgreementId { get; set; }
+        public int? ClaimStatus { get; set; }
+        public int? RequestMaintinenceStatusId { get; set; }
+        public string? Primaryname { get; set; }
+        public string? SeconderyName { get; set; }
+        public int VehicleId { get; set; }
+        public bool? IsExternal { get; set; }
+    }
 }

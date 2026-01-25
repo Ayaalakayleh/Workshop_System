@@ -21,7 +21,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>@ViewData["Title"] - @CommonLocalizer["WorkshopSystem"]</title>
+    <title>@ViewData["Title"] - @CommonLocalizer["Title_WorkshopSystem"]</title>
     <meta name="description" content="Page Description">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=5">
@@ -1222,22 +1222,15 @@
     /*End fix change Lang/Branch on mobile menu*/
 
 
-   /* Start Apply RTL and Dark mode on the DevExpress */
+/* Start DevExtreme Global RTL + Dark + Responsive Sync with SmartAdmin */
 document.addEventListener("DOMContentLoaded", function () {
 
+    if (!window.DevExpress?.ui) return;
+
     const htmlRoot = document.documentElement;
-
-    if (window.DevExpress?.localization) {
-        DevExpress.localization.locale(htmlRoot.lang || "en");
-    }
-
     const dxThemeLink = document.getElementById("dx-theme-style");
-
-    const DX_LIGHT = "/smartadmin-5-styles/plugins/data-grid/css/dx.light.css";
-    const DX_DARK = "/smartadmin-5-styles/plugins/data-grid/css/dx.dark.css";
-
-    let lastTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
-    let lastDir = htmlRoot.getAttribute("dir") || "ltr";
+    const DX_LIGHT = '@Url.Content("~/smartadmin-5-styles/plugins/data-grid/css/dx.light.css")';
+    const DX_DARK  = '@Url.Content("~/smartadmin-5-styles/plugins/data-grid/css/dx.dark.css")';
 
     function isDark() {
         return (htmlRoot.getAttribute("data-bs-theme") || "light") === "dark";
@@ -1247,40 +1240,98 @@ document.addEventListener("DOMContentLoaded", function () {
         return (htmlRoot.getAttribute("dir") || "ltr").toLowerCase() === "rtl";
     }
 
-    function repaintAllDxDataGrids() {
-        if (!window.DevExpress?.ui?.dxDataGrid) return;
-
+    function isPhone() {
+        try {
+            return DevExpress.devices.current().deviceType === "phone";
+        } catch (e) {
+            return window.innerWidth < 768;
+        }
+    }
+    function updateAllDxTables() {
         document.querySelectorAll(".dx-datagrid").forEach(el => {
             const grid = DevExpress.ui.dxDataGrid.getInstance(el);
-            if (grid) grid.repaint();
+            if (grid) {
+                grid.updateDimensions();
+                grid.repaint();
+            }
+        });
+        document.querySelectorAll(".dx-treelist").forEach(el => {
+            const tree = DevExpress.ui.dxTreeList?.getInstance(el);
+            if (tree) {
+                tree.updateDimensions();
+                tree.repaint();
+            }
         });
     }
-
     function applyDxTheme() {
         if (!dxThemeLink) return;
         dxThemeLink.href = isDark() ? DX_DARK : DX_LIGHT;
-        setTimeout(repaintAllDxDataGrids, 50);
+        setTimeout(updateAllDxTables, 80);
     }
-
     function applyDxRTL() {
-        if (!window.DevExpress) return;
-
         const rtl = isRTL();
-
         DevExpress.config({ rtlEnabled: rtl });
+        document.querySelectorAll(".dx-datagrid").forEach(el => {
+            const grid = DevExpress.ui.dxDataGrid.getInstance(el);
+            if (grid) grid.option("rtlEnabled", rtl);
+        });
 
-        if (window.DevExpress?.ui?.dxDataGrid) {
-            document.querySelectorAll(".dx-datagrid").forEach(el => {
-                const grid = DevExpress.ui.dxDataGrid.getInstance(el);
-                if (grid) grid.option("rtlEnabled", rtl);
-            });
+        document.querySelectorAll(".dx-treelist").forEach(el => {
+            const tree = DevExpress.ui.dxTreeList?.getInstance(el);
+            if (tree) tree.option("rtlEnabled", rtl);
+        });
+
+        updateAllDxTables();
+    }
+    function applyDxLocale() {
+        if (window.DevExpress?.localization) {
+            DevExpress.localization.locale(htmlRoot.lang || "en");
         }
-
-        repaintAllDxDataGrids();
+    }
+    if (DevExpress.ui.dxDataGrid?.defaultOptions) {
+        DevExpress.ui.dxDataGrid.defaultOptions({
+            device: () => isPhone(),
+            options: {
+                width: "100%",
+                columnHidingEnabled: true,
+                columnAutoWidth: true,
+                wordWrapEnabled: true,
+                scrolling: {
+                    useNative: true,
+                    showScrollbar: "always"
+                },
+                hoverStateEnabled: false,
+                rowAlternationEnabled: false,
+                columnChooser: {
+                    enabled: true,
+                    mode: "select"
+                },
+                rtlEnabled: isRTL()
+            }
+        });
     }
 
+    if (DevExpress.ui.dxTreeList?.defaultOptions) {
+        DevExpress.ui.dxTreeList.defaultOptions({
+            device: () => isPhone(),
+            options: {
+                width: "100%",
+                columnHidingEnabled: true,
+                columnAutoWidth: true,
+                wordWrapEnabled: true,
+                scrolling: {
+                    useNative: true,
+                    showScrollbar: "always"
+                },
+                rtlEnabled: isRTL()
+            }
+        });
+    }
+    applyDxLocale();
     applyDxTheme();
     applyDxRTL();
+    let lastTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
+    let lastDir = htmlRoot.getAttribute("dir") || "ltr";
 
     new MutationObserver(() => {
         const newTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
@@ -1299,13 +1350,22 @@ document.addEventListener("DOMContentLoaded", function () {
         attributes: true,
         attributeFilter: ["data-bs-theme", "dir"]
     });
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(updateAllDxTables, 200);
+    });
+
+    window.addEventListener("orientationchange", () => {
+        setTimeout(updateAllDxTables, 250);
+    });
 
 });
-/* End Apply RTL and Dark mode on the DevExpress */
+/* End DevExtreme Global RTL + Dark + Responsive */
+
 </script>
 
 @await RenderSectionAsync("Scripts", required: false)
-
 
 </body>
 </html>

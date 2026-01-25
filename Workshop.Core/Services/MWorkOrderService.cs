@@ -508,5 +508,17 @@ namespace Workshop.Core.Services
 				throw new Exception("Error in GetWorkOrdersSummeryByVehicleIdAsync", ex);
 			}
 		}
-	}
+
+        public async Task<List<PendingClaimAccidentWorkOrderDTO>> GetPendingClaimsAccidentWorkOrdersAsync(int? requestMaintinenceStatusId = null)
+        {
+            try
+            {
+                return await _mWorkOrderRepository.GetPendingClaimsAccidentWorkOrdersAsync(requestMaintinenceStatusId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in GetPendingClaimsAccidentWorkOrdersAsync", ex);
+            }
+        }
+    }
 }

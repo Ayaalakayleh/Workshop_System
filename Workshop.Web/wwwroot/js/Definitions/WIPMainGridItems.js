@@ -73,7 +73,7 @@ $(function () {
             { dataField: "Name", caption: window.RazorVars.DXName, allowEditing: false, alignment: "left" },
             {
                 dataField: "WarehouseId",
-                caption: "Warehouse",
+                caption: theMainLang == "en" ? "Warehouse" : "المستودع",
                 visible: true,
                 allowEditing: false,
                 alignment: "left",
@@ -486,7 +486,7 @@ $(function () {
             },
             {
                 dataField: "PartsIssueId", allowEditing: false,
-                caption: "Issue No.",
+                caption: theMainLang == "en" ? "Issue No.": "رقم الإستلام",
                 visible: true,
                 alignment: "left"
             },

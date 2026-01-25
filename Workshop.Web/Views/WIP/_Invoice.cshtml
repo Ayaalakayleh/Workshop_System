@@ -12,15 +12,15 @@
                 <thead>
                     <tr class="small text-muted">
                         <th>@Common["Label_AccountType"]</th>
-                        <th>Invoice No.</th>
-                        <th>Invoice Type</th>
-                        <th>Referance No.</th>
+                        <th>@Common["Label_InvoiceNo"]</th>
+                        <th>@Common["Label_InvoiceType"]</th>
+                        <th>@Common["Label_ReferanceNo"]</th>
                         <th>@Common["Label_Date"]</th>
-                        <th>Total</th>
-                        <th>Discount</th>
-                        <th>Tax</th>
-                        <th>Net</th>
-                        <th>Action</th>
+                        <th>@Common["Label_Total"]</th>
+                        <th>@Common["Label_Discount"]</th>
+                        <th>@Common["Label_Tax"]</th>
+                        <th>@Common["Label_Net"]</th>
+                        <th>@Common["Label_Action"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,12 +32,12 @@
                                 <td>
                                     @if (item.AccountType == 1)
                                     {
-                                        <label>Internal</label>
+                                        <label>@Common["Label_Internal"]</label>
                                     }
                                     else
                                     {
                                         <label>
-                                            External
+                                            @Common["Label_External"]
                                         </label>
                                     }
                                 </td>
@@ -45,12 +45,12 @@
                                 <td>
                                     @if (item.InvoiceType==1)
                                     {
-                                        <label>Invoice</label>
+                                        <label>@Common["Label_Invoice"]</label>
                                     }
                                     else
                                     {
                                         <label>
-                                            Credit Note
+                                            @Common["Label_CreditNote"]
                                         </label>
                                     }
                                 </td>

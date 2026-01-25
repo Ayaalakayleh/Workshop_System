@@ -1,6 +1,7 @@
 ﻿@using Workshop.Core.DTOs
 @using Workshop.Resources
 @model RecallModel
+@using Newtonsoft.Json
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
@@ -70,6 +71,32 @@
 </style>
 
 <script>
+    window.LABELS = @Html.Raw(JsonConvert.SerializeObject(new {
+    Id = Common["Label_ID"].Value,
+    Make = Common["Label_Make"].Value,
+    Model = Common["Label_Model"].Value,
+    Chassis = Common["Label_Chassis"].Value,
+    Action = Common["Label_Action"].Value,
+    NoData = Common["Label_NoData"].Value,
+
+    DeleteConfirmTitle = Common["Label_Confirm"].Value,
+    DeleteConfirmText = Message["Message_DeleteConfirm"].Value,
+    Yes = Common["Label_Yes"].Value,
+    No = Common["Label_No"].Value,
+
+    // ✅ add these because you use them in recall.js
+    Error = Common["Label_Error"].Value,
+    RecallSaveTitle = Common["Label_SuccessTitle"].Value,
+    RecallSaveText = Message["Message_SaveSuccess"].Value,
+
+    ImportSuccessTitle = Common["Label_Imported"].Value,
+    ImportSuccessText = Message["Message_ImportSuccess"].Value,
+    ImportErrorText = Message["Message_ImportError"].Value,
+
+    FilepondIdle = Common["Label_FilepondIdle"].Value,
+    FileTypeExcelOnly = Common["Validation_FileTypeExcel"].Value,
+    FileRequired = Common["Validation_FileRequired"].Value
+}));
     window.RazorVars = Object.assign({}, window.RazorVars || {}, {
         indexUrl: '@Url.Action("Index", "Recall")',
         importTemplateUrl: '@Url.Action("ImportTemplate", "Recall")',
@@ -77,5 +104,4 @@
         deleteRecallUrl: '@Url.Action("DeleteRecall", "Recall")'
     });
 </script>
-
 <script src="~/js/definitions/recall.js"></script>
