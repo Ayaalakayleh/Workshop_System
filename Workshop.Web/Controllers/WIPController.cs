@@ -180,8 +180,8 @@ namespace Workshop.Web.Controllers
                         ViewBag.HasExternalInvoices = false;
                     }
 
-                    var movementOperators =  await GetMovementOperatorsAsync(movementId, dto);
-                     
+                    var movementOperators = await GetMovementOperatorsAsync(movementId, dto);
+
                     ViewBag.DueInDate = movementOperators.DueInDate;
                     ViewBag.ReceivedMeter = movementOperators.ReceivedMeter;
                     ViewBag.CreatingOperator = movementOperators.CreatingOperator;
@@ -212,9 +212,22 @@ namespace Workshop.Web.Controllers
 
                     // Get services
                     ViewBag.Services = await GetWipServicesAsync(id.Value);
-                   
 
+                    var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, (int)dto.VehicleId);
 
+                    var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
+                    ViewBag.VehicleCustomers = vehicleCustomers?.Select(t => new SelectListItem
+                    {
+                        Text = lang == "en" ? t.CustomerPrimaryName : t.CustomerSecondaryname,
+                        Value = t.Id.ToString()
+                    }).ToList() ?? new List<SelectListItem>();
+                    if (openAgreement.Count > 0)
+                    {
+                        var firstAgreement = openAgreement?.FirstOrDefault();
+                        dto.CompanyId = (int)firstAgreement?.CustomerId;
+
+                    }
+                    
                     // Get account details
                     dto.InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(dto.Id, null);
 
@@ -2410,6 +2423,16 @@ namespace Workshop.Web.Controllers
                 model.CreatedDate = Details.CreatedAt?.ToString("dd-MM-yyyy");
                 var oo = await _apiClient.WIP_GetOptionsById(Id);
                 model.RepeatRepair = oo.RepeatRepair == true ? "Yes" : "No";
+
+                var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, vehicleId);
+
+                if (openAgreement.Count > 0)
+                {
+                    var firstAgreement = openAgreement?.FirstOrDefault();
+                    var vehicleCustomers = await _vehicleApiClient.GetCustomerData((int)firstAgreement.CustomerId);
+                    model.Company = lang=="en" ? vehicleCustomers.CustomerPrimaryName : vehicleCustomers.CustomerSecondaryname;
+
+                }
                 return View(model);
             }
             catch (Exception ex)

@@ -2,6 +2,7 @@
 @using Workshop.Domain.Enum;
 @using Newtonsoft.Json
 @using Workshop.Core.DTOs
+@using Workshop.Core.DTOs.AccountingDTOs
 @using Workshop.Resources
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
@@ -179,21 +180,27 @@
 					</div>
 					<!-- /tab-content -->
 					<div class="row g-3">
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label class="form-label">@Common["Label_WIPstatus"]</label>
 							<div class="d-flex flex-column">
 								@Html.DropDownListFor(m => m.Status, new SelectList(ViewBag.Status, "Value", "Text"), new { @class = "form-control", id = "statusId" })
 								@Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label>@Common["Label_Date"]</label>
 							<div class="d-flex flex-column">
 								@Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate" })
 								@Html.ValidationMessageFor(m => m.WipDate, "", new { @class = "text-danger" })
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<label>Company</label>
+							<div class="d-flex flex-column">
+								@Html.DropDownList("CompanyId", new SelectList(ViewBag.VehicleCustomers, "Value", "Text"), " ", new { @class = "form-control", disabled = "disabled " })
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label>@Common["Label_WIPNo"]</label>
 							<div class="d-flex flex-column">
 								@* @Html.LabelFor(model => model.Id) *@

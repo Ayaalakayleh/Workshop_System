@@ -52,6 +52,7 @@ namespace Workshop.Core.DTOs
         public string? LookupPrimaryName { get; set; }
         public string? LookupSecondaryName { get; set; }
         public int? ClosedBy { get; set; }
+        public int? CompanyId { get; set; }
     }
 
     public class AccountDTO

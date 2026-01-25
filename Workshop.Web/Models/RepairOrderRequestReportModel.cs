@@ -34,6 +34,7 @@ namespace Workshop.Web.Models
         public string? DateLastVisit { get; set; }
         public string? AccountNo { get; set; }
         public string? RepeatRepair { get; set; }
+        public string? Company { get; set; }
         //public List<string>? Services { get; set; }
         public List<VehicleChecklist>? VehicleCkecklist { get; set; }
         public List<TyreChecklist>? TyreCkecklist { get; set; }
