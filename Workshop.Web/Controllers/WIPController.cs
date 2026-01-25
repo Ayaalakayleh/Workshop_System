@@ -311,7 +311,14 @@ namespace Workshop.Web.Controllers
                 {
                     ViewBag.AccountTypes = new List<SelectListItem>();
                 }
-
+                // Get WIP service
+                
+                var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(15, CompanyId);
+                ViewBag.VehcileServices = VehcileServices?.Select(t => new SelectListItem
+                {
+                    Text = lang == "en" ?  t.PrimaryName : t.SecondaryName,
+                    Value = t.Id.ToString()
+                }).ToList() ?? new List<SelectListItem>();
                 // Get WIP status
                 try
                 {
@@ -417,7 +424,7 @@ namespace Workshop.Web.Controllers
                         var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(dto.VehicleId);
 
                         selectedCustomerId = activeAgreement?.CustomerId;
-                        var status = (activeAgreement?.AgreementId > 0) ? "Open" : "No Agreement";
+                        var status = (activeAgreement?.AgreementId > 0) ? _common["Open"] : _common["NoAgreement"];
 
 
                         ViewBag.AgreementStatus = status;

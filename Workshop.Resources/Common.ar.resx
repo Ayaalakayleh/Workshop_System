@@ -2625,14 +2625,68 @@
   <data name="FailedCreateSeller" xml:space="preserve">
     <value>تعذر إنشاء البائع</value>
   </data>
-  <data name="PriceWorkflow" xml:space="preserve">
-    <value>سير عمل اسعار القطع</value>
+  <data name="ReportHeader_WIP" xml:space="preserve">
+    <value>أمر العمل</value>
   </data>
-  <data name="Workflow" xml:space="preserve">
-    <value>سير العمل</value>
+  <data name="ReportHeader_InvoiceDate" xml:space="preserve">
+    <value>تاريخ الفاتورة</value>
   </data>
-  <data name="Label_CreateWIP" xml:space="preserve">
-    <value>انشاء امر عمل </value>
+  <data name="ReportHeader_InvoiceNumber" xml:space="preserve">
+    <value>رقم الفاتورة</value>
+  </data>
+  <data name="ReportHeader_CompanyCode" xml:space="preserve">
+    <value>رمز الشركة</value>
+  </data>
+  <data name="ReportHeader_Account" xml:space="preserve">
+    <value>الحساب</value>
+  </data>
+  <data name="ReportHeader_Department" xml:space="preserve">
+    <value>القسم</value>
+  </data>
+  <data name="ReportHeader_CustomerName" xml:space="preserve">
+    <value>اسم العميل</value>
+  </data>
+  <data name="ReportHeader_TotalAmount" xml:space="preserve">
+    <value>إجمالي المبلغ</value>
+  </data>
+  <data name="ReportHeader_TotalLabours" xml:space="preserve">
+    <value>إجمالي الأجور</value>
+  </data>
+  <data name="ReportHeader_TotalParts" xml:space="preserve">
+    <value>إجمالي القطع</value>
+  </data>
+  <data name="ReportHeader_VIN" xml:space="preserve">
+    <value>رقم تعريف المركبة</value>
+  </data>
+  <data name="ReportHeader_PlateNumber" xml:space="preserve">
+    <value>رقم اللوحة</value>
+  </data>
+  <data name="ReportHeader_ManufactureYear" xml:space="preserve">
+    <value>سنة الصنع</value>
+  </data>
+  <data name="ReportHeader_OPNumber" xml:space="preserve">
+    <value>رقم الشخص المسؤول</value>
+  </data>
+  <data name="ReportHeader_OPName" xml:space="preserve">
+    <value>اسم الشخص المسؤول</value>
+  </data>
+  <data name="ReportHeader_ServiceCode" xml:space="preserve">
+    <value>رمز الخدمة</value>
+  </data>
+  <data name="ReportHeader_ServiceDescription" xml:space="preserve">
+    <value>وصف الخدمة</value>
+  </data>
+  <data name="ReportHeader_CustomerId" xml:space="preserve">
+    <value>معرف العميل</value>
+  </data>
+  <data name="ReportHeader_TotalLubes" xml:space="preserve">
+    <value>إجمالي الزيوت</value>
+  </data>
+  <data name="ReportHeader_TotalPaints" xml:space="preserve">
+    <value>إجمالي الدهانات</value>
+  </data>
+  <data name="ReportHeader_Manufacturer" xml:space="preserve">
+    <value>الشركة المصنعة</value>
   </data>
   <data name="Button_Print" xml:space="preserve">
     <value>طباعة</value>
@@ -2656,3 +2710,32 @@
     <value>مسند الى</value>
   </data>
 </root>
+  <data name="Open" xml:space="preserve">
+    <value>مفتوح</value>
+  </data>
+  <data name="NoAgreement" xml:space="preserve">
+    <value>لا يوجد عقد</value>
+  </data>
+  <data name="Label_Invoice" xml:space="preserve">
+    <value>الفاتورة</value>
+  </data>
+  <data name="Label_PartialAccount" xml:space="preserve">
+    <value>حساب جزئي</value>
+  </data>
+  <data name="NoServiceHistoryFound" xml:space="preserve">
+    <value>لا يوجد معلومات في سجل الخدمات</value>
+  </data>
+  <data name="NoInvoicesFound" xml:space="preserve">
+    <value>لا توجد فواتير</value>
+  </data>
+  <data name="Label_Net" xml:space="preserve">
+    <value>الإجمالي</value>
+  </data>
+  <data name="Label_Discount" xml:space="preserve">
+    <value>الخصم</value>
+  </data>
+  <data name="Label_ReferanceNo" xml:space="preserve">
+    <value>رقم المرجع</value>
+  </data>
+</root>
+

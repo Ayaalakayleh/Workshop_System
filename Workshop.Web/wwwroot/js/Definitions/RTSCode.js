@@ -219,6 +219,19 @@
             $("#btnSearch").on("click", function () {
                 getData();
             });
+
+            // Make IsOil and IsPaint mutually exclusive
+            $("#IsOil").on("change", function () {
+                if ($(this).is(":checked")) {
+                    $("#IsPaint").prop("checked", false);
+                }
+            });
+
+            $("#IsPaint").on("change", function () {
+                if ($(this).is(":checked")) {
+                    $("#IsOil").prop("checked", false);
+                }
+            });
         }
 
         function getData(page) {

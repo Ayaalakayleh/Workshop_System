@@ -2856,5 +2856,33 @@ namespace Workshop.Web.Services
         }
 
         #endregion
+
+        #region Reports
+        public async Task<IEnumerable<MonthlyRepairCostReportDTO>?> GetMonthlyRepairCostReportAsync(MonthlyRepairCostReportFilterDTO filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Reports/GetMonthlyRepairCost", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<MonthlyRepairCostReportDTO>>();
+        }
+        public async Task<IEnumerable<MonthlyRepairCostBranchWiseReportDTO>?> GetMonthlyRepairCostBranchWiseReportAsync(MonthlyRepairCostReportFilterDTO filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Reports/GetMonthlyRepairCostBranchWise", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<MonthlyRepairCostBranchWiseReportDTO>>();
+        }
+        public async Task<byte[]> GetMonthlyRepairCostExcelReportAsync(MonthlyRepairCostReportFilterDTO filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Reports/ExportMonthlyRepairCostToExcel", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+        public async Task<byte[]> GetMonthlyRepairCostBranchWiseExcelReportAsync(MonthlyRepairCostReportFilterDTO filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Reports/ExportMonthlyRepairCostBranchWiseToExcel", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+        #endregion
+
     }
 }

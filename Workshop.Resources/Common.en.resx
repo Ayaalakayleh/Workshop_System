@@ -331,7 +331,7 @@
     <value>Try Again</value>
   </data>
   <data name="Ok" xml:space="preserve">
-    <value>OK</value>
+    <value>Ok</value>
   </data>
   <data name="msgSuccessTitle" xml:space="preserve">
     <value>The operation was successful</value>
@@ -2625,14 +2625,68 @@
   <data name="FailedCreateSeller" xml:space="preserve">
     <value>Failed to create seller</value>
   </data>
-  <data name="PriceWorkflow" xml:space="preserve">
-    <value>Parts Price Workflow</value>
+  <data name="ReportHeader_WIP" xml:space="preserve">
+    <value>WIP</value>
   </data>
-  <data name="Workflow" xml:space="preserve">
-    <value>Workflow</value>
+  <data name="ReportHeader_InvoiceDate" xml:space="preserve">
+    <value>Invoice Date</value>
   </data>
-  <data name="Label_CreateWIP" xml:space="preserve">
-    <value>Create WIP</value>
+  <data name="ReportHeader_InvoiceNumber" xml:space="preserve">
+    <value>Invoice Number</value>
+  </data>
+  <data name="ReportHeader_CompanyCode" xml:space="preserve">
+    <value>Company Code</value>
+  </data>
+  <data name="ReportHeader_Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="ReportHeader_Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="ReportHeader_CustomerName" xml:space="preserve">
+    <value>Customer Name</value>
+  </data>
+  <data name="ReportHeader_TotalAmount" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+  <data name="ReportHeader_TotalLabours" xml:space="preserve">
+    <value>Total Labours</value>
+  </data>
+  <data name="ReportHeader_TotalParts" xml:space="preserve">
+    <value>Total Parts</value>
+  </data>
+  <data name="ReportHeader_VIN" xml:space="preserve">
+    <value>VIN</value>
+  </data>
+  <data name="ReportHeader_PlateNumber" xml:space="preserve">
+    <value>Plate Number</value>
+  </data>
+  <data name="ReportHeader_ManufactureYear" xml:space="preserve">
+    <value>Manufacture Year</value>
+  </data>
+  <data name="ReportHeader_OPNumber" xml:space="preserve">
+    <value>OP Number</value>
+  </data>
+  <data name="ReportHeader_OPName" xml:space="preserve">
+    <value>OP Name</value>
+  </data>
+  <data name="ReportHeader_ServiceCode" xml:space="preserve">
+    <value>Service Code</value>
+  </data>
+  <data name="ReportHeader_ServiceDescription" xml:space="preserve">
+    <value>Service Description</value>
+  </data>
+  <data name="ReportHeader_CustomerId" xml:space="preserve">
+    <value>Customer Id</value>
+  </data>
+  <data name="ReportHeader_TotalLubes" xml:space="preserve">
+    <value>Total Lubes</value>
+  </data>
+  <data name="ReportHeader_TotalPaints" xml:space="preserve">
+    <value>Total Paints</value>
+  </data>
+  <data name="ReportHeader_Manufacturer" xml:space="preserve">
+    <value>Manufacturer</value>
   </data>
   <data name="Button_Print" xml:space="preserve">
     <value>Print</value>
@@ -2656,3 +2710,32 @@
     <value>Assign To:</value>
   </data>
 </root>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="NoAgreement" xml:space="preserve">
+    <value>No Agreement</value>
+  </data>
+  <data name="Label_Invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="Label_PartialAccount" xml:space="preserve">
+    <value>Partial Account</value>
+  </data>
+  <data name="NoServiceHistoryFound" xml:space="preserve">
+    <value>No Service History Found</value>
+  </data>
+  <data name="NoInvoicesFound" xml:space="preserve">
+    <value>No Invoices Found</value>
+  </data>
+  <data name="Label_Net" xml:space="preserve">
+    <value>Net</value>
+  </data>
+  <data name="Label_Discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="Label_ReferanceNo" xml:space="preserve">
+    <value>Referance No.</value>
+  </data>
+</root>
+

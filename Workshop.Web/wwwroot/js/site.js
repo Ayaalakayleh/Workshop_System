@@ -200,17 +200,23 @@ document.addEventListener("DOMContentLoaded", function () {
         if (existing) existing.remove();
     }
 
-    new MutationObserver(() => {
-        const newTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
-
-        if (newTheme === lastTheme) return;
-
-        if (newTheme === "dark") {
+    function syncFlatpickrTheme(theme) {
+        if (theme === "dark") {
             addDarkCss();
         } else {
             removeDarkCss();
         }
+    }
 
+    // ✅ Apply theme ON LOAD (important part)
+    syncFlatpickrTheme(lastTheme);
+
+    // ✅ Keep watching for changes
+    new MutationObserver(() => {
+        const newTheme = htmlRoot.getAttribute("data-bs-theme") || "light";
+        if (newTheme === lastTheme) return;
+
+        syncFlatpickrTheme(newTheme);
         lastTheme = newTheme;
     }).observe(htmlRoot, {
         attributes: true,
@@ -218,4 +224,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
-

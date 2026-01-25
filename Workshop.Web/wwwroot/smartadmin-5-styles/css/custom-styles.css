@@ -1564,7 +1564,7 @@ html[dir="rtl"] .toggle-pin {
         border: 2px dashed var(--primary-50, #e9eafb);
         padding: clamp(.75rem, 1.2vw, 1rem);
         border-radius: 14px;
-        background: #fff;
+        background: var(--bg-body)
     }
 
     .the-movements legend {
@@ -1627,7 +1627,7 @@ html[dir="rtl"] .toggle-pin {
 }
 
 .the-movements .vehicle-hero__fact {
-    background: #fff;
+    background: var(--bg-body);
     border: 1px solid #eef0f6;
     border-radius: 12px;
     padding: 10px 12px;
@@ -1651,7 +1651,7 @@ html[dir="rtl"] .toggle-pin {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #fcfcff;
+    background: var(--bg-body);
     border: 1px dashed #e5e7f3;
     padding: 9px 12px;
     border-radius: 12px;
@@ -1695,7 +1695,7 @@ html[dir="rtl"] .toggle-pin {
     border: 1px solid #e6e9f2;
     border-radius: 12px;
     padding: 10px 12px;
-    background: #fff;
+    background: var(--secondary-50);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1727,7 +1727,7 @@ html[dir="rtl"] .toggle-pin {
 
 /* customer card */
 .the-movements .customer-card {
-    background: #fff;
+    background: var(--bg-body);
     border: 1px solid #eef0f6;
     border-radius: 18px;
     padding: 14px;
@@ -1742,11 +1742,10 @@ html[dir="rtl"] .toggle-pin {
     flex: 0 0 64px;
     height: 64px;
     border-radius: 16px;
-    background: #f3f4ff;
+    background: var(--bg-body);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
 
     .the-movements .customer-card__icon i {
@@ -1757,7 +1756,6 @@ html[dir="rtl"] .toggle-pin {
 .the-movements .customer-card__body h4 {
     font-size: .95rem;
     margin: 0 0 .25rem;
-    color: #111827;
 }
 
 .the-movements .customer-card__body .val {
@@ -3506,8 +3504,15 @@ html[data-bs-theme="dark"] .the-movements .status-button__chip {
     box-shadow: none;
     border:none
 }
-html[data-bs-theme="dark"] .the-movements table.table thead th {
-    background: linear-gradient(180deg, #cacaca 0%, #6c6c6c 100%)
+html[data-bs-theme="dark"] .vehicle-card {
+    background-color:#444
+}
+html[data-bs-theme="dark"] .spec-label {
+    color:#ccc
+}
+html[data-bs-theme="dark"] div.dm-wrapperDiv div.dm-innerDiv {
+    background-color: #242933;
+    border-bottom-color: #242933;
 }
 /* End Dark Mode Customization */
 @media (max-width: 450px) {

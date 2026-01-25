@@ -47,9 +47,9 @@ function initializeHistoryTable() {
                 autoWidth: false,
                 searching: false,
                 language: {
-                    emptyTable: "No data available",
-                    search: "Search:",
-                    zeroRecords: "No matching records found"
+                    emptyTable:theMainLang == "en" ? "No data available":"لا يوجد معلومات في الجدول",
+                    search: theMainLang == "en" ? "Search" : "بحث",
+                    zeroRecords: theMainLang == "en" ? "No data available" : "لا يوجد معلومات في الجدول"
                 },
                 columnDefs: [
                     {
