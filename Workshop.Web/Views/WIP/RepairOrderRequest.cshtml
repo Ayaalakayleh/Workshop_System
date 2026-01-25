@@ -697,11 +697,9 @@
                             <tr><td class="lbl">Preferred Contact No</td><td class="val"></td></tr>
                             <tr><td class="lbl">Vehicle</td><td class="val">@Model.VehicleInfo.Make &nbsp; @Model.VehicleInfo.Model</td></tr>
                             <tr><td class="lbl">Chassis No</td><td class="val bigval">@Model.VehicleInfo.VIN</td></tr>
-                            <tr><td class="lbl">Engine No</td><td class="val bigval"></td></tr>
                             <tr><td class="lbl">Colour</td><td class="val bigval">@Model.VehicleInfo.ColorName</td></tr>
-                            <tr><td class="lbl">Trim</td><td class="val bigval">@Model.Trim</td></tr>
                             <tr><td class="lbl">Fuel Reading</td><td class="val">@Model.FuelLevel</td></tr>
-                            <tr><td class="lbl">Vehicle No</td><td class="val bigval"></td></tr>
+                            <tr><td class="lbl">Plate No.</td><td class="val bigval">@Model.VehicleInfo.PlateNumber</td></tr>
                             <tr><td class="lbl">Registration Date</td><td class="val bigval">@Model.RegistrationExpDate</td></tr>
                             <tr><td class="lbl">Mileage</td><td class="val bigval">@Model.VehicleInfo.Mileage</td></tr>
                         </table>
@@ -709,14 +707,11 @@
 
                     <div class="jc-block">
                         <table class="jc-table">
-                            <tr><td class="lbl">Created by</td><td class="val">@Model.CustomerName</td></tr>
-                            <tr><td class="lbl">Phone No.</td><td class="val"></td></tr>
-                            <tr><td class="lbl">Loan Car Required</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Created by</td><td class="val">@Model.CreatedBy</td></tr>
+                            <tr><td class="lbl">Phone No.</td><td class="val">@Model.UserPhoeNo</td></tr>
                             <tr><td class="lbl">Customer Waiting</td><td class="val"></td></tr>
-                            <tr><td class="lbl">Return Parts</td><td class="val"></td></tr>
-                            <tr><td class="lbl">Created Date</td><td class="val"></td></tr>
-                            <tr><td class="lbl">Duplicate Copy</td><td class="val"></td></tr>
-                            <tr><td class="lbl">Repeat Repair</td><td class="val"></td></tr>
+                            <tr><td class="lbl">Created Date</td><td class="val">@Model.CreatedDate</td></tr>
+                            <tr><td class="lbl">Repeat Repair</td><td class="val">@Model.RepeatRepair </td></tr>
                         </table>
                     </div>
                 </div>
@@ -727,14 +722,8 @@
                     <div class="cell"><div class="k">Date Due Out<br /><span class="rtl">تاريخ الخروج</span></div><div class="v">@Model.DateOut</div></div>
                     <div class="cell"><div class="k">Time Due Out<br /><span class="rtl">وقت الخروج</span></div><div class="v">@Model.TimeOut</div></div>
                     <div class="cell"><div class="k">Account No<br /><span class="rtl">رقم الحساب</span></div><div class="v">@Model.AccountNo</div></div>
-                    <div class="cell"><div class="k">Customer Order No<br /><span class="rtl">رقم طلب العميل</span></div><div class="v"></div></div>
                 </div>
 
-                <div class="jc-minirow" aria-label="Service Summary">
-                    <div class="cell"><div class="k">Dept<br /><span class="rtl">القسم</span></div><div class="v"></div></div>
-                    <div class="cell"><div class="k">Next Service Due<br /><span class="rtl">الخدمة القادمة</span></div><div class="v"></div></div>
-                    <div class="cell"><div class="k">Date Last Visit<br /><span class="rtl">تاريخ آخر زيارة</span></div><div class="v">@Model.DateLastVisit</div></div>
-                </div>
             </div>
 
             <div class="jc-services" aria-label="Description of Goods and Services">
@@ -793,11 +782,6 @@
                                 C&nbsp;CHIP<br />
                                 R&nbsp;RUST
                             </div>
-                        </div>
-
-                        <div class="jc-signbox">
-                            CUSTOMER/REPRESENTATIVE SIGNATURE<br />
-                            <span class="rtl">توقيع ممثل العميل</span>
                         </div>
 
                         <div class="jc-footnote">

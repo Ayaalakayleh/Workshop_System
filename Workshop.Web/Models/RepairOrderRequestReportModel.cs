@@ -17,6 +17,9 @@ namespace Workshop.Web.Models
         public string? FuelLevel { get; set; }
         public string? InsuranceExpDate { get; set; }
         public string? CustomerName { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? CreatedDate { get; set; }
+        public string? UserPhoeNo { get; set; }
         //public string? ColorName { get; set; }
         public string? Trim { get; set; }
         public string? EstimaraExpDate { get; set; }
@@ -25,11 +28,12 @@ namespace Workshop.Web.Models
         public string? RegistrationExpDate { get; set; }
         public string? Complaint { get; set; }
         public string? DateIn { get; set; }
-        public TimeSpan? TimeIn { get; set; }
+        public string? TimeIn { get; set; }
         public string? DateOut { get; set; }
-        public TimeSpan? TimeOut { get; set; }
+        public string? TimeOut { get; set; }
         public string? DateLastVisit { get; set; }
         public string? AccountNo { get; set; }
+        public string? RepeatRepair { get; set; }
         //public List<string>? Services { get; set; }
         public List<VehicleChecklist>? VehicleCkecklist { get; set; }
         public List<TyreChecklist>? TyreCkecklist { get; set; }

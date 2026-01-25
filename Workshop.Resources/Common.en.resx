@@ -2652,4 +2652,7 @@
   <data name="Notify" xml:space="preserve">
     <value>Notify</value>
   </data>
+  <data name="Label_DXAssignTo" xml:space="preserve">
+    <value>Assign To:</value>
+  </data>
 </root>

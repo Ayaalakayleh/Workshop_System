@@ -2161,14 +2161,14 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Labour>>($"api/WIP/WIPServiceHistoryDetailsGetLaboursByWIPId?Id={Id}");
         }
 
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts>> WIPServiceHistoryDetails_GetParts()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts>> WIPServiceHistoryDetails_GetParts(int VehicleId)
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Parts>>($"api/WIP/WIPServiceHistoryDetailsGetParts");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Parts>>($"api/WIP/WIPServiceHistoryDetailsGetParts?VehicleId={VehicleId}");
         }
 
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour>> WIPServiceHistoryDetails_GetLabours()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour>> WIPServiceHistoryDetails_GetLabours(int VehicleId)
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Labour>>($"api/WIP/WIPServiceHistoryDetailsGetLabours");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Labour>>($"api/WIP/WIPServiceHistoryDetailsGetLabours?VehicleId={VehicleId}");
         }
 
         public async Task<IEnumerable< WIPDTO?>> GetWIPDDL()

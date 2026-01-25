@@ -165,11 +165,12 @@ function showError(message) {
 
 function loadServiceHistory(vehicleId) {
     showLoadingIndicator();
+    const WIPId = $('#Id').val();
 
     $.ajax({
         url: window.RazorVars.getServiceHistoryUrl,
         type: 'GET',
-        data: { vehicleId: vehicleId },
+        data: { vehicleId: vehicleId, WIPId: WIPId },
         success: function (response) {
             console.log(response);
             $('#tabHistory').html(response);

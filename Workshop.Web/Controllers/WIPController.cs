@@ -151,24 +151,7 @@ namespace Workshop.Web.Controllers
                     }
                 }
 
-                if (dto.MovementId > 0)
-                {
-                    movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
-                    if (movement != null)
-                    {
-                        var user = await _erpApiClient.GetUserInfoById((int)movement.CreatedBy);
-
-                        var first = user?.FirstName?.Trim();
-                        var last = user?.LastName?.Trim();
-
-                        string userFullName = string.Join(" ", new[] { first, last }.Where(x => !string.IsNullOrWhiteSpace(x)));
-                        ViewBag.CreatingOperator = userFullName;
-                        ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
-
-                        ViewBag.DueOutDate = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-                        ViewBag.ReceivedMeter = movement.ReceivedMeter;
-                    }
-                }
+               
                 var _WIPID = 0;
 
                 if (id.HasValue && id.Value > 0)
@@ -197,30 +180,17 @@ namespace Workshop.Web.Controllers
                         ViewBag.HasExternalInvoices = false;
                     }
 
-                    if (dto.MovementId > 0)
-                    {
-                        movement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
-                        if (movement != null)
-                        {
-                            ViewBag.DueInDate = movement.CreatedAt?.ToString("yyyy-MM-dd");
+                    var movementOperators =  await GetMovementOperatorsAsync(movementId, dto);
+                     
+                    ViewBag.DueInDate = movementOperators.DueInDate;
+                    ViewBag.ReceivedMeter = movementOperators.ReceivedMeter;
+                    ViewBag.CreatingOperator = movementOperators.CreatingOperator;
 
-                        }
-                        var LastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
-                        ViewBag.DueOutDate = LastMovement.MovementOut == true ? LastMovement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-                        
-                        ViewBag.CreatingOperator = await GetUserFullNameAsync(dto?.CreatedBy as int? ?? dto?.CreatedBy);
+                    ViewBag.DueOutDate = movementOperators.DueOutDate;
+                    ViewBag.BookedOutOperator = movementOperators.BookedOutOperator;
 
-                        if (dto?.Status == 2032) // closed
-                        {
-                            ViewBag.InvoicingOperator = await GetUserFullNameAsync(dto.ClosedBy as int? ?? dto.ClosedBy);
-                        }
+                    ViewBag.InvoicingOperator = movementOperators.InvoicingOperator;
 
-
-                        if (LastMovement?.MovementOut == true)
-                        {
-                            ViewBag.BookedOutOperator = await GetUserFullNameAsync(LastMovement.CreatedBy as int? ?? LastMovement.CreatedBy);
-                        }
-                    }
 
                     // Get vehicle documents - handle nulls
                     var docs = await GetVehicleDocumentDatesAsync(dto.VehicleId);
@@ -242,6 +212,7 @@ namespace Workshop.Web.Controllers
 
                     // Get services
                     ViewBag.Services = await GetWipServicesAsync(id.Value);
+                   
 
 
                     // Get account details
@@ -954,18 +925,46 @@ namespace Workshop.Web.Controllers
             return await _apiClient.UpdateWIPOptions(oWIPOptionsDTO);
         }
 
-        public async Task<IActionResult> GetWIPServiceHistory(int VehicleId)
+        public async Task<IActionResult> GetWIPServiceHistory(int VehicleId, int WIPId)
         {
             try
             {
                 var result = await _apiClient.GetWIPServiceHistory(VehicleId);
-                var labourHistory = await _apiClient.WIPServiceHistoryDetails_GetLabours();
-                var partsHistory = await _apiClient.WIPServiceHistoryDetails_GetParts();
+                var labourHistory = await _apiClient.WIPServiceHistoryDetails_GetLabours(VehicleId);
+                var partsHistory = await _apiClient.WIPServiceHistoryDetails_GetParts(VehicleId);
+                
+                var productIds = partsHistory
+                    .Where(p => p.Product.HasValue)
+                    .Select(p => p.Product.Value)
+                    .Distinct()
+                    .ToList();
+
+                var productLookup = new Dictionary<int, string>();
+
+                foreach (var productId in productIds)
+                {
+                    var item = await _inventoryApiClient.GetItemByIdAsync(productId);
+                    if (item != null)
+                        productLookup[productId] = lang=="en" ? item.PrimaryName : item.SecondaryName;
+                }
+
+                foreach (var part in partsHistory)
+                {
+                    if (part.Product.HasValue &&
+                        productLookup.TryGetValue(part.Product.Value, out var name))
+                    {
+                        part.ProductName = name;
+                    }
+                }
+
                 foreach (var item in result)
                 {
-                    item.HistoryLabours = labourHistory.Where(record => record.FK_WIPId == item.WIPId);
-                    item.HistoryParts = partsHistory.Where(record => record.FK_WIPId == item.WIPId);
+                    item.HistoryLabours = labourHistory.Where(x => x.FK_WIPId == item.WIPId);
+                    item.HistoryParts = partsHistory.Where(x => x.FK_WIPId == item.WIPId);
+                    var branchInfo = await _erpApiClient.GetBranchById(item.BranchId);
+                    item.Branch = lang == "en" ? branchInfo.BranchPrimaryName : branchInfo.BranchSecondaryName;
                 }
+                
                 return PartialView("_History", result ?? new List<M_WIPServiceHistoryDTO>());
             }
             catch (Exception ex)
@@ -975,13 +974,14 @@ namespace Workshop.Web.Controllers
             }
         }
 
+
         public async Task<IActionResult> GetWIPDetails(int VehicleId)
         {
             try
             {
                 var result = await _apiClient.GetWIPServiceHistory(VehicleId);
-                var labourHistory = await _apiClient.WIPServiceHistoryDetails_GetLabours();
-                var partsHistory = await _apiClient.WIPServiceHistoryDetails_GetParts();
+                var labourHistory = await _apiClient.WIPServiceHistoryDetails_GetLabours(VehicleId);
+                var partsHistory = await _apiClient.WIPServiceHistoryDetails_GetParts(VehicleId);
                 foreach (var item in result)
                 {
                     item.HistoryLabours = labourHistory.Where(record => record.FK_WIPId == item.WIPId);
@@ -1868,7 +1868,16 @@ namespace Workshop.Web.Controllers
         public async Task<JsonResult> GetWIPByVehicleId(int id)
         {
             var result = await _apiClient.GetWIPByVehicleId(id);
-            return Json(new { success = true, data = result });
+            var db = result;
+
+            var dto = new 
+            {
+                OpenWIPCount = db.OpenWIPCount,
+                Previous = db.Previous,
+                OpenWIPs = string.IsNullOrWhiteSpace(db.OpenWIPs) ? new List<string>() : db.OpenWIPs.Split(',').ToList(),
+                PreviousWIPs = string.IsNullOrWhiteSpace(db.PreviousWIPs) ? new List<string>() : db.PreviousWIPs.Split(',').ToList()
+            };
+            return Json(new { success = true, data = dto });
         }
 
         #endregion
@@ -2325,12 +2334,12 @@ namespace Workshop.Web.Controllers
                 model.MovementId = Details.MovementId;
                 model.VehicleNo = Details.VehicleId;
 
-                var customer = "";
+                //var customer = "";
                 if (accountDetails.CustomerId != null)
                 {
                     var _customer = await _accountingApiClient.Customer_GetById((int)accountDetails.CustomerId);
 
-                    customer = _customer.CustomerPrimaryName;
+                    //customer = _customer.CustomerPrimaryName;
                     model.AccountNo = _customer.AccountNoReceivable;
                 }
 
@@ -2356,7 +2365,6 @@ namespace Workshop.Web.Controllers
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
                 //============================================================================================================
-                var last = await _apiClient.GetLastMovementOutByWorkOrderId((int)Details.WorkOrderId);
                 model.VehicleInfo ??= new VehicleInfoModel();
                 model.Date = DateTime.Now;
                 model.TimeReceived = movement.ReceivedTime;
@@ -2367,10 +2375,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.Make = vehicleInfo.Make;
                 model.VehicleInfo.Model = vehicleInfo.Model;
                 model.VehicleInfo.Mileage = vehicleInfo.Mileage?? movement.ReceivedMeter;
-                model.DateLastVisit = last?.GregorianMovementDate?.ToString("yyyy-MM-dd");
-                //model.EngineNumber = vehicleDetails.Eng;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
-                //model.Trim = accountDetails.TermsId;
                 //model.CompanyName = Details.CompanyName;
                 model.InsuranceExpDate = await VehicleDocumants(Details.VehicleId, 5); 
                 model.EstimaraExpDate = await VehicleDocumants(Details.VehicleId, 2);
@@ -2378,16 +2383,26 @@ namespace Workshop.Web.Controllers
                 model.RegistrationExpDate = await VehicleDocumants(Details.VehicleId, 8); 
                 model.Complaint = Complaint;
                 model.DateIn = movement.GregorianMovementDate?.ToString("yyyy-MM-dd");
-                model.TimeIn = movement.ReceivedTime;
-                model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-                //model.TimeOut = movement.ReceivedTime;
-                //model.AccountNo = Details.AccountNo;
-                model.FuelLevel = movement.fuelLevel;
+                model.TimeIn = movement.CreatedAt?.ToString("HH:mm"); 
+                var lastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(Details.VehicleId);
+                if (lastMovement?.MovementOut == true)
+                {
+                    model.DateOut = lastMovement.CreatedAt?.ToString("yyyy-MM-dd");
+                    model.TimeOut = lastMovement.CreatedAt?.ToString("HH:mm");
+                }
+                //model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
+                var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId);
+                model.FuelLevel = f.FuelLevelPercentage +"%";
                 model.Services = services?.ToList();
                 model.Items = await GetItemsModelsAsync(Id, lang); 
                 model.VehicleCkecklist = await GetVehicleChecklistAsync(Details.MovementId);
                 model.TyreCkecklist = await GetTyreChecklistAsync(Details.MovementId);
-                
+                model.CreatedBy = await GetUserFullNameAsync(Details.CreatedBy);
+                var user = await _erpApiClient.GetUserInfoById((int)Details.CreatedBy);
+                model.UserPhoeNo = user.PhoneNo;
+                model.CreatedDate = Details.CreatedAt?.ToString("dd-MM-yyyy");
+                var oo = await _apiClient.WIP_GetOptionsById(Id);
+                model.RepeatRepair = oo.RepeatRepair == true ? "Yes" : "No";
                 return View(model);
             }
             catch (Exception ex)
@@ -2646,7 +2661,7 @@ namespace Workshop.Web.Controllers
         private async Task<string> VehicleDocumants(int vehicleId, int type)
         {
             var vehicleDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(vehicleId, type);
-            return vehicleDoc?.strExpiryDate ?? "";
+            return vehicleDoc?.ExpiryDate?.ToString("dd-MM-yyyy") ?? "";
         }
 
 
@@ -2867,6 +2882,60 @@ namespace Workshop.Web.Controllers
                 return new List<SelectListItem>();
             }
         }
+
+        private async Task<MovementOperatorsViewModel> GetMovementOperatorsAsync(int? movementId, WIPDTO dto)
+        {
+            try {
+                var result = new MovementOperatorsViewModel();
+
+                // current movement (IN)
+                VehicleMovement currentMovement = null;
+
+                if (movementId.HasValue && movementId > 0)
+                {
+                    currentMovement = await _apiClient.GetVehicleMovementByIdAsync(movementId.Value);
+
+                }
+                else if (dto?.MovementId > 0)
+                {
+                    currentMovement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
+                }
+
+                if (currentMovement != null)
+                {
+                    result.DueInDate = currentMovement.CreatedAt?.ToString("yyyy-MM-dd");
+                    result.ReceivedMeter = currentMovement.ReceivedMeter;
+                    result.CreatingOperator = await GetUserFullNameAsync(currentMovement.CreatedBy);
+
+                }
+
+                // last movement (OUT)
+                if (dto?.VehicleId > 0)
+                {
+                    var lastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
+                    if (lastMovement?.MovementOut == true)
+                    {
+                        result.DueOutDate = lastMovement.CreatedAt?.ToString("yyyy-MM-dd");
+                        result.BookedOutOperator = await GetUserFullNameAsync(lastMovement.CreatedBy);
+                    }
+                }
+
+                // invoicing operator
+                if (dto?.Status == 2032 && dto.ClosedBy > 0)
+                {
+                    result.InvoicingOperator = await GetUserFullNameAsync(dto.ClosedBy);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error fetching movement operators for movement {MovementId} and WIP {WIPId}", movementId, dto?.Id);
+                return new MovementOperatorsViewModel();
+            }
+          
+        }
+
 
         public async Task<JsonResult> GetItemUnits(int itemId)
         {

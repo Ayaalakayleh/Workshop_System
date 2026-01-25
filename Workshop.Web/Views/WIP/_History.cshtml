@@ -12,7 +12,7 @@
                     <tr class="small text-muted">
                         <th>@Common["Label_Date"]</th>
                         <th>@Common["Label_InvoiceDate"]</th>
-                        <th>@Common["Label_Event"]</th>
+                        <th>@Common["Label_Branch"]</th>
                         <th>@Common["Label_Odometer"]</th>
                         <th>@Common["Label_Description"]</th>
                         <th>@Common["Label_WIP"]</th>
@@ -27,9 +27,9 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td>@item.WIPDate.ToString("dd-MMM-yyyy")</td>
-                                <td>@item.InvoiceDate.ToString("dd-MMM-yyyy")</td>
-                                <td>@Common["Label_Event"]</td>
+                                <td>@item.WIPDate.ToString("dd-MM-yyyy")</td>
+                                <td>@item.InvoiceDate.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Branch</td>
                                 <td>@item.OdometerCurrentOUT.ToString("N0")</td>
                                 <td>@(item.VehServiceDesc ?? "-")</td>
                                 <td>@item.WIPId</td>

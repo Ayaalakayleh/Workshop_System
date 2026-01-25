@@ -314,6 +314,7 @@
   var WarehouseData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Warehouses));
   var generalRequest = @Html.Raw(JsonConvert.SerializeObject(ViewBag.GeneralRequest));
   var OurWarehouses = @Html.Raw(Json.Serialize(ViewBag.OurWarehouses));
+  var TechniciansDDL = @Html.Raw(Json.Serialize(ViewBag.Technicians));
   var movementId = '@Model.MovementId';
   var AllowActions = @Html.Raw(Json.Serialize(ViewBag.AllowActions));
   var Permission_AddDiscount = @(AddDiscount.ToString().ToLower());
@@ -433,6 +434,7 @@
 		  RecallFixed: '@Html.Raw(Common["Recall_fixed"])',
 		  ErrorHappend: '@Html.Raw(Common["ErrorHappend"])',
 		  LabelError: '@Html.Raw(Common["Label_Error"])',
+		  DXAssignTo: '@Html.Raw(Common["Label_DXAssignTo"])',
 
 		  // ============================
 		  // DevExpress Labels - Services

@@ -135,6 +135,7 @@ namespace Workshop.Core.DTOs
         public string? StatusPrimaryName { get; set; }
         public string? StatusSecondaryName { get; set; }
         public int? KeyId { get; set; }
+        public int? TechnicianId { get; set; }
         public int? tableId { get; set; }// The actual Id in WIP_Service table
         public bool IsExternal { get; set; }
         public bool IsFixed { get; set; } = false;
@@ -294,9 +295,12 @@ namespace Workshop.Core.DTOs
         public string? SalesTypePrimaryName { get; set; }
         public string? SalesTypeSecondaryName { get; set; }
         public decimal? Total { get; set; }
+        public int BranchId { get; set; }
+        public string Branch { get; set; }
 
-        public IEnumerable<WIPServiceHistoryDetails_Labour>? HistoryLabours;
-        public IEnumerable<WIPServiceHistoryDetails_Parts>? HistoryParts;
+
+        public IEnumerable<WIPServiceHistoryDetails_Labour> HistoryLabours;
+        public IEnumerable<WIPServiceHistoryDetails_Parts> HistoryParts;
     }
 
     public class WIPServiceHistoryDetails_Labour
@@ -322,7 +326,7 @@ namespace Workshop.Core.DTOs
     {
         public int FK_WIPId { get; set; }
         public int? Product { get; set; }
-        //public string? ProductText { get; set; }
+        public string? ProductName { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? Price { get; set; }
        // public decimal? Discount { get; set; }
@@ -385,6 +389,8 @@ namespace Workshop.Core.DTOs
     {
         public int OpenWIPCount { get; set; }
         public int Previous { get; set; }
+        public string OpenWIPs { get; set; }
+        public string PreviousWIPs { get; set; }
     }
 
     public class UpdateIssueIdDTO

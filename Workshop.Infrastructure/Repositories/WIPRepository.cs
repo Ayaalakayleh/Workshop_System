@@ -617,15 +617,15 @@ namespace Workshop.Infrastructure.Repositories
             var parameters = new { WIPId = id };
             return await _database.ExecuteGetAllStoredProcedure<WIPServiceHistoryDetails_Labour?>("D_WIP_ServiceHistoryDetails_GetLabours", parameters);
         }
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetParts()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetParts(int VehicleId)
         {
-            var parameters = new { };
+            var parameters = new { VehicleId = VehicleId };
             return await _database.ExecuteGetAllStoredProcedure<WIPServiceHistoryDetails_Parts?>("D_WIP_ServiceHistoryDetails_GetParts", parameters);
         }
 
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLabours()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLabours(int VehicleId)
         {
-            var parameters = new { };
+            var parameters = new { VehicleId= VehicleId };
             return await _database.ExecuteGetAllStoredProcedure<WIPServiceHistoryDetails_Labour?>("D_WIP_ServiceHistoryDetails_GetLabours", parameters);
         }
 

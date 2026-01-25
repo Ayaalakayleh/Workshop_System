@@ -2652,4 +2652,7 @@
   <data name="Notify" xml:space="preserve">
     <value>إشعار</value>
   </data>
+  <data name="Label_DXAssignTo" xml:space="preserve">
+    <value>مسند الى</value>
+  </data>
 </root>
