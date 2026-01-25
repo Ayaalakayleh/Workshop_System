@@ -138,6 +138,10 @@ namespace Workshop.Core.Services
 		{
 			await _mWorkOrderRepository.WorkOrderReport_Insert(WorkOrderDocument);
 		}
+		public async Task WorkOrderMultiDocs_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument)
+		{
+			await _mWorkOrderRepository.WorkOrderMultiDocs_Insert(WorkOrderDocument);
+		}
 		public async Task WorkOrderDetalsDoc_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument)
 		{
 			await _mWorkOrderRepository.WorkOrderDetalsDoc_Insert(WorkOrderDocument);
@@ -183,6 +187,18 @@ namespace Workshop.Core.Services
 			try
 			{
 				var result = await _mWorkOrderRepository.WorkOrderReports_Get(WorkOrderId);
+				return result;
+			}
+			catch (Exception ex)
+			{
+				throw;
+			}
+		}
+		public async Task<List<MWorkOrdersDetailsDocument>> WorkOrderMultiReports_Get(int WorkOrderId)
+		{
+			try
+			{
+				var result = await _mWorkOrderRepository.WorkOrderMultiReports_Get(WorkOrderId);
 				return result;
 			}
 			catch (Exception ex)

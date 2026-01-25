@@ -24,11 +24,13 @@ namespace Workshop.Core.Interfaces.IRepositories
 
 		Task<List<MWorkOrderDetailDTO>> M_WorkOrderDetails_GetByWorkOrderID(int WorkOrderId);
 		Task WorkOrderReport_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument);
+		Task WorkOrderMultiDocs_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument);
 		Task WorkOrderDetalsDoc_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument);
 		Task<MWorkOrderDetail> WorkOrderDetails_Insert(MWorkOrderDetail workOrder);
 		Task<MWorkOrderDetail> M_WorkOrderDetails_Update(MWorkOrderDetail workOrder);
 		Task<List<MWorkOrdersDetailsDocument>> WorkOrdersDetailsDocument_Get(int WorkOrderDetailsId);
 		Task<List<MWorkOrdersDetailsDocument>> WorkOrderReports_Get(int WorkOrderId);
+		Task<List<MWorkOrdersDetailsDocument>> WorkOrderMultiReports_Get(int WorkOrderId);
 
 		Task DeleteReportByWorkOrderId(int WorkOrderId);
 		Task<int> DeleteMWorkOrderDetailsAsync(int id);

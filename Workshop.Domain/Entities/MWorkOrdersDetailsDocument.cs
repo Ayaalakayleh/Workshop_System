@@ -6,6 +6,7 @@ namespace Workshop.Infrastructure;
 public partial class MWorkOrdersDetailsDocument
 {
     public int Id { get; set; }
+    public int FileId { get; set; }
 
     public int? WorkOrderDetailsId { get; set; }
 

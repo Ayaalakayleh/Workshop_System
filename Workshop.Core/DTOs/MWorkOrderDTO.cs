@@ -178,6 +178,9 @@ namespace Workshop.Core.DTOs
 
 	public class MWorkOrdersDetailsDocumentDTO
 	{
+		
+		public int? Id { get; set; }
+		public int? FileId { get; set; }
 		public int? WorkOrderListId { get; set; }
 		public string? FilePath { get; set; }
 		public string? FileName { get; set; }

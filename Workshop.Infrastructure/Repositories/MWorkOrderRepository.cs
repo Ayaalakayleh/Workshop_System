@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using System.ComponentModel.Design;
 using System.Data;
@@ -448,6 +449,22 @@ namespace Workshop.Infrastructure.Repositories
 				parameters
 				);
 		}
+		public async Task WorkOrderMultiDocs_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument)
+		{
+
+			var parameters = new { @WorkOrderDocument = _database.ToDataTable<MWorkOrdersDetailsDocumentDTO>(WorkOrderDocument) };
+			try
+			{
+				await _database.ExecuteNonReturnProcedure(
+					"[WorkOrder].[D_WorkOrderMultiDocs_Insert]",
+					parameters
+					);
+			}
+			catch(Exception ex)
+			{
+				throw ex;
+			}
+		}
 		public async Task WorkOrderDetalsDoc_Insert(List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument)
 		{
 			try
@@ -560,6 +577,28 @@ namespace Workshop.Infrastructure.Repositories
 
 				var result = await connection.QueryAsync<MWorkOrdersDetailsDocument>(
 					"[WorkOrder].[D_WorkOrderReport_GetByWorkOrder]",
+					parameters
+				);
+				return result?.ToList();
+			}
+			catch (Exception e)
+			{
+
+				var r = e;
+			}
+			return null;
+		}
+		public async Task<List<MWorkOrdersDetailsDocument>> WorkOrderMultiReports_Get(int WorkOrderId)
+		{
+			using var connection = _context.CreateConnection();
+
+			try
+			{
+				var parameters = new DynamicParameters();
+				parameters.Add("@WorkOrderId", WorkOrderId);
+
+				var result = await connection.QueryAsync<MWorkOrdersDetailsDocument>(
+					"[WorkOrder].[D_WorkOrderMultiDoc_GetByWorkOrder]",
 					parameters
 				);
 				return result?.ToList();
