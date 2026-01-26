@@ -121,25 +121,13 @@
 
                         <div class="col-lg-3 col-md-6 col-sm-12 my-1">
                             <div class="form-group">
-                                <div class="form-check">
-                                    <input type="checkbox" id="IsOil" name="RTSCode.IsOil" value="true" class="form-check-input" @(Model.RTSCode.IsOil == true ? "checked" : "") />
-                                    @Html.CheckBoxFor(m => m.RTSCode.IsOil, new { @class = "form-check-input", id = "IsOil" })
-                                    <label class="form-check-label" for="IsOil">@Common["IsOil"]</label>
-                                </div>
+                               
+                                    <label>@Common["Label_Type"]</label>
+                                    @Html.DropDownListFor(m => m.RTSCode.TypeId, new SelectList(ViewBag.Types ?? new List<object>
+                                                                        (),"Value", "Text"), new { @class = "form-control", id = "TypeId" })
+             
                             </div>
                         </div>
-
-                        <div class="col-lg-3 col-md-6 col-sm-12 my-1">
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input type="checkbox" id="IsPaint" name="RTSCode.IsPaint" value="true" class="form-check-input" @(Model.RTSCode.IsPaint == true ? "checked" : "") />
-                                    @Html.CheckBoxFor(m => m.RTSCode.IsPaint, new { @class = "form-check-input", id = "IsPaint" })
-
-                                    <label class="form-check-label" for="IsPaint">@Common["IsPaint"]</label>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="col-lg-3 col-md-6 col-sm-12 my-1">
                             <div class="form-group">
                                 <label>@Common["Label_PrimaryDescription"] <span class="text-danger">*</span></label>
@@ -162,9 +150,6 @@
                             </div>
                         </div>
                         
-                       
-
-  
                     </div>
                     <!--Allowed Times-->
                     @await Html.PartialAsync("_AllowedTimes",Model)

@@ -2882,6 +2882,12 @@ namespace Workshop.Web.Services
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsByteArrayAsync();
         }
+        public async Task<IEnumerable<ConsumptionReportDTO>?> GetConsumptionReportAsync(ConsumptionReportFilterDTO filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Reports/GetConsumption", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<ConsumptionReportDTO>>();
+        }
         #endregion
 
     }

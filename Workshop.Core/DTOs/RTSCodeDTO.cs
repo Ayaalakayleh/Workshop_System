@@ -26,8 +26,7 @@ namespace Workshop.Core.DTOs
         public decimal? DefaultRate { get; set; } = 0;
         public string? PrimaryName { get; set; }
         public string? SecondaryName { get; set; }
-        public bool IsOil { get; set; }
-        public bool IsPaint { get; set; }
+        public int? TypeId { get; set; }
 
     }
 

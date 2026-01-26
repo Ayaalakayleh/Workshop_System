@@ -24,6 +24,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.GetMonthlyRepairCostBranchWiseReport(filterDTO);
         }
+        public async Task<IEnumerable<ConsumptionReportDTO>> GetConsumptionReport(ConsumptionReportFilterDTO filterDTO)
+        {
+            return await _repository.GetConsumptionReport(filterDTO);
+        }
     }
 }
 

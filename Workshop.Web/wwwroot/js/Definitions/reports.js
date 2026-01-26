@@ -13,6 +13,7 @@
 
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
+                TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,
                 CustomerId: CustomerId ? parseInt(CustomerId) : null
@@ -46,6 +47,7 @@
             $("#InvoiceDateStart").val("");
             $("#InvoiceDateEnd").val("");
             $("#CustomerId").val("");
+            $("#TypeId").val("");
 
             // Optionally reload with no filters (empty report)
             $("#ReportListContainer").html('<table class="table table-bordered table-hover text-center w-100 main-table"><thead><tr><th>WIP</th><th>Invoice Date</th><th>Invoice Number</th><th>Company Code</th><th>Account</th><th>Department</th><th>Customer Name</th><th>Total Amount</th><th>Total Labours</th><th>Total Parts</th><th>VIN</th><th>Plate Number</th><th>Manufacture Year</th><th>OP Number</th><th>OP Name</th><th>Service Code</th><th>Service Description</th></tr></thead><tbody><tr><td colspan="17">No data available. Please adjust your filters and search.</td></tr></tbody></table>');
@@ -60,6 +62,7 @@
 
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
+                TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,
                 CustomerId: CustomerId ? parseInt(CustomerId) : null
@@ -84,7 +87,7 @@
                     } else {
                         // If not PDF, try to read as text to show error
                         var reader = new FileReader();
-                        reader.onload = function() {
+                        reader.onload = function () {
                             try {
                                 var errorText = reader.result;
                                 console.error("Server Error:", errorText);
@@ -102,7 +105,7 @@
                     var errorMsg = "Error generating PDF report. Please try again.";
                     if (xhr.response && xhr.response instanceof Blob) {
                         var reader = new FileReader();
-                        reader.onload = function() {
+                        reader.onload = function () {
                             try {
                                 var errorText = reader.result;
                                 var errorData = JSON.parse(errorText);
@@ -131,6 +134,7 @@
 
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
+                TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,
                 CustomerId: CustomerId ? parseInt(CustomerId) : null
@@ -153,7 +157,7 @@
                         var url = window.URL.createObjectURL(blob);
                         var link = document.createElement('a');
                         link.href = url;
-                        link.download = 'MonthlyRepairCostReport_' + new Date().toISOString().slice(0, 19).replace(/:/g, '') + '.xlsx';
+                        link.download = 'Report_' + new Date().toISOString().slice(0, 19).replace(/:/g, '') + '.xlsx';
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
@@ -161,7 +165,7 @@
                     } else {
                         // If not Excel, try to read as text to show error
                         var reader = new FileReader();
-                        reader.onload = function() {
+                        reader.onload = function () {
                             try {
                                 var errorText = reader.result;
                                 console.error("Server Error:", errorText);
@@ -179,7 +183,7 @@
                     var errorMsg = "Error generating Excel report. Please try again.";
                     if (xhr.response && xhr.response instanceof Blob) {
                         var reader = new FileReader();
-                        reader.onload = function() {
+                        reader.onload = function () {
                             try {
                                 var errorText = reader.result;
                                 var errorData = JSON.parse(errorText);
@@ -201,7 +205,7 @@
 
         // Optional: Auto-search on date/customer changes (debounced)
         let searchTimeout;
-        $("#WIP, #InvoiceDateStart, #InvoiceDateEnd, #CustomerId").on("input change", function () {
+        $("#WIP, #InvoiceDateStart, #InvoiceDateEnd, #CustomerId, #TypeId").on("input change", function () {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(function () {
                 // Uncomment below if you want auto-search
