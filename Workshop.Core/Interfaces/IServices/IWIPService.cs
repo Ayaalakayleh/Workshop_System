@@ -66,5 +66,6 @@ namespace Workshop.Core.Interfaces.IServices
         Task<IEnumerable<WipInvoiceDetailDTO>> WIP_InvoiceDetails_GetByHeaderId(int headerId);
         Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services);
         Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal);
+        Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int movementId);
     }
 }

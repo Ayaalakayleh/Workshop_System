@@ -2973,7 +2973,18 @@ namespace Workshop.Web.Controllers
           
         }
 
-
+        public async Task<JsonResult> CheckExistWIP(int movementId)
+        {
+            var getWIPByMovement = await _apiClient.GetWIPByMovementId(movementId);
+            if(getWIPByMovement.Count() > 0)
+            {
+                return Json(new { exist = true });
+            }
+            else
+            {
+                return Json(new { exist = false });
+            }
+        }
         public async Task<JsonResult> GetItemUnits(int itemId)
         {
             var units = await _inventoryApiClient.GetItemUnitByIdAsync(itemId);

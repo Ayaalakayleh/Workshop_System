@@ -2736,5 +2736,7 @@
   <data name="Label_ReferanceNo" xml:space="preserve">
     <value>رقم المرجع</value>
   </data>
+  <data name="Label_CreateWIP" xml:space="preserve">
+    <value>انشاء امر عمل</value>
+  </data>
 </root>
-

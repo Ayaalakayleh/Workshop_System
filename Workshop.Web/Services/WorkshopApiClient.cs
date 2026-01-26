@@ -1864,6 +1864,19 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<WIPDTO>>();
             return result != null ? result : null;
         }
+        public async Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int MovementId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/WIP/GetByMovementId", MovementId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return new List<WIPDTO>();
+            }
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<WIPDTO>>();
+            return result != null ? result : new List<WIPDTO>();
+        }
 
         public async Task<IEnumerable<CreateWIPServiceDTO>?> GetAllInternalLabourLineAsync(int WIPId)
         {

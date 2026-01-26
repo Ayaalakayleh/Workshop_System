@@ -303,6 +303,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_HasOpenByVehicleAsync(vehicleId, isExternal);
         }
+        public async Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int movementId)
+        {
+            return await _repository.GetWIPByMovementId(movementId);
+        }
 
     }
 }

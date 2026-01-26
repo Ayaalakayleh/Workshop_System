@@ -23,6 +23,9 @@
                                     @Html.DisplayName(Common["Label_MovementDate"])
                                 </th>
                                 <th>
+                                    @Html.DisplayName(Common["Label_WIPNo"])
+                                </th>
+                                <th>
                                     @Html.DisplayName(Common["Label_ExitBranch"])
                                 </th>
                                 <th>
@@ -43,6 +46,9 @@
                                         </td>
                                         <td>
                                             @(item.GregorianMovementDate?.ToString("dd/MM/yyyy"))
+                                        </td>
+                                        <td>
+                                            @(item.WIPId == 0 ? "" : item.WIPId)
                                         </td>
                                         <td>
                                             @((Model.ColBranches).Where(x => x.BranchID == item.ExitBranchId).FirstOrDefault() != null ?

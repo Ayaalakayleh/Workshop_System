@@ -557,5 +557,20 @@ namespace Workshop.API.Controllers
             return Ok(result);
 
         }
+
+        [HttpPost("GetByMovementId")]
+        public async Task<ActionResult<IEnumerable<WIPDTO>>> GetByMovementId([FromBody] int movementId)
+        {
+            try
+            {
+                var result = await _service.GetWIPByMovementId(movementId);
+                if (result == null) return new List<WIPDTO>();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
