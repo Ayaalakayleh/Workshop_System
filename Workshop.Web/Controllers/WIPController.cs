@@ -423,9 +423,14 @@ namespace Workshop.Web.Controllers
                 }
 
                 // Check if waiting for invoice
-                if (dto.Status == (int)WIPStatusEnum.C)
+                if (dto.Status == (int)WIPStatusEnum.G)
                 {
                     ViewBag.IsWaitingInvoiced = true;
+                }
+                
+                if(dto.Status == (int)WIPStatusEnum.C)
+                {
+                    ViewBag.IsCompleated = true;
                 }
 
                 int? selectedCustomerId = null;

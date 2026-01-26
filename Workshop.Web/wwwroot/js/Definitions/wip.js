@@ -376,6 +376,7 @@
                                 window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
                             });
                         }
+                        evaluateAndUpdateWIPStatus();
 
                     } else {
                         Swal.fire({
@@ -1082,12 +1083,12 @@ $(document).ready(function () {
         });
     });
 
-    var st = $("#statusId").val();
-    if (st == 2032) {
-        $("#statusId").prop("disabled", true);   
-    } else {
-        $("#statusId").prop("disabled", false); 
-    }
+    //var st = $("#statusId").val();
+    //if (st == 2032) {
+    //    $("#statusId").prop("disabled", true);   
+    //} else {
+    //    $("#statusId").prop("disabled", false); 
+    //}
 });
 function validateGridsAccountTypeForPartialInv() {
     const partialInvoicing = $("#optPartialInv").is(":checked");
@@ -1158,4 +1159,120 @@ $("#statusId").change(function () {
         location.reload();
       
     }); 
+});
+
+$("#completedBTN").on('click',function () {
+    var model = {
+        WIPId: $("#Id").val(),
+        StatusId: 2030
+    };
+
+    return $.ajax({
+        type: 'Post',
+        url: window.URLs.UpdateWIPStatus,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(model)
+    }).done(function (result) {
+        if (!result) return;
+        location.reload();
+      
+    }); 
+});
+
+function getCurrentWipStatus() {
+    return parseInt($("#statusId").val()) || null;
+}
+
+function UpdateWIPStatus(id) {
+    
+    var model = {
+        WIPId: $("#Id").val(),
+        StatusId: id
+    };
+
+    return $.ajax({
+        type: 'Post',
+        url: window.URLs.UpdateWIPStatus,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(model)
+    }).done(function (result) {
+        if (!result) return;
+        location.reload();
+
+    });
+}
+
+
+async function getStatusesFromGrid(gridSelector) {
+    const grid = $(gridSelector).dxDataGrid("instance");
+    if (!grid) return [];
+
+    const ds = grid.getDataSource();
+    if (!ds) return [];
+
+    const rows = await ds.store().load();
+    if (!rows || !rows.length) return [];
+
+    return rows
+        .map(r => r.Status)
+        .filter(s => s !== null && s !== undefined)
+        .map(s => parseInt(s));
+}
+
+let wipStatusCheckInProgress = false;
+async function evaluateAndUpdateWIPStatusSafe() {
+    if (wipStatusCheckInProgress) return;
+    wipStatusCheckInProgress = true;
+
+    try {
+        await evaluateAndUpdateWIPStatus();
+    } finally {
+        wipStatusCheckInProgress = false;
+    }
+}
+
+async function evaluateAndUpdateWIPStatus() {
+
+    const currentStatus = getCurrentWipStatus();
+
+    if (currentStatus === 2030 || currentStatus === 2032) {
+        return;
+    }
+
+    const serviceStatuses = await getStatusesFromGrid("#mainRTSGrid");
+    const itemStatuses = await getStatusesFromGrid("#mainItemsGrid");
+
+    let targetStatusId = null;
+
+    //Compleated
+    if ( serviceStatuses.length &&  itemStatuses.length && serviceStatuses.every(s => s === 25) && itemStatuses.every(s => s === 42) ) {
+       targetStatusId = 2031;
+    }
+    else if (itemStatuses.includes(41)) { //Waiting Parts
+        targetStatusId = 2027;
+    }
+    else if (serviceStatuses.includes(23)) { //Waiting Labour
+        targetStatusId = 2028;
+    }
+    else if (serviceStatuses.length && serviceStatuses.every(s => s === 19)) { //Booked
+        targetStatusId = 2025;
+    }
+    else if (serviceStatuses.length && serviceStatuses.every(s => s === 20)) { //WIP 
+        targetStatusId = 2026;
+    }
+
+    if (!targetStatusId) return;
+
+    if (currentStatus === targetStatusId) return;
+
+    UpdateWIPStatus(targetStatusId);
+}
+
+
+$(function () {
+    setTimeout(() => {
+        evaluateAndUpdateWIPStatusSafe();
+    }, 0);
 });

@@ -668,6 +668,7 @@ $("#btnSaveSchedule").on("click", function (e) {
             }
             updateTotalLabourFieldsFromGrid();
             Swal.fire(theMainLang == "en" ? 'Success' : "تمت العملية بنجاح", "", "success");
+            evaluateAndUpdateWIPStatus();
         }
     }).fail(function (xhr, status, error) {
         console.error("Error:", error);

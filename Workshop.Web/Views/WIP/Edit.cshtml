@@ -154,11 +154,17 @@
 							}
 							@if (ViewBag.IsWaitingInvoiced == true || ViewBag.IsWaitingInvoiced == "true")
 							{
+								<button type="button" class="btn btn-secondary btn-sm" id="completedBTN">
+									<i class="fa fa-check-circle"></i>&nbsp;@Common["Button_Complete"]
+								</button>
+							}
+							@if (ViewBag.IsCompleated == true || ViewBag.IsCompleated == "true")
+							{
 								<button type="button" class="btn btn-secondary btn-sm" id="closeBTN">
 									<i class="fa fa-times"></i>&nbsp;@Common["Button_Close"]
 								</button>
-							 } 
-							</div>
+							}
+						</div>
 					</div>
 					
 					<!-- tab-content -->
@@ -184,7 +190,7 @@
 						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label class="form-label">@Common["Label_WIPstatus"]</label>
 							<div class="d-flex flex-column">
-								@Html.DropDownListFor(m => m.Status, new SelectList(ViewBag.Status, "Value", "Text"), new { @class = "form-control", id = "statusId" })
+								@Html.DropDownListFor(m => m.Status, new SelectList(ViewBag.Status, "Value", "Text"), new { @class = "form-control", id = "statusId", disabled = "disabled " })
 								@Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
 							</div>
 						</div>
