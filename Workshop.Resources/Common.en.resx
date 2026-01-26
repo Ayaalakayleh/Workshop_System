@@ -2706,6 +2706,9 @@
   <data name="Notify" xml:space="preserve">
     <value>Notify</value>
   </data>
+  <data name="Label_DXAssignTo" xml:space="preserve">
+    <value>Assign To:</value>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
   </data>
@@ -2733,5 +2736,7 @@
   <data name="Label_ReferanceNo" xml:space="preserve">
     <value>Referance No.</value>
   </data>
+  <data name="Label_CreateWIP" xml:space="preserve">
+    <value>Create WIP</value>
+  </data>
 </root>
-

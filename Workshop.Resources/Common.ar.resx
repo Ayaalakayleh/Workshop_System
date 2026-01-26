@@ -2706,6 +2706,9 @@
   <data name="Notify" xml:space="preserve">
     <value>إشعار</value>
   </data>
+  <data name="Label_DXAssignTo" xml:space="preserve">
+    <value>مسند الى</value>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>مفتوح</value>
   </data>
@@ -2733,5 +2736,7 @@
   <data name="Label_ReferanceNo" xml:space="preserve">
     <value>رقم المرجع</value>
   </data>
+  <data name="Label_CreateWIP" xml:space="preserve">
+    <value>انشاء امر عمل</value>
+  </data>
 </root>
-

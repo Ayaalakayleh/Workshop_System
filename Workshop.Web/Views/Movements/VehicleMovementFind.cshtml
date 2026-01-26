@@ -844,10 +844,10 @@
                                                         </table>
                                                     </div>
 
-                                                    <div class="form-group mt-2">
+                                                    @* <div class="form-group mt-2">
                                                         <label for="TireRemarks">@Common["Label_RemarksForTires"]</label>
                                                         <textarea type="text" id="TireRemarks" name="Tires.Remarks" class="form-control form-control-sm" rows="3" placeholder="@Common["Label_Remarks"]" disabled></textarea>
-                                                    </div>
+                                                    </div> *@
                                                 </div>
                                             </div>
                                         </div>
@@ -884,7 +884,10 @@
                                     }
                                     if (true && Model.LastMovementDetails.HasWorkorder == 0)
                                     {
-                                        <a href="@Url.Action("CreateJobCard", "WIP", new { movementId = Model.MovementId })" class="btn btn-success btn-w-m my-1"><i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]</a>
+                                        @* <a href="@Url.Action("CreateJobCard", "WIP", new { movementId = Model.MovementId })" class="btn btn-success btn-w-m my-1"><i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]</a> *@
+                                        <a href="javascript:void(0);" id="createJobCardBtn" data-movement-id="@Model.MovementId" class="btn btn-success btn-w-m my-1">
+                                            <i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]
+                                        </a>
                                     }
                                     if (true)
                                     {
@@ -1050,4 +1053,33 @@
     //     });
     // });
 
+</script>
+<script>
+    $(document).on('click', '#createJobCardBtn', function () {
+        var movementId = $(this).data('movement-id');
+
+        $.ajax({
+            url: '@Url.Action("CheckExistWIP", "WIP")',
+            type: 'GET',
+            data: { movementId: movementId },
+            success: function (response) {
+                if(response.exist){
+                    Swal.fire({
+                        title: 'Info',
+                        text: 'There is already open WIP for this vehicle',
+                        icon: 'info',
+                        confirmButtonText:'OK'
+                    });
+                }else{
+                    var url = '@Url.Action("CreateJobCard", "WIP")' + '?movementId=' + movementId;
+                    window.location.href = url;
+                }
+            },
+            error: function () {
+                location.reload();
+            }
+        });
+        
+    });
+    
 </script>

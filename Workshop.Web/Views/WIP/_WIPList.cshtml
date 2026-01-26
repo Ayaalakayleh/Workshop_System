@@ -27,6 +27,7 @@
         <tr>
             <th>@Common["Label_WIPNo"]</th>
             <th>@Common["Label_Status"]</th>
+            <th>@Common["Label_PlateNumber"]</th>
             <th>@Common["Label_Type"]</th>
             <th>@Common["Label_Actions"]</th>
         </tr>
@@ -39,6 +40,7 @@
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.LookupCode - @item.LookupPrimaryName</td>
+                    <td>@item.PlateNumber</td>
                     <td>@(item.IsExternal? Common["Label_External"] : Common["Label_Internal"])</td>
                     <td>
                         <a href="@Url.Action("Edit", "WIP", new { id = item.Id })"

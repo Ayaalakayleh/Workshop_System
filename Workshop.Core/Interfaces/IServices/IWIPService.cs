@@ -39,8 +39,8 @@ namespace Workshop.Core.Interfaces.IServices
         Task<decimal?> WIP_GetLabourRate(LabourRateFilterDTO filter);
         Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetPartsByWIPId(int id);
         Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLaboursByWIPId(int id);
-        Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetParts();
-        Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLabours();
+        Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetParts(int VehicleId);
+        Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLabours(int VehicleId);
         Task<int> DeleteService(DeleteServiceDTO dto);
         Task<int?> WIP_Close(CloseWIPDTO dto);
         Task<int?> WIP_Validation(int WIPId);
@@ -66,5 +66,6 @@ namespace Workshop.Core.Interfaces.IServices
         Task<IEnumerable<WipInvoiceDetailDTO>> WIP_InvoiceDetails_GetByHeaderId(int headerId);
         Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services);
         Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal);
+        Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int movementId);
     }
 }

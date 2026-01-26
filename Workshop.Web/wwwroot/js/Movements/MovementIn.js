@@ -857,6 +857,28 @@
         });
     }
 
+      function buildWipList(title, list) {
+        if (!list || list.length === 0) return '';
+
+        let items = list.map(wipId => `
+        <li>
+            <a href="${window.RazorVars.editGetUrl}?id=${wipId}"
+               target="_blank"
+               style="color:#0d6efd;">
+                ${wipId}
+            </a>
+        </li>
+    `).join('');
+
+        return `
+        <div style="text-align:left;margin-top:10px">
+            <strong>${title}</strong>
+            <ul style="margin:5px 0 0 15px">${items}</ul>
+        </div>
+    `;
+    }
+
+
     function GetWIPByVehicleId(vehicleId) {
         vehicleId = Number(vehicleId || 0);
         if (!vehicleId) return;
@@ -875,23 +897,40 @@
 
             if (wipSwalShownByVehicle[vehicleId]) return;
             wipSwalShownByVehicle[vehicleId] = true;
-            if (theMainLang == "en") {
+
+            const hasOpen = result.data.openWIPs && result.data.openWIPs.length > 0;
+            const hasPrevious = result.data.previousWIPs && result.data.previousWIPs.length > 0;
+
+            if (!hasOpen && !hasPrevious) {
                 Swal.fire({
-                    title: 'Warning',
-                    html: "You have already - " + result.data.openWIPCount + " - open WIP<br>" +
-                        "And - " + result.data.previous + " - WIP from last month",
-                    icon: 'warning',
-                    confirmButtonText: 'OK'
+                    title: theMainLang == "en" ? 'Info' : 'معلومة',
+                    text: theMainLang == "en"
+                        ? 'There is no open WIP for this vehicle.'
+                        : 'لا يوجد أوامر عمل مفتوحة لهذه السيارة.',
+                    icon: 'info',
+                    confirmButtonText: theMainLang == "en" ? 'OK' : 'حسناً'
                 });
-            } else {
-                Swal.fire({
-                    title: 'تنبيه',
-                    html: "لديك بالفعل - " + result.data.openWIPCount + " - من أوامر العمل المفتوحة (WIP)<br>" +
-                        "ولديك - " + result.data.previous + " - من أوامر العمل (WIP) من الشهر الماضي",
-                    icon: 'warning',
-                    confirmButtonText: 'حسناً'
-                });
+                return;
             }
+
+            let htmlContent = `
+        ${buildWipList(
+                theMainLang == "en" ? "Open WIP Orders:" : "أوامر العمل المفتوحة:",
+                result.data.openWIPs
+            )}
+        ${buildWipList(
+                theMainLang == "en" ? "Last Month WIP Orders:" : "أوامر العمل من الشهر الماضي:",
+                result.data.previousWIPs
+            )}
+    `;
+
+            Swal.fire({
+                title: theMainLang == "en" ? 'Warning' : 'تنبيه',
+                html: htmlContent,
+                icon: 'warning',
+                confirmButtonText: theMainLang == "en" ? 'OK' : 'حسناً'
+            });
+
 
         }).fail(function () {
             wipRequestInFlightByVehicle[vehicleId] = false;

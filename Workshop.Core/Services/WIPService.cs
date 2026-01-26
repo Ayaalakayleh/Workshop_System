@@ -1,4 +1,5 @@
 using Workshop.Core.DTOs;
+using Workshop.Core.DTOs.AccountingDTOs;
 using Workshop.Core.DTOs.Vehicle;
 using Workshop.Core.Interfaces.IRepositories;
 using Workshop.Core.Interfaces.IServices;
@@ -168,13 +169,13 @@ namespace Workshop.Core.Services
             return await _repository.WIP_ServiceHistoryDetails_GetLaboursByWIPId(id);
         }
 
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetParts()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts?>> WIP_ServiceHistoryDetails_GetParts(int VehicleId)
         {
-            return await _repository.WIP_ServiceHistoryDetails_GetParts();
+            return await _repository.WIP_ServiceHistoryDetails_GetParts(VehicleId);
         }
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLabours()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour?>> WIP_ServiceHistoryDetails_GetLabours(int VehicleId)
         {
-            return await _repository.WIP_ServiceHistoryDetails_GetLabours();
+            return await _repository.WIP_ServiceHistoryDetails_GetLabours(VehicleId);
         }
 
         public async Task<IEnumerable<WIPDTO>> GetAllDDLAsync()
@@ -301,6 +302,10 @@ namespace Workshop.Core.Services
         public async Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal)
         {
             return await _repository.WIP_HasOpenByVehicleAsync(vehicleId, isExternal);
+        }
+        public async Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int movementId)
+        {
+            return await _repository.GetWIPByMovementId(movementId);
         }
 
     }

@@ -1864,6 +1864,19 @@ namespace Workshop.Web.Services
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<WIPDTO>>();
             return result != null ? result : null;
         }
+        public async Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int MovementId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/WIP/GetByMovementId", MovementId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return new List<WIPDTO>();
+            }
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<WIPDTO>>();
+            return result != null ? result : new List<WIPDTO>();
+        }
 
         public async Task<IEnumerable<CreateWIPServiceDTO>?> GetAllInternalLabourLineAsync(int WIPId)
         {
@@ -2161,14 +2174,14 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Labour>>($"api/WIP/WIPServiceHistoryDetailsGetLaboursByWIPId?Id={Id}");
         }
 
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts>> WIPServiceHistoryDetails_GetParts()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Parts>> WIPServiceHistoryDetails_GetParts(int VehicleId)
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Parts>>($"api/WIP/WIPServiceHistoryDetailsGetParts");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Parts>>($"api/WIP/WIPServiceHistoryDetailsGetParts?VehicleId={VehicleId}");
         }
 
-        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour>> WIPServiceHistoryDetails_GetLabours()
+        public async Task<IEnumerable<WIPServiceHistoryDetails_Labour>> WIPServiceHistoryDetails_GetLabours(int VehicleId)
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Labour>>($"api/WIP/WIPServiceHistoryDetailsGetLabours");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<WIPServiceHistoryDetails_Labour>>($"api/WIP/WIPServiceHistoryDetailsGetLabours?VehicleId={VehicleId}");
         }
 
         public async Task<IEnumerable< WIPDTO?>> GetWIPDDL()

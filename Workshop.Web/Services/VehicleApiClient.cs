@@ -192,6 +192,12 @@ namespace Workshop.Web.Services
             string url = $"/Workshop/GetFuleLevel";
             return await SendRequest<List<FuleLevel>>(url, HttpMethod.Get);
         }
+        public async Task<FuleLevel> GetFuleLevelById(int Id)
+        {
+
+            string url = $"/Workshop/FuleLevel_GetById?Id={Id}";
+            return await SendRequest<FuleLevel>(url, HttpMethod.Get);
+        }
 
         public async Task<VehicleDefinitions> M_VehicleDefinitionsGetPlateNumberCostCenterById(int id)
         {

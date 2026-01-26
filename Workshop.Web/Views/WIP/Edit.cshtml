@@ -2,6 +2,7 @@
 @using Workshop.Domain.Enum;
 @using Newtonsoft.Json
 @using Workshop.Core.DTOs
+@using Workshop.Core.DTOs.AccountingDTOs
 @using Workshop.Resources
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
@@ -102,6 +103,7 @@
             @Html.HiddenFor(m => m.VehicleId, new { Id="_vehicleId" }) 
             @Html.HiddenFor(m => m.MovementId, new { Id = "_movementId" })
 			@Html.HiddenFor(m => m.PartsIssueId, new { Id = "_PartsIssueId" })
+			@Html.HiddenFor(m => m.AgreementId, new { Id = "_AgreementId" })
 			<input type="hidden" id="_DiscountPercentageLabor"  />
             <input type="hidden" id="_DiscountPercentagePart"  />
 
@@ -179,21 +181,27 @@
 					</div>
 					<!-- /tab-content -->
 					<div class="row g-3">
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label class="form-label">@Common["Label_WIPstatus"]</label>
 							<div class="d-flex flex-column">
 								@Html.DropDownListFor(m => m.Status, new SelectList(ViewBag.Status, "Value", "Text"), new { @class = "form-control", id = "statusId" })
 								@Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label>@Common["Label_Date"]</label>
 							<div class="d-flex flex-column">
 								@Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate" })
 								@Html.ValidationMessageFor(m => m.WipDate, "", new { @class = "text-danger" })
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-3 col-md-6 col-sm-12">
+							<label>Company</label>
+							<div class="d-flex flex-column">
+								@Html.DropDownList("CompanyId", new SelectList(ViewBag.VehicleCustomers, "Value", "Text"), " ", new { @class = "form-control", disabled = "disabled " })
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label>@Common["Label_WIPNo"]</label>
 							<div class="d-flex flex-column">
 								@* @Html.LabelFor(model => model.Id) *@
@@ -314,6 +322,7 @@
   var WarehouseData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Warehouses));
   var generalRequest = @Html.Raw(JsonConvert.SerializeObject(ViewBag.GeneralRequest));
   var OurWarehouses = @Html.Raw(Json.Serialize(ViewBag.OurWarehouses));
+  var TechniciansDDL = @Html.Raw(Json.Serialize(ViewBag.Technicians));
   var movementId = '@Model.MovementId';
   var AllowActions = @Html.Raw(Json.Serialize(ViewBag.AllowActions));
   var Permission_AddDiscount = @(AddDiscount.ToString().ToLower());
@@ -433,6 +442,7 @@
 		  RecallFixed: '@Html.Raw(Common["Recall_fixed"])',
 		  ErrorHappend: '@Html.Raw(Common["ErrorHappend"])',
 		  LabelError: '@Html.Raw(Common["Label_Error"])',
+		  DXAssignTo: '@Html.Raw(Common["Label_DXAssignTo"])',
 
 		  // ============================
 		  // DevExpress Labels - Services

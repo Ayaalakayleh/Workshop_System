@@ -191,6 +191,13 @@ namespace Workshop.API.Controllers
 			await _mWorkOrderService.WorkOrderReport_Insert(WorkOrderDocument);
 			return Ok();
 		}
+
+		[HttpPost("WorkOrderMultiDocs_Insert")]
+		public async Task<IActionResult> WorkOrderMultiDocs_Insert([FromBody] List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument)
+		{
+			await _mWorkOrderService.WorkOrderMultiDocs_Insert(WorkOrderDocument);
+			return Ok();
+		}
 		[HttpPost("WorkOrderDetailsDoc_Insert")]
 		public async Task<IActionResult> WorkOrderDetalsDoc_Insert([FromBody] List<MWorkOrdersDetailsDocumentDTO> WorkOrderDocument)
 		{
@@ -219,6 +226,12 @@ namespace Workshop.API.Controllers
 		public async Task<ActionResult<MWorkOrdersDetailsDocument>> WorkOrderReports_Get(int WorkOrderId)
 		{
 			var result = await _mWorkOrderService.WorkOrderReports_Get(WorkOrderId);
+			return Ok(result);
+		}
+		[HttpGet("WorkOrderMultiReports_Get/{WorkOrderId}")]
+		public async Task<ActionResult<MWorkOrdersDetailsDocument>> WorkOrderMultiReports_Get(int WorkOrderId)
+		{
+			var result = await _mWorkOrderService.WorkOrderMultiReports_Get(WorkOrderId);
 			return Ok(result);
 		}
 		[HttpDelete("DeleteReportByWorkOrderId/{WorkOrderId}")]

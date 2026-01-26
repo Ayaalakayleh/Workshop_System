@@ -314,16 +314,16 @@ namespace Workshop.API.Controllers
         }
 
         [HttpGet("WIPServiceHistoryDetailsGetParts")]
-        public async Task<ActionResult<IEnumerable<WIPServiceHistoryDetails_Parts?>>> WIP_ServiceHistoryDetails_GetParts()
+        public async Task<ActionResult<IEnumerable<WIPServiceHistoryDetails_Parts?>>> WIP_ServiceHistoryDetails_GetParts([FromQuery] int VehicleId)
         {
-            var result = await _service.WIP_ServiceHistoryDetails_GetParts();
+            var result = await _service.WIP_ServiceHistoryDetails_GetParts(VehicleId);
             if (result == null) return new List<WIPServiceHistoryDetails_Parts>();
             return Ok(result);
         }
         [HttpGet("WIPServiceHistoryDetailsGetLabours")]
-        public async Task<ActionResult<IEnumerable<WIPServiceHistoryDetails_Labour?>>> WIP_ServiceHistoryDetails_GetLabours()
+        public async Task<ActionResult<IEnumerable<WIPServiceHistoryDetails_Labour?>>> WIP_ServiceHistoryDetails_GetLabours([FromQuery] int VehicleId)
         {
-            var result = await _service.WIP_ServiceHistoryDetails_GetLabours();
+            var result = await _service.WIP_ServiceHistoryDetails_GetLabours(VehicleId);
             if (result == null) return new List<WIPServiceHistoryDetails_Labour>();
             return Ok(result);
         }
@@ -556,6 +556,21 @@ namespace Workshop.API.Controllers
             var result = await _service.WIP_HasOpenByVehicleAsync(vehicleId, isExternal);
             return Ok(result);
 
+        }
+
+        [HttpPost("GetByMovementId")]
+        public async Task<ActionResult<IEnumerable<WIPDTO>>> GetByMovementId([FromBody] int movementId)
+        {
+            try
+            {
+                var result = await _service.GetWIPByMovementId(movementId);
+                if (result == null) return new List<WIPDTO>();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

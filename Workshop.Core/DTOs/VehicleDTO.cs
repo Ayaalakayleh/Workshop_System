@@ -246,7 +246,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public int? MoveOutWorkshopId { get; set; }//vid
 		public int? MoveInWorkshopId { get; set; }//vid
 		public int? MovementOutId { get; set; }//vid
-		public int? WIP_Id { get; set; }
+		public int? WIPId { get; set; }
 		public int? FromWhere { get; set; }
 		public int? ReceivedBranchId { get; set; }
 		public string? fuelLevel { get; set; }

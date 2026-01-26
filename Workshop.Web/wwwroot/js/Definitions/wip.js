@@ -235,6 +235,7 @@
             var WsId = 10;//$("#FK_WarehouseId").val();
             var VehId = $('#_vehicleId').val();
             var MovId = $('#_movementId').val();
+            var AgreementId = $('#_AgreementId').val();
             var accountType = $("#AccountType").val();
             var salesType = $("#SalesType").val();
             var customer = $("#CustomerId").val();
@@ -328,6 +329,7 @@
                     Id: WIPId,
                     VehicleId: VehId,
                     MovementId: MovId,
+                    AgreementId: AgreementId,
                     Items: itemsJson,
                     FK_WarehouseId: WsId,
                     Services: ServicesJson,

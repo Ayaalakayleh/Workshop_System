@@ -76,7 +76,7 @@ $(function () {
             paging: true
         },
         columns: [
-            { dataField: "KeyId", caption: "#", visible: true, allowEditing: false, width: 80, },
+            { dataField: "KeyId", caption: "#", visible: true, allowEditing: false, width: 50, },
             { dataField: "Id", caption: "ID", visible: false },
             {
                 dataField: "WIPId", caption: "WIPId", dataType: "number", visible: false,
@@ -88,12 +88,12 @@ $(function () {
                 }
             },
             { dataField: "Code", caption: window.RazorVars.DXCode, allowEditing: false },
-            { dataField: "Description", caption: window.RazorVars.DXName, allowEditing: true },
+            { dataField: "Description", caption: window.RazorVars.DXName, allowEditing: true, width: 120 },
             {
                 dataField: "LongDescription",
                 caption: window.RazorVars.DXLongDescription,
                 allowEditing: false,
-                width: 300,
+                width: 200,
                 cellTemplate: function (container, options) {
                     const value = options.value || "";
                     const shortText = value.length > 25 ? value.substring(0, 25) + "..." : value;
@@ -131,7 +131,7 @@ $(function () {
                         .appendTo(container);
                 }
             },
-            { dataField: "StandardHours", dataType: "number", caption: window.RazorVars.DXStandardHours, allowEditing: true, alignment: "left" },
+            { dataField: "StandardHours", dataType: "number", caption: window.RazorVars.DXStandardHours, width: 120, allowEditing: true, alignment: "left" },
             { dataField: "BaseRate", visible: false, allowEditing: false },
             { dataField: "Rate",
                 caption: window.RazorVars.DXRate,
@@ -159,7 +159,6 @@ $(function () {
                 allowEditing: false,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-                    //var vatId = $("#Vat").val();
                     var vatId = getEffectiveVatId(rowData);
 
                     var vatValue = parseFloat(GetVatValueById(vatId)) || 0;
@@ -203,23 +202,29 @@ $(function () {
             {
                 dataField: "StatusText", caption: window.RazorVars.DXStatus, allowEditing: false, alignment: "left",
             },
-            //{
-            //    dataField: "AccountType", caption: window.RazorVars.DXAccountType, dataType: "number", allowEditing: true,
-            //    lookup: {
-            //        dataSource: AccountTypes.map(x => ({
-            //            Value: parseInt(x.Value),
-            //            Text: x.Text
-            //        })),
-            //        valueExpr: "Value",
-            //        displayExpr: "Text"
-            //    },
-            //    calculateCellValue: function (rowData) {
-            //        if (!rowData.AccountType) {
-            //            rowData.AccountType = 1;
-            //        }
-            //        return rowData.AccountType;
-            //    }
-            //},
+            {
+                dataField: "TechnicianId",
+                caption: window.RazorVars.DXAssignTo,
+                dataType: "number",
+                allowEditing: false,
+                alignment: "left",
+
+                lookup: {
+                    dataSource: TechniciansDDL,
+                    valueExpr: "value",
+                    displayExpr: "text"
+                },
+
+                calculateDisplayValue: function (row) {
+                    if (row.TechnicianId == null) return "";
+
+                    const tech = TechniciansDDL.find(
+                        t => Number(t.value) === Number(row.TechnicianId)
+                    );
+
+                    return tech ? tech.text : row.TechnicianId;
+                }
+            },
             {
                 dataField: "AccountType",
                 caption: window.RazorVars.DXAccountType,
@@ -251,10 +256,10 @@ $(function () {
                 width: 110,
                 buttons: [
                     {
-                        hint: "Add",
+                        hint: "Assign",
                         icon: "fad fa-regular fa-user act-booking",
                         visible: function (e) {
-                            return !(wipStatus === Gone || wipStatus === Invoiced) && e.row.data.Status === 23;
+                            return !(wipStatus === Gone || wipStatus === Invoiced);//&& e.row.data.Status === 23;
                         },
                         onClick: function (e) {
                             console.log(e.row.data.Id);
@@ -653,7 +658,9 @@ $("#btnSaveSchedule").on("click", function (e) {
                 const target = data.find(x => x.KeyId === result.keyId);
                 if (target) {
                     target.Status = result.status;
-                    target.StatusText = "Booked";
+                    target.StatusText = "B-Booked";
+                    grid.cellValue(rowIndex, "TechnicianId", parseInt($('#schTech').val()));
+
                 }
 
                 //getRate(WIPSChedule.RTSId, WIPSChedule.TechnicianId);
