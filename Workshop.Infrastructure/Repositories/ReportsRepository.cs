@@ -61,5 +61,27 @@ namespace Workshop.Infrastructure.Repositories
         }
 
 
+        public async Task<IEnumerable<ConsumptionReportDTO>> GetConsumptionReport(ConsumptionReportFilterDTO filterDTO)
+        {
+
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@TypeId", filterDTO.TypeId);
+            parameters.Add("@WIPId", filterDTO.WIP);
+            parameters.Add("@InvoiceDateStart", filterDTO.InvoiceDateStart);
+            parameters.Add("@InvoiceDateEND", filterDTO.InvoiceDateEnd);
+            parameters.Add("@CustomerId", filterDTO.CustomerId);
+
+            var result = await connection.QueryAsync<ConsumptionReportDTO>(
+            "R_Consumption",
+            parameters,
+            commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+
+
     }
 }

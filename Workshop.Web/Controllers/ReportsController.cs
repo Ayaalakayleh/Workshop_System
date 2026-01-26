@@ -6,6 +6,7 @@ using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
+using Workshop.Domain.Enum;
 
 namespace Workshop.Web.Controllers
 {
@@ -16,6 +17,7 @@ namespace Workshop.Web.Controllers
         private readonly ERPApiClient _erpClient;
         private readonly AccountingApiClient _accountingApiClient;
         private readonly VehicleApiClient _vehicleApiClient;
+        private readonly InventoryApiClient _inventoryApiClient;
         public readonly string lang;
         public ReportsController(
             WorkshopApiClient apiClient,
@@ -23,12 +25,14 @@ namespace Workshop.Web.Controllers
             ERPApiClient eRPApiClient,
             AccountingApiClient accountingApiClient,
             VehicleApiClient vehicleApiClient,
+            InventoryApiClient inventoryApiClient,
             IWebHostEnvironment env) : base(null, configuration, env)
         {
             _apiClient = apiClient;
             _erpClient = eRPApiClient;
             _accountingApiClient = accountingApiClient;
             _vehicleApiClient = vehicleApiClient;
+            _inventoryApiClient = inventoryApiClient;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
@@ -609,5 +613,267 @@ namespace Workshop.Web.Controllers
             var makes = await _vehicleApiClient.GetAllManufacturers(lang);
             return makes;
         }
+
+        #region Consumption Report
+        public async Task<IActionResult> ConsumptionReport()
+        {
+            var isCompanyCenterialized = 1;
+            var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+            var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(16, CompanyId);
+            ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CustomerName
+            }).ToList() ?? new List<SelectListItem>();
+
+            ViewBag.AccountTypes = VehcileServices?.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = lang == "en" ? c.PrimaryName : c.SecondaryName
+
+            }).ToList() ?? new List<SelectListItem>();
+
+            var model = new ConsumptionReportViewModel
+            {
+                Filter = new ConsumptionReportFilterDTO(),
+                ReportData = new List<ConsumptionReportDTO>()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetConsumptionReport([FromBody] ConsumptionReportFilterDTO filter)
+        {
+            try
+            {
+                filter.TypeId ??= 0;
+                var data = await _apiClient.GetConsumptionReportAsync(filter);
+                
+                var isCompanyCenterialized = 1;
+                
+                var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+                var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(15, CompanyId);
+
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        item.OPName = await GetUserFullNameAsync(item.OPNumber);
+                        if (item.MovementId.HasValue)
+                        {
+                            var move = await _apiClient.GetVehicleMovementByIdAsync(item.MovementId.Value);
+                            if (move != null) item.Millage = move.ReceivedMeter;
+                        }
+
+                        if (item.CustomerId.HasValue)
+                        {
+                            var customer = allCustomers.FirstOrDefault(c => c.Id == item.CustomerId);
+                            item.Account = customer?.AccountNo.ToString();
+                            item.CustomerName = customer?.CustomerName;
+                        }
+                       
+                        item.CompanyCode = (await GetBranchNameAsync(item.workshopId)).ToString();
+
+                        item.VehServiceCode = VehcileServices?.FirstOrDefault(v => v.Id == item.VehServiceId)?.Code;
+                        item.VehServiceDesc = lang == "en" ? VehcileServices?.FirstOrDefault(v => v.Id == item.VehServiceId)?.PrimaryName : VehcileServices?.FirstOrDefault(v => v.Id == item.VehServiceId)?.SecondaryName;
+                        if(item.TypeId != null)
+                        item.Type = (await _apiClient.GetLookupDetailByIdAsync(item.TypeId ?? 0, 15, CompanyId))?.Code;
+
+                        if (item.IsExternal ?? false)
+                        {
+                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_Find(item.VehicleId ?? 0)) ?? new VehicleDefinitions();
+                            item.VIN = vehicleDetails.ChassisNo;
+                        }
+                        else
+                        {
+                           // var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(item.VehicleId ?? 0)) ?? new CreateVehicleDefinitionsModel();
+                           // External vehicle logic might differ, assuming VehicleDefinitions_Find handles it or similar
+                            var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_Find(item.VehicleId ?? 0);
+                            item.VIN = vehicleDetails?.ChassisNo;
+                        }
+                        var inventoryItem = await _inventoryApiClient.GetItemByIdAsync(item.ItemId ?? 0);
+                        item.ItemName = lang == "en" ? inventoryItem.PrimaryName : inventoryItem.SecondaryName;
+                    }
+                }
+
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_ReportListConsumption", data);
+                }
+
+                var model = new ConsumptionReportViewModel
+                {
+                    Filter = filter,
+                    ReportData = data?.ToList() ?? new List<ConsumptionReportDTO>()
+                };
+
+                return View("ConsumptionReport", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PrintConsumptionReport([FromBody] ConsumptionReportFilterDTO filter)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var reportsServiceUrl = _configuration["ReportsService:BaseUrl"] ?? "https://localhost:44332";
+                    
+                    var response = await httpClient.PostAsJsonAsync($"{reportsServiceUrl}/api/reports/consumption", filter);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var pdfBytes = await response.Content.ReadAsByteArrayAsync();
+                        return File(pdfBytes, "application/pdf", $"ConsumptionReport_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+                    }
+                    else
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        return Json(new { success = false, message = $"Failed to generate PDF report: {errorContent}" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportConsumptionReportToExcel([FromBody] ConsumptionReportFilterDTO filter)
+        {
+            try
+            {
+                filter.TypeId ??= 0;
+                var data = await _apiClient.GetConsumptionReportAsync(filter);
+                var isCompanyCenterialized = 1;
+                var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+                var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(15, CompanyId);
+
+                if (data != null) 
+                {
+                    foreach (var item in data)
+                    {
+                        item.OPName = await GetUserFullNameAsync(item.OPNumber);
+                        if (item.MovementId.HasValue)
+                        {
+                            var move = await _apiClient.GetVehicleMovementByIdAsync(item.MovementId.Value);
+                            if (move != null) item.Millage = move.ReceivedMeter;
+                        }
+                        if (item.CustomerId.HasValue)
+                        {
+                            var customer = allCustomers.FirstOrDefault(c => c.Id == item.CustomerId);
+                            item.Account = customer?.AccountNo.ToString();
+                            item.CustomerName = customer?.CustomerName;
+                        }
+                        item.CompanyCode = (await GetBranchNameAsync(item.workshopId)).ToString();
+                        item.VehServiceCode = VehcileServices?.FirstOrDefault(v => v.Id == item.VehServiceId)?.Code;
+                        item.VehServiceDesc = lang == "en" ? VehcileServices?.FirstOrDefault(v => v.Id == item.VehServiceId)?.PrimaryName : VehcileServices?.FirstOrDefault(v => v.Id == item.VehServiceId)?.SecondaryName;
+                        if (item.TypeId != null)
+                            item.Type = (await _apiClient.GetLookupDetailByIdAsync(item.TypeId ?? 0, 15, CompanyId))?.Code;
+                        if (item.IsExternal ?? false)
+                        {
+                            var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_Find(item.VehicleId ?? 0)) ?? new VehicleDefinitions();
+                            item.VIN = vehicleDetails.ChassisNo;
+                        }
+                        else
+                        {
+                            var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_Find(item.VehicleId ?? 0);
+                            item.VIN = vehicleDetails?.ChassisNo;
+                        }
+                        var inventoryItem = await _inventoryApiClient.GetItemByIdAsync(item.ItemId ?? 0);
+                        item.ItemName = lang == "en" ? inventoryItem.PrimaryName : inventoryItem.SecondaryName;
+                    }
+                }
+
+                using var workbook = new XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("Consumption Report");
+                if (lang == "en")
+                {
+                    worksheet.Cell(1, 1).Value = "WIP";
+                    worksheet.Cell(1, 2).Value = "Invoice Date";
+                    worksheet.Cell(1, 3).Value = "Invoice Number";
+                    worksheet.Cell(1, 4).Value = "Company Code";
+                    worksheet.Cell(1, 5).Value = "Account";
+                    worksheet.Cell(1, 6).Value = "Department";
+                    worksheet.Cell(1, 7).Value = "Part No";
+                    worksheet.Cell(1, 8).Value = "QTY";
+                    worksheet.Cell(1, 9).Value = "Customer Name";
+                    worksheet.Cell(1, 10).Value = "Cost";
+                    worksheet.Cell(1, 11).Value = "Fran";
+                    worksheet.Cell(1, 12).Value = "VIN";
+                    worksheet.Cell(1, 13).Value = "Plate Number";
+                    worksheet.Cell(1, 14).Value = "Manufacture Year";
+                    worksheet.Cell(1, 15).Value = "OP Number";
+                    worksheet.Cell(1, 16).Value = "OP Name";
+                    worksheet.Cell(1, 17).Value = "Service Code";
+                    worksheet.Cell(1, 18).Value = "Service Description";
+                }
+                else
+                {
+                    worksheet.Cell(1, 1).Value = "أمر العمل";
+                    worksheet.Cell(1, 2).Value = "تاريخ الفاتورة";
+                    worksheet.Cell(1, 3).Value = "رقم الفاتورة";
+                    worksheet.Cell(1, 4).Value = "رمز الشركة";
+                    worksheet.Cell(1, 5).Value = "الحساب";
+                    worksheet.Cell(1, 6).Value = "القسم";
+                    worksheet.Cell(1, 7).Value = "رقم القطعة";
+                    worksheet.Cell(1, 8).Value = "الكمية";
+                    worksheet.Cell(1, 9).Value = "اسم العميل";
+                    worksheet.Cell(1, 10).Value = "التكلفة";
+                    worksheet.Cell(1, 11).Value = "النوع";
+                    worksheet.Cell(1, 12).Value = "رقم تعريف المركبة";
+                    worksheet.Cell(1, 13).Value = "رقم اللوحة";
+                    worksheet.Cell(1, 14).Value = "سنة الصنع";
+                    worksheet.Cell(1, 15).Value = "رقم الشخص المسؤول";
+                    worksheet.Cell(1, 16).Value = "اسم الشخص المسؤول";
+                    worksheet.Cell(1, 17).Value = "رمز الخدمة";
+                    worksheet.Cell(1, 18).Value = "وصف الخدمة";
+                }
+
+                int row = 2;
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        worksheet.Cell(row, 1).Value = item.WIP;
+                        worksheet.Cell(row, 2).Value = item.InvoiceDate;
+                        worksheet.Cell(row, 3).Value = item.InvoiceNumber;
+                        worksheet.Cell(row, 4).Value = item.CompanyCode;
+                        worksheet.Cell(row, 5).Value = item.Account;
+                        worksheet.Cell(row, 6).Value = item.Department;
+                        worksheet.Cell(row, 7).Value = item.ItemName;
+                        worksheet.Cell(row, 8).Value = item.Quantity;
+                        worksheet.Cell(row, 9).Value = item.CustomerName;
+                        worksheet.Cell(row, 10).Value = item.TotalCost;
+                        worksheet.Cell(row, 11).Value = item.Type;
+                        worksheet.Cell(row, 12).Value = item.VIN;
+                        worksheet.Cell(row, 13).Value = item.PlateNumber;
+                        worksheet.Cell(row, 14).Value = item.ManufactureYear;
+                        worksheet.Cell(row, 15).Value = item.OPNumber;
+                        worksheet.Cell(row, 16).Value = item.OPName;
+                        worksheet.Cell(row, 17).Value = item.VehServiceCode;
+                        worksheet.Cell(row, 18).Value = item.VehServiceDesc;
+                        row++;
+                    }
+                }
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                stream.Position = 0;
+                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ConsumptionReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        #endregion
     }
 }

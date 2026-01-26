@@ -28,6 +28,12 @@ namespace Workshop.API.Controllers
             var result = await _service.GetMonthlyRepairCostBranchWiseReport(filter);
             return Ok(result);
         }
-    
+        [HttpPost("GetConsumption")]
+        public async Task<IActionResult> GetConsumptionReport([FromBody] ConsumptionReportFilterDTO filter)
+        {
+            var result = await _service.GetConsumptionReport(filter);
+            return Ok(result);
+        }
+
     }
 }

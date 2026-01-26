@@ -25,13 +25,23 @@
     <div class="col-md-3">
         <div class="form-group">
             <label>@Common["Customer"]</label>
-            @* <input type="number" id="CustomerId" name="CustomerId" class="form-control" placeholder="Customer ID"> *@
             @Html.DropDownList(
                         "CustomerId",
                         (IEnumerable<SelectListItem>)ViewBag.Customers,
                         "Select Customer",
-                        new { @class = "form-control"  }
+                        new { @class = "form-control" }
                         )
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@Common["Type"]</label>
+             @Html.DropDownList(
+                "TypeId",
+                (IEnumerable<SelectListItem>)ViewBag.AccountTypes,
+                "Select Type",
+                new { @class = "form-control" }
+            )
         </div>
     </div>
 </div>

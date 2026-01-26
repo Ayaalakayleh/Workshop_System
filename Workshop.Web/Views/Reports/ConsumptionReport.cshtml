@@ -1,0 +1,48 @@
+@model Workshop.Web.Models.ConsumptionReportViewModel
+@using Workshop.Core.DTOs
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2 class="font-weight-bold">@Common["Consumption Report"]</h2>
+            </div>
+
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    <!-- Search Filters -->
+                    @await Html.PartialAsync("_FilterConsumption")
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-3 mb-3">
+                        <button type="button" class="btn btn-success ml-2" id="btnExportExcel">
+                            <i class="fad fa-file-excel"></i>&nbsp;@Common["Button_Export_Excel"]
+                        </button>
+                    </div>
+
+                    <!-- List -->
+                    <hr />
+                    <div id="ReportListContainer">
+                        @* Initial render of report data *@
+                        @await Html.PartialAsync("_ReportListConsumption", Model?.ReportData ?? new List<ConsumptionReportDTO>())
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/Definitions/reports.js" asp-append-version="true"></script>
+<script>
+    // Expose server-generated URLs to reports.js
+    window.URLs = {
+        getReportUrl: '@Url.Action("GetConsumptionReport", "Reports")',
+        printReportUrl: '@Url.Action("PrintConsumptionReport", "Reports")',
+        exportExcelUrl: '@Url.Action("ExportConsumptionReportToExcel", "Reports")'
+    };
+</script>

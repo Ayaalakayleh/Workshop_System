@@ -90,8 +90,8 @@ namespace Workshop.Web.Controllers
                 VehicleClassIds = oRTSCodeDTO.VehicleClassIds,
                 Id = Id ?? 0,
                 DefaultRate = oRTSCodeDTO.DefaultRate,
-                IsOil = oRTSCodeDTO.IsOil,
-                IsPaint = oRTSCodeDTO.IsPaint
+                TypeId = oRTSCodeDTO.TypeId,
+
 
             };
             var skills = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(1, CompanyId);
@@ -107,6 +107,10 @@ namespace Workshop.Web.Controllers
             var makes = await _vehicleApiClient.GetAllManufacturers(lang);
             ViewBag.make = makes.Select(t => new SelectListItem { Text = lang == "en" ? t.ManufacturerPrimaryName : t.ManufacturerSecondaryName, Value = t.Id.ToString() }).ToList();
             ViewBag.Makes = makes.Where(t => dto.FranchiseIds != null && dto.FranchiseIds.Contains(t.Id)).ToList();
+
+
+            var types = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(16, CompanyId);
+            ViewBag.Types = types.Select(t => new SelectListItem { Text = lang == "en" ? t.PrimaryName : t.SecondaryName, Value = t.Id.ToString() });
 
             RTSCodeWithAllowedTimeDTO rTSCodeWithAllowedTimeDTO = new RTSCodeWithAllowedTimeDTO();
             rTSCodeWithAllowedTimeDTO.RTSCode = dto;
@@ -288,8 +292,8 @@ namespace Workshop.Web.Controllers
                 VehicleClassIds = dto.VehicleClassIds,
                 CompanyId = CompanyId,
                 DefaultRate = dto.DefaultRate,
-                IsOil = dto.IsOil,
-                IsPaint = dto.IsPaint
+                TypeId = dto.TypeId,
+ 
 
             };
         }
@@ -314,8 +318,7 @@ namespace Workshop.Web.Controllers
                 FranchiseIds = dto.FranchiseIds,
                 VehicleClassIds = dto.VehicleClassIds,
                 DefaultRate = dto.DefaultRate,
-                IsOil = dto.IsOil,
-                IsPaint = dto.IsPaint
+                TypeId = dto.TypeId,
 
             };
         }

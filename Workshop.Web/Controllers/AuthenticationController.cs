@@ -2,6 +2,7 @@
 using Workshop.Core.DTOs;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
+using Workshop.Core.DTOs.General;
 
 namespace Workshop.Web.Controllers
 {
@@ -159,6 +160,43 @@ namespace Workshop.Web.Controllers
                 HttpContext.Session.SetString("UserGroupId", permissionData.Groups);
 
                 var primaryMenu =await _erpapicient.GetUserMenu("en", user.UserID, "11", companyId, branch);
+                
+                // Inject Consumption Report if not exists
+                //if (primaryMenu != null && !primaryMenu.Any(m => m.MethodName == "ConsumptionReport"))
+                //{
+                //    // Find parent (Reports section)
+                //    // Try to find an existing report item to get the parent ID
+                //    var existingReport = primaryMenu.FirstOrDefault(m => m.ControllerName == "Reports");
+                //    long parentId = -1;
+                //    if (existingReport != null)
+                //    {
+                //        parentId = existingReport.ParentId;
+                //    }
+                //    else
+                //    {
+                //        // Fallback: look for a top-level menu named "Reports"
+                //        var reportsGroup = primaryMenu.FirstOrDefault(m => (m.PrimaryName != null && m.PrimaryName.Contains("Report")) && m.ParentId == -1);
+                //        if (reportsGroup != null) parentId = reportsGroup.Id;
+                //    }
+
+                //    int newId = primaryMenu.Any() ? primaryMenu.Max(m => m.Id) + 1 : 99990;
+
+                //    primaryMenu.Add(new Menu
+                //    {
+                //        Id = newId,
+                //        ParentId = parentId,
+                //        PrimaryName = "Consumption Report",
+                //        SecondarName = "تقرير الاستهلاك",
+                //        Icon = "fal fa-chart-pie",
+                //        ControllerName = "Reports",
+                //        MethodName = "ConsumptionReport",
+                //        Seq = 100,
+                //        ModuleId = 11,
+                //        UserId = user.UserID,
+                //        MenuList = new List<Menu>()
+                //    });
+                //}
+
                 HttpContext.Session.SetString("PrimaryMenuList", System.Text.Json.JsonSerializer.Serialize(primaryMenu));
 
                 // If deep link exists

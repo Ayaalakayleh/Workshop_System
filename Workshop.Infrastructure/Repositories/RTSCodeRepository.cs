@@ -86,8 +86,7 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@DefaultRate", dto.DefaultRate);
             parameters.Add("@PrimaryName", dto.PrimaryName);
             parameters.Add("@SecondaryName", dto.SecondaryName);
-            parameters.Add("@IsOil", dto.IsOil);
-            parameters.Add("@IsPaint", dto.IsPaint);
+            parameters.Add("@TypeId", dto.TypeId);
 
             // Table-Valued Parameters
             var franchiseIdsTable = new DataTable();
@@ -144,8 +143,7 @@ namespace Workshop.Infrastructure.Repositories
             parameters.Add("@DefaultRate", dto.DefaultRate);
             parameters.Add("@PrimaryName", dto.PrimaryName);
             parameters.Add("@SecondaryName", dto.SecondaryName);
-            parameters.Add("@IsOil", dto.IsOil);
-            parameters.Add("@IsPaint", dto.IsPaint);
+            parameters.Add("@TypeId", dto.TypeId);
 
             // Table-Valued Parameters
             var franchiseIdsTable = new DataTable();
