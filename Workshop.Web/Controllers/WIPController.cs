@@ -213,20 +213,7 @@ namespace Workshop.Web.Controllers
                     // Get services
                     ViewBag.Services = await GetWipServicesAsync(id.Value);
 
-                    var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, (int)dto.VehicleId);
-
-                    var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
-                    ViewBag.VehicleCustomers = vehicleCustomers?.Select(t => new SelectListItem
-                    {
-                        Text = lang == "en" ? t.CustomerPrimaryName : t.CustomerSecondaryname,
-                        Value = t.Id.ToString()
-                    }).ToList() ?? new List<SelectListItem>();
-                    if (openAgreement.Count > 0)
-                    {
-                        var firstAgreement = openAgreement?.FirstOrDefault();
-                        dto.CompanyId = (int)firstAgreement?.CustomerId;
-
-                    }
+                    
                     
                     // Get account details
                     dto.InvoiceDetailsList = await _apiClient.WIPInvoiceGetById(dto.Id, null);
@@ -236,6 +223,21 @@ namespace Workshop.Web.Controllers
                     var wipItems = await GetWipItemsAsync(id.Value);
                     ViewBag.Items = wipItems.Items;
                     ViewBag.AllowActions = wipItems.AllowActions;
+
+                }
+
+                var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, (int)dto.VehicleId);
+
+                var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
+                ViewBag.VehicleCustomers = vehicleCustomers?.Select(t => new SelectListItem
+                {
+                    Text = lang == "en" ? t.CustomerPrimaryName : t.CustomerSecondaryname,
+                    Value = t.Id.ToString()
+                }).ToList() ?? new List<SelectListItem>();
+                if (openAgreement.Count > 0)
+                {
+                    var firstAgreement = openAgreement?.FirstOrDefault();
+                    dto.CompanyId = (int)firstAgreement?.CustomerId;
 
                 }
 
@@ -442,7 +444,10 @@ namespace Workshop.Web.Controllers
 
                         ViewBag.AgreementStatus = status;
                         if (activeAgreement.AgreementId != null && activeAgreement.AgreementId > 0)
+                        {
                             ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
+                            dto.AgreementId = (int)activeAgreement.AgreementId;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -478,6 +483,7 @@ namespace Workshop.Web.Controllers
                 {
                     dto.WipDate = DateTime.Today;
                 }
+
                 ViewBag.CreationDate = dto.WipDate?.ToString("yyyy-MM-dd");
 
                 return View(dto);
@@ -534,6 +540,7 @@ namespace Workshop.Web.Controllers
                         CreatedBy = UserId,
                         VehicleId = dto.VehicleId,
                         MovementId = dto.MovementId,
+                        AgreementId = dto.AgreementId,
                         Status = dto.Status,
                         Note = dto.Note,
                         WipDate = dto.WipDate,

@@ -85,6 +85,7 @@ namespace Workshop.Infrastructure.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("VehicleId", dto.VehicleId);
             parameters.Add("MovementId", dto.MovementId);
+            parameters.Add("AgreementId", dto.AgreementId);
             parameters.Add("WorkOrderId", dto.WorkOrderId);
             parameters.Add("JobCardNo", dto.JobCardNo);
             parameters.Add("Status", dto.Status);

@@ -10,6 +10,7 @@ namespace Workshop.Core.DTOs
         public int VehicleId { get; set; }
         public int MovementId { get; set; }
         public int? PartsIssueId { get; set; }
+        public int? AgreementId { get; set; }
         public string? PlateNumber { get; set; }
         public int? WorkOrderId { get; set; }
         public decimal? JobCardNo { get; set; }
