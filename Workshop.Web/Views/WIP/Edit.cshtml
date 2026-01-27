@@ -204,7 +204,7 @@
 						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label>Company</label>
 							<div class="d-flex flex-column">
-								@Html.DropDownList("CompanyId", new SelectList(ViewBag.VehicleCustomers, "Value", "Text"), " ", new { @class = "form-control", disabled = "disabled " })
+								@Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control", @readonly = "true" })
 							</div>
 						</div>
 						<div class="col-lg-3 col-md-6 col-sm-12">

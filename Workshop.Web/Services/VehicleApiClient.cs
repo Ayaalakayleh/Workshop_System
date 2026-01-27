@@ -294,5 +294,11 @@ namespace Workshop.Web.Services
             string url = $"/VehicleDefinition/GetServiceScheduleVehicle";
             return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Post, vehicle);
         }
+
+        public async Task<AgreementCustomerDTO> Get_AgreementCustomerAndCompanyName(int AgreementId, string language)
+        {
+            string url = $"/Agreement/Get_AgreementCustomerAndCompanyName?AgreementId={AgreementId}&language={language}";
+            return await SendRequest<AgreementCustomerDTO>(url, HttpMethod.Get);
+        }
     }
 }
