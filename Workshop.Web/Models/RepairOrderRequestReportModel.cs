@@ -23,7 +23,7 @@ namespace Workshop.Web.Models
         //public string? ColorName { get; set; }
         public string? Trim { get; set; }
         public string? EstimaraExpDate { get; set; }
-        public string? MobileNumber { get; set; }
+        public string? CustomerMobileNumber { get; set; }
         public string? MVPIExpDate { get; set; }
         public string? RegistrationExpDate { get; set; }
         public string? Complaint { get; set; }

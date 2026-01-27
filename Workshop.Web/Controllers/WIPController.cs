@@ -226,19 +226,11 @@ namespace Workshop.Web.Controllers
 
                 }
 
-                var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, (int)dto.VehicleId);
 
-                var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
-                ViewBag.VehicleCustomers = vehicleCustomers?.Select(t => new SelectListItem
+                if(dto.AgreementId != null)
                 {
-                    Text = lang == "en" ? t.CustomerPrimaryName : t.CustomerSecondaryname,
-                    Value = t.Id.ToString()
-                }).ToList() ?? new List<SelectListItem>();
-                if (openAgreement.Count > 0)
-                {
-                    var firstAgreement = openAgreement?.FirstOrDefault();
-                    dto.CompanyId = (int)firstAgreement?.CustomerId;
-
+                    var agreement = await _vehicleApiClient.Get_AgreementCustomerAndCompanyName((int)dto.AgreementId, lang);
+                    dto.CompanyName = agreement.CompanyName;
                 }
 
                 ViewBag.ID = _WIPID;
@@ -2375,24 +2367,15 @@ namespace Workshop.Web.Controllers
                     model.AccountNo = _customer.AccountNoReceivable;
                 }
 
-                var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
-                if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
+                if(Details.AgreementId != null)
                 {
-                    var customerLease = await _vehicleApiClient.GetGeneralInfo((int)activeAgreement.AgreementId);
-                    var CustomerId = customerLease.LeaseCustomerId;
-                     
-                    var customerName = "";
-                    var _customerInfo = await _vehicleApiClient.Get_CustomerInformation(BranchId, lang);
-                    
-                    if(CustomerId != null)
-                    {
-                        var _customerDetails =  _customerInfo.FirstOrDefault(c => c.Id == CustomerId) ;
-                        customerName = _customerDetails.CustomerPrimaryName;
-                        model.MobileNumber = _customerDetails.CustomerPhoneNumber;
-                    }
+                    var agreement = await _vehicleApiClient.Get_AgreementCustomerAndCompanyName((int)Details.AgreementId, lang);
 
-                        model.CustomerName = customerName;
+                    model.Company = agreement.CompanyName;
+                    model.CustomerName = agreement.CustomerName;
+                    model.CustomerMobileNumber = agreement.CustomerPhoneNumber;
                 }
+
 
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
@@ -2408,7 +2391,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.Model = vehicleInfo.Model;
                 model.VehicleInfo.Mileage = vehicleInfo.Mileage?? movement.ReceivedMeter;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
-                //model.CompanyName = Details.CompanyName;
+                
                 model.InsuranceExpDate = await VehicleDocumants(Details.VehicleId, 5); 
                 model.EstimaraExpDate = await VehicleDocumants(Details.VehicleId, 2);
                 model.MVPIExpDate = await VehicleDocumants(Details.VehicleId, 6); 
@@ -2436,15 +2419,7 @@ namespace Workshop.Web.Controllers
                 var oo = await _apiClient.WIP_GetOptionsById(Id);
                 model.RepeatRepair = oo.RepeatRepair == true ? "Yes" : "No";
 
-                var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, vehicleId);
-
-                if (openAgreement.Count > 0)
-                {
-                    var firstAgreement = openAgreement?.FirstOrDefault();
-                    var vehicleCustomers = await _vehicleApiClient.GetCustomerData((int)firstAgreement.CustomerId);
-                    model.Company = lang=="en" ? vehicleCustomers.CustomerPrimaryName : vehicleCustomers.CustomerSecondaryname;
-
-                }
+               
                 return View(model);
             }
             catch (Exception ex)
