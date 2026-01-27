@@ -1,5 +1,30 @@
 ﻿// ~/js/definitions/schedule-modal.js
 (() => {
+    function lockCustomerDropdown() {
+        const $c = $('#CustomerId');
+
+        $c.prop('disabled', true);
+
+        if ($c.hasClass('select2-hidden-accessible')) {
+            // force Select2 UI to refresh
+            $c.trigger('change.select2');
+        }
+    }
+
+    function unlockCustomerDropdown() {
+        const $c = $('#CustomerId');
+
+        $c.prop('disabled', false)
+            .removeAttr('disabled');
+
+        if ($c.hasClass('select2-hidden-accessible')) {
+            $c.select2('close');
+            $c.trigger('change.select2');
+        }
+    }
+
+
+
     function ensureFlatpickr() {
         return new Promise((resolve, reject) => {
             if (window.flatpickr && typeof window.flatpickr === 'function') return resolve();
@@ -440,7 +465,10 @@
                     $('#CustomerId')
                         .val(String(customerId))
                         .trigger('change.select2');
+
+                    lockCustomerDropdown();
                 }
+
             }
         });
 
@@ -504,12 +532,17 @@
                                 finalCustomerId = vehicleCustomerId;
                             }
 
-                            // Single customer update
                             if (finalCustomerId) {
-                                $('#CustomerId').val(String(finalCustomerId)).trigger('change.select2');
+                                $('#CustomerId')
+                                    .val(String(finalCustomerId))
+                                    .trigger('change.select2');
+
+                                lockCustomerDropdown();   // 🔒 AUTO source
                             } else {
                                 $('#CustomerId').val(null).trigger('change.select2');
+                                unlockCustomerDropdown();
                             }
+
                         },
                         onError: () => {
                             // If agreement call fails, use vehicle customer
@@ -528,11 +561,12 @@
         });
     }
     function handleCustomerChange() {
+
         const customerId = $('#CustomerId').val();
         state.customerId = toNumber(customerId);
 
         isCustomerSource = true;
-
+        
         const $vehicle = $('#vehicleDropdown');
         const $chassis = $('#chassisDropdown');
 
@@ -541,7 +575,7 @@
 
         if (!customerId) {
             isCustomerSource = false;
-
+            
             allVehicleOptionsCache.forEach(o => {
                 if (o.value) {
                     $vehicle.append(`<option value="${o.value}">${o.text}</option>`);
@@ -565,7 +599,7 @@
                     $chassis.trigger('change.select2');
                 }
             });
-
+            unlockCustomerDropdown();
             return;
         }
 
