@@ -281,10 +281,12 @@
     }
 
     function normalizeDurationToMinutes(rawDuration) {
-        const num = parseFloat(rawDuration || 0);
-        if (!isFinite(num) || num <= 0) return 0;
-        return Math.round(num);
+        const hours = parseFloat(rawDuration || 0);
+        if (!isFinite(hours) || hours <= 0) return 0;
+
+        return Math.round(hours * 60);
     }
+
 
     function formatDateISO(d) {
         if (!d) return '';
