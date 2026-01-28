@@ -584,23 +584,36 @@
                                 });
                                 return;
                             }
-
-                            $.ajax({
-                                type: 'POST',
-                                url: window.URLs.closeWipUrl,
-                                dataType: 'json',
-                                data: close
-                            }).done(function (result) {
-                                if (result.success) {
-                                    Swal.fire(theMainLang == "en" ? "WIP has been closed successfully." : "تم اغلاق العملية بنجاح", "", "success").then(() => {
-                                        window.location.href = window.URLs.indexUrl;
+                            Swal.fire({
+                                title: resources.areYouSure,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: 'var(--danger-600)',
+                                cancelButtonColor: 'var(--secondary-500)',
+                                confirmButtonText: resources.yes,
+                                cancelButtonText: resources.no
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    //================================
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: window.URLs.closeWipUrl,
+                                        dataType: 'json',
+                                        data: close
+                                    }).done(function (result) {
+                                        if (result.success) {
+                                            Swal.fire(theMainLang == "en" ? "WIP has been closed successfully." : "تم اغلاق العملية بنجاح", "", "success").then(() => {
+                                                window.location.href = window.URLs.indexUrl;
+                                            });
+                                        } else {
+                                            const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
+                                            Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
+                                        }
+                                    }).fail(function (xhr, status, error) {
+                                        console.error("Error:", error);
                                     });
-                                } else {
-                                    const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
-                                    Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
+                                    //================================
                                 }
-                            }).fail(function (xhr, status, error) {
-                                console.error("Error:", error);
                             });
 
                         })
