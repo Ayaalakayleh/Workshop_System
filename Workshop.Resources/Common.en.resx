@@ -2742,4 +2742,7 @@
   <data name="Button_Complete" xml:space="preserve">
     <value>Complete</value>
   </data>
+  <data name="Replacement" xml:space="preserve">
+    <value>Replacement</value>
+  </data>
 </root>

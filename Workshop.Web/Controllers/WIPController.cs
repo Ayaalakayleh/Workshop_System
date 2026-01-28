@@ -226,13 +226,6 @@ namespace Workshop.Web.Controllers
 
                 }
 
-
-                if(dto.AgreementId != null)
-                {
-                    var agreement = await _vehicleApiClient.Get_AgreementCustomerAndCompanyName((int)dto.AgreementId, lang);
-                    dto.CompanyName = agreement.CompanyName;
-                }
-
                 ViewBag.ID = _WIPID;
 
                     // Get makes
@@ -442,9 +435,29 @@ namespace Workshop.Web.Controllers
                         ViewBag.AgreementStatus = status;
                         if (activeAgreement.AgreementId != null && activeAgreement.AgreementId > 0)
                         {
-                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
+                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate?.ToString("yyyy-MM-dd");
                             dto.AgreementId = (int)activeAgreement.AgreementId;
                         }
+
+                        if (dto.AgreementId != null)
+                        {
+                            var agreement = await _vehicleApiClient.Get_AgreementCustomerAndCompanyName((int)dto.AgreementId, lang);
+                            dto.CompanyName = agreement.CompanyName;
+                        }
+
+                        var isReplacement = false;
+                        var generalInfo = await _vehicleApiClient.GetGeneralInfo((int)dto.AgreementId);
+                        var x =  generalInfo.ReservationId;
+                        if(generalInfo?.ReservationId != null)
+                        {
+                            var agreementVehicle = await _vehicleApiClient.GetReservationRentalDetails((int)generalInfo.ReservationId, lang);
+                            var vehicleInReservation = agreementVehicle.VehicleDefinitionId;
+                            if(dto.VehicleId != vehicleInReservation)
+                            {
+                                isReplacement = true;
+                            }
+                        }
+                        ViewBag.IsReplacement = isReplacement;
                     }
                 }
                 catch (Exception ex)
@@ -2468,7 +2481,7 @@ namespace Workshop.Web.Controllers
                 var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
 
                 if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
-                    return activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
+                    return activeAgreement.GregorianReturnDate?.ToString("yyyy-MM-dd");
 
 
                 return null;
