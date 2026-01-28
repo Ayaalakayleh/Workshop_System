@@ -119,7 +119,7 @@
                     </div>
 
                     <div class="col-lg-4">
-                        <label class="form-label">@Common["Label_DurationMins"]</label>
+                        <label class="form-label">@Common["Label_DurationHour"]</label>
                         <input type="number" id="schedDuration" class="form-control" min="1" readonly disabled />
                     </div>
 
@@ -193,6 +193,7 @@
     window.i18n = @Html.Raw(JsonSerializer.Serialize(new
         {
                     label_schedule = Common["Label_Schedule"].Value,
+                    Button_Book = Common["Button_Book"].Value,
                     label_job = Common["Label_Job"].Value,
                     label_allowed = Common["Label_Allowed"].Value,
                     label_overdue = Common["Label_Overdue"].Value,

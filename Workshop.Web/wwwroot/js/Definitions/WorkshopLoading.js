@@ -549,7 +549,7 @@ function renderUnscheduled() {
 
         const btn = document.createElement("button");
         btn.className = "btn btn-sm btn-outline-primary";
-        btn.textContent = window.i18n.label_schedule;
+        btn.textContent = window.i18n.Button_Book;
         btn.addEventListener("click", () => openScheduleModal(i));
 
         card.appendChild(left);
@@ -783,13 +783,12 @@ function initStartTimePicker($start, allowedTimes, defaultTime, onPicked) {
 function schedule2UpdateEnds(els) {
     const startVal = (els.start.value || "").trim();
 
-    const durationHours = Number(els.duration.value || 0);
-    const durationMins = Math.round(durationHours * 60);
-
-    if (!startVal || !durationMins) {
+    const durationHours = parseFloat(els.duration.value);
+    if (!Number.isFinite(durationHours) || durationHours <= 0) {
         els.ends.value = "";
         return;
     }
+    const durationMins = Math.round(durationHours * 60);
 
     const end24 = addMinutes(startVal, durationMins);
     els.ends.value = fmtHuman(end24);
@@ -910,7 +909,8 @@ function initModal2() {
         const dateISO = convertDateFormat(els.date.value);
         const techId = Number(els.tech.value || 0);
         const start24 = (els.start.value || "").trim();
-        const durationMins = Number(els.duration.value || 0);
+        const durationHours = parseFloat(els.duration.value);
+        const durationMins = Math.round(durationHours * 60);
 
         if (!dateISO || !techId || !start24 || !durationMins) {
             Swal.fire({ icon: "error", title: window.i18n.label_invalid, text: window.i18n.label_fillAll });

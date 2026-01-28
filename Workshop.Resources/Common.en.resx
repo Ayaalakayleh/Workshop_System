@@ -2748,4 +2748,7 @@
   <data name="WIP Report" xml:space="preserve">
     <value>WIP Report</value>
   </data>
+  <data name="Label_UnBookedLabour" xml:space="preserve">
+    <value>Un Booked Labour</value>
+  </data>
 </root>

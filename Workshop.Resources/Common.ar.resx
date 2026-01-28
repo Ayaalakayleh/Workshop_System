@@ -2748,4 +2748,7 @@
   <data name="WIP Report" xml:space="preserve">
     <value>تقرير الأعمال قيد التنفيذ</value>
   </data>
+  <data name="Label_UnBookedLabour" xml:space="preserve">
+    <value>عمل غير مُجدول</value>
+  </data>
 </root>
