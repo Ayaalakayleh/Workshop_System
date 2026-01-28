@@ -777,12 +777,14 @@ function initStartTimePicker($start, allowedTimes, defaultTime, onPicked) {
     }
 
     $start.datetimepicker(opts);
-    $start.val(defaultTime || (allowedTimes?.[0]) || SHIFT_START);
+    $start.val(defaultTime || (allowedTimes?.[0]) || SHIFT_START).trigger("change");
 }
 
 function schedule2UpdateEnds(els) {
     const startVal = (els.start.value || "").trim();
-    const durationMins = Number(els.duration.value || 0);
+
+    const durationHours = Number(els.duration.value || 0);
+    const durationMins = Math.round(durationHours * 60);
 
     if (!startVal || !durationMins) {
         els.ends.value = "";
@@ -1043,7 +1045,7 @@ async function openScheduleModal(jobIndex) {
     destroyStartPicker($(els.start));
     els.start.value = "";
 
-    els.duration.value = job.duration; // readonly but present
+    els.duration.value = job.durationHours; // readonly but present
     els.ends.value = "";
 
     schedule2SetStep(els, 1);
@@ -1232,6 +1234,7 @@ function GetServicesById(id, lang) {
                 ro: value.code,
                 rts: value.code,
                 duration: value.standardHours * 60,
+                durationHours: value.standardHours,  // hours (UI)
                 title: value.description,
                 allowed: value.standardHours,
                 wipid: value.wipId,
