@@ -466,6 +466,34 @@
         return Array.from(groupsMap.values());
     }
 
+    // ---------- Overlap layout (lanes) ----------
+    function assignLanes(intervals) {
+        const lanes = [];
+
+        intervals.forEach(item => {
+            let laneIndex = -1;
+
+            for (let i = 0; i < lanes.length; i++) {
+                const last = lanes[i][lanes[i].length - 1];
+                if (item.start >= last.end) {
+                    laneIndex = i;
+                    break;
+                }
+            }
+
+            if (laneIndex === -1) {
+                laneIndex = lanes.length;
+                lanes.push([]);
+            }
+
+            item.lane = laneIndex;
+            lanes[laneIndex].push(item);
+        });
+
+        return lanes.length;
+    }
+
+
     // ✅ Tooltip: show PLATE numbers (not description)
     function buildTooltipHtmlForGroup(group) {
         const plates = group.items
@@ -474,6 +502,30 @@
 
         const uniquePlates = [...new Set(plates)];
         return uniquePlates.length ? uniquePlates.join('<br>') : labelReserved;
+    }
+    function layoutOverlaps(intervals) {
+        const lanes = [];
+
+        intervals.forEach(item => {
+            let placed = false;
+
+            for (const lane of lanes) {
+                const last = lane[lane.length - 1];
+                if (item.start >= last.end) {
+                    lane.push(item);
+                    item.lane = lanes.indexOf(lane);
+                    placed = true;
+                    break;
+                }
+            }
+
+            if (!placed) {
+                item.lane = lanes.length;
+                lanes.push([item]);
+            }
+        });
+
+        return lanes.length;
     }
 
     function renderOverlayDay({ startM, endM, dateISO, intervalsMap }) {
@@ -489,58 +541,64 @@
         const bodyH = tbody.scrollHeight;
 
         const range = Math.max(1, endM - startM);
-        const timeToY = (mins) => bodyTop + ((mins - startM) / range) * bodyH;
+        const timeToY = (mins) =>
+            bodyTop + ((mins - startM) / range) * bodyH;
 
         // Day has ONE schedule column
-        const centers = centersFromSelector('.resv-grid thead th.schedule-col', scroll);
+        const centers = centersFromSelector(
+            '.resv-grid thead th.schedule-col',
+            scroll
+        );
         if (!centers.length) return;
         const cx = centers[0];
 
         const list = intervalsMap.get(dateISO) || [];
-        const groups = groupIntervalsByTime(list);
+        if (!list.length) return;
+
+        // ---- LANE LOGIC (NEW) ----
+        const items = [...list].sort((a, b) => a.start - b.start);
+        const laneCount = assignLanes(items);
+
+        const laneWidth = 22;
+        const totalWidth = laneCount * laneWidth;
+
         const toInit = [];
 
-        groups.forEach(group => {
-            const cStart = clamp(group.start, startM, endM);
-            const cEnd = clamp(group.end, startM, endM);
+        items.forEach(item => {
+            const cStart = clamp(item.start, startM, endM);
+            const cEnd = clamp(item.end, startM, endM);
             if (cEnd <= cStart) return;
 
             const y1 = timeToY(cStart);
             const y2 = timeToY(cEnd);
             const h = Math.max(4, y2 - y1);
 
-            const ids = group.items
-                .map(x => x.id)
-                .filter(id => id !== null && id !== undefined);
-
-            const count = group.items.length;
-
             const el = document.createElement('div');
             el.className = 'period-vert reserved';
-            el.style.left = `${cx}px`;
+
+            el.style.left =
+                `${cx - totalWidth / 2 + item.lane * laneWidth}px`;
+            el.style.width = `${laneWidth - 4}px`;
             el.style.top = `${y1}px`;
             el.style.height = `${h}px`;
-            if (ids.length) el.setAttribute('data-ids', ids.join(','));
 
-            const tip = buildTooltipHtmlForGroup(group);
+            el.setAttribute('data-ids', item.id);
+
+            const tip = item.plate || labelReserved;
 
             el.innerHTML = `
-                <span class="sr">${tip}</span>
-                <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
-            `;
+            <span class="sr">${tip}</span>
+            <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">1</span>
+        `;
 
             el.setAttribute('data-bs-toggle', 'tooltip');
             el.setAttribute('data-bs-html', 'true');
             el.setAttribute('data-bs-title', tip);
 
-            el.addEventListener('click', function (ev) {
+            el.addEventListener('click', ev => {
                 ev.preventDefault();
                 ev.stopPropagation();
-                const idsAttr = el.getAttribute('data-ids');
-                if (!idsAttr) return;
-                const ids = idsAttr.split(',').map(s => s.trim()).filter(Boolean);
-                if (!ids.length) return;
-                openReservationDetailsModal(ids);
+                openReservationDetailsModal([item.id]);
             });
 
             overlay.appendChild(el);
@@ -548,7 +606,11 @@
         });
 
         toInit.forEach(el => {
-            try { new bootstrap.Tooltip(el); } catch { /* ignore */ }
+            try {
+                new bootstrap.Tooltip(el);
+            } catch {
+                /* ignore */
+            }
         });
     }
 
@@ -565,11 +627,17 @@
         const bodyH = tbody.scrollHeight;
 
         const range = Math.max(1, endM - startM);
-        const timeToY = (mins) => bodyTop + ((mins - startM) / range) * bodyH;
+        const timeToY = (mins) =>
+            bodyTop + ((mins - startM) / range) * bodyH;
 
-        const centers = centersFromSelector('.resv-grid thead th.day-col', scroll);
+        // Centers of each day column
+        const centers = centersFromSelector(
+            '.resv-grid thead th.day-col',
+            scroll
+        );
         if (!centers.length) return;
 
+        // Map ISO date -> column index
         const dayIndexByISO = new Map();
         for (let i = 0; i < 7; i++) {
             const d = new Date(weekStartDate);
@@ -580,54 +648,56 @@
         const toInit = [];
 
         intervalsMap.forEach((rawList, dISO) => {
-            const idx = dayIndexByISO.get(dISO);
-            if (idx === undefined) return;
-            const cx = centers[idx];
+            const dayIndex = dayIndexByISO.get(dISO);
+            if (dayIndex === undefined) return;
+
+            const cx = centers[dayIndex];
             if (typeof cx !== "number") return;
 
-            const groups = groupIntervalsByTime(rawList);
+            if (!rawList || !rawList.length) return;
 
-            groups.forEach(group => {
-                const cStart = clamp(group.start, startM, endM);
-                const cEnd = clamp(group.end, startM, endM);
+            // ---- SAME LANE LOGIC AS DAY ----
+            const items = [...rawList].sort((a, b) => a.start - b.start);
+            const laneCount = assignLanes(items);
+
+            const laneWidth = 18;
+            const totalWidth = laneCount * laneWidth;
+
+            items.forEach(item => {
+                const cStart = clamp(item.start, startM, endM);
+                const cEnd = clamp(item.end, startM, endM);
                 if (cEnd <= cStart) return;
 
                 const y1 = timeToY(cStart);
                 const y2 = timeToY(cEnd);
                 const h = Math.max(4, y2 - y1);
 
-                const ids = group.items
-                    .map(x => x.id)
-                    .filter(id => id !== null && id !== undefined);
-
-                const count = group.items.length;
-
                 const el = document.createElement('div');
                 el.className = 'period-vert reserved';
-                el.style.left = `${cx}px`;
+
+                el.style.left =
+                    `${cx - totalWidth / 2 + item.lane * laneWidth}px`;
+                el.style.width = `${laneWidth - 3}px`;
                 el.style.top = `${y1}px`;
                 el.style.height = `${h}px`;
-                if (ids.length) el.setAttribute('data-ids', ids.join(','));
 
-                const tip = buildTooltipHtmlForGroup(group);
+                el.setAttribute('data-ids', item.id);
+
+                const tip = item.plate || labelReserved;
 
                 el.innerHTML = `
-                    <span class="sr">${tip}</span>
-                    <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
-                `;
+                <span class="sr">${tip}</span>
+                <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">1</span>
+            `;
 
                 el.setAttribute('data-bs-toggle', 'tooltip');
                 el.setAttribute('data-bs-html', 'true');
                 el.setAttribute('data-bs-title', tip);
 
-                el.addEventListener('click', function (ev) {
+                el.addEventListener('click', ev => {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    const idsAttr = el.getAttribute('data-ids');
-                    if (!idsAttr) return;
-                    const ids = idsAttr.split(',').map(s => s.trim()).filter(Boolean);
-                    if (!ids.length) return;
-                    openReservationDetailsModal(ids);
+                    openReservationDetailsModal([item.id]);
                 });
 
                 overlay.appendChild(el);
@@ -636,9 +706,14 @@
         });
 
         toInit.forEach(el => {
-            try { new bootstrap.Tooltip(el); } catch { /* ignore */ }
+            try {
+                new bootstrap.Tooltip(el);
+            } catch {
+                /* ignore */
+            }
         });
     }
+
 
     // ---------- DAY VIEW ----------
     function buildDay() {
