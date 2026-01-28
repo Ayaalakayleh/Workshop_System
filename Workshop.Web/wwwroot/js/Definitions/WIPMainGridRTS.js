@@ -289,7 +289,9 @@ $(function () {
         ],
         allowColumnReordering: true,
         allowColumnResizing: true,
-        columnAutoWidth: true,
+        columnAutoWidth: false,
+        columnMinWidth: 50,
+        wordWrapEnabled: false,
         hoverStateEnabled: false,
         paging: {
             pageSize: 10

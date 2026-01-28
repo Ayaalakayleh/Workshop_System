@@ -1,7 +1,7 @@
 ﻿// ~/js/Definitions/wip.js
 (function ($, window, document) {
     "use strict";
-    const resources = window.resources || {};
+    //const resources = window.resources || {};
 
     $(document).ready(function () {
 
@@ -699,18 +699,18 @@
             e.preventDefault();
             const $row = $(this).closest('tr');
             Swal.fire({
-                title: resources.confirm_title,
-                text: resources.are_you_sure,
+                title: "resources.confirm_title",
+                text: "resources.are_you_sure",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: resources.yes,
-                cancelButtonText: resources.no,
+                confirmButtonText: "resources.yes",
+                cancelButtonText: "resources.no",
                 confirmButtonColor: "var(--danger-700)",
                 cancelButtonColor: "var(--secondary-600)",
             }).then(res => {
                 if (res.isConfirmed) {
                     $row.remove();
-                    Swal.fire({ icon: 'success', title: resources.done_title, timer: 1200, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', title: "resources.done_title", timer: 1200, showConfirmButton: false });
                 }
             });
         });
@@ -1042,11 +1042,11 @@ $(document).ready(function () {
 
         Swal.fire({
             icon: "warning",
-            title: window.resources.are_you_sure,
+            title: "window.resources.are_you_sure",
             text: window.RazorVars.RecallConfirmation,
             showCancelButton: true,
-            confirmButtonText: resources.yes,
-            cancelButtonText: resources.no,
+            confirmButtonText: "resources.yes",
+            cancelButtonText: "resources.no",
             confirmButtonColor: "#d33"
         }).then(result => {
 
@@ -1061,7 +1061,7 @@ $(document).ready(function () {
                 if (res && res.updated > 0) {
                     Swal.fire({
                         icon: "success",
-                        title: resources.done_title,
+                        title: "resources.done_title",
                         text: window.RazorVars.RecallFixed
                     });
                     $btn.remove();
