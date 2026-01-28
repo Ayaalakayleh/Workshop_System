@@ -875,5 +875,309 @@ namespace Workshop.Web.Controllers
             }
         }
         #endregion
+
+        #region WIP Report
+        public async Task<IActionResult> WIPReport()
+        {
+            var isCompanyCenterialized = 1;
+            var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+            ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CustomerName
+            }).ToList() ?? new List<SelectListItem>();
+
+             try
+            {
+                var status = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(8, CompanyId);
+                ViewBag.Status = status?.Select(t => new SelectListItem
+                {
+                    Text = lang == "en" ? t.Code + " - " + t.PrimaryName : t.SecondaryName,
+                    Value = t.Id.ToString()
+                }).ToList() ?? new List<SelectListItem>();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Status = new List<SelectListItem>();
+            }
+
+            var model = new WIPReportViewModel
+            {
+                Filter = new WIPReportFilterDTO(),
+                ReportData = new List<WIPReportDTO>()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetWIPReport([FromBody] WIPReportFilterDTO filter)
+        {
+            try
+            {
+
+                var isCompanyCenterialized = 1;
+                var data = await _apiClient.GetWIPReportAsync(filter);
+                var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+                var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(15, CompanyId);
+                var statuses = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(8, CompanyId);
+                
+                foreach (var item in data)
+                {
+
+                    //var move = await _apiClient.GetVehicleMovementByIdAsync(item.MovementId ?? 0);
+                    item.Account = allCustomers.Where(c => c.Id == item.CustomerId).Select(s => s.AccountNo).FirstOrDefault().ToString();
+                    item.CustomerName = allCustomers.Where(c => c.Id == item.CustomerId).Select(s => s.CustomerName).FirstOrDefault();
+                    item.Status = lang == "en" ? statuses?.Where(c => c.Id == item.StatusId)?.FirstOrDefault()?.PrimaryName: statuses?.Where(c => c.Id == item.StatusId)?.FirstOrDefault()?.SecondaryName;
+                    
+                     if (!item.IsExternal ?? false)
+                    {
+                        var vehicleDetails = (await _vehicleApiClient.GetVehicleDetails(item.VehicleId ?? 0,lang)) ?? new VehicleDefinitions();
+                        var vehicleVINDetails = (await _vehicleApiClient.VehicleDefinitions_Find(item.VehicleId ?? 0)) ?? new VehicleDefinitions();
+                        item.VIN = vehicleVINDetails.ChassisNo;
+                        item.MakeId = vehicleDetails.ManufacturerId;
+                        item.ModelId = vehicleDetails.VehicleModelId;
+                        item.Make = lang == "en" ? vehicleDetails.RefManufacturers.ManufacturerPrimaryName : vehicleDetails.RefManufacturers.ManufacturerSecondaryName;
+                        item.Model = lang == "en" ? vehicleDetails.RefVehicleModels.VehicleModelPrimaryName : vehicleDetails.RefVehicleModels.VehicleModelSecondaryName;
+                    }
+                    else
+                    {
+                        var vehicleDetails = (await _vehicleApiClient.GetExternalVehicleDetails(item.VehicleId ?? 0, lang)) ?? new VehicleDefinitions();
+                        var vehicleVINDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(item.VehicleId ?? 0)) ?? new CreateVehicleDefinitionsModel();
+                        item.VIN = vehicleVINDetails.ChassisNo;
+                        item.MakeId = vehicleDetails.ManufacturerId;
+                        item.ModelId = vehicleDetails.VehicleModelId;
+                        item.Make = lang == "en" ? vehicleDetails.RefManufacturers.ManufacturerPrimaryName : vehicleDetails.RefManufacturers.ManufacturerSecondaryName;
+                        item.Model = lang == "en" ? vehicleDetails.RefVehicleModels.VehicleModelPrimaryName : vehicleDetails.RefVehicleModels.VehicleModelSecondaryName;
+                    }
+
+                    var wip = await _apiClient.GetWIPByIdAsync(item.WIP);
+                    var movementDetails = await GetMovementOperatorsAsync(item.MovementId, wip);
+                    item.DueIn = movementDetails.DueInDate;
+                    item.DueOut = movementDetails.DueOutDate;
+                    if(item.DueOut == null)
+                    {
+                        item.VehicleInOut = lang == "en" ? "In" : "داخل";
+                    }
+                    else
+                        item.VehicleInOut = lang == "en" ? "out" : "خارج";
+                    item.ServiceAdvisor  = await GetUserFullNameAsync(item.ServiceAdvisorId);
+                }
+
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_ReportListWIP", data);
+                }
+
+                var model = new WIPReportViewModel
+                {
+                    Filter = filter,
+                    ReportData = data?.ToList() ?? new List<WIPReportDTO>()
+                };
+
+                return View("WIPReport", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportWIPReportToExcel([FromBody] WIPReportFilterDTO filter)
+        {
+            try
+            {
+                var isCompanyCenterialized = 1;
+                var data = await _apiClient.GetWIPReportAsync(filter);
+                var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+                var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(15, CompanyId);
+                var statuses = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(8, CompanyId);
+
+                foreach (var item in data)
+                {
+
+                    //var move = await _apiClient.GetVehicleMovementByIdAsync(item.MovementId ?? 0);
+                    item.Account = allCustomers.Where(c => c.Id == item.CustomerId).Select(s => s.AccountNo).FirstOrDefault().ToString();
+                    item.CustomerName = allCustomers.Where(c => c.Id == item.CustomerId).Select(s => s.CustomerName).FirstOrDefault();
+                    item.Status = lang == "en" ? statuses?.Where(c => c.Id == item.StatusId)?.FirstOrDefault()?.PrimaryName : statuses?.Where(c => c.Id == item.StatusId)?.FirstOrDefault()?.SecondaryName;
+
+                    if (!item.IsExternal ?? false)
+                    {
+                        var vehicleDetails = (await _vehicleApiClient.GetVehicleDetails(item.VehicleId ?? 0, lang)) ?? new VehicleDefinitions();
+                        var vehicleVINDetails = (await _vehicleApiClient.VehicleDefinitions_Find(item.VehicleId ?? 0)) ?? new VehicleDefinitions();
+                        item.VIN = vehicleVINDetails.ChassisNo;
+                        item.MakeId = vehicleDetails.ManufacturerId;
+                        item.ModelId = vehicleDetails.VehicleModelId;
+                        item.Make = lang == "en" ? vehicleDetails.RefManufacturers.ManufacturerPrimaryName : vehicleDetails.RefManufacturers.ManufacturerSecondaryName;
+                        item.Model = lang == "en" ? vehicleDetails.RefVehicleModels.VehicleModelPrimaryName : vehicleDetails.RefVehicleModels.VehicleModelSecondaryName;
+                    }
+                    else
+                    {
+                        var vehicleDetails = (await _vehicleApiClient.GetExternalVehicleDetails(item.VehicleId ?? 0, lang)) ?? new VehicleDefinitions();
+                        var vehicleVINDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(item.VehicleId ?? 0)) ?? new CreateVehicleDefinitionsModel();
+                        item.VIN = vehicleVINDetails.ChassisNo;
+                        item.MakeId = vehicleDetails.ManufacturerId;
+                        item.ModelId = vehicleDetails.VehicleModelId;
+                        item.Make = lang == "en" ? vehicleDetails.RefManufacturers.ManufacturerPrimaryName : vehicleDetails.RefManufacturers.ManufacturerSecondaryName;
+                        item.Model = lang == "en" ? vehicleDetails.RefVehicleModels.VehicleModelPrimaryName : vehicleDetails.RefVehicleModels.VehicleModelSecondaryName;
+                    }
+
+                    var wip = await _apiClient.GetWIPByIdAsync(item.WIP);
+                    var movementDetails = await GetMovementOperatorsAsync(item.MovementId, wip);
+                    item.DueIn = movementDetails.DueInDate;
+                    item.DueOut = movementDetails.DueOutDate;
+                    if (item.DueOut == null)
+                    {
+                        item.VehicleInOut = lang == "en" ? "In" : "داخل";
+                    }
+                    else
+                        item.VehicleInOut = lang == "en" ? "out" : "خارج";
+                    item.ServiceAdvisor = await GetUserFullNameAsync(item.ServiceAdvisorId);
+                }
+
+
+
+                using var workbook = new XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("WIP Report");
+                
+                if (lang == "en")
+                {
+                    worksheet.Cell(1, 1).Value = "WIP";
+                    worksheet.Cell(1, 2).Value = "Status";
+                    worksheet.Cell(1, 3).Value = "Created Date";
+                    worksheet.Cell(1, 4).Value = "Due In";
+                    worksheet.Cell(1, 5).Value = "Due Out";
+                    worksheet.Cell(1, 6).Value = "Ageing";
+                    worksheet.Cell(1, 7).Value = "Customer Name";
+                    worksheet.Cell(1, 8).Value = "Total Amount";
+                    worksheet.Cell(1, 9).Value = "Total Labours";
+                    worksheet.Cell(1, 10).Value = "Total Parts";
+                    worksheet.Cell(1, 11).Value = "VIN";
+                    worksheet.Cell(1, 12).Value = "Plate Number";
+                    worksheet.Cell(1, 13).Value = "Make";
+                    worksheet.Cell(1, 14).Value = "Model";
+                    worksheet.Cell(1, 15).Value = "Service Advisor";
+                    worksheet.Cell(1, 16).Value = "Branch";
+                    worksheet.Cell(1, 17).Value = "Vehcile In/Out";
+                }
+                else
+                {
+                    worksheet.Cell(1, 1).Value = "أمر العمل";
+                    worksheet.Cell(1, 2).Value = "الحالة";
+                    worksheet.Cell(1, 3).Value = "تاريخ الانشاء";
+                    worksheet.Cell(1, 4).Value = "تاريخ الدخول";
+                    worksheet.Cell(1, 5).Value = "تاريخ الخروج";
+                    worksheet.Cell(1, 6).Value = "العمر";
+                    worksheet.Cell(1, 7).Value = "اسم العميل";
+                    worksheet.Cell(1, 8).Value = "إجمالي المبلغ";
+                    worksheet.Cell(1, 9).Value = "إجمالي الأجور";
+                    worksheet.Cell(1, 10).Value = "إجمالي القطع";
+                    worksheet.Cell(1, 11).Value = "رقم الهيكل";
+                    worksheet.Cell(1, 12).Value = "رقم اللوحة";
+                    worksheet.Cell(1, 13).Value = "الشركة المصنعة";
+                    worksheet.Cell(1, 14).Value = "الموديل";
+                    worksheet.Cell(1, 15).Value = "مستشار الخدمة";
+                    worksheet.Cell(1, 16).Value = "الفرع";
+                    worksheet.Cell(1, 17).Value = "المركبة داحل/خارج";
+                }
+
+                int row = 2;
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        worksheet.Cell(row, 1).Value = item.WIP;
+                        worksheet.Cell(row, 2).Value = item.Status;
+                        worksheet.Cell(row, 3).Value = item.CreatedDate;
+                        worksheet.Cell(row, 4).Value = item.DueIn;
+                        worksheet.Cell(row, 5).Value = item.DueOut;
+                        worksheet.Cell(row, 6).Value = item.Ageing;
+                        worksheet.Cell(row, 7).Value = item.CustomerName;
+                        worksheet.Cell(row, 8).Value = item.TotalAmount;
+                        worksheet.Cell(row, 9).Value = item.TotalLabours;
+                        worksheet.Cell(row, 10).Value = item.TotalParts;
+                        worksheet.Cell(row, 11).Value = item.VIN;
+                        worksheet.Cell(row, 12).Value = item.PlateNumber;
+                        worksheet.Cell(row, 13).Value = item.Make;
+                        worksheet.Cell(row, 14).Value = item.Model;
+                        worksheet.Cell(row, 15).Value = item.ServiceAdvisor;
+                        worksheet.Cell(row, 16).Value = item.Branch;
+                        worksheet.Cell(row, 16).Value = item.VehicleInOut;
+                        row++;
+                    }
+                }
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                stream.Position = 0;
+                return File(
+                    stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"WIPReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                );
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        #endregion
+
+
+        private async Task<MovementOperatorsViewModel> GetMovementOperatorsAsync(int? movementId, WIPDTO dto)
+        {
+            try
+            {
+                var result = new MovementOperatorsViewModel();
+
+                // current movement (IN)
+                VehicleMovement currentMovement = null;
+
+                if (movementId.HasValue && movementId > 0)
+                {
+                    currentMovement = await _apiClient.GetVehicleMovementByIdAsync(movementId.Value);
+
+                }
+                else if (dto?.MovementId > 0)
+                {
+                    currentMovement = await _apiClient.GetVehicleMovementByIdAsync(dto.MovementId);
+                }
+
+                if (currentMovement != null)
+                {
+                    result.DueInDate = currentMovement.CreatedAt?.ToString("yyyy-MM-dd");
+                    result.ReceivedMeter = currentMovement.ReceivedMeter;
+                    result.CreatingOperator = await GetUserFullNameAsync(currentMovement.CreatedBy);
+
+                }
+
+                // last movement (OUT)
+                if (dto?.VehicleId > 0)
+                {
+                    var lastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(dto.VehicleId);
+                    if (lastMovement?.MovementOut == true)
+                    {
+                        result.DueOutDate = lastMovement.CreatedAt?.ToString("yyyy-MM-dd");
+                        result.BookedOutOperator = await GetUserFullNameAsync(lastMovement.CreatedBy);
+                    }
+                }
+
+                // invoicing operator
+                if (dto?.Status == 2032 && dto.ClosedBy > 0)
+                {
+                    result.InvoicingOperator = await GetUserFullNameAsync(dto.ClosedBy);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new MovementOperatorsViewModel();
+            }
+
+        }
+
+
     }
 }

@@ -14,6 +14,7 @@
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
                 TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
+                StatusId: $("#StatusId").val() ? parseInt($("#StatusId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,
                 CustomerId: CustomerId ? parseInt(CustomerId) : null
@@ -63,6 +64,7 @@
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
                 TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
+                StatusId: $("#StatusId").val() ? parseInt($("#StatusId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,
                 CustomerId: CustomerId ? parseInt(CustomerId) : null
@@ -135,6 +137,7 @@
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
                 TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
+                StatusId: $("#StatusId").val() ? parseInt($("#StatusId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,
                 CustomerId: CustomerId ? parseInt(CustomerId) : null

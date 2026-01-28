@@ -1,0 +1,62 @@
+@model IEnumerable<Workshop.Core.DTOs.WIPReportDTO>
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+
+<table class="table table-bordered table-hover text-center w-100 main-table">
+    <thead>
+        <tr>
+            <th>@Common["WIP"]</th>
+            <th>@Common["Status"]</th>
+            <th>@Common["Created Date"]</th>
+            <th>@Common["Due In"]</th>
+            <th>@Common["Due Out"]</th>
+            <th>@Common["Ageing"]</th>
+             <th>@Common["Customer Name"]</th>
+            <th>@Common["Total Amount"]</th>
+            <th>@Common["Total Labours"]</th>
+            <th>@Common["Total Parts"]</th>
+             <th>@Common["VIN"]</th>
+            <th>@Common["Plate Number"]</th>
+            <th>@Common["Make"]</th>
+            <th>@Common["Model"]</th>
+             <th>@Common["Service Advisor"]</th>
+            <th>@Common["Branch"]</th>
+            <th>@Common["Vehcile In/Out"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.WIP</td>
+                    <td>@item.Status</td>
+                    <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@item.DueIn</td>
+                    <td>@item.DueOut</td>
+                    <td>@item.Ageing</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.TotalAmount?.ToString("N2")</td>
+                    <td>@item.TotalLabours?.ToString("N2")</td>
+                    <td>@item.TotalParts?.ToString("N2")</td>
+                    <td>@item.VIN</td>
+                    <td>@item.PlateNumber</td>
+                    <td>@item.Make</td>
+                    <td>@item.Model</td>
+                    <td>@item.ServiceAdvisor</td>
+                    <td>@item.Branch</td>
+                    <td>@item.VehicleInOut</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="16">@Common["NoData"]</td>
+            </tr>
+        }
+    </tbody>
+</table>

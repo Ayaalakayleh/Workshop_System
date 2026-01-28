@@ -2745,4 +2745,7 @@
   <data name="Replacement" xml:space="preserve">
     <value>سيارة بديلة</value>
   </data>
+  <data name="WIP Report" xml:space="preserve">
+    <value>تقرير الأعمال قيد التنفيذ</value>
+  </data>
 </root>

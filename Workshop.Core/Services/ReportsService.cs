@@ -28,6 +28,11 @@ namespace Workshop.Core.Services
         {
             return await _repository.GetConsumptionReport(filterDTO);
         }
+
+        public async Task<IEnumerable<WIPReportDTO>> GetWIPReport(WIPReportFilterDTO filterDTO)
+        {
+            return await _repository.GetWIPReport(filterDTO);
+        }
     }
 }
 
