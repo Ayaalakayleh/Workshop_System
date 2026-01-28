@@ -2739,4 +2739,7 @@
   <data name="Label_CreateWIP" xml:space="preserve">
     <value>Create WIP</value>
   </data>
+  <data name="WIP Report" xml:space="preserve">
+    <value>WIP Report</value>
+  </data>
 </root>

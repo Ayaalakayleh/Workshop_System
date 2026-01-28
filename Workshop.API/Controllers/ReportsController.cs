@@ -22,12 +22,14 @@ namespace Workshop.API.Controllers
             var result = await _service.GetMonthlyRepairCostReport(filter);
             return Ok(result);
         }
+
         [HttpPost("GetMonthlyRepairCostBranchWise")]
         public async Task<IActionResult> GetMonthlyRepairCostBranchWiseReport([FromBody] MonthlyRepairCostReportFilterDTO filter)
         {
             var result = await _service.GetMonthlyRepairCostBranchWiseReport(filter);
             return Ok(result);
         }
+
         [HttpPost("GetConsumption")]
         public async Task<IActionResult> GetConsumptionReport([FromBody] ConsumptionReportFilterDTO filter)
         {
@@ -35,5 +37,11 @@ namespace Workshop.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("GetWIP")]
+        public async Task<IActionResult> GetConsumptionReport([FromBody] WIPReportFilterDTO filter)
+        {
+            var result = await _service.GetWIPReport(filter);
+            return Ok(result);
+        }
     }
 }

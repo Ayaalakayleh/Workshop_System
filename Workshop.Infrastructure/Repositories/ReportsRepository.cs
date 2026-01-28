@@ -82,6 +82,25 @@ namespace Workshop.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<IEnumerable<WIPReportDTO>> GetWIPReport(WIPReportFilterDTO filterDTO)
+        {
+
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@WIPId", filterDTO.WIP);
+            parameters.Add("@StatusId", filterDTO.StatusId);
+            parameters.Add("@CustomerId", filterDTO.CustomerId);
+
+            var result = await connection.QueryAsync<WIPReportDTO>(
+            "R_WIP",
+            parameters,
+            commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+
 
     }
 }

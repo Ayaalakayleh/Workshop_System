@@ -2739,4 +2739,7 @@
   <data name="Label_CreateWIP" xml:space="preserve">
     <value>انشاء امر عمل</value>
   </data>
+  <data name="WIP Report" xml:space="preserve">
+    <value>تقرير الأعمال قيد التنفيذ</value>
+  </data>
 </root>
