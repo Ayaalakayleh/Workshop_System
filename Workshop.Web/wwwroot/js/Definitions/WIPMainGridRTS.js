@@ -289,7 +289,9 @@ $(function () {
         ],
         allowColumnReordering: true,
         allowColumnResizing: true,
-        columnAutoWidth: true,
+        columnAutoWidth: false,
+        columnMinWidth: 50,
+        wordWrapEnabled: false,
         hoverStateEnabled: false,
         paging: {
             pageSize: 10
@@ -668,6 +670,7 @@ $("#btnSaveSchedule").on("click", function (e) {
             }
             updateTotalLabourFieldsFromGrid();
             Swal.fire(theMainLang == "en" ? 'Success' : "تمت العملية بنجاح", "", "success");
+            evaluateAndUpdateWIPStatus();
         }
     }).fail(function (xhr, status, error) {
         console.error("Error:", error);

@@ -226,21 +226,6 @@ namespace Workshop.Web.Controllers
 
                 }
 
-                var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, (int)dto.VehicleId);
-
-                var vehicleCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
-                ViewBag.VehicleCustomers = vehicleCustomers?.Select(t => new SelectListItem
-                {
-                    Text = lang == "en" ? t.CustomerPrimaryName : t.CustomerSecondaryname,
-                    Value = t.Id.ToString()
-                }).ToList() ?? new List<SelectListItem>();
-                if (openAgreement.Count > 0)
-                {
-                    var firstAgreement = openAgreement?.FirstOrDefault();
-                    dto.CompanyId = (int)firstAgreement?.CustomerId;
-
-                }
-
                 ViewBag.ID = _WIPID;
 
                     // Get makes
@@ -423,9 +408,14 @@ namespace Workshop.Web.Controllers
                 }
 
                 // Check if waiting for invoice
-                if (dto.Status == (int)WIPStatusEnum.C)
+                if (dto.Status == (int)WIPStatusEnum.G)
                 {
                     ViewBag.IsWaitingInvoiced = true;
+                }
+                
+                if(dto.Status == (int)WIPStatusEnum.C)
+                {
+                    ViewBag.IsCompleated = true;
                 }
 
                 int? selectedCustomerId = null;
@@ -445,9 +435,29 @@ namespace Workshop.Web.Controllers
                         ViewBag.AgreementStatus = status;
                         if (activeAgreement.AgreementId != null && activeAgreement.AgreementId > 0)
                         {
-                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
+                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate?.ToString("yyyy-MM-dd");
                             dto.AgreementId = (int)activeAgreement.AgreementId;
                         }
+
+                        if (dto.AgreementId != null)
+                        {
+                            var agreement = await _vehicleApiClient.Get_AgreementCustomerAndCompanyName((int)dto.AgreementId, lang);
+                            dto.CompanyName = agreement.CompanyName;
+                        }
+
+                        var isReplacement = false;
+                        var generalInfo = await _vehicleApiClient.GetGeneralInfo((int)dto.AgreementId);
+                        var x =  generalInfo.ReservationId;
+                        if(generalInfo?.ReservationId != null)
+                        {
+                            var agreementVehicle = await _vehicleApiClient.GetReservationRentalDetails((int)generalInfo.ReservationId, lang);
+                            var vehicleInReservation = agreementVehicle.VehicleDefinitionId;
+                            if(dto.VehicleId != vehicleInReservation)
+                            {
+                                isReplacement = true;
+                            }
+                        }
+                        ViewBag.IsReplacement = isReplacement;
                     }
                 }
                 catch (Exception ex)
@@ -2370,24 +2380,15 @@ namespace Workshop.Web.Controllers
                     model.AccountNo = _customer.AccountNoReceivable;
                 }
 
-                var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
-                if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
+                if(Details.AgreementId != null)
                 {
-                    var customerLease = await _vehicleApiClient.GetGeneralInfo((int)activeAgreement.AgreementId);
-                    var CustomerId = customerLease.LeaseCustomerId;
-                     
-                    var customerName = "";
-                    var _customerInfo = await _vehicleApiClient.Get_CustomerInformation(BranchId, lang);
-                    
-                    if(CustomerId != null)
-                    {
-                        var _customerDetails =  _customerInfo.FirstOrDefault(c => c.Id == CustomerId) ;
-                        customerName = _customerDetails.CustomerPrimaryName;
-                        model.MobileNumber = _customerDetails.CustomerPhoneNumber;
-                    }
+                    var agreement = await _vehicleApiClient.Get_AgreementCustomerAndCompanyName((int)Details.AgreementId, lang);
 
-                        model.CustomerName = customerName;
+                    model.Company = agreement.CompanyName;
+                    model.CustomerName = agreement.CustomerName;
+                    model.CustomerMobileNumber = agreement.CustomerPhoneNumber;
                 }
+
 
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
@@ -2403,7 +2404,7 @@ namespace Workshop.Web.Controllers
                 model.VehicleInfo.Model = vehicleInfo.Model;
                 model.VehicleInfo.Mileage = vehicleInfo.Mileage?? movement.ReceivedMeter;
                 model.ContractExpDate = await GetContractExpDateAsync(Details.VehicleId);
-                //model.CompanyName = Details.CompanyName;
+                
                 model.InsuranceExpDate = await VehicleDocumants(Details.VehicleId, 5); 
                 model.EstimaraExpDate = await VehicleDocumants(Details.VehicleId, 2);
                 model.MVPIExpDate = await VehicleDocumants(Details.VehicleId, 6); 
@@ -2418,8 +2419,8 @@ namespace Workshop.Web.Controllers
                     model.TimeOut = lastMovement.CreatedAt?.ToString("HH:mm");
                 }
                 //model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-                var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId);
-                model.FuelLevel = f.FuelLevelPercentage +"%";
+                var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId)?? new FuleLevel();
+                model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
                 model.Services = services?.ToList();
                 model.Items = await GetItemsModelsAsync(Id, lang); 
                 model.VehicleCkecklist = await GetVehicleChecklistAsync(Details.MovementId);
@@ -2431,15 +2432,7 @@ namespace Workshop.Web.Controllers
                 var oo = await _apiClient.WIP_GetOptionsById(Id);
                 model.RepeatRepair = oo.RepeatRepair == true ? "Yes" : "No";
 
-                var openAgreement = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(null, vehicleId);
-
-                if (openAgreement.Count > 0)
-                {
-                    var firstAgreement = openAgreement?.FirstOrDefault();
-                    var vehicleCustomers = await _vehicleApiClient.GetCustomerData((int)firstAgreement.CustomerId);
-                    model.Company = lang=="en" ? vehicleCustomers.CustomerPrimaryName : vehicleCustomers.CustomerSecondaryname;
-
-                }
+               
                 return View(model);
             }
             catch (Exception ex)
@@ -2488,7 +2481,7 @@ namespace Workshop.Web.Controllers
                 var activeAgreement = await _vehicleApiClient.GetActiveAgreementId(vehicleId);
 
                 if (activeAgreement?.AgreementId != null && activeAgreement.AgreementId > 0)
-                    return activeAgreement.GregorianReturnDate.ToString("yyyy-MM-dd");
+                    return activeAgreement.GregorianReturnDate?.ToString("yyyy-MM-dd");
 
 
                 return null;

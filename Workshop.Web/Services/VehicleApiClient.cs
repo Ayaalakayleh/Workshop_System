@@ -238,7 +238,8 @@ namespace Workshop.Web.Services
         public async Task<Agreement> GetGeneralInfo(int AgreementId)
         {
             string url = $"/Agreement/GetGeneralInfo?AgreementId={AgreementId}";
-            return await SendRequest<Agreement>(url, HttpMethod.Get);
+            var response = await SendRequest<Agreement>(url, HttpMethod.Get);
+            return response;
         }
         public async Task<VehicleDefinitions> VehicleDefinitionsGetByChassisNo(string chassisNo)
         {
@@ -294,5 +295,18 @@ namespace Workshop.Web.Services
             string url = $"/VehicleDefinition/GetServiceScheduleVehicle";
             return await SendRequest<List<VehicleDefinitions>>(url, HttpMethod.Post, vehicle);
         }
+
+        public async Task<AgreementCustomerDTO> Get_AgreementCustomerAndCompanyName(int AgreementId, string language)
+        {
+            string url = $"/Agreement/Get_AgreementCustomerAndCompanyName?AgreementId={AgreementId}&language={language}";
+            return await SendRequest<AgreementCustomerDTO>(url, HttpMethod.Get);
+        }
+        public async Task<Reservation> GetReservationRentalDetails(int ReservationId, string language)
+        {
+            string url = $"/Reservation/GetRentalDetails?ReservationId={ReservationId}&language={language}";
+            return await SendRequest<Reservation>(url, HttpMethod.Get);
+        }
+
+
     }
 }
