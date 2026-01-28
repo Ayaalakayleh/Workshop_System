@@ -2419,8 +2419,8 @@ namespace Workshop.Web.Controllers
                     model.TimeOut = lastMovement.CreatedAt?.ToString("HH:mm");
                 }
                 //model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
-                var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId);
-                model.FuelLevel = f.FuelLevelPercentage +"%";
+                var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId)?? new FuleLevel();
+                model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
                 model.Services = services?.ToList();
                 model.Items = await GetItemsModelsAsync(Id, lang); 
                 model.VehicleCkecklist = await GetVehicleChecklistAsync(Details.MovementId);
