@@ -130,17 +130,18 @@ $('#workOrderModal').on('shown.bs.modal', function () {
 // =========================
 $(document).ready(function () {
     $("#ResetBtn").on("click", function (e) {
-        e.preventDefault();
-        $("#WorkOrderFilter_VehicleID").val('').trigger('change');
-        $("#WorkOrderFilter_WorkOrderTypeId").val('').trigger('change');
-        $("#WorkOrderFilter_FromDate").val('').trigger('change');
-        $("#WorkOrderFilter_ToDate").val('').trigger('change');
-        $("#WorkOrderFilter_CreatedBy").val('').trigger('change');
-        $("#WorkOrderFilter_WorkOrderStatus").val('').trigger('change');
-        $("#WorkOrderFilter_InvoicingStatus").val('').trigger('change');
-        $("#WorkOrderFilter_WorkOrderNo").val('').trigger('change');
+        window.location.reload();
+        //e.preventDefault();
+        //$("#WorkOrderFilter_VehicleID").val('').trigger('change');
+        //$("#WorkOrderFilter_WorkOrderTypeId").val('').trigger('change');
+        //$("#WorkOrderFilter_FromDate").val('').trigger('change');
+        //$("#WorkOrderFilter_ToDate").val('').trigger('change');
+        //$("#WorkOrderFilter_CreatedBy").val('').trigger('change');
+        //$("#WorkOrderFilter_WorkOrderStatus").val('').trigger('change');
+        //$("#WorkOrderFilter_InvoicingStatus").val('').trigger('change');
+        //$("#WorkOrderFilter_WorkOrderNo").val('').trigger('change');
 
-        loadWorkOrders(1);
+        //loadWorkOrders(1);
     });
 
     $('#BtnAddNew').on('click', function () {

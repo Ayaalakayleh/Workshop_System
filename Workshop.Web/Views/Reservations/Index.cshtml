@@ -243,14 +243,14 @@
             });
         }
          $(document).on("click", "#btnReset", function () {
+             window.location.reload();
+        // $("#filterFromDate").val("");
+        // $("#filterToDate").val("");
+        // $("#filterPlateNumber").val("");
+        // $("#filterChassis").val("");
+        // $("#filterCustomerId").val("");
 
-        $("#filterFromDate").val("");
-        $("#filterToDate").val("");
-        $("#filterPlateNumber").val("");
-        $("#filterChassis").val("");
-        $("#filterCustomerId").val("");
-
-        getReservations();
+        // getReservations();
     });
 
         // Initial fetch for the grid

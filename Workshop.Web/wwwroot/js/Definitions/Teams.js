@@ -418,18 +418,7 @@ $(document).on("click", "#deleteBtn", function () {
     deleteTeam(teamId);
 });
 $(document).on("click", "#btnReset", function (e) {
-    e.preventDefault();
-    // Clear search inputs
-    $("#_Code").val('');
-    $("#_Name").val('');
-    
-    // Reset filter and page number
-    currentFilter.name = '';
-    currentFilter.code = '';
-    currentFilter.pageNumber = 1;
-    
-    // Reload data with cleared filters
-    loadPage(1);
+    window.location.reload();
 });
 
 

@@ -79,7 +79,7 @@ $(document).ready(function () {
             e.preventDefault();
         }
     });
-    var phoneInput = document.querySelector(".phone-number");
+    var phoneInput = document.querySelector(".phone-number,.phone-number-search");
      iti = window.intlTelInput(phoneInput, {
         hiddenInput: "full_number",
         preferredCountries: ['sa', 'jo', 'eg'],
@@ -90,7 +90,6 @@ $(document).ready(function () {
     itip = window.intlTelInputGlobals.getInstance(phoneInput);
     // Completely disable DataTables alert popups
     $.fn.dataTable.ext.errMode = 'none';
-
 });
 (function ($) {
     function sanitize($el) {

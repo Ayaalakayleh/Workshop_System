@@ -47,7 +47,7 @@
                                     </button>
                                 </div>
                                 @* Book *@
-                                @if (item.Status == (int)ReservationStatus.New)
+                                @* @if (item.Status == (int)ReservationStatus.New)
                                 {
                                     hasAction = true;
                                     <div class="dropdown-item p-2">
@@ -58,9 +58,9 @@
                                             <i class="fad fa-check-circle"></i>&nbsp;@Common["Label_Confirm"]
                                         </button>
                                     </div>
-                                }
+                                } *@
                                 @* Create Workorder *@
-                                else if (item.Status == (int)ReservationStatus.Booked)
+                                @if (item.Status == (int)ReservationStatus.New)
                                 {
                                     hasAction = true;
                                     <div class="dropdown-item p-2">
@@ -132,38 +132,38 @@
     });
 
     // BOOK
-    $(document).off('click', '.btn-book').on('click', '.btn-book', function () {
-        const reservationId = $(this).data('reservationid');
-        const statusId = $(this).data('statusid');
+    // $(document).off('click', '.btn-book').on('click', '.btn-book', function () {
+    //     const reservationId = $(this).data('reservationid');
+    //     const statusId = $(this).data('statusid');
 
-        $.ajax({
-            url: '@Url.Action("UpdatedReservationStatus", "Reservations")',
-            type: 'POST',
-            data: {
-                ReservationId: reservationId,
-                StatusId: statusId,
-                UpdatedBy: 1
-            },
-            success: function (res) {
-                if (res.success) {
+    //     $.ajax({
+    //         url: '@Url.Action("UpdatedReservationStatus", "Reservations")',
+    //         type: 'POST',
+    //         data: {
+    //             ReservationId: reservationId,
+    //             StatusId: statusId,
+    //             UpdatedBy: 1
+    //         },
+    //         success: function (res) {
+    //             if (res.success) {
 
 
-                    Swal.fire({
-                                    title: '@Html.Raw(Common["DoneSuccessfully"])',
-            icon: 'success',
-            confirmButtonText: '@Html.Raw(Common["Ok"])',
-                    });
+    //                 Swal.fire({
+    //                                 title: '@Html.Raw(Common["DoneSuccessfully"])',
+    //         icon: 'success',
+    //         confirmButtonText: '@Html.Raw(Common["Ok"])',
+    //                 });
 
-                     $('#btnSearch').click();
-                } else {
-                    Swal.fire('@Html.Raw(Common["ErrorHappend"])', res.message || '', 'error');
-                }
-            },
-            error: function () {
-                Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
-            }
-        });
-    });
+    //                  $('#btnSearch').click();
+    //             } else {
+    //                 Swal.fire('@Html.Raw(Common["ErrorHappend"])', res.message || '', 'error');
+    //             }
+    //         },
+    //         error: function () {
+    //             Swal.fire('@Html.Raw(Common["ErrorHappend"])', '', 'error');
+    //         }
+    //     });
+    // });
 
     // CANCEL
     $(document).off('click', '.btn-cancel').on('click', '.btn-cancel', function () {

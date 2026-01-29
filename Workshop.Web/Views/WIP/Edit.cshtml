@@ -166,7 +166,7 @@
 							@if (ViewBag.IsCompleated == true || ViewBag.IsCompleated == "true")
 							{
 								<button type="button" class="btn btn-secondary btn-sm" id="closeBTN">
-									<i class="fa fa-times"></i>&nbsp;@Common["Button_Close"]
+									<i class="fa fa-file-invoice"></i>&nbsp;&nbsp;@Common["Button_Invoice"]
 								</button>
 							}
 						</div>
@@ -500,9 +500,9 @@
 	// ============================
 	// Transfer Totals (External Invoices)
 	// ============================
-	transferSubtotal: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoiceWithoutVat : 0),
-	transferVatAmount: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferVatAmount : 0),
-	transferTotal: @(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoice : 0)
+		transferSubtotal: @Html.Raw(Json.Serialize(ViewBag.HasExternalInvoices == true? ViewBag.TransferTotalInvoiceWithoutVat: 0)),
+		transferVatAmount: @Html.Raw(Json.Serialize(ViewBag.HasExternalInvoices == true ? ViewBag.TransferVatAmount : 0)),
+		transferTotal: @Html.Raw(Json.Serialize(ViewBag.HasExternalInvoices == true ? ViewBag.TransferTotalInvoice : 0	))	
 	  };
 		const internalMatches = @Html.Raw(Json.Serialize(ViewBag.InternalMatches));
 	  const externalMatches = @Html.Raw(Json.Serialize(ViewBag.ExternalMatches));

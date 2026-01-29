@@ -259,7 +259,7 @@ $(function () {
                         hint: "Assign",
                         icon: "fad fa-regular fa-user act-booking",
                         visible: function (e) {
-                            return !(wipStatus === Gone || wipStatus === Invoiced);//&& e.row.data.Status === 23;
+                            return !(wipStatus === Gone || wipStatus === Invoiced) && e.row.data.Status != 1;//&& e.row.data.Status === 23;
                         },
                         onClick: function (e) {
                             console.log(e.row.data.Id);
@@ -491,9 +491,9 @@ function openScheduleModal(e) {
     });
 
     if (e.StandardHours != null && e.StandardHours !== undefined && e.StandardHours > 0) {
-        $('#schDuration').val(parseFloat(e.StandardHours * 60));
+        $('#schDuration').val(parseFloat(e.StandardHours));
     } else {
-        $('#schDuration').val('30');
+        $('#schDuration').val('1');
     }
     recompute();
 
@@ -580,7 +580,8 @@ function fromM(n) {
 }
 function recompute() {
     const s = mins($schStart.val());
-    const d = parseInt($schDuration.val() || '0', 10);
+    const hours = parseInt($schDuration.val() || '0', 10);
+    const d = Math.round(hours * 60);
     $schEnd.val(s && d ? fromM(s + d) : '');
 }
 
@@ -627,7 +628,7 @@ initSchStartTimepicker([], "08:00");
 
 $('#btnSaveSchedule').on('click', function () {
     if (!$('#schDate').val() || !$('#schTech').val() || !$('#schStart').val() || !$('#schDuration').val()) {
-        alert(resources.fill_required || 'Please fill required fields');
+        Swal.fire(theMainLang == "en" ? resources.fill_required || 'Please fill required fields' : "الرجاء ملئ الحقول", "", "warining");
         return;
     }
     $('#scheduleModal').modal('hide');
@@ -641,7 +642,8 @@ $("#btnSaveSchedule").on("click", function (e) {
         TechnicianId: parseInt($('#schTech').val()),
         Date: new Date($('#schDate').val()),
         StartTime: $('#schStart').val() + ":00",
-        Duration: parseFloat($('#schDuration').val()),
+        //Duration: parseFloat($('#schDuration').val()),//For Hours
+        Duration: Math.round(parseFloat($('#schDuration').val()) * 60), //For Minutes
         EndTime: $('#schEnd').val() + ":00"
     };
     debugger
@@ -785,7 +787,7 @@ function minutesToHHMM(total) {
 function normalizeDurationToMinutes(rawDuration) {
     const num = parseFloat(rawDuration || 0);
     if (!isFinite(num) || num <= 0) return 0;
-    return Math.round(num);
+    return Math.round(num * 60);
 }
 
 function computeStartOptionsEnumerate(freeIntervals, durationMin, stepMin = 5) {

@@ -185,6 +185,8 @@
     }
 
     // ---------- modal helpers ----------
+    const isAr = (typeof theMainLang !== "undefined" && theMainLang === "ar");
+    const tr = (en, ar) => (isAr ? ar : en);
     function formatDateDisplay(dateStr) {
         if (!dateStr) return "";
         const d = new Date(dateStr);
@@ -240,12 +242,39 @@
         $('#reservationDetailsModal').remove();
 
         const many = list.length > 1;
-        const title = many ? 'Reservations' : 'Reservation details';
+
+        const title = many
+            ? tr('Reservations', 'الحجوزات')
+            : tr('Reservation details', 'تفاصيل الحجز');
+
+        const subTitle = many
+            ? tr(`${list.length} reservations in this slot`, `${list.length} حجز في هذه الفترة`)
+            : '';
+
+        const txt = {
+            noDetails: tr('No reservation details found.', 'لم يتم العثور على تفاصيل للحجز.'),
+            noDesc: tr('No description provided', 'لا يوجد وصف'),
+            duration: tr('Duration', 'المدة'),
+            minutes: tr('min', 'دقيقة'),
+            chassis: tr('Chassis', 'رقم الشاصي'),
+            company: tr('Company', 'الشركة'),
+            startTime: tr('Start time', 'وقت البدء'),
+            endTime: tr('End time', 'وقت الانتهاء'),
+            description: tr('Description', 'الوصف'),
+            reservationId: tr('Reservation ID', 'رقم الحجز'),
+            close: tr('Close', 'إغلاق'),
+            idLabel: tr('ID', 'رقم الحجز'),
+            noPlate: tr('No plate', 'بدون لوحة'),
+            durationPrefix: tr('Duration:', 'المدة:')
+        };
+
+        const endAlign = isAr ? 'text-start' : 'text-end';
+        const modalDir = isAr ? 'rtl' : 'ltr';
 
         let bodyHtml = '';
 
         if (!list.length) {
-            bodyHtml = `<p class="text-muted mb-0">No reservation details found.</p>`;
+            bodyHtml = `<p class="text-muted mb-0">${txt.noDetails}</p>`;
         } else if (!many) {
             const r = list[0];
 
@@ -253,10 +282,15 @@
             const timeText = `${formatTimeDisplay(r.start_Time || r.startTime)} – ${formatTimeDisplay(r.end_Time || r.endTime)}`;
             const plate = r.plate_Number || r.plateNumber || '—';
             const chassis = r.chassis || r.Chassis || '—';
-            const company = r.customerName || r.customerName || r.customerName || '—';
+            const company = r.customerName || r.companyName || r.CompanyName || '—';
             const status = r.statusPrimaryName || r.statusSecondaryName || '—';
-            const duration = r.duration != null ? `${r.duration} min` : '—';
-            const description = (r.description || '').trim() || '<span class="text-muted">No description provided</span>';
+
+            const duration = (r.duration != null)
+                ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
+                : '—';
+
+            const description = (r.description || '').trim()
+                || `<span class="text-muted">${txt.noDesc}</span>`;
 
             bodyHtml = `
             <div class="resv-modal-summary mb-3">
@@ -268,57 +302,64 @@
                         <i class="bi bi-clock me-1"></i>${timeText}
                     </div>
                     <div class="text-muted small mt-1">
-                        <i class="bi bi-hash me-1"></i>ID ${r.id}
+                        <i class="bi bi-hash me-1"></i>${txt.idLabel} ${r.id}
                     </div>
                 </div>
-                <div class="text-end">
+                <div class="${endAlign}">
                     <div class="mb-2">
                         <span class="badge resv-status-badge">${status}</span>
                     </div>
-                    <div class="small text-muted">Duration</div>
+                    <div class="small text-muted">${txt.duration}</div>
                     <div class="fw-semibold">${duration}</div>
                 </div>
             </div>
 
             <div class="resv-modal-grid mb-3">
                 <div class="resv-field">
-                    <div class="resv-label">Chassis</div>
+                    <div class="resv-label">${txt.chassis}</div>
                     <div class="resv-value">${chassis}</div>
                 </div>
                 <div class="resv-field">
-                    <div class="resv-label">Company</div>
+                    <div class="resv-label">${txt.company}</div>
                     <div class="resv-value">${company}</div>
                 </div>
                 <div class="resv-field">
-                    <div class="resv-label">Start time</div>
+                    <div class="resv-label">${txt.startTime}</div>
                     <div class="resv-value">${formatTimeDisplay(r.start_Time || r.startTime)}</div>
                 </div>
                 <div class="resv-field">
-                    <div class="resv-label">End time</div>
+                    <div class="resv-label">${txt.endTime}</div>
                     <div class="resv-value">${formatTimeDisplay(r.end_Time || r.endTime)}</div>
                 </div>
             </div>
 
             <div class="resv-description-card">
-                <div class="resv-label mb-1">Description</div>
-                <div class="resv-description text-truncate">${description.replace(/\n/g, '<br>')}</div>
+                <div class="resv-label mb-1">${txt.description}</div>
+                <div class="resv-description text-truncate">${String(description).replace(/\n/g, '<br>')}</div>
             </div>
         `;
         } else {
             bodyHtml += `<div class="accordion" id="resDetailsAccordion">`;
+
             list.forEach((r, idx) => {
                 const idSafe = r.id || idx;
                 const collapseId = `resDetails-${idSafe}`;
                 const headingId = `heading-${idSafe}`;
 
-                const plate = r.plate_Number || r.plateNumber || 'No plate';
+                const plate = r.plate_Number || r.plateNumber || txt.noPlate;
                 const dateText = formatDateDisplay(r.date);
                 const timeText = `${formatTimeDisplay(r.start_Time || r.startTime)} – ${formatTimeDisplay(r.end_Time || r.endTime)}`;
                 const status = r.statusPrimaryName || r.statusSecondaryName || '—';
-                const duration = r.duration != null ? `${r.duration} min` : '—';
+
+                const duration = (r.duration != null)
+                    ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
+                    : '—';
+
                 const chassis = r.chassis || r.Chassis || '—';
-                const company = r.companyName || r.companyId || r.CompanyId || '—';
-                const description = (r.description || '').trim() || '<span class="text-muted">No description provided</span>';
+                const company = r.companyName || r.customerName || r.companyId || r.CompanyId || '—';
+
+                const description = (r.description || '').trim()
+                    || `<span class="text-muted">${txt.noDesc}</span>`;
 
                 const showClass = idx === 0 ? 'show' : '';
                 const expanded = idx === 0 ? 'true' : 'false';
@@ -335,68 +376,70 @@
                                     <div class="fw-semibold">${plate}</div>
                                     <div class="small text-muted">${dateText} • ${timeText}</div>
                                 </div>
-                                <div class="text-end">
+                                <div class="${endAlign}">
                                     <div><span class="badge resv-status-badge">${status}</span></div>
-                                    <div class="small text-muted mt-1">Duration: ${duration}</div>
+                                    <div class="small text-muted mt-1">${txt.durationPrefix} ${duration}</div>
                                 </div>
                             </div>
                         </button>
                     </h2>
+
                     <div id="${collapseId}" class="accordion-collapse collapse ${showClass}"
                          aria-labelledby="${headingId}" data-bs-parent="#resDetailsAccordion">
                         <div class="accordion-body">
                             <div class="resv-modal-grid mb-3">
                                 <div class="resv-field">
-                                    <div class="resv-label">Reservation ID</div>
+                                    <div class="resv-label">${txt.reservationId}</div>
                                     <div class="resv-value">${r.id}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">Chassis</div>
+                                    <div class="resv-label">${txt.chassis}</div>
                                     <div class="resv-value">${chassis}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">Company</div>
+                                    <div class="resv-label">${txt.company}</div>
                                     <div class="resv-value">${company}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">Start time</div>
+                                    <div class="resv-label">${txt.startTime}</div>
                                     <div class="resv-value">${formatTimeDisplay(r.start_Time || r.startTime)}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">End time</div>
+                                    <div class="resv-label">${txt.endTime}</div>
                                     <div class="resv-value">${formatTimeDisplay(r.end_Time || r.endTime)}</div>
                                 </div>
                             </div>
 
                             <div class="resv-description-card">
-                                <div class="resv-label mb-1">Description</div>
-                                <div class="resv-description text-truncate">${description.replace(/\n/g, '<br>')}</div>
+                                <div class="resv-label mb-1">${txt.description}</div>
+                                <div class="resv-description text-truncate">${String(description).replace(/\n/g, '<br>')}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
             });
+
             bodyHtml += `</div>`;
         }
 
         const modalHtml = `
-<div class="modal fade resv-details-modal" id="reservationDetailsModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade resv-details-modal" id="reservationDetailsModal" tabindex="-1" aria-hidden="true" dir="${modalDir}">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header border-0 pb-0">
         <div>
             <h5 class="modal-title fw-semibold">${title}</h5>
-            ${many ? `<div class="text-muted small">${list.length} reservations in this slot</div>` : ''}
+            ${many ? `<div class="text-muted small">${subTitle}</div>` : ''}
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${txt.close}"></button>
       </div>
       <div class="modal-body pt-3">
         ${bodyHtml}
       </div>
       <div class="modal-footer border-0 justify-content-center pt-0">
         <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-            Close
+            ${txt.close}
         </button>
       </div>
     </div>
@@ -404,11 +447,14 @@
 </div>`;
 
         container.html(modalHtml);
+
         const modalEl = document.getElementById('reservationDetailsModal');
         if (!modalEl) return;
+
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
     }
+
 
     // ---------- Overlay helpers (vertical bars) ----------
     function getResGridBits() {
@@ -466,6 +512,34 @@
         return Array.from(groupsMap.values());
     }
 
+    // ---------- Overlap layout (lanes) ----------
+    function assignLanes(intervals) {
+        const lanes = [];
+
+        intervals.forEach(item => {
+            let laneIndex = -1;
+
+            for (let i = 0; i < lanes.length; i++) {
+                const last = lanes[i][lanes[i].length - 1];
+                if (item.start >= last.end) {
+                    laneIndex = i;
+                    break;
+                }
+            }
+
+            if (laneIndex === -1) {
+                laneIndex = lanes.length;
+                lanes.push([]);
+            }
+
+            item.lane = laneIndex;
+            lanes[laneIndex].push(item);
+        });
+
+        return lanes.length;
+    }
+
+
     // ✅ Tooltip: show PLATE numbers (not description)
     function buildTooltipHtmlForGroup(group) {
         const plates = group.items
@@ -474,6 +548,30 @@
 
         const uniquePlates = [...new Set(plates)];
         return uniquePlates.length ? uniquePlates.join('<br>') : labelReserved;
+    }
+    function layoutOverlaps(intervals) {
+        const lanes = [];
+
+        intervals.forEach(item => {
+            let placed = false;
+
+            for (const lane of lanes) {
+                const last = lane[lane.length - 1];
+                if (item.start >= last.end) {
+                    lane.push(item);
+                    item.lane = lanes.indexOf(lane);
+                    placed = true;
+                    break;
+                }
+            }
+
+            if (!placed) {
+                item.lane = lanes.length;
+                lanes.push([item]);
+            }
+        });
+
+        return lanes.length;
     }
 
     function renderOverlayDay({ startM, endM, dateISO, intervalsMap }) {
@@ -489,58 +587,64 @@
         const bodyH = tbody.scrollHeight;
 
         const range = Math.max(1, endM - startM);
-        const timeToY = (mins) => bodyTop + ((mins - startM) / range) * bodyH;
+        const timeToY = (mins) =>
+            bodyTop + ((mins - startM) / range) * bodyH;
 
         // Day has ONE schedule column
-        const centers = centersFromSelector('.resv-grid thead th.schedule-col', scroll);
+        const centers = centersFromSelector(
+            '.resv-grid thead th.schedule-col',
+            scroll
+        );
         if (!centers.length) return;
         const cx = centers[0];
 
         const list = intervalsMap.get(dateISO) || [];
-        const groups = groupIntervalsByTime(list);
+        if (!list.length) return;
+
+        // ---- LANE LOGIC (NEW) ----
+        const items = [...list].sort((a, b) => a.start - b.start);
+        const laneCount = assignLanes(items);
+
+        const laneWidth = 22;
+        const totalWidth = laneCount * laneWidth;
+
         const toInit = [];
 
-        groups.forEach(group => {
-            const cStart = clamp(group.start, startM, endM);
-            const cEnd = clamp(group.end, startM, endM);
+        items.forEach(item => {
+            const cStart = clamp(item.start, startM, endM);
+            const cEnd = clamp(item.end, startM, endM);
             if (cEnd <= cStart) return;
 
             const y1 = timeToY(cStart);
             const y2 = timeToY(cEnd);
             const h = Math.max(4, y2 - y1);
 
-            const ids = group.items
-                .map(x => x.id)
-                .filter(id => id !== null && id !== undefined);
-
-            const count = group.items.length;
-
             const el = document.createElement('div');
             el.className = 'period-vert reserved';
-            el.style.left = `${cx}px`;
+
+            el.style.left =
+                `${cx - totalWidth / 2 + item.lane * laneWidth}px`;
+            el.style.width = `${laneWidth - 4}px`;
             el.style.top = `${y1}px`;
             el.style.height = `${h}px`;
-            if (ids.length) el.setAttribute('data-ids', ids.join(','));
 
-            const tip = buildTooltipHtmlForGroup(group);
+            el.setAttribute('data-ids', item.id);
+
+            const tip = item.plate || labelReserved;
 
             el.innerHTML = `
-                <span class="sr">${tip}</span>
-                <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
-            `;
+            <span class="sr">${tip}</span>
+            <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">1</span>
+        `;
 
             el.setAttribute('data-bs-toggle', 'tooltip');
             el.setAttribute('data-bs-html', 'true');
             el.setAttribute('data-bs-title', tip);
 
-            el.addEventListener('click', function (ev) {
+            el.addEventListener('click', ev => {
                 ev.preventDefault();
                 ev.stopPropagation();
-                const idsAttr = el.getAttribute('data-ids');
-                if (!idsAttr) return;
-                const ids = idsAttr.split(',').map(s => s.trim()).filter(Boolean);
-                if (!ids.length) return;
-                openReservationDetailsModal(ids);
+                openReservationDetailsModal([item.id]);
             });
 
             overlay.appendChild(el);
@@ -548,7 +652,11 @@
         });
 
         toInit.forEach(el => {
-            try { new bootstrap.Tooltip(el); } catch { /* ignore */ }
+            try {
+                new bootstrap.Tooltip(el);
+            } catch {
+                /* ignore */
+            }
         });
     }
 
@@ -565,11 +673,17 @@
         const bodyH = tbody.scrollHeight;
 
         const range = Math.max(1, endM - startM);
-        const timeToY = (mins) => bodyTop + ((mins - startM) / range) * bodyH;
+        const timeToY = (mins) =>
+            bodyTop + ((mins - startM) / range) * bodyH;
 
-        const centers = centersFromSelector('.resv-grid thead th.day-col', scroll);
+        // Centers of each day column
+        const centers = centersFromSelector(
+            '.resv-grid thead th.day-col',
+            scroll
+        );
         if (!centers.length) return;
 
+        // Map ISO date -> column index
         const dayIndexByISO = new Map();
         for (let i = 0; i < 7; i++) {
             const d = new Date(weekStartDate);
@@ -580,54 +694,56 @@
         const toInit = [];
 
         intervalsMap.forEach((rawList, dISO) => {
-            const idx = dayIndexByISO.get(dISO);
-            if (idx === undefined) return;
-            const cx = centers[idx];
+            const dayIndex = dayIndexByISO.get(dISO);
+            if (dayIndex === undefined) return;
+
+            const cx = centers[dayIndex];
             if (typeof cx !== "number") return;
 
-            const groups = groupIntervalsByTime(rawList);
+            if (!rawList || !rawList.length) return;
 
-            groups.forEach(group => {
-                const cStart = clamp(group.start, startM, endM);
-                const cEnd = clamp(group.end, startM, endM);
+            // ---- SAME LANE LOGIC AS DAY ----
+            const items = [...rawList].sort((a, b) => a.start - b.start);
+            const laneCount = assignLanes(items);
+
+            const laneWidth = 18;
+            const totalWidth = laneCount * laneWidth;
+
+            items.forEach(item => {
+                const cStart = clamp(item.start, startM, endM);
+                const cEnd = clamp(item.end, startM, endM);
                 if (cEnd <= cStart) return;
 
                 const y1 = timeToY(cStart);
                 const y2 = timeToY(cEnd);
                 const h = Math.max(4, y2 - y1);
 
-                const ids = group.items
-                    .map(x => x.id)
-                    .filter(id => id !== null && id !== undefined);
-
-                const count = group.items.length;
-
                 const el = document.createElement('div');
                 el.className = 'period-vert reserved';
-                el.style.left = `${cx}px`;
+
+                el.style.left =
+                    `${cx - totalWidth / 2 + item.lane * laneWidth}px`;
+                el.style.width = `${laneWidth - 3}px`;
                 el.style.top = `${y1}px`;
                 el.style.height = `${h}px`;
-                if (ids.length) el.setAttribute('data-ids', ids.join(','));
 
-                const tip = buildTooltipHtmlForGroup(group);
+                el.setAttribute('data-ids', item.id);
+
+                const tip = item.plate || labelReserved;
 
                 el.innerHTML = `
-                    <span class="sr">${tip}</span>
-                    <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">${count}</span>
-                `;
+                <span class="sr">${tip}</span>
+                <span class="badge bg-primary position-absolute top-50 start-50 translate-middle">1</span>
+            `;
 
                 el.setAttribute('data-bs-toggle', 'tooltip');
                 el.setAttribute('data-bs-html', 'true');
                 el.setAttribute('data-bs-title', tip);
 
-                el.addEventListener('click', function (ev) {
+                el.addEventListener('click', ev => {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    const idsAttr = el.getAttribute('data-ids');
-                    if (!idsAttr) return;
-                    const ids = idsAttr.split(',').map(s => s.trim()).filter(Boolean);
-                    if (!ids.length) return;
-                    openReservationDetailsModal(ids);
+                    openReservationDetailsModal([item.id]);
                 });
 
                 overlay.appendChild(el);
@@ -636,9 +752,14 @@
         });
 
         toInit.forEach(el => {
-            try { new bootstrap.Tooltip(el); } catch { /* ignore */ }
+            try {
+                new bootstrap.Tooltip(el);
+            } catch {
+                /* ignore */
+            }
         });
     }
+
 
     // ---------- DAY VIEW ----------
     function buildDay() {

@@ -6,10 +6,6 @@
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
 
-
-@if (Model != null && Model.ToList().Count > 0)
-{
-
 	<table id="workshops-table" class="table table-bordered table-hover table-striped w-100 text-center main-table">
 		<thead class="bg-primary-500 bg-primary-gradient">
 			<tr>
@@ -58,15 +54,6 @@
 		</tbody>
 	</table>
     
-	@* ToDo: Pagination *@
-	@* <input id="total_pages" value="@Math.Ceiling((decimal)Model.ToList()[0].NumberOfPages / 25)" hidden /> *@
-}
-else
-{
-	<div class="alert alert-info text-center">
-		@Common["NoDataFound"]
-	</div>
-}
 
 @if (Model.Count() > 0)
 {

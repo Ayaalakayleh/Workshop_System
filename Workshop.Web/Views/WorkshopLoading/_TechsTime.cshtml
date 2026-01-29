@@ -2,12 +2,13 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
 
-<div class="flex-grow-1">
-    <div class="wl-grid mb-3">
-        <div class="wl-head">
-            <div class="fw-bold">@Common["Label_TechsTime"]</div>
-            <div class="wl-hours" id="hoursHeader"></div>
+<div class="flex-grow-1 table-mobile">
+        <div class="wl-grid mb-3 table-mobile">
+            <div class="wl-head">
+                <div class="fw-bold">@Common["Label_TechsTime"]</div>
+                <div class="wl-hours" id="hoursHeader"></div>
+            </div>
+            <div id="gridBody"></div>
         </div>
-        <div id="gridBody"></div>
     </div>
-</div>
+
