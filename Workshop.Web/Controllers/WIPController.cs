@@ -446,15 +446,18 @@ namespace Workshop.Web.Controllers
                         }
 
                         var isReplacement = false;
-                        var generalInfo = await _vehicleApiClient.GetGeneralInfo((int)dto.AgreementId);
-                        var x =  generalInfo.ReservationId;
-                        if(generalInfo?.ReservationId != null)
+                        if(dto.AgreementId != null)
                         {
-                            var agreementVehicle = await _vehicleApiClient.GetReservationRentalDetails((int)generalInfo.ReservationId, lang);
-                            var vehicleInReservation = agreementVehicle.VehicleDefinitionId;
-                            if(dto.VehicleId != vehicleInReservation)
+                            var generalInfo = await _vehicleApiClient.GetGeneralInfo((int)dto.AgreementId);
+                            var x =  generalInfo.ReservationId;
+                            if(generalInfo?.ReservationId != null)
                             {
-                                isReplacement = true;
+                                var agreementVehicle = await _vehicleApiClient.GetReservationRentalDetails((int)generalInfo.ReservationId, lang);
+                                var vehicleInReservation = agreementVehicle.VehicleDefinitionId;
+                                if(dto.VehicleId != vehicleInReservation)
+                                {
+                                    isReplacement = true;
+                                }
                             }
                         }
                         ViewBag.IsReplacement = isReplacement;
@@ -2389,7 +2392,6 @@ namespace Workshop.Web.Controllers
                     model.CustomerMobileNumber = agreement.CustomerPhoneNumber;
                 }
 
-
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
                 //============================================================================================================
@@ -2418,7 +2420,6 @@ namespace Workshop.Web.Controllers
                     model.DateOut = lastMovement.CreatedAt?.ToString("yyyy-MM-dd");
                     model.TimeOut = lastMovement.CreatedAt?.ToString("HH:mm");
                 }
-                //model.DateOut = movement.MovementOut == true ? movement.CreatedAt?.ToString("yyyy-MM-dd") : null;
                 var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId)?? new FuleLevel();
                 model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
                 model.Services = services?.ToList();
@@ -2432,6 +2433,12 @@ namespace Workshop.Web.Controllers
                 var oo = await _apiClient.WIP_GetOptionsById(Id);
                 model.RepeatRepair = oo.RepeatRepair == true ? "Yes" : "No";
 
+                //if(vehicleInfo.VIN != null)
+                //{
+
+                //    var recallResponse = await _apiClient.GetActiveRecallsByChassis(vehicleInfo.VIN);
+                //     ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
+                //}
                
                 return View(model);
             }
