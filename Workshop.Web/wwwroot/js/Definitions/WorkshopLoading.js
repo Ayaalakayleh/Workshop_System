@@ -810,6 +810,77 @@ function initModal2() {
     if (scheduleModal2Bound) return;
     scheduleModal2Bound = true;
 
+    const $modal = $(els.modalEl);
+
+    // ---------------------------------------------------------------------
+    // ✅ SELECT2 FIX (Bootstrap modal focus-trap vs Select2 search input)
+    // ---------------------------------------------------------------------
+
+    // (Bootstrap 5) FocusTrap is internal, but this is the real culprit when
+    // select2 dropdown is not perfectly "inside" the modal focus boundary.
+    function setModalFocusTrap(enable) {
+        try {
+            const inst = bootstrap.Modal.getInstance(els.modalEl);
+            if (inst && inst._focustrap) {
+                enable ? inst._focustrap.activate() : inst._focustrap.deactivate();
+            }
+        } catch { }
+    }
+
+    // Init/re-init select2 without clearing options or value
+    function initSelect2InModal($sel) {
+        if (!$sel || !$sel.length) return;
+        if (!$sel.is("select")) return;
+
+        const currentVal = $sel.val();
+
+        if ($sel.hasClass("select2-hidden-accessible")) {
+            try { $sel.select2("destroy"); } catch { }
+        }
+
+        $sel.select2({
+            dropdownParent: $modal,   // ✅ critical: keep dropdown inside modal
+            theme: "bootstrap-5",
+            width: "100%"
+        });
+
+        // restore selection (does NOT clear dropdown data)
+        if (currentVal != null) $sel.val(currentVal).trigger("change.select2");
+    }
+
+    // Ensure select2 is initialized after the modal is shown (better layout + z-index)
+    $modal
+        .off("shown.bs.modal.sched2")
+        .on("shown.bs.modal.sched2", function () {
+            // Initialize select2 for the modal selects (add class="select2" on your <select>)
+            initSelect2InModal($(els.tech)); // main one
+        })
+        .off("hidden.bs.modal.sched2")
+        .on("hidden.bs.modal.sched2", function () {
+            // if focus trap was disabled while select2 was open, re-enable it
+            setModalFocusTrap(true);
+        });
+
+    // When select2 opens, Bootstrap focus-trap can steal focus from the search input.
+    // So: temporarily disable focus trap + force focus into the search box.
+    $modal
+        .off("select2:open.sched2fix")
+        .on("select2:open.sched2fix", "select", function () {
+            setModalFocusTrap(false);
+            setTimeout(() => {
+                const field = document.querySelector(".select2-container--open .select2-search__field");
+                if (field) field.focus();
+            }, 0);
+        })
+        .off("select2:close.sched2fix")
+        .on("select2:close.sched2fix", "select", function () {
+            setModalFocusTrap(true);
+        });
+
+    // ---------------------------------------------------------------------
+    // ✅ Your existing initModal2 logic (unchanged except tiny select2 triggers)
+    // ---------------------------------------------------------------------
+
     // ✅ schedStart: readonly (no manual typing), but still clickable for picker
     $(els.start)
         .prop("readonly", true)
@@ -818,6 +889,7 @@ function initModal2() {
 
     // block editing ends
     $(els.ends).off(".block2").on("keydown.block2 paste.block2", (e) => e.preventDefault());
+
     // Date change -> fetch tech -> enable tech
     $(els.date).off(".sched2").on("change.sched2", async function () {
         schedule2SetStep(els, 1);
@@ -829,6 +901,11 @@ function initModal2() {
 
         // reset tech options
         $(els.tech).empty().append(new Option("Select", ""));
+
+        // ✅ if select2 already active, tell it the underlying select changed (no clearing data beyond your .empty())
+        if ($(els.tech).hasClass("select2-hidden-accessible")) {
+            $(els.tech).trigger("change.select2");
+        }
 
         // reset timepicker
         destroyStartPicker($(els.start));
@@ -878,9 +955,6 @@ function initModal2() {
             allowedTimes[0] || SHIFT_START,
             () => schedule2UpdateEnds(els)
         );
-
-        // IMPORTANT: don't auto-advance to next step here.
-        // user must change/pick start time -> then we enable next fields.
     });
 
     // Start picked/changed -> enable duration+ends and compute
@@ -955,6 +1029,8 @@ function initModal2() {
         });
     });
 }
+
+
 
 // This populates the dropdown AND stores freeIntervals (if provided)
 function fillTechsForLabour(data) {

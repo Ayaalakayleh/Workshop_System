@@ -2751,4 +2751,7 @@
   <data name="Label_UnBookedLabour" xml:space="preserve">
     <value>Un Booked Labour</value>
   </data>
+  <data name="DefineRecallRule" xml:space="preserve">
+    <value>Define Recall Rule</value>
+  </data>
 </root>

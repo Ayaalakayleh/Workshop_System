@@ -7,6 +7,6 @@
 #historyTable_filter{
     float:left
 }
-.fa-chevron-left, .fa-chevron-right {
+.fa-chevron-left, .fa-chevron-right, .sa-chevron-left, .sa-chevron-right {
     transform: scaleX(-1)
 }

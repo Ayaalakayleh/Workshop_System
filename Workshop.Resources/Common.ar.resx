@@ -2751,4 +2751,7 @@
   <data name="Label_UnBookedLabour" xml:space="preserve">
     <value>عمل غير مُجدول</value>
   </data>
+  <data name="DefineRecallRule" xml:space="preserve">
+    <value>تعريف إعادة الطلب</value>
+  </data>
 </root>

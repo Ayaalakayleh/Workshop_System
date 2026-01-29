@@ -526,7 +526,7 @@ $(document).ready(function () {
             $nav.append(
                 '<li class="page-item disabled">' +
                 '<span class="page-link" aria-label="Previous">' +
-                '<span aria-hidden="true"><i class="sa sa-chevron-right"></i></span>' +
+                '<span aria-hidden="true"><i class="sa sa-chevron-left"></i></span>' +
                 '</span>' +
                 '</li>'
             );
@@ -534,7 +534,7 @@ $(document).ready(function () {
             $nav.append(
                 '<li class="page-item">' +
                 '<a class="page-link" href="#" aria-label="Previous" data-prev="1">' +
-                '<span aria-hidden="true"><i class="sa sa-chevron-right"></i></span>' +
+                '<span aria-hidden="true"><i class="sa sa-chevron-left"></i></span>' +
                 '</a>' +
                 '</li>'
             );
@@ -565,7 +565,7 @@ $(document).ready(function () {
             $nav.append(
                 '<li class="page-item disabled">' +
                 '<span class="page-link" aria-label="Next">' +
-                '<span aria-hidden="true"><i class="sa sa-chevron-left"></i></span>' +
+                '<span aria-hidden="true"><i class="sa sa-chevron-right"></i></span>' +
                 '</span>' +
                 '</li>'
             );
@@ -573,7 +573,7 @@ $(document).ready(function () {
             $nav.append(
                 '<li class="page-item">' +
                 '<a class="page-link" href="#" aria-label="Next" data-next="1">' +
-                '<span aria-hidden="true"><i class="sa sa-chevron-left"></i></span>' +
+                '<span aria-hidden="true"><i class="sa sa-chevron-right"></i></span>' +
                 '</a>' +
                 '</li>'
             );

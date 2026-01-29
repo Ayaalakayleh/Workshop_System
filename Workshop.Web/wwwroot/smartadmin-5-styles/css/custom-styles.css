@@ -3514,6 +3514,13 @@ html[data-bs-theme="dark"] div.dm-wrapperDiv div.dm-innerDiv {
     background-color: #242933;
     border-bottom-color: #242933;
 }
+html[data-bs-theme="dark"] .dxc-title text {
+    fill: rgb(255, 255, 255) !important
+}
+.scratch-wrap {
+    overflow: hidden;
+    overflow-x: auto
+}
 /* End Dark Mode Customization */
 @media (max-width: 450px) {
     #new_quickAccess .app-page-title img {
@@ -3536,10 +3543,7 @@ html[data-bs-theme="dark"] div.dm-wrapperDiv div.dm-innerDiv {
         width: unset;
     }
 
-    .scratch-wrap {
-        overflow: hidden;
-        overflow-x: auto
-    }
+
 
     .scratch-controls button {
         margin: .5rem 0
@@ -3552,5 +3556,26 @@ html[data-bs-theme="dark"] div.dm-wrapperDiv div.dm-innerDiv {
 
     .reservations-card .d-flex.align-items-center.gap-2 {
         flex-direction: column
+    }
+
+    #LookupForm table th, #LookupForm table td {
+        min-width: 160px;
+        white-space: nowrap;
+    }
+
+    .flex-column-mobile {
+        flex-direction: column
+    }
+
+    #btnToday {
+        width: 100%
+    }
+
+    .jSignature {
+        height: 100% !important
+    }
+
+    body:not(.no-slimscroll) .custom-scroll {
+        overflow-y: scroll;
     }
 }

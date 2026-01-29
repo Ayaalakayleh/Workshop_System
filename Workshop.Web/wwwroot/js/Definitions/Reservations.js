@@ -185,6 +185,8 @@
     }
 
     // ---------- modal helpers ----------
+    const isAr = (typeof theMainLang !== "undefined" && theMainLang === "ar");
+    const tr = (en, ar) => (isAr ? ar : en);
     function formatDateDisplay(dateStr) {
         if (!dateStr) return "";
         const d = new Date(dateStr);
@@ -240,12 +242,39 @@
         $('#reservationDetailsModal').remove();
 
         const many = list.length > 1;
-        const title = many ? 'Reservations' : 'Reservation details';
+
+        const title = many
+            ? tr('Reservations', 'الحجوزات')
+            : tr('Reservation details', 'تفاصيل الحجز');
+
+        const subTitle = many
+            ? tr(`${list.length} reservations in this slot`, `${list.length} حجز في هذه الفترة`)
+            : '';
+
+        const txt = {
+            noDetails: tr('No reservation details found.', 'لم يتم العثور على تفاصيل للحجز.'),
+            noDesc: tr('No description provided', 'لا يوجد وصف'),
+            duration: tr('Duration', 'المدة'),
+            minutes: tr('min', 'دقيقة'),
+            chassis: tr('Chassis', 'رقم الشاصي'),
+            company: tr('Company', 'الشركة'),
+            startTime: tr('Start time', 'وقت البدء'),
+            endTime: tr('End time', 'وقت الانتهاء'),
+            description: tr('Description', 'الوصف'),
+            reservationId: tr('Reservation ID', 'رقم الحجز'),
+            close: tr('Close', 'إغلاق'),
+            idLabel: tr('ID', 'رقم الحجز'),
+            noPlate: tr('No plate', 'بدون لوحة'),
+            durationPrefix: tr('Duration:', 'المدة:')
+        };
+
+        const endAlign = isAr ? 'text-start' : 'text-end';
+        const modalDir = isAr ? 'rtl' : 'ltr';
 
         let bodyHtml = '';
 
         if (!list.length) {
-            bodyHtml = `<p class="text-muted mb-0">No reservation details found.</p>`;
+            bodyHtml = `<p class="text-muted mb-0">${txt.noDetails}</p>`;
         } else if (!many) {
             const r = list[0];
 
@@ -253,10 +282,15 @@
             const timeText = `${formatTimeDisplay(r.start_Time || r.startTime)} – ${formatTimeDisplay(r.end_Time || r.endTime)}`;
             const plate = r.plate_Number || r.plateNumber || '—';
             const chassis = r.chassis || r.Chassis || '—';
-            const company = r.customerName || r.customerName || r.customerName || '—';
+            const company = r.customerName || r.companyName || r.CompanyName || '—';
             const status = r.statusPrimaryName || r.statusSecondaryName || '—';
-            const duration = r.duration != null ? `${r.duration} min` : '—';
-            const description = (r.description || '').trim() || '<span class="text-muted">No description provided</span>';
+
+            const duration = (r.duration != null)
+                ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
+                : '—';
+
+            const description = (r.description || '').trim()
+                || `<span class="text-muted">${txt.noDesc}</span>`;
 
             bodyHtml = `
             <div class="resv-modal-summary mb-3">
@@ -268,57 +302,64 @@
                         <i class="bi bi-clock me-1"></i>${timeText}
                     </div>
                     <div class="text-muted small mt-1">
-                        <i class="bi bi-hash me-1"></i>ID ${r.id}
+                        <i class="bi bi-hash me-1"></i>${txt.idLabel} ${r.id}
                     </div>
                 </div>
-                <div class="text-end">
+                <div class="${endAlign}">
                     <div class="mb-2">
                         <span class="badge resv-status-badge">${status}</span>
                     </div>
-                    <div class="small text-muted">Duration</div>
+                    <div class="small text-muted">${txt.duration}</div>
                     <div class="fw-semibold">${duration}</div>
                 </div>
             </div>
 
             <div class="resv-modal-grid mb-3">
                 <div class="resv-field">
-                    <div class="resv-label">Chassis</div>
+                    <div class="resv-label">${txt.chassis}</div>
                     <div class="resv-value">${chassis}</div>
                 </div>
                 <div class="resv-field">
-                    <div class="resv-label">Company</div>
+                    <div class="resv-label">${txt.company}</div>
                     <div class="resv-value">${company}</div>
                 </div>
                 <div class="resv-field">
-                    <div class="resv-label">Start time</div>
+                    <div class="resv-label">${txt.startTime}</div>
                     <div class="resv-value">${formatTimeDisplay(r.start_Time || r.startTime)}</div>
                 </div>
                 <div class="resv-field">
-                    <div class="resv-label">End time</div>
+                    <div class="resv-label">${txt.endTime}</div>
                     <div class="resv-value">${formatTimeDisplay(r.end_Time || r.endTime)}</div>
                 </div>
             </div>
 
             <div class="resv-description-card">
-                <div class="resv-label mb-1">Description</div>
-                <div class="resv-description text-truncate">${description.replace(/\n/g, '<br>')}</div>
+                <div class="resv-label mb-1">${txt.description}</div>
+                <div class="resv-description text-truncate">${String(description).replace(/\n/g, '<br>')}</div>
             </div>
         `;
         } else {
             bodyHtml += `<div class="accordion" id="resDetailsAccordion">`;
+
             list.forEach((r, idx) => {
                 const idSafe = r.id || idx;
                 const collapseId = `resDetails-${idSafe}`;
                 const headingId = `heading-${idSafe}`;
 
-                const plate = r.plate_Number || r.plateNumber || 'No plate';
+                const plate = r.plate_Number || r.plateNumber || txt.noPlate;
                 const dateText = formatDateDisplay(r.date);
                 const timeText = `${formatTimeDisplay(r.start_Time || r.startTime)} – ${formatTimeDisplay(r.end_Time || r.endTime)}`;
                 const status = r.statusPrimaryName || r.statusSecondaryName || '—';
-                const duration = r.duration != null ? `${r.duration} min` : '—';
+
+                const duration = (r.duration != null)
+                    ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
+                    : '—';
+
                 const chassis = r.chassis || r.Chassis || '—';
-                const company = r.companyName || r.companyId || r.CompanyId || '—';
-                const description = (r.description || '').trim() || '<span class="text-muted">No description provided</span>';
+                const company = r.companyName || r.customerName || r.companyId || r.CompanyId || '—';
+
+                const description = (r.description || '').trim()
+                    || `<span class="text-muted">${txt.noDesc}</span>`;
 
                 const showClass = idx === 0 ? 'show' : '';
                 const expanded = idx === 0 ? 'true' : 'false';
@@ -335,68 +376,70 @@
                                     <div class="fw-semibold">${plate}</div>
                                     <div class="small text-muted">${dateText} • ${timeText}</div>
                                 </div>
-                                <div class="text-end">
+                                <div class="${endAlign}">
                                     <div><span class="badge resv-status-badge">${status}</span></div>
-                                    <div class="small text-muted mt-1">Duration: ${duration}</div>
+                                    <div class="small text-muted mt-1">${txt.durationPrefix} ${duration}</div>
                                 </div>
                             </div>
                         </button>
                     </h2>
+
                     <div id="${collapseId}" class="accordion-collapse collapse ${showClass}"
                          aria-labelledby="${headingId}" data-bs-parent="#resDetailsAccordion">
                         <div class="accordion-body">
                             <div class="resv-modal-grid mb-3">
                                 <div class="resv-field">
-                                    <div class="resv-label">Reservation ID</div>
+                                    <div class="resv-label">${txt.reservationId}</div>
                                     <div class="resv-value">${r.id}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">Chassis</div>
+                                    <div class="resv-label">${txt.chassis}</div>
                                     <div class="resv-value">${chassis}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">Company</div>
+                                    <div class="resv-label">${txt.company}</div>
                                     <div class="resv-value">${company}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">Start time</div>
+                                    <div class="resv-label">${txt.startTime}</div>
                                     <div class="resv-value">${formatTimeDisplay(r.start_Time || r.startTime)}</div>
                                 </div>
                                 <div class="resv-field">
-                                    <div class="resv-label">End time</div>
+                                    <div class="resv-label">${txt.endTime}</div>
                                     <div class="resv-value">${formatTimeDisplay(r.end_Time || r.endTime)}</div>
                                 </div>
                             </div>
 
                             <div class="resv-description-card">
-                                <div class="resv-label mb-1">Description</div>
-                                <div class="resv-description text-truncate">${description.replace(/\n/g, '<br>')}</div>
+                                <div class="resv-label mb-1">${txt.description}</div>
+                                <div class="resv-description text-truncate">${String(description).replace(/\n/g, '<br>')}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
             });
+
             bodyHtml += `</div>`;
         }
 
         const modalHtml = `
-<div class="modal fade resv-details-modal" id="reservationDetailsModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade resv-details-modal" id="reservationDetailsModal" tabindex="-1" aria-hidden="true" dir="${modalDir}">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header border-0 pb-0">
         <div>
             <h5 class="modal-title fw-semibold">${title}</h5>
-            ${many ? `<div class="text-muted small">${list.length} reservations in this slot</div>` : ''}
+            ${many ? `<div class="text-muted small">${subTitle}</div>` : ''}
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${txt.close}"></button>
       </div>
       <div class="modal-body pt-3">
         ${bodyHtml}
       </div>
       <div class="modal-footer border-0 justify-content-center pt-0">
         <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-            Close
+            ${txt.close}
         </button>
       </div>
     </div>
@@ -404,11 +447,14 @@
 </div>`;
 
         container.html(modalHtml);
+
         const modalEl = document.getElementById('reservationDetailsModal');
         if (!modalEl) return;
+
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
     }
+
 
     // ---------- Overlay helpers (vertical bars) ----------
     function getResGridBits() {
