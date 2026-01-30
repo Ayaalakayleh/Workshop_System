@@ -17,58 +17,67 @@ function initializeItemSelectionGrid() {
             paging: true
         },
         columns: [
-            { dataField: "id", caption: "ID", visible: false },
-            { dataField: "code", caption: "Code", allowEditing: false },
+            { dataField: "id", caption: theMainLang == "en" ? "ID" : "الرقم", visible: false },
+            { dataField: "code", caption: theMainLang == "en" ? "Code" : "الرمز", allowEditing: false },
             {
-                dataField: "Name", caption: "Name", allowEditing: false,
+                dataField: "Name",
+                caption: theMainLang == "en" ? "Name" : "الاسم",
+                allowEditing: false,
                 calculateDisplayValue: function (rowData) {
                     return lang === "en" ? rowData?.primaryName : rowData?.secondaryName;
                 }
             },
-            { dataField: "primaryName", caption: "PrimaryName", visible: false },
-            { dataField: "secondaryName", caption: "SecondaryName", visible: false },
-            { dataField: "fK_CategoryId", caption: "CategoryId", visible: false },
+            { dataField: "primaryName", caption: theMainLang == "en" ? "Primary Name" : "الاسم الأساسي", visible: false },
+            { dataField: "secondaryName", caption: theMainLang == "en" ? "Secondary Name" : "الاسم الثانوي", visible: false },
+            { dataField: "fK_CategoryId", caption: theMainLang == "en" ? "CategoryId" : "رمز الفئة", visible: false },
             {
                 dataField: "CategoryName",
-                caption: "CategoryName",
+                caption: theMainLang == "en" ? "Category Name" : "اسم الفئة",
                 allowEditing: false,
                 calculateDisplayValue: function (rowData) {
                     return lang === "en" ? rowData?.categoryPrimaryName : rowData?.categorySecondaryName;
                 }
             },
-            { dataField: "categoryPrimaryName", caption: "CategoryPrimaryName", visible: false },
-            { dataField: "categorySecondaryName", caption: "CategorySecondaryName", visible: false },
-            { dataField: "fK_SubCategoryId", caption: "SubCategory", visible: false },
+            { dataField: "categoryPrimaryName", caption: theMainLang == "en" ? "Category Primary Name" : "الاسم الأساسي للفئة", visible: false },
+            { dataField: "categorySecondaryName", caption: theMainLang == "en" ? "Category Secondary Name" : "الاسم الثانوي للفئة", visible: false },
+            { dataField: "fK_SubCategoryId", caption: theMainLang == "en" ? "Sub Category" : "الفئة الفرعية", visible: false },
             {
                 dataField: "SubCategoryName",
-                caption: "Sub Category",
+                caption: theMainLang == "en" ? "Sub Category" : "الفئة الفرعية",
                 allowEditing: false,
                 calculateDisplayValue: function (rowData) {
                     return lang === "en" ? rowData?.subCategoryPrimaryName : rowData?.subCategorySecondaryName;
                 }
             },
-            { dataField: "subCategoryPrimaryName", caption: "subCategoryPrimaryName", visible: false },
-            { dataField: "subCategorySecondaryName", caption: "subCategorySecondaryName", visible: false },
-            { dataField: "fK_UnitId", caption: "Unit", visible: false },
+            { dataField: "subCategoryPrimaryName", caption: theMainLang == "en" ? "Sub Category Primary Name" : "الاسم الأساسي للفئة الفرعية", visible: false },
+            { dataField: "subCategorySecondaryName", caption: theMainLang == "en" ? "Sub Category Secondary Name" : "الاسم الثانوي للفئة الفرعية", visible: false },
+
+            { dataField: "fK_UnitId", caption: theMainLang == "en" ? "Unit" : "الوحدة", visible: false },
             {
-                dataField: "UnitName", caption: "Unit", allowEditing: false,
+                dataField: "UnitName",
+                caption: theMainLang == "en" ? "Unit" : "الوحدة",
+                allowEditing: false,
                 calculateDisplayValue: function (rowData) {
                     return lang === "en" ? rowData?.unitPrimaryName : rowData?.unitSecondaryName;
                 }
             },
-            { dataField: "unitPrimaryName", caption: "unitPrimaryName", visible: false },
-            { dataField: "unitSecondaryName", caption: "unitSecondaryName", visible: false },
-            { dataField: "avgCost", caption: "Price", dataType: "number", allowEditing: false, visible: true },
-            { dataField: "price", caption: "Price", dataType: "number", allowEditing: false, visible: false },
-            { dataField: "costPrice", caption: "Cost", dataType: "number", allowEditing: false, visible: false },
-            { dataField: "salePrice", caption: "salePrice", dataType: "number", allowEditing: false, visible: false },
+            { dataField: "unitPrimaryName", caption: theMainLang == "en" ? "Unit Primary Name" : "الاسم الأساسي للوحدة", visible: false },
+            { dataField: "unitSecondaryName", caption: theMainLang == "en" ? "Unit Secondary Name" : "الاسم الثانوي للوحدة", visible: false },
 
-            { dataField: "warehouseId", caption: "Warehouse", allowEditing: false, visible: false },
-            { dataField: "warehouse", caption: "Warehouse", allowEditing: false, visible: true },
-            { dataField: "locatorId", caption: "locatorId", dataType: "number", allowEditing: false, visible: false },
-            { dataField: "locatorCode", caption: "locatorCode", allowEditing: false, visible: true },
-            { dataField: "availableQty", caption: "availableQty", allowEditing: false, visible: true },
+            { dataField: "avgCost", caption: theMainLang == "en" ? "Avg Cost" : "معدل السعر", dataType: "number", allowEditing: false, visible: true },
+            { dataField: "price", caption: theMainLang == "en" ? "Price" : "السعر", dataType: "number", allowEditing: false, visible: false },
+            { dataField: "costPrice", caption: theMainLang == "en" ? "Cost" : "التكلفة", dataType: "number", allowEditing: false, visible: false },
+            { dataField: "salePrice", caption: theMainLang == "en" ? "Sale Price" : "سعر البيع", dataType: "number", allowEditing: false, visible: false },
+
+            { dataField: "warehouseId", caption: theMainLang == "en" ? "Warehouse ID" : "رقم المستودع", allowEditing: false, visible: false },
+            { dataField: "warehouse", caption: theMainLang == "en" ? "Warehouse" : "المستودع", allowEditing: false, visible: true },
+
+            { dataField: "locatorId", caption: theMainLang == "en" ? "Locator Id" : "رقم الموقع", dataType: "number", allowEditing: false, visible: false },
+            { dataField: "locatorCode", caption: theMainLang == "en" ? "Locator Code" : "رمز الموقع", allowEditing: false, visible: true },
+
+            { dataField: "availableQty", caption: theMainLang == "en" ? "Available Qty" : "الكمية المتاحة", allowEditing: false, visible: true },
         ],
+
         showBorders: true,
         allowColumnReordering: true,
         allowColumnResizing: true,

@@ -279,25 +279,20 @@
     }
 
     .scratches-container {
-        display: flex;
-        justify-content: center;
+        overflow-x:auto;
+        width: 100%;
     }
 
     .mark-scratces-section #panel,
     .mark-scratces-section #panel-edit,
     #panel-canvas {
         position: relative;
-        width: 1000px;
-        height: 500px;
+        height: 394px;
         border: 1px dashed #ccc;
         border-radius: .5rem;
         background-image: url('@Url.Content("~/images/tajeer-car-assets/tajeer-car.jpeg")');
         background-size: cover;
-        background-position: center;
         background-repeat: no-repeat;
-        padding: 45px;
-        background-origin: content-box;
-        background-color: #f5f5f5;
         margin: 0 auto;
     }
 
@@ -345,6 +340,11 @@
 
     .mark-scratces-section #bend-in-body {
         background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
+    }
+    @@media (max-width: 450px) {
+    .mark-scratces-section #panel{
+        width:55rem
+    }
     }
 </style>
 
@@ -629,7 +629,7 @@
                         <div class="col-12 my-3">
                             <fieldset class="ui-fieldset">
                                 <legend>@Common["MovementIn"]</legend>
-                                <div class="row mark-scratces-section">
+                                <div class="row mark-scratces-section justify-content-center">
                                     <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 border-left">
                                         <div class="scratch-controls text-center">
                                             <button type="button" class="btn btn-outline-primary btn-sm btn-w-m damage-btn" id="DeepScratch-btn">

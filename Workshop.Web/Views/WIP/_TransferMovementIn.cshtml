@@ -9,7 +9,6 @@
 @{
     var lang = "en";
 }
-
 <div class="row mb-3">
     <div class="col-12">
         <div class="btn-group btn-group-toggle w-100" data-toggle="buttons" id="invoiceTypeToggle">
@@ -41,6 +40,7 @@
         @Html.HiddenFor(a => a.VatRate)
         @Html.HiddenFor(a => a.WorkOrderId)
         @Html.Hidden("FixedServiceIds", "", new { id = "FixedServiceIds" })
+
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
@@ -78,6 +78,7 @@
                                 : new { @class = "form-control select2", @id = "OutfuelLevelId" })
             </div>
         </div>
+
         <div class="col-lg-6">
             <div class="form-group">
                 <label class="font-normal ">@Common["Label_Driver"]</label>
@@ -144,6 +145,7 @@
             </div>
         </div>
     </div>
+
     <div class="row mt-2">
         <div class="col-12">
             <form role="form">
@@ -154,6 +156,7 @@
             </form>
         </div>
     </div>
+
     <div class="row mt-2">
         <div class="col-12">
             <div id="panel-1" class="panel">
@@ -203,7 +206,9 @@
         </div>
 
         <div class="text-center mt-4">
-            <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;@Common["Save"]</button>
+            <button type="button" id="btnCreate" onclick="ValidOut();" class="btn btn-primary">
+                <i class="fa fa-save"></i>&nbsp;@Common["Save"]
+            </button>
         </div>
     }
 </div>
@@ -264,19 +269,19 @@
             <!-- Petty Cash Expense Fields -->
             <div class="col-6">
                 <div class="form-group">
-                    <label>Request No <span class="text-danger">*</span></label>
+                    <label>@Common["Label_RequestNo"] <span class="text-danger">*</span></label>
                     <select id="PettyCash_RequestNo" name="PettyCash_RequestNo" class="form-control select2" required>
                         <option value="">@Common["Select"]</option>
                     </select>
                     <div class="text-right mt-1">
-                        <small class="text-muted">Balance: <span id="PettyCash_UserBalance" class="text-success font-weight-bold">0.00</span></small>
+                        <small class="text-muted">@Common["Label_Balance"]: <span id="PettyCash_UserBalance" class="text-success font-weight-bold">0.00</span></small>
                     </div>
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Expense Type <span class="text-danger">*</span></label>
+                    <label>@Common["Label_ExpenseType"] <span class="text-danger">*</span></label>
                     <select id="PettyCash_ExpenseType" name="PettyCash_ExpenseType" class="form-control select2" required>
                         <option value="">@Common["Select"]</option>
                     </select>
@@ -285,7 +290,7 @@
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Type of Expense <span class="text-danger">*</span></label>
+                    <label>@Common["Label_TypeOfExpense"] <span class="text-danger">*</span></label>
                     <select id="PettyCash_TypeOfExpense" name="PettyCash_TypeOfExpense" class="form-control select2" required>
                         <option value="">@Common["Select"]</option>
                     </select>
@@ -294,24 +299,24 @@
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Seller Name <span class="text-danger">*</span></label>
+                    <label>@Common["Label_SellerName"] <span class="text-danger">*</span></label>
                     <select id="PettyCash_SellerId" name="PettyCash_SellerId" class="form-control select2" required>
                         <option value="">@Common["Select"]</option>
-                        <option value="-1" style="color:#1ab394; font-weight: 600;">+ Create New Seller</option>
+                        <option value="-1" style="color:#1ab394; font-weight: 600;">@Common["Text_CreateNewSeller"]</option>
                     </select>
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Invoice No <span class="text-danger">*</span></label>
-                    <input type="text" id="PettyCash_InvoiceNo" name="PettyCash_InvoiceNo" class="form-control" placeholder="@Common["Invoice No"]" required />
+                    <label>@Common["Label_InvoiceNo"] <span class="text-danger">*</span></label>
+                    <input type="text" id="PettyCash_InvoiceNo" name="PettyCash_InvoiceNo" class="form-control" placeholder="@Common["Label_InvoiceNo"]" required />
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Invoice Date <span class="text-danger">*</span></label>
+                    <label>@Common["Label_InvoiceDate"] <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <input type="date" class="form-control" id="PettyCash_InvoiceDate" name="PettyCash_InvoiceDate" required />
                     </div>
@@ -320,7 +325,7 @@
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Currency <span class="text-danger">*</span></label>
+                    <label>@Common["Label_Currency"] <span class="text-danger">*</span></label>
                     <select id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" class="form-control select2" required>
                         <option value="">@Common["Select"]</option>
                     </select>
@@ -343,7 +348,7 @@
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Total Invoice</label>
+                    <label>@Common["Label_TotalInvoice"]</label>
                     <input type="number" id="PettyCash_TotalInvoice" name="PettyCash_TotalInvoice" class="form-control" step="0.01" readonly />
                 </div>
             </div>
@@ -357,7 +362,7 @@
 
             <div class="col-6">
                 <div class="form-group">
-                    <label>Net Amount</label>
+                    <label>@Common["Label_NetAmount"]</label>
                     <input type="number" id="PettyCash_NetAmount" name="PettyCash_NetAmount" class="form-control" step="0.01" readonly />
                 </div>
             </div>
@@ -366,21 +371,21 @@
                 <div class="form-group">
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" id="PettyCash_NotTaxable" name="PettyCash_NotTaxable" onchange="calculatePettyCashAmounts()" />
-                        <label class="form-check-label" for="PettyCash_NotTaxable">Not Taxable</label>
+                        <label class="form-check-label" for="PettyCash_NotTaxable">@Common["Label_NotTaxable"]</label>
                     </div>
                 </div>
             </div>
 
             <div class="col-12">
                 <div class="form-group">
-                    <label>Description <span class="text-danger">*</span></label>
+                    <label>@Common["Label_Description"] <span class="text-danger">*</span></label>
                     <textarea id="PettyCash_Description" name="PettyCash_Description" class="form-control" rows="3" required></textarea>
                 </div>
             </div>
 
             <div class="col-12">
                 <div class="form-group">
-                    <label>Upload Invoice <span class="text-warning"> (pdf, png, jpeg allowed)</span></label>
+                    <label>@Common["Label_UploadInvoice"] <span class="text-warning">@Common["Hint_FileTypesAllowed"]</span></label>
                     <input type="file" id="PettyCash_Files" name="PettyCash_Files" class="form-control" accept=".pdf,.png,.jpg,.jpeg" />
                 </div>
             </div>
@@ -444,7 +449,7 @@
 
         <div class="text-center mt-4">
             <button type="button" id="btnCreatePettyCash" onclick="ValidPettyCashOut();" class="btn btn-success">
-                <i class="fa fa-save"></i>&nbsp;Save Petty Cash Invoice
+                <i class="fa fa-save"></i>&nbsp;@Common["Button_SavePettyCashInvoice"]
             </button>
         </div>
     }
@@ -455,28 +460,28 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Seller</h5>
+                <h5 class="modal-title">@Common["Title_AddNewSeller"]</h5>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="SellerPrimaryName">Name (English) <span class="text-danger">*</span></label>
+                    <label for="SellerPrimaryName">@Common["Label_NameEnglish"] <span class="text-danger">*</span></label>
                     <input id="SellerPrimaryName" type="text" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <label for="SellerSecondaryName">Name (Arabic) <span class="text-danger">*</span></label>
+                    <label for="SellerSecondaryName">@Common["Label_NameArabic"] <span class="text-danger">*</span></label>
                     <input id="SellerSecondaryName" type="text" class="form-control" dir="rtl" required />
                 </div>
                 <div class="form-group">
-                    <label for="SellerTaxNumber">Tax Number</label>
+                    <label for="SellerTaxNumber">@Common["Label_TaxNumber"]</label>
                     <input id="SellerTaxNumber" type="text" class="form-control" />
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" onclick="AddSeller()" class="btn btn-primary">
-                    <i class="fa fa-save"></i>&nbsp;Save
+                    <i class="fa fa-save"></i>&nbsp;@Common["Save"]
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="$('#AddSellerModal').modal('hide'); $('#PettyCash_SellerId').val('');">
-                    <i class="fa fa-times"></i>&nbsp;Cancel
+                    <i class="fa fa-times"></i>&nbsp;@Common["Cancel"]
                 </button>
             </div>
         </div>

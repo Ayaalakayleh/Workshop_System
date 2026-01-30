@@ -72,6 +72,20 @@
           rel="stylesheet"
           href="@Url.Content("~/smartadmin-5-styles/css/themes/earth.css")"
           asp-append-version="true" />
+          <script>
+(function () {
+  const KEY = 'sa-theme-style';
+  const DEFAULT = 'earth';
+  const THEMES = ['earth','olive','nebula','solar','lunar','night','aurora','flare','storm']; // keep in sync with your files
+  const base = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
+
+  const saved = (localStorage.getItem(KEY) || '').toLowerCase().trim();
+  const theme = THEMES.includes(saved) ? saved : DEFAULT;
+
+  const link = document.getElementById('theme-style');
+  if (link) link.href = base + theme + '.css';
+})();
+</script>
 
     <link rel="stylesheet" media="screen, print" href="~/smartadmin-5-styles/plugins/waves/waves.min.css" />
 
@@ -1163,7 +1177,7 @@
 </script>
 
 <script>
-    (() => {
+  @*   (() => {
         const themeBase = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
         const themeLink = document.getElementById('theme-style');
 
@@ -1189,7 +1203,7 @@
                 applyTheme(el.dataset.themeStyle);
             }
         }, true);
-    })();
+    })(); *@
     /*Start fix change Lang/Branch on mobile menu*/
     document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".dropdown-menu .dropdown-toggle").forEach((toggle) => {

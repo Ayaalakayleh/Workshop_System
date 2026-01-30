@@ -15,11 +15,11 @@ function initialize_RTSGrid() {
             paging: true
         },
         columns: [
-            { dataField: "id", caption: "ID", visible: false },
-            { dataField: "code", caption: "Code", allowEditing: false },
-            { dataField: "primaryName", caption: "Name EN", allowEditing: false },
-            { dataField: "secondaryName", caption: "Name AR", allowEditing: false },
-            { dataField: "hours", caption: "Hours", allowEditing: false },
+            { dataField: "id", caption: theMainLang == "en" ? "ID" : "الرقم", visible: false },
+            { dataField: "code", caption: theMainLang == "en" ? "Code" : "الرمز", allowEditing: false },
+            { dataField: "primaryName", caption: theMainLang == "en" ? "Name (EN)" : "الاسم باللغة الإنجليزية", allowEditing: false },
+            { dataField: "secondaryName", caption: theMainLang == "en" ? "Name (AR)" : "الاسم باللغة العربية", allowEditing: false },
+            { dataField: "hours", caption: theMainLang == "en" ? "Hours" : "الساعات", allowEditing: false },
             //{ dataField: "price", caption: "Price", allowEditing: false },
             //{ dataField: "fK_SkillId", caption: "SkillId", visible: false },
         ],
