@@ -1376,6 +1376,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 /* End DevExtreme Global RTL + Dark + Responsive */
+// Stop DataTables from showing alert() popups
+$.fn.dataTable.ext.errMode = 'none';
+$(document).on('error.dt', function (e, settings, techNote, message) {
+  console.warn('DataTables:', message);
+});
 
 </script>
 
