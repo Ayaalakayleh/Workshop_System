@@ -106,25 +106,26 @@
 
                             @Html.ValidationMessageFor(m => m.WorkOrderForm.Description, "", new { @class = "text-danger" })
                         </div>
-
-                        <div class="col-md-6 col-sm-12 my-1" id="showAgreement" style="display:none">
-                            <div class="form-group">
-                                <div class="col-md-6 mb-3">
-                                    @Html.LabelFor(m => m.WorkOrderForm.FkAgreementId, Common["Label_AgreementId"].Value, new { @class = "form-label" })
-                                    @Html.DropDownListFor(m => m.WorkOrderForm.FkAgreementId, new List<SelectListItem>(), Common["Select"].Value,
-                                                                        new { @class = "form-control", required = "required", id = "FK_AgreementId" })
-                                    @Html.ValidationMessageFor(m => m.WorkOrderForm.FkAgreementId, "", new { @class = "text-danger" })
+                        <div class="col-md-6 col-sm-12 my-1">
+                            <div class="col-md-12 col-sm-12 my-1" id="showAgreement" style="display:none">
+                                <div class="form-group">
+                                    <div class="col-md-12 mb-3">
+                                        @Html.LabelFor(m => m.WorkOrderForm.FkAgreementId, Common["Label_AgreementId"].Value, new { @class = "form-label" })
+                                        @Html.DropDownListFor(m => m.WorkOrderForm.FkAgreementId, new List<SelectListItem>(), Common["Select"].Value,
+                                                                            new { @class = "form-control", required = "required", id = "FK_AgreementId" })
+                                        @Html.ValidationMessageFor(m => m.WorkOrderForm.FkAgreementId, "", new { @class = "text-danger" })
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-6 col-sm-12 my-1" id="showVehicleMovemen" style="display:none">
-                            <div class="form-group">
-                                <div class="col-md-6 mb-3">
-                                    @Html.LabelFor(m => m.WorkOrderForm.FkVehicleMovementId, Common["Label_VehicleMovement"].Value, new { @class = "form-label" })
-                                    @Html.DropDownListFor(m => m.WorkOrderForm.FkVehicleMovementId, ViewBag.FkVehicleMovementId as List<SelectListItem>, Common["Select"].Value,
-                                                                        new { @class = "form-control", required = "required", id = "FkVehicleMovementId" })
-                                    @Html.ValidationMessageFor(m => m.WorkOrderForm.FkVehicleMovementId, "", new { @class = "text-danger" })
+                            <div class="col-md-12 col-sm-12 my-1" id="showVehicleMovemen" style="display:none">
+                                <div class="form-group">
+                                    <div class="col-md-12 mb-3">
+                                        @Html.LabelFor(m => m.WorkOrderForm.FkVehicleMovementId, Common["Label_VehicleMovement"].Value, new { @class = "form-label" })
+                                        @Html.DropDownListFor(m => m.WorkOrderForm.FkVehicleMovementId, ViewBag.FkVehicleMovementId as List<SelectListItem>, Common["Select"].Value,
+                                                                            new { @class = "form-control", required = "required", id = "FkVehicleMovementId" })
+                                        @Html.ValidationMessageFor(m => m.WorkOrderForm.FkVehicleMovementId, "", new { @class = "text-danger" })
+                                    </div>
                                 </div>
                             </div>
                         </div>

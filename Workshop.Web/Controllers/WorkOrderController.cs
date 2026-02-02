@@ -199,7 +199,7 @@ namespace Workshop.Web.Controllers
             var agreement = new List<Agreement>();
             if (VehicleDefinitionId > 0)
             {
-                agreement = await _vehicleApiClient.GetLastAgreement(lang, 6193);
+                agreement = await _vehicleApiClient.GetAgreementbyVehicleId(VehicleDefinitionId);
             }
             return Json(agreement);
         }
@@ -209,7 +209,7 @@ namespace Workshop.Web.Controllers
             var movement = new VehicleMovement();
             if (VehicleDefinitionId > 0)
             {
-                movement = await _vehicleApiClient.GetVehicleMovement(6193);
+                movement = await _vehicleApiClient.GetVehicleMovement(VehicleDefinitionId);
             }
             return Json(movement);
         }
