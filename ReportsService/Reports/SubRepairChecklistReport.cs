@@ -16,14 +16,14 @@ namespace ReportsService.Reports {
     using CrystalDecisions.CrystalReports.Engine;
     
     
-    public class CrystalReport1 : ReportClass {
+    public class SubRepairChecklistReport : ReportClass {
         
-        public CrystalReport1() {
+        public SubRepairChecklistReport() {
         }
         
         public override string ResourceName {
             get {
-                return "CrystalReport1.rpt";
+                return "SubRepairChecklistReport.rpt";
             }
             set {
                 // Do nothing
@@ -41,7 +41,7 @@ namespace ReportsService.Reports {
         
         public override string FullResourceName {
             get {
-                return "ReportsService.Reports.CrystalReport1.rpt";
+                return "ReportsService.Reports.SubRepairChecklistReport.rpt";
             }
             set {
                 // Do nothing
@@ -87,20 +87,12 @@ namespace ReportsService.Reports {
                 return this.ReportDefinition.Sections[4];
             }
         }
-        
-        [Browsable(false)]
-        [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.Shared.IParameterField Parameter_ReportTitle {
-            get {
-                return this.DataDefinition.ParameterFields[0];
-            }
-        }
     }
     
     [System.Drawing.ToolboxBitmapAttribute(typeof(CrystalDecisions.Shared.ExportOptions), "report.bmp")]
-    public class CachedCrystalReport1 : Component, ICachedReport {
+    public class CachedSubRepairChecklistReport : Component, ICachedReport {
         
-        public CachedCrystalReport1() {
+        public CachedSubRepairChecklistReport() {
         }
         
         [Browsable(false)]
@@ -137,7 +129,7 @@ namespace ReportsService.Reports {
         }
         
         public virtual CrystalDecisions.CrystalReports.Engine.ReportDocument CreateReport() {
-            CrystalReport1 rpt = new CrystalReport1();
+            SubRepairChecklistReport rpt = new SubRepairChecklistReport();
             rpt.Site = this.Site;
             return rpt;
         }

@@ -42,6 +42,7 @@ namespace Workshop.Web.Controllers
         private readonly VehicleApiClient _vehicleApiClient;
         private readonly InventoryApiClient _inventoryApiClient;
         private readonly ERPApiClient _erpApiClient;
+        private readonly ReportsServiceApiClient _reportsServiceApiClient;
         private readonly IFileService _fileService;
         private readonly IFileValidationService _fileValidationService;
         private readonly ILogger<WIPController> _logger;
@@ -54,6 +55,7 @@ namespace Workshop.Web.Controllers
             WorkshopApiClient apiClient,
             InventoryApiClient inventoryApiClient,
             ERPApiClient erpApiClient,
+            ReportsServiceApiClient repo,
             IConfiguration configuration,
             IWebHostEnvironment env,
             IFileService fileService,
@@ -66,6 +68,7 @@ namespace Workshop.Web.Controllers
             _vehicleApiClient = vehicleApiClient;
             _apiClient = apiClient;
             _inventoryApiClient = inventoryApiClient;
+            _reportsServiceApiClient = repo;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
             _fileService = fileService;
             _fileValidationService = fileValidationService;
@@ -2430,8 +2433,8 @@ namespace Workshop.Web.Controllers
                 var user = await _erpApiClient.GetUserInfoById((int)Details.CreatedBy);
                 model.UserPhoeNo = user.PhoneNo;
                 model.CreatedDate = Details.CreatedAt?.ToString("dd-MM-yyyy");
-                var oo = await _apiClient.WIP_GetOptionsById(Id);
-                model.RepeatRepair = oo.RepeatRepair == true ? "Yes" : "No";
+                var options = await _apiClient.WIP_GetOptionsById(Id);
+                model.RepeatRepair = options.RepeatRepair == true ? "Yes" : "No";
 
                 //if(vehicleInfo.VIN != null)
                 //{
@@ -2439,8 +2442,14 @@ namespace Workshop.Web.Controllers
                 //    var recallResponse = await _apiClient.GetActiveRecallsByChassis(vehicleInfo.VIN);
                 //     ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
                 //}
-               
-                return View(model);
+
+
+                //return View(model);
+                //Crystal Report
+                var bytes = await _reportsServiceApiClient.RepairOrderRequestReportAsync(model);
+
+                Response.Headers["Content-Disposition"] = "inline; filename=Wip.pdf";
+                return File(bytes, "application/pdf");
             }
             catch (Exception ex)
             {

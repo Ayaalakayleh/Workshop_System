@@ -11,6 +11,7 @@ namespace Workshop.Web.Extensions
             var accountingUrl = configuration["ApiSettings:AccountingApiUrl"]!;
             var vehicleUrl = configuration["ApiSettings:VehicleApiUrl"]!;
             var inventoryUrl = configuration["ApiSettings:InventoryApiUrl"]!;
+            var reportsServiceUrl = configuration["ApiSettings:ReportsServiceUrl"]!;
 
             // Internal API clients (using BaseUrl)
             services.AddHttpClient<WorkshopApiClient>(client =>
@@ -42,6 +43,12 @@ namespace Workshop.Web.Extensions
             services.AddHttpClient<InventoryApiClient>(client =>
             {
                 client.BaseAddress = new Uri(inventoryUrl);
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
+
+            services.AddHttpClient<ReportsServiceApiClient>(client =>
+            {
+                client.BaseAddress = new Uri(reportsServiceUrl);
                 client.Timeout = TimeSpan.FromSeconds(30);
             });
 

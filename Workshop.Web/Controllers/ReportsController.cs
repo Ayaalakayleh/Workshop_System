@@ -36,7 +36,7 @@ namespace Workshop.Web.Controllers
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
-   
+
         public async Task<IActionResult> MonthlyRepairCost()
         {
             var isCompanyCenterialized = 1;
