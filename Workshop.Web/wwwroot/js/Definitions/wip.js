@@ -1259,20 +1259,23 @@ async function evaluateAndUpdateWIPStatus() {
 
     let targetStatusId = null;
 
-    //Compleated
-    if ( serviceStatuses.length &&  itemStatuses.length && serviceStatuses.every(s => s === 25) && itemStatuses.every(s => s === 42) ) {
-       targetStatusId = 2031;
-    }
-    else if (itemStatuses.includes(41)) { //Waiting Parts
+    //Compleated service & Items
+    if (serviceStatuses.length > 0 && itemStatuses.length > 0 && serviceStatuses.every(s => s === 25 || s === 26) && itemStatuses.every(s => s === 42)) {
+        targetStatusId = 2031;
+    }//Compleated or Transfer Compleated
+    else if (serviceStatuses.length > 0 && itemStatuses.length == 0 && serviceStatuses.every(s => s === 25 || s === 26)) { 
+        targetStatusId = 2031;
+    }//Waiting Parts
+    else if (itemStatuses.length > 0 && itemStatuses.includes(41)) { 
         targetStatusId = 2027;
-    }
-    else if (serviceStatuses.includes(23)) { //Waiting Labour
+    }//Waiting Labour
+    else if (serviceStatuses.length > 0 && serviceStatuses.includes(23)) { 
         targetStatusId = 2028;
-    }
-    else if (serviceStatuses.length && serviceStatuses.every(s => s === 19)) { //Booked
+    }//Booked
+    else if (serviceStatuses.length > 0 && serviceStatuses.every(s => s === 19 || s === 24)) { //24: Transfer
         targetStatusId = 2025;
-    }
-    else if (serviceStatuses.length && serviceStatuses.every(s => s === 20)) { //WIP 
+    }//WIP 
+    else if (serviceStatuses.length > 0 && serviceStatuses.every(s => s === 20 || s === 24)) { 
         targetStatusId = 2026;
     }
 
