@@ -334,7 +334,11 @@ function loadShiftForEdit(id) {
 
                 $('#shiftModal').modal('show');
             } else {
-                alert(response.message);
+                Swal.fire({
+                    title: response.message,
+                    icon: 'error',
+                    confirmButtonText: resources.ok
+                });
             }
         },
         error: function () {
@@ -382,7 +386,11 @@ function deleteShift(id) {
                         });
                         loadShifts();
                     } else {
-                        alert(result.message);
+                        Swal.fire({
+                            title: result.message,
+                            icon: 'error',
+                            confirmButtonText: resources.ok
+                        });
                     }
                 },
                 error: function () {
