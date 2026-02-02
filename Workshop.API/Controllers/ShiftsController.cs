@@ -144,9 +144,12 @@ namespace Workshop.API.Controllers
 
                 var result = await _shiftService.DeleteAsync(id);
 
-                if (result <= 0)
-                    return NotFound(new { IsSuccess = false, Message = "Shift not found or could not be deleted" });
+                if (result == 0)
+                    return NotFound(new { IsSuccess = false, Message = "Shift not found" });
 
+                if (result == -1)
+                    return Conflict(new { IsSuccess = false, Message = "Cannot delete shift: there are technicians assigned." });
+ 
                 return Ok(new { IsSuccess = true, Message = "Shift deleted successfully" });
             }
             catch (ArgumentException ex)

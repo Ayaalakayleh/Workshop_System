@@ -1274,21 +1274,27 @@ namespace Workshop.Web.Services
                 if (response.StatusCode == HttpStatusCode.NotFound)
                     throw new KeyNotFoundException("Shift not found");
 
+                if (response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    var apiResult = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                    throw new InvalidOperationException(apiResult?.Message.ToString() ?? "Cannot delete shift: there are technicians assigned.");            
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
-                throw new ArgumentException("Invalid shift ID");
+                throw;
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new KeyNotFoundException("Shift not found");
+                throw;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error deleting shift {id}: {ex.Message}");
+                throw;
             }
         }
 

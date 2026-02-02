@@ -117,7 +117,11 @@ namespace Workshop.Web.Controllers
             try
             {
                 var result = await _apiClient.ShiftDeleteAsync(id);
-                return Json(new { success = result, message = result.IsSuccess ? "Shift deleted successfully" : "Failed to delete shift" });
+                return Json(new { success = result.IsSuccess, message = result.IsSuccess ? "Shift deleted successfully" : "Failed to delete shift" });
+            }
+            catch (InvalidOperationException ex) // 409 (there are technicians)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
