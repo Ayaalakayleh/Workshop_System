@@ -1411,76 +1411,149 @@ function CreateIssueVoucher(row) {
         data: formData,
         processData: false,
         contentType: false,
-        success: function (data) {
+        dataType: "json",
+        success: function (data, textStatus, xhr) {
             submitBtn.html(originalText).prop('disabled', false);
-
-            if (data == -2) {
-                Swal.fire({
-                    icon: 'error',
-                    title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                    confirmButtonText: resources.ok
-                });
-            } else if (data == -3) {
-                Swal.fire({
-                    icon: 'error',
-                    title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                    confirmButtonText: resources.ok
-                });
-            } else if (data == -4) {
-                Swal.fire({
-                    icon: 'error',
-                    title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                    confirmButtonText: resources.ok
-                });
-            } else {
-                if (data && (data.success === true || data.Success === true || !data.hasOwnProperty('success'))) {
-                    row.PartsIssueId = data.partsIssueId;
-                     ;
-                    const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                    grid.getDataSource().store().update(row.KeyId, row).then(() => {
-                        grid.refresh();
-                    });
-
-                    updateStatusItem(row, 42);
-                } else {
-                    const errorMessage =
-                        data.message ||
-                        data.Message ||
-                        "T.validationErrorDefault" ||
-                        'Failed to create the GRN due to validation errors.';
-                    Swal.fire({
-                        icon: 'error',
-                        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                        text: errorMessage,
-                        confirmButtonText: 'OK'
-                    });
-                }
+            if (typeof data === "string") {
+                try { data = JSON.parse(data); } catch (e) { }
             }
+
+            if (data && (data.success === true || data.Success === true)) {
+                row.PartsIssueId = data.partsIssueId || data.PartsIssueId;
+
+                const grid = $("#mainItemsGrid").dxDataGrid("instance");
+                grid.getDataSource().store().update(row.KeyId, row).then(() => grid.refresh());
+
+                updateStatusItem(row, 42);
+                return;
+            }
+            handleFailure(data);
+            //if (data == -2) {
+            //    Swal.fire({
+            //        icon: 'error',
+            //        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+            //        confirmButtonText: resources.ok
+            //    });
+            //} else if (data == -3) {
+            //    Swal.fire({
+            //        icon: 'error',
+            //        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+            //        confirmButtonText: resources.ok
+            //    });
+            //} else if (data == -4) {
+            //    Swal.fire({
+            //        icon: 'error',
+            //        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+            //        confirmButtonText: resources.ok
+            //    });
+            //} else {
+            //    if (data && (data.success === true || data.Success === true || !data.hasOwnProperty('success'))) {
+            //        row.PartsIssueId = data.partsIssueId;
+            //         ;
+            //        const grid = $("#mainItemsGrid").dxDataGrid("instance");
+            //        grid.getDataSource().store().update(row.KeyId, row).then(() => {
+            //            grid.refresh();
+            //        });
+
+            //        updateStatusItem(row, 42);
+            //    } else {
+            //        const errorMessage =
+            //            data.message ||
+            //            data.Message ||
+            //            "T.validationErrorDefault" ||
+            //            'Failed to create the GRN due to validation errors.';
+            //        Swal.fire({
+            //            icon: 'error',
+            //            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+            //            text: errorMessage,
+            //            confirmButtonText: 'OK'
+            //        });
+            //    }
+            //}
         },
         error: function (xhr) {
             submitBtn.html(originalText).prop('disabled', false);
 
-            let errorMessage = resources.error_msg;
-
-            if (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.Message)) {
-                errorMessage = xhr.responseJSON.message || xhr.responseJSON.Message;
-            } else if (xhr.responseText) {
-                try {
-                    const errorData = JSON.parse(xhr.responseText);
-                    errorMessage = errorData.message || errorData.Message || errorMessage;
-                } catch (e) { }
+            let data = xhr.responseJSON;
+            if (!data && xhr.responseText) {
+                try { data = JSON.parse(xhr.responseText); } catch (e) { }
             }
+
+            if (xhr.status === 409) {
+                handleFailure(data, true);
+                return;
+            }
+            const errorMessage =
+                (data && (data.message || data.Message)) ||
+                resources.error_msg;
+
+            //let errorMessage = resources.error_msg;
+
+            //if (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.Message)) {
+            //    errorMessage = xhr.responseJSON.message || xhr.responseJSON.Message;
+            //} else if (xhr.responseText) {
+            //    try {
+            //        const errorData = JSON.parse(xhr.responseText);
+            //        errorMessage = errorData.message || errorData.Message || errorMessage;
+            //    } catch (e) { }
+            //}
 
             Swal.fire({
                 icon: 'error',
                 title: resources.error,
-                text: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                text: errorMessage,
                 confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
             });
         }
     });
 }
+function handleFailure(data, isConflict) {
+    const errorMessage =
+        (data && (data.message || data.Message)) ||
+        (isConflict ? (theMainLang == "en" ? "Insufficient stock for one or more items." : "المخزون غير كافٍ لعنصر/عناصر.")
+            : (theMainLang == "en" ? "Validation error." : "خطأ تحقق."));
 
+    // shortages ممكن تكون Shortages أو shortages
+    const shortages = (data && (data.shortages || data.Shortages)) || [];
+
+    if (shortages && shortages.length) {
+        const html = shortages.map(s => {
+            const item = `${s.itemName || s.ItemName || ""} (${s.itemCode || s.ItemCode || ""})`;
+            const reqQty = (s.requestedQty ?? s.RequestedQty ?? 0);
+            const unit = (s.requestedUnitName || s.RequestedUnitName || "");
+            const avlQty = (s.availableQty ?? s.AvailableQty ?? 0);
+            const shQty = (s.shortageQty ?? s.ShortageQty ?? 0);
+            const wh = (s.warehouseName || s.WarehouseName || "");
+            const loc = (s.locatorCode || s.LocatorCode || "-");
+
+            return `
+                <div style="text-align:${theMainLang == "en" ? "left" : "right"}; margin-bottom:8px;">
+                    <div><b>${item}</b></div>
+                    <div>${theMainLang == "en" ? "Requested" : "المطلوب"}: ${reqQty} ${unit}</div>
+                    <div>${theMainLang == "en" ? "Available" : "المتاح"}: ${avlQty}</div>
+                    <div>${theMainLang == "en" ? "Shortage" : "العجز"}: ${shQty}</div>
+                    <div>${theMainLang == "en" ? "Warehouse/Locator" : "المستودع/الموقع"}: ${wh} / ${loc}</div>
+                </div>
+            `;
+        }).join("<hr/>");
+
+        Swal.fire({
+            icon: 'warning',
+            title: theMainLang == "en" ? "Insufficient Stock" : "المخزون غير كافٍ",
+            html: `<div>${errorMessage}</div><br/>${html}`,
+            confirmButtonText: theMainLang == "en" ? "Ok" : "حسناً"
+        });
+        return;
+    }
+
+    // without shortages
+    Swal.fire({
+        icon: 'error',
+        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+        text: errorMessage,
+        confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
+    });
+}
 function UndoIssueVoucher(row) {
     $.ajax({
         type: 'GET',

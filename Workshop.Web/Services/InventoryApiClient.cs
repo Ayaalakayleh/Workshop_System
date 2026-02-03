@@ -1,6 +1,8 @@
 ﻿using Azure;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using NPOI.Util;
+using System.Globalization;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using Workshop.Core.DTOs;
@@ -129,125 +131,186 @@ namespace Workshop.Web.Services
 
         }
 
-        public async Task<string> GRNAdd(CreateInventoryTransactionDTO grnObj) //Aya WS Service
+        public async Task<CreateInventoryTransactionResult> GRNAdd(CreateInventoryTransactionDTO grnObj) //Aya WS Service
         {
-            using var form = new MultipartFormDataContent();
+            var oldCulture = CultureInfo.CurrentCulture;
+            var oldUICulture = CultureInfo.CurrentUICulture;
 
-            // Add file
-            if (grnObj.AttachmentFile != null)
-            {
-                var streamContent = new StreamContent(grnObj.AttachmentFile.OpenReadStream());
-                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(grnObj.AttachmentFile.ContentType);
-                form.Add(streamContent, "AttachmentFile", grnObj.AttachmentFile.FileName);
-            }
+            try {
 
-            
-            if (grnObj.Details != null && grnObj.Details.Any())
-            {
-                grnObj.Details = grnObj.Details
-                .GroupBy(d => new { d.FK_ItemId, d.FK_UnitId, d.KeyId })
-                .Select(g => g.First())
-                .ToList(); 
-                for (int i = 0; i < grnObj.Details.Count; i++)
+                CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+                CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+
+                using var form = new MultipartFormDataContent();
+
+                // Add file
+                if (grnObj.AttachmentFile != null)
                 {
-                    var detail = grnObj.Details[i];
-
-                    if (detail.FK_ItemId.HasValue)
-                        form.Add(new StringContent(detail.FK_ItemId.Value.ToString()), $"Details[{i}].FK_ItemId");
-
-                    if (detail.FK_UnitId.HasValue)
-                        form.Add(new StringContent(detail.FK_UnitId.Value.ToString()), $"Details[{i}].FK_UnitId");
-
-                    if (!string.IsNullOrEmpty(detail.KeyId))
-                        form.Add(new StringContent(detail.KeyId), $"Details[{i}].KeyId");
-
-                    if (detail.Quantity.HasValue)
-                        form.Add(new StringContent(detail.Quantity.Value.ToString()), $"Details[{i}].Quantity");
-
-                    if (detail.UnitQuantity.HasValue)
-                        form.Add(new StringContent(detail.UnitQuantity.Value.ToString()), $"Details[{i}].UnitQuantity");
-
-                    if (detail.Price.HasValue)
-                        form.Add(new StringContent(detail.Price.Value.ToString()), $"Details[{i}].Price");
-
-                    if (detail.Total.HasValue)
-                        form.Add(new StringContent(detail.Total.Value.ToString()), $"Details[{i}].Total");
-
-                    if (detail.FK_LocatorId.HasValue)
-                        form.Add(new StringContent(detail.FK_LocatorId.Value.ToString()), $"Details[{i}].FK_LocatorId");
-
-                    if (!string.IsNullOrEmpty(detail.Description))
-                        form.Add(new StringContent(detail.Description), $"Details[{i}].Description");
-
-                    if (!string.IsNullOrEmpty(detail.Serial))
-                        form.Add(new StringContent(detail.Serial), $"Details[{i}].Serial");
-
-                    if (!string.IsNullOrEmpty(detail.Batch))
-                        form.Add(new StringContent(detail.Batch), $"Details[{i}].Batch");
-
-                    if (detail.ExpiryDate.HasValue)
-                        form.Add(new StringContent(detail.ExpiryDate.Value.ToString("o")), $"Details[{i}].ExpiryDate"); // ISO 8601 format
+                    var streamContent = new StreamContent(grnObj.AttachmentFile.OpenReadStream());
+                    streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(grnObj.AttachmentFile.ContentType);
+                    form.Add(streamContent, "AttachmentFile", grnObj.AttachmentFile.FileName);
                 }
+
+
+                if (grnObj.Details != null && grnObj.Details.Any())
+                {
+                    grnObj.Details = grnObj.Details
+                    .GroupBy(d => new { d.FK_ItemId, d.FK_UnitId, d.KeyId })
+                    .Select(g => g.First())
+                    .ToList();
+                    for (int i = 0; i < grnObj.Details.Count; i++)
+                    {
+                        var detail = grnObj.Details[i];
+
+                        if (detail.FK_ItemId.HasValue)
+                            form.Add(new StringContent(detail.FK_ItemId.Value.ToString()), $"Details[{i}].FK_ItemId");
+
+                        if (detail.FK_UnitId.HasValue)
+                            form.Add(new StringContent(detail.FK_UnitId.Value.ToString()), $"Details[{i}].FK_UnitId");
+
+                        if (!string.IsNullOrEmpty(detail.KeyId))
+                            form.Add(new StringContent(detail.KeyId), $"Details[{i}].KeyId");
+
+                        if (detail.Quantity.HasValue)
+                            form.Add(new StringContent(detail.Quantity.Value.ToString()), $"Details[{i}].Quantity");
+
+                        if (detail.UnitQuantity.HasValue)
+                            form.Add(new StringContent(detail.UnitQuantity.Value.ToString()), $"Details[{i}].UnitQuantity");
+
+                        if (detail.Price.HasValue)
+                            form.Add(new StringContent(detail.Price.Value.ToString()), $"Details[{i}].Price");
+
+                        if (detail.Total.HasValue)
+                            form.Add(new StringContent(detail.Total.Value.ToString()), $"Details[{i}].Total");
+
+                        if (detail.FK_LocatorId.HasValue)
+                            form.Add(new StringContent(detail.FK_LocatorId.Value.ToString()), $"Details[{i}].FK_LocatorId");
+
+                        if (!string.IsNullOrEmpty(detail.Description))
+                            form.Add(new StringContent(detail.Description), $"Details[{i}].Description");
+
+                        if (!string.IsNullOrEmpty(detail.Serial))
+                            form.Add(new StringContent(detail.Serial), $"Details[{i}].Serial");
+
+                        if (!string.IsNullOrEmpty(detail.Batch))
+                            form.Add(new StringContent(detail.Batch), $"Details[{i}].Batch");
+
+                        if (detail.ExpiryDate.HasValue)
+                            form.Add(new StringContent(detail.ExpiryDate.Value.ToString("o")), $"Details[{i}].ExpiryDate"); // ISO 8601 format
+                    }
+                }
+
+                //3-9
+                // Add other simple properties
+                form.Add(new StringContent(grnObj.TransactionDate.ToString("o")), "TransactionDate"); // ISO 8601
+
+                if (grnObj.TransactionReferenceNo.HasValue)
+                    form.Add(new StringContent(grnObj.TransactionReferenceNo.Value.ToString()), "TransactionReferenceNo");
+
+                if (grnObj.FK_TransactionReferenceTypeId.HasValue)
+                    form.Add(new StringContent(grnObj.FK_TransactionReferenceTypeId.Value.ToString()), "FK_TransactionReferenceTypeId");
+
+                if (grnObj.FK_WarehouseId.HasValue)
+                    form.Add(new StringContent(grnObj.FK_WarehouseId.Value.ToString()), "FK_WarehouseId");
+
+                form.Add(new StringContent(grnObj.FK_TransactionTypeId.ToString()), "FK_TransactionTypeId");
+
+                form.Add(new StringContent(grnObj.FK_TransactionStatusId.ToString()), "FK_TransactionStatusId");
+
+                form.Add(new StringContent(grnObj.Description ?? ""), "Description");
+
+                if (grnObj.CreatedBy.HasValue)
+                    form.Add(new StringContent(grnObj.CreatedBy.Value.ToString()), "CreatedBy");
+
+                if (grnObj.CompanyId.HasValue)
+                    form.Add(new StringContent(grnObj.CompanyId.Value.ToString()), "CompanyId");
+
+                if (grnObj.BranchId.HasValue)
+                    form.Add(new StringContent(grnObj.BranchId.Value.ToString()), "BranchId");
+
+                if (grnObj.FK_FromWarehouseId.HasValue)
+                    form.Add(new StringContent(grnObj.FK_FromWarehouseId.Value.ToString()), "FK_FromWarehouseId");
+
+                if (grnObj.FK_ToWarehouseId.HasValue)
+                    form.Add(new StringContent(grnObj.FK_ToWarehouseId.Value.ToString()), "FK_ToWarehouseId");
+
+                if (grnObj.Fk_FinancialTransactionMasterId.HasValue)
+                    form.Add(new StringContent(grnObj.Fk_FinancialTransactionMasterId.Value.ToString()), "Fk_FinancialTransactionMasterId");
+
+                if (grnObj.FinancialTransactionNo.HasValue)
+                    form.Add(new StringContent(grnObj.FinancialTransactionNo.Value.ToString()), "FinancialTransactionNo");
+
+                if (grnObj.FinancialTransactionTypeNo.HasValue)
+                    form.Add(new StringContent(grnObj.FinancialTransactionTypeNo.Value.ToString()), "FinancialTransactionTypeNo");
+
+                if (grnObj.Fk_InvoiceType.HasValue)
+                    form.Add(new StringContent(grnObj.Fk_InvoiceType.Value.ToString()), "Fk_InvoiceType");
+
+                if (grnObj.StockType.HasValue)
+                    form.Add(new StringContent(grnObj.StockType.Value.ToString()), "StockType");
+
+                form.Add(new StringContent(grnObj.AttachmentPath ?? ""), "AttachmentPath");
+
+
+
+                // Post to API
+                var response = await _httpClient.PostAsync("api/InventoryTransaction/Create", form);
+
+                var responseData = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    return new CreateInventoryTransactionResult
+                    {
+                        Success = false,
+                        Message = responseData
+                    };
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var ok = JsonSerializer.Deserialize<CreateInventoryTransactionResult>(responseData, options);
+
+                    return new CreateInventoryTransactionResult
+                    {
+                        Success = true,
+                        HeaderId = ok?.HeaderId
+                    };
+                }
+
+                if (response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    var conflict = JsonSerializer.Deserialize<CreateInventoryTransactionResult>(responseData, options);
+
+                    if (conflict != null) conflict.Success = false;
+
+                    return conflict ?? new CreateInventoryTransactionResult
+                    {
+                        Success = false,
+                        Message = "Cannot issue: insufficient stock for one or more items."
+                    };
+                }
+
+
+                return new CreateInventoryTransactionResult
+                {
+                    Success = false,
+                    Message = $"API error: {(int)response.StatusCode} {response.ReasonPhrase}"
+                };
+            } 
+            catch {
+                throw;
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = oldCulture;
+                CultureInfo.CurrentUICulture = oldUICulture;
             }
 
-            //3-9
-            // Add other simple properties
-            form.Add(new StringContent(grnObj.TransactionDate.ToString("o")), "TransactionDate"); // ISO 8601
-
-            if (grnObj.TransactionReferenceNo.HasValue)
-                form.Add(new StringContent(grnObj.TransactionReferenceNo.Value.ToString()), "TransactionReferenceNo");
-
-            if (grnObj.FK_TransactionReferenceTypeId.HasValue)
-                form.Add(new StringContent(grnObj.FK_TransactionReferenceTypeId.Value.ToString()), "FK_TransactionReferenceTypeId");
-
-            if (grnObj.FK_WarehouseId.HasValue)
-                form.Add(new StringContent(grnObj.FK_WarehouseId.Value.ToString()), "FK_WarehouseId");
-
-            form.Add(new StringContent(grnObj.FK_TransactionTypeId.ToString()), "FK_TransactionTypeId");
-
-            form.Add(new StringContent(grnObj.FK_TransactionStatusId.ToString()), "FK_TransactionStatusId");
-
-            form.Add(new StringContent(grnObj.Description ?? ""), "Description");
-
-            if (grnObj.CompanyId.HasValue)
-                form.Add(new StringContent(grnObj.CreatedBy.Value.ToString()), "CreatedBy");
-
-            if (grnObj.CompanyId.HasValue)
-                form.Add(new StringContent(grnObj.CompanyId.Value.ToString()), "CompanyId");
-
-            if (grnObj.BranchId.HasValue)
-                form.Add(new StringContent(grnObj.BranchId.Value.ToString()), "BranchId");
-
-            if (grnObj.FK_FromWarehouseId.HasValue)
-                form.Add(new StringContent(grnObj.FK_FromWarehouseId.Value.ToString()), "FK_FromWarehouseId");
-
-            if (grnObj.FK_ToWarehouseId.HasValue)
-                form.Add(new StringContent(grnObj.FK_ToWarehouseId.Value.ToString()), "FK_ToWarehouseId");
-
-            if (grnObj.Fk_FinancialTransactionMasterId.HasValue)
-                form.Add(new StringContent(grnObj.Fk_FinancialTransactionMasterId.Value.ToString()), "Fk_FinancialTransactionMasterId");
-
-            if (grnObj.FinancialTransactionNo.HasValue)
-                form.Add(new StringContent(grnObj.FinancialTransactionNo.Value.ToString()), "FinancialTransactionNo");
-
-            if (grnObj.FinancialTransactionTypeNo.HasValue)
-                form.Add(new StringContent(grnObj.FinancialTransactionTypeNo.Value.ToString()), "FinancialTransactionTypeNo");
-
-            if (grnObj.Fk_InvoiceType.HasValue)
-                form.Add(new StringContent(grnObj.Fk_InvoiceType.Value.ToString()), "Fk_InvoiceType");
-
-            if (grnObj.StockType.HasValue)
-                form.Add(new StringContent(grnObj.StockType.Value.ToString()), "StockType");
-
-            form.Add(new StringContent(grnObj.AttachmentPath ?? ""), "AttachmentPath");
-
-
-
-            // Post to API
-            var response = await _httpClient.PostAsync("api/InventoryTransaction/Create", form);
-
-            var responseData = await response.Content.ReadAsStringAsync();
-            return responseData;
         }
 
         //public async Task<string> GetAllGRNByIdHead(long invObj)

@@ -1981,7 +1981,8 @@ namespace Workshop.Web.Controllers
                 model.Details = JsonConvert.DeserializeObject<List<InventoryTransactionDetailsDTO>>(rawDetails);
             }
             int keyId = int.Parse(model.Details.First().KeyId);
-            var result = string.Empty;
+            //var result = string.Empty;
+            var result = new CreateInventoryTransactionResult();
             var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
             var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
             var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
@@ -2015,8 +2016,20 @@ namespace Workshop.Web.Controllers
                 result = await _inventoryApiClient.GRNAdd(model); // step 2
             }
 
-            var json = JsonDocument.Parse(result);
-            long headerId = json.RootElement.GetProperty("newId").GetInt64();
+            if (!result.Success)
+            {
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    message = result.Message,
+                    shortages = result.Shortages
+                });
+            }
+
+            //var json = JsonDocument.Parse(result);
+            //long headerId = json.RootElement.GetProperty("newId").GetInt64();
+            long headerId = result.HeaderId!.Value;
+
             UpdateIssueIdDTO dto = new UpdateIssueIdDTO
             {
                 IssueId = (int)headerId,
