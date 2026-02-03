@@ -125,7 +125,7 @@
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_Kilometres"] <span class="text-danger">*</span></label>
-                                @Html.EditorFor(a => a.CurrentMeter, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                                @Html.EditorFor(a => a.CurrentMeter, new { htmlAttributes = new { @class = "form-control", @type = "number", step = "any" } })
                             </div>
                         </div>
 
@@ -134,7 +134,7 @@
                                 <label>@Common["Label_ChassisNumber"] <span class="text-danger">*</span></label>
                                 @Html.EditorFor(a => a.ChassisNo, new { htmlAttributes = new { @class = "form-control" } })
                             </div>
-                        </div>
+                        </div>  
 
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="form-group">

@@ -27,17 +27,18 @@ $(document).ready(function () {
         rules: {
             ManufacturerId: { required: true },
             VehicleModelId: { required: true },
+            VehicleClassId: { required: true },
             ManufacturingYear: {
                 required: true,
                 min: 1900,
                 max: 2100
             },
             PlateNumber: { required: true },
-            newColorId: { required: true },
+            Color: { required: true },
             CurrentMeter: {
                 required: true,
                 number: true,
-                min: 0
+                min: 0.01
             },
             ChassisNo: { required: true },
             CompanyId: { required: false }
