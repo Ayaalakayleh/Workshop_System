@@ -889,6 +889,21 @@ namespace Workshop.Infrastructure.Repositories
             return await _database.ExecuteGetAllStoredProcedure<WIPDTO>("WIP_GetByMovementId", parameters);
                 
         }
+        public async Task<IEnumerable<VehicleNoServiceReportDTO>> GetVehiclesWithoutWIPInPeriodAsync(string vehicleIds, int branchId, DateTime fromDate, DateTime toDate)
+        {
+            var parameters = new
+            {
+                VehicleIds = vehicleIds,
+                BranchId = branchId,
+                FromDate = fromDate,
+                ToDate = toDate
+            };
+
+            return await _database.ExecuteGetAllStoredProcedure<VehicleNoServiceReportDTO>(
+                "JobCard_GetVehiclesWithoutWIPInPeriod",
+                parameters
+            );
+        }
 
 
 

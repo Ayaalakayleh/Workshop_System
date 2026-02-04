@@ -572,5 +572,11 @@ namespace Workshop.API.Controllers
                 throw ex;
             }
         }
+        [HttpPost("GetVehiclesWithoutWIPInPeriod")]
+        public async Task<IActionResult> GetVehiclesWithoutWIPInPeriodAsync([FromBody] VehicleNoServiceFilterDTO filter)
+        {
+            var result = await _service.GetVehiclesWithoutWIPInPeriodAsync(filter.VehicleIds, filter.BranchId, filter.FromDate, filter.ToDate);
+            return Ok(result);
+        }
     }
 }

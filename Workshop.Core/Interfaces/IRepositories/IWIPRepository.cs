@@ -66,5 +66,6 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<int> UpdateWIPServicesExternalAndFixStatusAsync(List<WipServiceFixDto> services);
         Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal);
         Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int movementId);
+        Task<IEnumerable<VehicleNoServiceReportDTO>> GetVehiclesWithoutWIPInPeriodAsync(string vehicleIds, int branchId, DateTime fromDate, DateTime toDate);
     }
 }
