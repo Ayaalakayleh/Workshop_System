@@ -1036,7 +1036,7 @@
     <value>Creation date</value>
   </data>
   <data name="Label_InvoiceDate" xml:space="preserve">
-    <value>Invoice date</value>
+    <value>Invoice Date</value>
   </data>
   <data name="Label_Event" xml:space="preserve">
     <value>Event</value>
@@ -2769,53 +2769,49 @@
   <data name="Part" xml:space="preserve">
     <value>Part</value>
   </data>
-	<data name="Label_RequestNo" xml:space="preserve">
-  <value>Request No</value>
-</data>
-	<data name="Label_Balance" xml:space="preserve">
-  <value>Balance</value>
-</data>
-	<data name="Label_ExpenseType" xml:space="preserve">
-  <value>Expense Type</value>
-</data>
-	<data name="Label_TypeOfExpense" xml:space="preserve">
-  <value>Type of Expense</value>
-</data>
-	<data name="Label_SellerName" xml:space="preserve">
-  <value>Seller Name</value>
-</data>
-	<data name="Text_CreateNewSeller" xml:space="preserve">
-  <value>+ Create New Seller</value>
-</data>
-	<data name="Label_InvoiceDate" xml:space="preserve">
-  <value>Invoice Date</value>
-</data>
-	<data name="Label_Currency" xml:space="preserve">
-  <value>Currency</value>
-</data>
-	<data name="Label_NetAmount" xml:space="preserve">
-  <value>Net Amount</value>
-</data>
-	<data name="Label_UploadInvoice" xml:space="preserve">
-  <value>Upload Invoice</value>
-</data>
-	<data name="Hint_FileTypesAllowed" xml:space="preserve">
-  <value>(pdf, png, jpeg allowed)</value>
-</data>
-	<data name="Button_SavePettyCashInvoice" xml:space="preserve">
-  <value>Save Petty Cash Invoice</value>
-</data>
-	<data name="Title_AddNewSeller" xml:space="preserve">
-  <value>Add New Seller</value>
-</data>
-	<data name="Label_NameEnglish" xml:space="preserve">
-  <value>Name (English)</value>
-</data>
-	<data name="Label_NameArabic" xml:space="preserve">
-  <value>Name (Arabic)</value>
-</data>
-	<data name="Label_TaxNumber" xml:space="preserve">
-  <value>Tax Number</value>
-</data>
-
+  <data name="Label_RequestNo" xml:space="preserve">
+    <value>Request No</value>
+  </data>
+  <data name="Label_Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="Label_ExpenseType" xml:space="preserve">
+    <value>Expense Type</value>
+  </data>
+  <data name="Label_TypeOfExpense" xml:space="preserve">
+    <value>Type of Expense</value>
+  </data>
+  <data name="Label_SellerName" xml:space="preserve">
+    <value>Seller Name</value>
+  </data>
+  <data name="Text_CreateNewSeller" xml:space="preserve">
+    <value>+ Create New Seller</value>
+  </data>
+  <data name="Label_NetAmount" xml:space="preserve">
+    <value>Net Amount</value>
+  </data>
+  <data name="Label_UploadInvoice" xml:space="preserve">
+    <value>Upload Invoice</value>
+  </data>
+  <data name="Hint_FileTypesAllowed" xml:space="preserve">
+    <value>(pdf, png, jpeg allowed)</value>
+  </data>
+  <data name="Button_SavePettyCashInvoice" xml:space="preserve">
+    <value>Save Petty Cash Invoice</value>
+  </data>
+  <data name="Title_AddNewSeller" xml:space="preserve">
+    <value>Add New Seller</value>
+  </data>
+  <data name="Label_NameEnglish" xml:space="preserve">
+    <value>Name (English)</value>
+  </data>
+  <data name="Label_NameArabic" xml:space="preserve">
+    <value>Name (Arabic)</value>
+  </data>
+  <data name="Label_TaxNumber" xml:space="preserve">
+    <value>Tax Number</value>
+  </data>
+  <data name="Label_Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
 </root>

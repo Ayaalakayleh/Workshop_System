@@ -3282,17 +3282,19 @@ html[dir="rtl"] .toggle-pin {
 }
 /*End fix change Lang/Branch on mobile menu*/
 /* Make The DevExpress Tables have a right Aligmnet on Arabic */
-#gridContainer .dx-datagrid .dx-row > td,
-#gridContainer .dx-datagrid .dx-header-row > td,
-#gridContainer .dx-datagrid .dx-filter-row > td,
-#gridContainer .dx-datagrid .dx-group-row > td,
-#gridContainer .dx-datagrid .dx-row > td .dx-cell-content,
-#gridContainer .dx-datagrid .dx-header-row > td .dx-datagrid-text-content,
-#gridContainer .dx-datagrid .dx-filter-row > td .dx-editor-cell,
-#gridContainer .dx-datagrid .dx-editor-cell .dx-texteditor-input {
+/* All columns EXCEPT the first one */
+#gridContainer .dx-datagrid .dx-row > td:not(:nth-child(1)),
+#gridContainer .dx-datagrid .dx-header-row > td:not(:nth-child(1)),
+#gridContainer .dx-datagrid .dx-filter-row > td:not(:nth-child(1)),
+#gridContainer .dx-datagrid .dx-group-row > td:not(:nth-child(1)),
+#gridContainer .dx-datagrid .dx-row > td:not(:nth-child(1)) .dx-cell-content,
+#gridContainer .dx-datagrid .dx-header-row > td:not(:nth-child(1)) .dx-datagrid-text-content,
+#gridContainer .dx-datagrid .dx-filter-row > td:not(:nth-child(1)) .dx-editor-cell,
+#gridContainer .dx-datagrid .dx-row > td:not(:nth-child(1)) .dx-editor-cell .dx-texteditor-input {
     text-align: start !important;
     justify-content: flex-start !important;
 }
+
 /* Start Dark Mode Customization */
 .select2-container--bootstrap-5.select2-container--disabled .select2-selection, .select2-container--bootstrap-5.select2-container--disabled.select2-container--focus .select2-selection {
     background-color: var(--bs-secondary-bg);

@@ -2769,53 +2769,49 @@
   <data name="Part" xml:space="preserve">
     <value>قطعة</value>
   </data>
-	<data name="Label_RequestNo" xml:space="preserve">
-  <value>رقم الطلب</value>
-</data>
-	<data name="Label_Balance" xml:space="preserve">
-  <value>الرصيد</value>
-</data>
-	<data name="Label_ExpenseType" xml:space="preserve">
-  <value>نوع المصروف</value>
-</data>
-	<data name="Label_TypeOfExpense" xml:space="preserve">
-  <value>تصنيف المصروف</value>
-</data>
-	<data name="Label_SellerName" xml:space="preserve">
-  <value>اسم البائع</value>
-</data>
-	<data name="Text_CreateNewSeller" xml:space="preserve">
-  <value>+ إنشاء بائع جديد</value>
-</data>
-	<data name="Label_InvoiceDate" xml:space="preserve">
-  <value>تاريخ الفاتورة</value>
-</data>
-	<data name="Label_Currency" xml:space="preserve">
-  <value>العملة</value>
-</data>
-	<data name="Label_NetAmount" xml:space="preserve">
-  <value>صافي المبلغ</value>
-</data>
-	<data name="Label_UploadInvoice" xml:space="preserve">
-  <value>رفع الفاتورة</value>
-</data>
-	<data name="Hint_FileTypesAllowed" xml:space="preserve">
-  <value>(يسمح بـ pdf, png, jpeg)</value>
-</data>
-	<data name="Button_SavePettyCashInvoice" xml:space="preserve">
-  <value>حفظ فاتورة العهدة</value>
-</data>
-	<data name="Title_AddNewSeller" xml:space="preserve">
-  <value>إضافة بائع جديد</value>
-</data>
-	<data name="Label_NameEnglish" xml:space="preserve">
-  <value>الاسم (بالإنجليزية)</value>
-</data>
-	<data name="Label_NameArabic" xml:space="preserve">
-  <value>الاسم (بالعربية)</value>
-</data>
-	<data name="Label_TaxNumber" xml:space="preserve">
-  <value>الرقم الضريبي</value>
-</data>
-
+  <data name="Label_RequestNo" xml:space="preserve">
+    <value>رقم الطلب</value>
+  </data>
+  <data name="Label_Balance" xml:space="preserve">
+    <value>الرصيد</value>
+  </data>
+  <data name="Label_ExpenseType" xml:space="preserve">
+    <value>نوع المصروف</value>
+  </data>
+  <data name="Label_TypeOfExpense" xml:space="preserve">
+    <value>تصنيف المصروف</value>
+  </data>
+  <data name="Label_SellerName" xml:space="preserve">
+    <value>اسم البائع</value>
+  </data>
+  <data name="Text_CreateNewSeller" xml:space="preserve">
+    <value>+ إنشاء بائع جديد</value>
+  </data>
+  <data name="Label_NetAmount" xml:space="preserve">
+    <value>صافي المبلغ</value>
+  </data>
+  <data name="Label_UploadInvoice" xml:space="preserve">
+    <value>رفع الفاتورة</value>
+  </data>
+  <data name="Hint_FileTypesAllowed" xml:space="preserve">
+    <value>(يسمح بـ pdf, png, jpeg)</value>
+  </data>
+  <data name="Button_SavePettyCashInvoice" xml:space="preserve">
+    <value>حفظ فاتورة العهدة</value>
+  </data>
+  <data name="Title_AddNewSeller" xml:space="preserve">
+    <value>إضافة بائع جديد</value>
+  </data>
+  <data name="Label_NameEnglish" xml:space="preserve">
+    <value>الاسم (بالإنجليزية)</value>
+  </data>
+  <data name="Label_NameArabic" xml:space="preserve">
+    <value>الاسم (بالعربية)</value>
+  </data>
+  <data name="Label_TaxNumber" xml:space="preserve">
+    <value>الرقم الضريبي</value>
+  </data>
+  <data name="Label_Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
 </root>
