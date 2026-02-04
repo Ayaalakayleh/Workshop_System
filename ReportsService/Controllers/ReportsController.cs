@@ -27,74 +27,74 @@ namespace ReportsService.Controllers
             _httpClient.BaseAddress = new Uri(_apiBaseUrl);
         }
 
-        [HttpGet]
-        [Route("api/reports/test")]
-        public IHttpActionResult Test()
-        {
-            return Ok(new
-            {
-                message = "ReportsService is running!",
-                timestamp = DateTime.Now,
-                baseUrl = _apiBaseUrl
-            });
-        }
+        //[HttpGet]
+        //[Route("api/reports/test")]
+        //public IHttpActionResult Test()
+        //{
+        //    return Ok(new
+        //    {
+        //        message = "ReportsService is running!",
+        //        timestamp = DateTime.Now,
+        //        baseUrl = _apiBaseUrl
+        //    });
+        //}
 
-        [HttpGet]
-        [Route("api/reports/wip/{id}")]
-        public HttpResponseMessage GetWipReport(int id)
-        {
-            try
-            {
-                var reportDocument = new CrystalDecisions.CrystalReports.Engine.ReportDocument();
-                var reportPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Reports/CrystalReport1.rpt");
+        //[HttpGet]
+        //[Route("api/reports/wip/{id}")]
+        //public HttpResponseMessage GetWipReport(int id)
+        //{
+        //    try
+        //    {
+        //        var reportDocument = new CrystalDecisions.CrystalReports.Engine.ReportDocument();
+        //        var reportPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Reports/CrystalReport1.rpt");
                 
-                if (!System.IO.File.Exists(reportPath))
-                {
-                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Report file not found.");
-                }
+        //        if (!System.IO.File.Exists(reportPath))
+        //        {
+        //            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Report file not found.");
+        //        }
 
-                reportDocument.Load(reportPath);
+        //        reportDocument.Load(reportPath);
 
-                // Attempt to set connection credentials - Update these to match your DB
-                // Ideally reading from config
-                // reportDocument.SetDatabaseLogon("acs@workshop", "ACS@Worksh0p_#2025_", "94.249.88.254,1433", "DB_WorkshopCore");
-                // Because connection handling in Crystal can be tricky depending on how the report was designed (OLEDB vs ODBC etc)
-                // We will try standard Initialize but often need concrete Logon info.
+        //        // Attempt to set connection credentials - Update these to match your DB
+        //        // Ideally reading from config
+        //        // reportDocument.SetDatabaseLogon("acs@workshop", "ACS@Worksh0p_#2025_", "94.249.88.254,1433", "DB_WorkshopCore");
+        //        // Because connection handling in Crystal can be tricky depending on how the report was designed (OLEDB vs ODBC etc)
+        //        // We will try standard Initialize but often need concrete Logon info.
                 
-                try
-                {
-                     reportDocument.SetDatabaseLogon("acs@workshop", "ACS@Worksh0p_#2025_", "94.249.88.254,1433", "DB_WorkshopCore");
-                }
-                catch
-                {
-                    // Ignore or log if logon fails (might be using saved data or integrated security)
-                }
+        //        try
+        //        {
+        //             reportDocument.SetDatabaseLogon("acs@workshop", "ACS@Worksh0p_#2025_", "94.249.88.254,1433", "DB_WorkshopCore");
+        //        }
+        //        catch
+        //        {
+        //            // Ignore or log if logon fails (might be using saved data or integrated security)
+        //        }
 
-                // Try setting parameter 'Id' if it exists
-                if (reportDocument.ParameterFields["Id"] != null) 
-                    reportDocument.SetParameterValue("Id", id);
-                else if (reportDocument.ParameterFields["@Id"] != null)
-                     reportDocument.SetParameterValue("@Id", id);
+        //        // Try setting parameter 'Id' if it exists
+        //        if (reportDocument.ParameterFields["Id"] != null) 
+        //            reportDocument.SetParameterValue("Id", id);
+        //        else if (reportDocument.ParameterFields["@Id"] != null)
+        //             reportDocument.SetParameterValue("@Id", id);
 
-                var stream = reportDocument.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+        //        var stream = reportDocument.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
                 
-                var result = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StreamContent(stream)
-                };
-                result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
-                result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = $"WIP_Report_{id}.pdf"
-                };
+        //        var result = new HttpResponseMessage(HttpStatusCode.OK)
+        //        {
+        //            Content = new StreamContent(stream)
+        //        };
+        //        result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+        //        result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+        //        {
+        //            FileName = $"WIP_Report_{id}.pdf"
+        //        };
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
 
         [HttpPost]
         [Route("api/reports/wip/")]
@@ -222,7 +222,26 @@ namespace ReportsService.Controllers
                 }
 
                 ds.Tables.Add(dtItems);
-                // End Vehicle Items Table ==============================
+                // End Vehicle Items Table 
+
+                // Vehicle Tires Checklist Table ========================
+                var dtTires = new DataTable("Tires");
+                dtTires.Columns.Add("LookupPrimaryDescription", typeof(string));
+                dtTires.Columns.Add("Brand", typeof(string));
+                dtTires.Columns.Add("DOT", typeof(string));
+                dtTires.Columns.Add("WearLevel", typeof(decimal));
+
+                foreach (var v in model.TyreCkecklist ?? new List<TyreChecklist>())
+                {
+                    dtTires.Rows.Add(
+                        v.LookupPrimaryDescription ?? "",
+                        v.Brand ?? "",
+                        v.DOT ?? "",
+                        v.WearLevel
+                    );
+                }
+                ds.Tables.Add(dtTires);
+                // End Vehicle Tires Checklist Table
 
                 rpt.Load(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "RepairOrderReport.rpt"));
                 
@@ -243,6 +262,9 @@ namespace ReportsService.Controllers
                 var sub_Items = rpt.OpenSubreport("SubRepairItemsReport.rpt");
                 sub_Items.Database.Tables["Items"].SetDataSource(ds.Tables["Items"]);
 
+                //Tires Subreport
+                var sub_Tires = rpt.OpenSubreport("SubTiresChecklistReport.rpt");
+                sub_Tires.Database.Tables["Tires"].SetDataSource(ds.Tables["Tires"]);
 
                 string contentType;
                 string fileName;

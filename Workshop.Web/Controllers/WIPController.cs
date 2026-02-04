@@ -1696,8 +1696,8 @@ namespace Workshop.Web.Controllers
             string InternalType = "";
             var AccountTable = await _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId);
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
-            decimal? totalInternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity);
-            decimal? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.Quantity);
+            decimal? totalInternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.UsedQuantity);
+            decimal? totalExternal = oWIPDTO.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.External).Sum(x => x.CostPrice * (decimal)x.UsedQuantity);
             var VehicleDetails = await _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang);
 
             if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
@@ -2026,8 +2026,6 @@ namespace Workshop.Web.Controllers
                 });
             }
 
-            //var json = JsonDocument.Parse(result);
-            //long headerId = json.RootElement.GetProperty("newId").GetInt64();
             long headerId = result.HeaderId!.Value;
 
             UpdateIssueIdDTO dto = new UpdateIssueIdDTO
@@ -2436,8 +2434,11 @@ namespace Workshop.Web.Controllers
                     model.DateOut = lastMovement.CreatedAt?.ToString("yyyy-MM-dd");
                     model.TimeOut = lastMovement.CreatedAt?.ToString("HH:mm");
                 }
-                var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId)?? new FuleLevel();
-                model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
+                if(movement.FuelLevelId != null)
+                {
+                    var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId)?? new FuleLevel();
+                    model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
+                }
                 model.Services = services?.ToList();
                 model.Items = await GetItemsModelsAsync(Id, lang); 
                 model.VehicleCkecklist = await GetVehicleChecklistAsync(Details.MovementId);

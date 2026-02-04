@@ -203,6 +203,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>RepairServicesDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="DataSets\TiresDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TiresDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="DataSets\VehicleChecklist.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -218,6 +223,12 @@
     <Compile Include="Models\VehicleInfoModel.cs" />
     <Compile Include="Models\WIPModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\SubTiresChecklistReport.cs">
+      <DependentUpon>SubTiresChecklistReport.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Reports\SubRepairItemsReport.cs">
       <DependentUpon>SubRepairItemsReport.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -299,6 +310,17 @@
     <Content Include="DataSets\RepairServicesDataSet.xss">
       <DependentUpon>RepairServicesDataSet.xsd</DependentUpon>
     </Content>
+    <Content Include="DataSets\TiresDataSet.xsc">
+      <DependentUpon>TiresDataSet.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\TiresDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TiresDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\TiresDataSet.xss">
+      <DependentUpon>TiresDataSet.xsd</DependentUpon>
+    </Content>
     <None Include="DataSets\VehicleChecklist.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
@@ -310,6 +332,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Reports\SubTiresChecklistReport.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>SubTiresChecklistReport.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\SubRepairItemsReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>SubRepairItemsReport.cs</LastGenOutput>

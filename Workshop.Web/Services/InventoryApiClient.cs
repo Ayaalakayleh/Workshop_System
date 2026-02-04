@@ -273,14 +273,41 @@ namespace Workshop.Web.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var ok = JsonSerializer.Deserialize<CreateInventoryTransactionResult>(responseData, options);
+                    int? headerId = null;
+
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(responseData);
+                        var root = doc.RootElement;
+
+                        if (root.ValueKind == JsonValueKind.Object &&
+                            root.TryGetProperty("newId", out var newIdEl))
+                        {
+                            if (newIdEl.ValueKind == JsonValueKind.Number)
+                                headerId = newIdEl.GetInt32();
+                            else if (newIdEl.ValueKind == JsonValueKind.String &&
+                                     int.TryParse(newIdEl.GetString(), out var idFromString))
+                                headerId = idFromString;
+                        }
+                    }
+                    catch
+                    {
+                    }
+
+                    if (headerId == null)
+                        return new CreateInventoryTransactionResult
+                        {
+                            Success = false,
+                            Message = $"response: {responseData}"
+                        };
 
                     return new CreateInventoryTransactionResult
                     {
                         Success = true,
-                        HeaderId = ok?.HeaderId
+                        HeaderId = headerId
                     };
                 }
+
 
                 if (response.StatusCode == HttpStatusCode.Conflict)
                 {
