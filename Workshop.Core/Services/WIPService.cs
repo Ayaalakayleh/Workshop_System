@@ -307,6 +307,11 @@ namespace Workshop.Core.Services
         {
             return await _repository.GetWIPByMovementId(movementId);
         }
+        public async Task<IEnumerable<VehicleNoServiceReportDTO>> GetVehiclesWithoutWIPInPeriodAsync(string vehicleIds, int branchId, DateTime fromDate, DateTime toDate)
+        {
+            return await _repository.GetVehiclesWithoutWIPInPeriodAsync(vehicleIds, branchId, fromDate, toDate);
+
+        }
 
     }
 }
