@@ -400,7 +400,12 @@ $(document).ready(function () {
     } else {
         $("#ResignedDate").prop("disabled", true).val("");
     }
+
+    $('#IsResigned').on('change', function () {
+        $('#IsActive').prop('checked', !this.checked).trigger('change');
+    });
 });
+
 
 // ---------- List load + pager ----------
 function getData(page) {
