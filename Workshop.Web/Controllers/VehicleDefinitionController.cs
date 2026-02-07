@@ -139,7 +139,7 @@ namespace Workshop.Controllers
             if (Id > 0)
             {
                 vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById((int)Id);
-            }
+                }
 
             //ToDo : Caching
             //if (cache.Get(string.Format(CacheKeys.Manufacturers)) != null)

@@ -812,12 +812,14 @@
     }
 
     function SelectVehicle(selectedVehicleId) {
+        debugger
         if (!selectedVehicleId) return;
         selectCount += 1;
         $("#VehicleID").val(selectedVehicleId);
         $("#GettingVehicleId").val(selectedVehicleId);
         GetVehicleData(selectedVehicleId);
         $("#ModalOutsideSearch").modal('hide');
+        $("#openVehicleList").css("display", "none");
         GetWIPByVehicleId(selectedVehicleId);
         // Get recalls for the selected vehicle
         GetRecallsByVehicleId($("#GettingVehicleId").val());

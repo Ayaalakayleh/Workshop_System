@@ -438,7 +438,7 @@ namespace Workshop.Web.Controllers
                         ViewBag.AgreementStatus = status;
                         if (activeAgreement.AgreementId != null && activeAgreement.AgreementId > 0)
                         {
-                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate?.ToString("yyyy-MM-dd");
+                            ViewBag.AgreementEndDate = activeAgreement.GregorianReturnDate?.ToString("dd-MMM-yyyy");
                             dto.AgreementId = (int)activeAgreement.AgreementId;
                         }
 
@@ -2440,7 +2440,8 @@ namespace Workshop.Web.Controllers
                     model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
                 }
                 model.Services = services?.ToList();
-                model.Items = await GetItemsModelsAsync(Id, lang); 
+                var Items = await GetItemsModelsAsync(Id, lang);
+                model.Items = Items ?? new List<ItemModel>();
                 model.VehicleCkecklist = await GetVehicleChecklistAsync(Details.MovementId);
                 model.TyreCkecklist = await GetTyreChecklistAsync(Details.MovementId);
                 model.CreatedBy = await GetUserFullNameAsync(Details.CreatedBy);

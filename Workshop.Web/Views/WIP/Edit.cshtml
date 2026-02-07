@@ -59,17 +59,17 @@
 		<div id="panel-1" class="panel p-3 General_Panel">
 			<div class="d-flex justify-content-between Header">
 				<div class="text-start px-3 py-2">
-					<div class="fw-semibold">
+					<h5 class="fw-semibold">
 						<i class="fad fa-wrench me-2"></i>
 						@Common["Hi"],
 						@userInfo?.FirstName @userInfo?.LastName
-					</div>
+					</h5>
 				</div>
 				<div class="d-flex flex-column">
-                    <div>
+                    <h4>
 						 @(lang == "en" ? Model?.VehicleTab?.VehicleModelPrimaryName : Model?.VehicleTab?.VehicleModelSecondaryName)
 						 (@Model?.VehicleTab?.ManufacturingYear) / @Model?.VehicleTab?.PlateNumber / @Model?.VehicleTab?.ChassisNo
-					</div>
+					</h4>
 					@if (ViewBag.IsReplacement == true)
 					{
 						<h6 class="mx-4 my-2 text-center">@Common["Replacement"]</h6>
@@ -80,10 +80,8 @@
 					<div class="statusContainer">
 						@if (ViewBag.AgreementStatus != "")
 						{
-							<label>
-								@Common["Agreement"]:
-							</label>
-
+							<h5 class="px-2" >@Common["Agreement"]: </h5>
+							
 							<div class="agreementStatus">@ViewBag.AgreementStatus</div>
 						}
 
