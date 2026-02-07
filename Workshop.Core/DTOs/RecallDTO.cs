@@ -7,8 +7,8 @@
 		public string? Description { get; set; }
 		public DateTime? StartDate { get; set; }
 		public DateTime? EndDate { get; set; }
-		public bool IsActive { get; set; }
-		public List<VehicleRecallDTO>? Vehicles { get; set; }
+		public bool IsActive { get; set; } = true;
+        public List<VehicleRecallDTO>? Vehicles { get; set; }
 	}
 
 	public class RecallDTO : RecallBaseDTO
