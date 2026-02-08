@@ -114,6 +114,8 @@ namespace Workshop.Web.Controllers
 
                 filter.CompanyId = CompanyId;
 
+                ViewBag.VehicleTypeId = filter.VehicleTypeId ?? 0;
+
                 if (filter.VehicleTypeId == 1) // internal
                 {
                     colVehicleDefinitions = await _vehicleApiClient.GetWorkshopVehicles(filter);

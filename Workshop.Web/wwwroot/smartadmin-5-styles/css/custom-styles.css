@@ -1695,7 +1695,7 @@ html[dir="rtl"] .toggle-pin {
     border: 1px solid #e6e9f2;
     border-radius: 12px;
     padding: 10px 12px;
-    background: var(--secondary-50);
+/*    background: var(--secondary-50);*/
     display: flex;
     align-items: center;
     gap: 10px;

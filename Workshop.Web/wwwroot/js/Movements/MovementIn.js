@@ -756,6 +756,26 @@
     /* ==================================================
        Data (AJAX)
     ================================================== */
+    $(document).on('click change', 'input.maintenance-radio', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        $(this).prop('checked', $(this).data('lockedChecked') === true);
+    });
+
+    $(document).on('keydown', 'input.maintenance-radio', function (e) {
+        if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    });
+
+    $(function () {
+        $('input.maintenance-radio').each(function () {
+            $(this).data('lockedChecked', this.checked);
+        });
+    });
+
     function GetVehicleData(vehicleId) {
         $('.MaintenanceDesc').val("");
         $('#WorkOrderId').html("");
@@ -765,7 +785,7 @@
             ? reservationType
             : Number($("#VehicleTypeId").val());
 
-        if (Etype == 2) { $('input[type="radio"][value="option2"][id="Type"]').prop('disabled', true); }
+        //if (Etype == 2) { $('input[type="radio"][value="option2"][id="Type"]').prop('disabled', true); }
 
         $.ajax({
             type: "GET",
@@ -780,6 +800,8 @@
             $("#VehiclePlateNo").html(Data.PlateNumber);
             $("#VehicleModel").html(Data.RefVehicleModels.VehicleModelPrimaryName);
             $("#LastVehicleStatus").val(Data.VehicleStatusId);
+            $("#VehicleSubStatusId").val(String(Data.VehicleSubStatusId)).trigger("change");
+            $("#VehicleSubStatusId").trigger("change.select2");
 
             $.ajax({
                 type: "GET",
@@ -789,8 +811,11 @@
                 if (res && res.isSuccess && res.data && res.data.length > 0) {
                     var agr = res.data[0];
                     $("#customerName").html(agr.customerName ?? "");
+                    $("#ResivedDriverId").val(agr.customerPrimaryName ?? "");
+                    $("#customerPhone").html(agr.customerPhoneNumber ?? "");
                 } else {
                     $("#customerName").html("");
+                    $("#customerPhone").html("");
                 }
             });
 
