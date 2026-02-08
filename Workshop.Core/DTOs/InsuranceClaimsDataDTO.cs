@@ -52,4 +52,14 @@ namespace Workshop.Core.DTOs
 
 
     }
+
+
+    public class InsuranceClaimsDataFilterDTO
+    {
+        public int? CompanyId { get; set; }
+        public int? BranchId { get; set; }
+        public int? ClaimStatus { get; set; }
+        public int? WorkOrderId { get; set; }
+
+    }
 }
