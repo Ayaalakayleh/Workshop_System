@@ -445,16 +445,14 @@ $(function () {
                     let basePrice = 0;
 
                     if (type === "1") {
-                        //basePrice = parseFloat(rowData.CostPrice);
-                        //if (isNaN(basePrice)) basePrice = 0;
-                        const baseCost = parseFloat(rowData.BaseCostPrice ?? rowData.CostPrice) || 0;
-                        const factor = parseFloat(rowData.UnitFactor) || 1;
-
-                        basePrice = baseCost / factor;
+                        basePrice = parseFloat(rowData.CostPrice);
+                        if (isNaN(basePrice)) basePrice = 0;
 
                     } else if (type === "2") {
-                        basePrice = parseFloat(rowData.SalePrice);
-                        if (isNaN(basePrice)) basePrice = 0;
+                        const baseSale = parseFloat(rowData.SalePrice) || 0;
+                        const factor = parseFloat(rowData.UnitFactor) || 1;
+
+                        basePrice = baseSale / factor;
 
                         basePrice = basePrice - (basePrice * (discount / 100));
                     }
