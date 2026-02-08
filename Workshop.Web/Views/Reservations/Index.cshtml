@@ -214,6 +214,7 @@
             const dateFrom = $('#filterFromDate').val();
             const dateTo = $('#filterToDate').val();
             const vehicleId = $('#filterPlateNumber').val();
+            const vehicleTypeId = $("#vehicleType").val();
             const chassisId = $('#filterChassis').val();
             const customerId = $('#filterCustomerId').val();
 
@@ -221,6 +222,7 @@
                 DateFrom: dateFrom || null,
                 DateTo: dateTo || null,
                 VehicleId: vehicleId ? parseInt(vehicleId) : null,
+                VehicleTypeId: vehicleTypeId ? parseInt(vehicleTypeId) : null,
                 chassisId: chassisId ? chassisId : null,
                 customerId: customerId ? parseInt(customerId): null
             };
