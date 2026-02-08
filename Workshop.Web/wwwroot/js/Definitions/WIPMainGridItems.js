@@ -39,7 +39,7 @@ function getEffectiveQty(d) {
 }
 
 function getQtyNumberBoxOptions(row) {
-    const allowDecimal = !!row?.IsDecimalUnit;
+    const allowDecimal = !!row?.isDecimalUnit;
 
     return {
         allowDecimal,
@@ -175,60 +175,92 @@ $(function () {
 
                         onValueChanged: function (e) {
 
-                            const grid = cellInfo.component;          
-                            const rowIndex = cellInfo.row.rowIndex;   
+                            const grid = cellInfo.component;
+                            const rowIndex = cellInfo.row.rowIndex;
                             const selectedUnitId = Number(e.value) || 0;
-
-                            const oldFactor = Number(row.UnitFactor) || 1;
 
                             row.fk_UnitId = selectedUnitId;
 
-                            const selectedUnit = (row.ItemUnits || []).find(x => x.unitId == selectedUnitId);
-                            row.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
-                            row.IsDecimalUnit = !!selectedUnit?.IsDecimalUnit;
+                            const ensureUnits = (row.ItemUnits && row.ItemUnits.length)
+                                ? $.Deferred().resolve(row.ItemUnits).promise()
+                                : fetchItemUnitsCached(row.ItemId).then(units => {
+                                    row.ItemUnits = Array.isArray(units) ? units : [];
+                                    return row.ItemUnits;
+                                });
 
-                            if (!row.IsDecimalUnit) {
-                                row.RequestQuantity = Math.floor(Number(row.RequestQuantity) || 0);
-                                row.Quantity = Math.floor(Number(row.Quantity) || 0);
-                                row.UsedQuantity = Math.floor(Number(row.UsedQuantity) || 0);
-                            }
+                            ensureUnits.then(() => {
 
-                            if (!row.BaseCostPrice || Number(row.BaseCostPrice) === 0) {
-                                row.BaseCostPrice = +((Number(row.CostPrice) || 0) * oldFactor).toFixed(2);
-                            }
+                                const selectedUnit = (row.ItemUnits || []).find(x => x.unitId == selectedUnitId);
 
-                            recalcCostPriceForUnit(row);
+                                row.isDecimalUnit = !!(selectedUnit?.isDecimalUnit ?? selectedUnit?.isDecimalUnit);
 
-                            row.LocatorId = null;
-                            row.LocatorCode = null;
-                            row.AvailableQty = null;
-                            row.AvailableLocators = [];
+                                // Factor
+                                const oldFactor = Number(row.UnitFactor) || 1;
+                                row.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
 
-                            cellInfo.setValue(selectedUnitId);
+                                if (!row.isDecimalUnit) {
+                                    row.RequestQuantity = Math.floor(Number(row.RequestQuantity) || 0);
+                                    row.Quantity = Math.floor(Number(row.Quantity) || 0);
+                                    row.UsedQuantity = Math.floor(Number(row.UsedQuantity) || 0);
+                                }
 
-                            grid.beginUpdate();
-                            try {
-                                grid.cellValue(rowIndex, "RequestQuantity", row.RequestQuantity);
-                                grid.cellValue(rowIndex, "Quantity", row.Quantity);
-                                grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
+                                if (!row.BaseCostPrice || Number(row.BaseCostPrice) === 0) {
+                                    row.BaseCostPrice = +((Number(row.CostPrice) || 0) * oldFactor).toFixed(2);
+                                }
 
-                                grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
-                                grid.cellValue(rowIndex, "Price", row.Price);
-                                grid.cellValue(rowIndex, "LocatorId", row.LocatorId);
-                            } finally {
-                                grid.endUpdate();
-                            }
+                                recalcCostPriceForUnit(row);
 
-                            grid.closeEditCell();
+                                // reset locator
+                                row.LocatorId = null;
+                                row.LocatorCode = null;
+                                row.AvailableQty = null;
+                                row.AvailableLocators = [];
 
-                            grid.saveEditData().then(() => {
+                                cellInfo.setValue(selectedUnitId);
 
-                                fillLocators([row]);
+                                grid.beginUpdate();
+                                try {
+                                    grid.cellValue(rowIndex, "isDecimalUnit", row.isDecimalUnit);
 
-                                safeUpdateFieldsFromGrid();
+                                    grid.cellValue(rowIndex, "RequestQuantity", row.RequestQuantity);
+                                    grid.cellValue(rowIndex, "Quantity", row.Quantity);
+                                    grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
+
+                                    grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
+                                    grid.cellValue(rowIndex, "Price", row.Price);
+                                    grid.cellValue(rowIndex, "LocatorId", row.LocatorId);
+                                } finally {
+                                    grid.endUpdate();
+                                }
+
+                                grid.closeEditCell();
+
+                                grid.saveEditData().then(() => {
+                                    fillLocators([row]);
+                                    safeUpdateFieldsFromGrid();
+                                });
+
                             });
                         }
                     }).appendTo(cellElement);
+                }
+            },
+            {
+                caption: "isDecimalUnit",
+                visible: false,
+                allowEditing: false,
+                width: 120,
+                alignment: "center",
+                calculateCellValue: function (row) {
+                    if (row.isDecimalUnit !== undefined && row.isDecimalUnit !== null) {
+                        return !!row.isDecimalUnit;
+                    }
+
+                    const u = (row.ItemUnits || []).find(x => x.unitId == row.fk_UnitId);
+                    return !!u?.isDecimalUnit;   
+                },
+                cellTemplate: function (container, options) {
+                    $(container).text(options.value ? "TRUE" : "FALSE");
                 }
             },
             {
@@ -254,10 +286,16 @@ $(function () {
                         disabled: !canEdit,
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
+                            const allowDecimal = !!row.isDecimalUnit;
                             let v = Number(e.value);
-                            //let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
 
                             if (!isFinite(v)) v = 0;
+
+                            if (!allowDecimal) {
+                                v = Math.floor(v);
+                            } else {
+                                v = +v.toFixed(2);
+                            }
 
                             if (v < 0) {
                                 v = 0;
@@ -268,8 +306,6 @@ $(function () {
                                 v = available;
                                 e.component.option("value", available);
                             }
-
-                            //if (v !== e.value) e.component.option("value", v);
 
                             cellInfo.setValue(v);
                             row.RequestQuantity = v;
@@ -326,6 +362,7 @@ $(function () {
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
                             //let v = Number(e.value) || 0;
+                            const opt = getQtyNumberBoxOptions(row);
                             let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
 
                             if (v > finalMax) {
@@ -867,6 +904,10 @@ function fillLocators(rows) {
                 row.LocatorCode = match.locatorCode;
                 row.AvailableQty = match.onHandQtyInUnit;
                 row.MaxQty = Number(row.AvailableQty) || 0;
+            }
+            if (row.isDecimalUnit == null) {
+                const u = (row.ItemUnits || []).find(x => x.unitId == row.fk_UnitId);
+                row.isDecimalUnit = !!u?.isDecimalUnit;
             }
 
             return updateRowInGrid(row);

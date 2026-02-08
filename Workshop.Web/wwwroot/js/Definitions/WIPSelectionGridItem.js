@@ -160,6 +160,7 @@ function updateSelectionCount(count) {
                     AvailableQty: item.availableQty,
                     MaxQty: item.availableQty,
                     WarehouseId: item.warehouseId,
+                    isDecimalUnit: item.isDecimalUnit,
 
                 }));
                 const existingData = targetGrid.option("dataSource") || [];
@@ -272,7 +273,7 @@ function loadUnitsForRows(rows) {
             }
 
             r.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
-            r.IsDecimalUnit = !!selectedUnit?.IsDecimalUnit;
+            r.isDecimalUnit = !!selectedUnit?.isDecimalUnit;
             
             if (!r.BaseCostPrice || Number(r.BaseCostPrice) === 0) {
                 const costNow = Number(r.CostPrice) || 0;

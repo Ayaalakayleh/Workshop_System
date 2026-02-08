@@ -85,6 +85,8 @@ namespace Workshop.Core.DTOs
         public int Id { get; set; }
         public string primaryName { get; set; }
         public string secondaryName { get; set; }
+        public bool IsDecimal { get; set; } = false;
+
     }
 
     public class CreateItemDTO

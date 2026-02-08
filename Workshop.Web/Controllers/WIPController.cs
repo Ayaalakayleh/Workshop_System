@@ -761,6 +761,7 @@ namespace Workshop.Web.Controllers
                     categoryPrimaryName = cat?.primaryName,
                     categorySecondaryName = cat?.secondaryName,
 
+                    isDecimalUnit = unit?.IsDecimal ?? false,
                     unitPrimaryName = unit?.primaryName,
                     unitSecondaryName = unit?.secondaryName
                 };
