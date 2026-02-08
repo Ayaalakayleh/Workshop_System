@@ -235,6 +235,22 @@
         });
     }
 
+    function buildMovementInUrl(vehicleId, vehicleTypeId) {
+        debugger
+        const base = (window.API_BASE && window.API_BASE.MovementInIndex) || '';
+        if (!base || !vehicleId) return null;
+
+        const url = new URL(base, window.location.origin);
+        url.searchParams.set('vehicleId', vehicleId);
+
+        if (vehicleTypeId != null && vehicleTypeId !== '') {
+            url.searchParams.set('vehicleTypeId', vehicleTypeId);
+        }
+
+        return url.toString();
+    }
+
+
     function buildReservationDetailsModal(list) {
         const container = $('#reservationDetailsModalContainer');
         if (!container.length) return;
@@ -285,6 +301,10 @@
             const company = r.customerName || r.companyName || r.CompanyName || '—';
             const status = r.statusPrimaryName || r.statusSecondaryName || '—';
 
+            const vehicleId = r.vehicleId || r.VehicleId;
+            const vehicleTypeId = r.vehicleTypeId || r.VehicleTypeId;
+            const moveUrl = buildMovementInUrl(vehicleId, vehicleTypeId);
+
             const duration = (r.duration != null)
                 ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
                 : '—';
@@ -306,9 +326,22 @@
                     </div>
                 </div>
                 <div class="${endAlign}">
-                    <div class="mb-2">
-                        <span class="badge resv-status-badge">${status}</span>
-                    </div>
+                    
+
+                        <div class="mb-2">
+                         ${moveUrl ? `
+                          <span class="mt-2">
+                            <a href="${moveUrl}"
+                               class="mx-1 movementLink"
+                               title="${tr('Movement In', 'Movement In')}">
+                               <i class="fad fa-clipboard-list"></i>&nbsp;${tr('Movement In', 'Movement In')}
+                            </a>
+                          </span>
+                        ` : ``}
+                            <span class="badge resv-status-badge">${status}</span>
+                        </div>
+                    
+
                     <div class="small text-muted">${txt.duration}</div>
                     <div class="fw-semibold">${duration}</div>
                 </div>
@@ -350,6 +383,10 @@
                 const dateText = formatDateDisplay(r.date);
                 const timeText = `${formatTimeDisplay(r.start_Time || r.startTime)} – ${formatTimeDisplay(r.end_Time || r.endTime)}`;
                 const status = r.statusPrimaryName || r.statusSecondaryName || '—';
+
+                const vId = r.vehicleId || r.VehicleId;
+                const vType = r.vehicleTypeId || r.VehicleTypeId;
+                const moveUrl = buildMovementInUrl(vId, vType);
 
                 const duration = (r.duration != null)
                     ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
@@ -407,6 +444,15 @@
                                 <div class="resv-field">
                                     <div class="resv-label">${txt.endTime}</div>
                                     <div class="resv-value">${formatTimeDisplay(r.end_Time || r.endTime)}</div>
+                                </div>
+                                <div>
+                                    ${moveUrl ? `
+                                      <div class="mt-2">
+                                        <a href="${moveUrl}" class="btn btn-sm btn-outline-primary w-100">
+                                          <i class="fad fa-clipboard-list"></i>&nbsp;${tr('Movement In', 'Movement In')}
+                                        </a>
+                                      </div>
+                                    ` : ``}
                                 </div>
                             </div>
 

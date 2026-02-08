@@ -3581,3 +3581,7 @@ html[data-bs-theme="dark"] .dxc-title text {
         overflow-y: scroll;
     }
 }
+
+.movementLink{
+    cursor: pointer;
+}
