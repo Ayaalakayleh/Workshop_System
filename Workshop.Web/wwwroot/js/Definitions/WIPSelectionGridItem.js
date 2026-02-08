@@ -272,7 +272,7 @@ function loadUnitsForRows(rows) {
             }
 
             r.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
-
+            r.IsDecimalUnit = !!selectedUnit?.IsDecimalUnit;
             
             if (!r.BaseCostPrice || Number(r.BaseCostPrice) === 0) {
                 const costNow = Number(r.CostPrice) || 0;

@@ -2814,4 +2814,7 @@
   <data name="Label_Success" xml:space="preserve">
     <value>Success</value>
   </data>
+  <data name="Label_CreditNote" xml:space="preserve">
+    <value>Credit Note</value>
+  </data>
 </root>

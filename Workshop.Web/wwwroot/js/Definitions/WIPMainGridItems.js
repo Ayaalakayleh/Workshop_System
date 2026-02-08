@@ -38,6 +38,28 @@ function getEffectiveQty(d) {
     return hasUsed ? Number(u) : baseQty;
 }
 
+function getQtyNumberBoxOptions(row) {
+    const allowDecimal = !!row?.IsDecimalUnit;
+
+    return {
+        allowDecimal,
+        precision: allowDecimal ? 2 : 0,
+        step: allowDecimal ? 0.01 : 1,
+        format: { type: "fixedPoint", precision: allowDecimal ? 2 : 0 }
+    };
+}
+
+function normalizeQtyValue(v, allowDecimal, digits = 2) {
+    let n = Number(v);
+    if (!isFinite(n)) n = 0;
+
+    if (!allowDecimal) {
+        n = Math.floor(n);             
+    } else {
+        n = +n.toFixed(digits);        
+    }
+    return n;
+}
 
 $(function () {
     let locatorsLoadedOnInit = false;
@@ -163,6 +185,13 @@ $(function () {
 
                             const selectedUnit = (row.ItemUnits || []).find(x => x.unitId == selectedUnitId);
                             row.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
+                            row.IsDecimalUnit = !!selectedUnit?.IsDecimalUnit;
+
+                            if (!row.IsDecimalUnit) {
+                                row.RequestQuantity = Math.floor(Number(row.RequestQuantity) || 0);
+                                row.Quantity = Math.floor(Number(row.Quantity) || 0);
+                                row.UsedQuantity = Math.floor(Number(row.UsedQuantity) || 0);
+                            }
 
                             if (!row.BaseCostPrice || Number(row.BaseCostPrice) === 0) {
                                 row.BaseCostPrice = +((Number(row.CostPrice) || 0) * oldFactor).toFixed(2);
@@ -179,6 +208,10 @@ $(function () {
 
                             grid.beginUpdate();
                             try {
+                                grid.cellValue(rowIndex, "RequestQuantity", row.RequestQuantity);
+                                grid.cellValue(rowIndex, "Quantity", row.Quantity);
+                                grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
+
                                 grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
                                 grid.cellValue(rowIndex, "Price", row.Price);
                                 grid.cellValue(rowIndex, "LocatorId", row.LocatorId);
@@ -222,6 +255,7 @@ $(function () {
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
                             let v = Number(e.value);
+                            //let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
 
                             if (!isFinite(v)) v = 0;
 
@@ -234,6 +268,8 @@ $(function () {
                                 v = available;
                                 e.component.option("value", available);
                             }
+
+                            //if (v !== e.value) e.component.option("value", v);
 
                             cellInfo.setValue(v);
                             row.RequestQuantity = v;
@@ -289,12 +325,15 @@ $(function () {
                         disabled: !canEdit,
                         inputAttr: { "autocomplete": "off" },
                         onValueChanged: function (e) {
-                            let v = Number(e.value) || 0;
+                            //let v = Number(e.value) || 0;
+                            let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
 
                             if (v > finalMax) {
                                 v = finalMax;
                                 e.component.option("value", finalMax);
                             }
+
+                            if (v !== e.value) e.component.option("value", v);
 
                             cellInfo.setValue(v);
                             row.Quantity = v;
@@ -311,18 +350,28 @@ $(function () {
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
                     const canEdit = Permission_Approve && Number(row.Status) === 42;
+                    const opt = getQtyNumberBoxOptions(row);
 
                     $("<div>").dxNumberBox({
                         value: cellInfo.value,         
                         min: 0,
-                        max: row.Quantity,             
+                        max: row.Quantity,      
+                        step: opt.step,
+                        format: opt.format,
                         showSpinButtons: true,
                         readOnly: !canEdit, 
                         disabled: !canEdit,
                         valueChangeEvent: "input",
                         onValueChanged: function (e) {
                             if (!canEdit) return;
-                            const v = e.value;
+                            //const v = e.value;
+                            let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
+
+                            const maxV = Number(row.Quantity) || 0;
+                            if (v > maxV) v = maxV;
+                            if (v < 0) v = 0;
+
+                            if (v !== e.value) e.component.option("value", v);
 
                             cellInfo.setValue(v);
                             row.UsedQuantity = v;        

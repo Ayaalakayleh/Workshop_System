@@ -738,7 +738,7 @@ namespace Workshop.Web.Controllers
                 unitById.TryGetValue(item.FK_UnitId, out var unit);
 
                 return new
-                {
+                { 
                     id = item.Id,
                     code = item.Code,
                     primaryName = item.PrimaryName,
@@ -826,17 +826,8 @@ namespace Workshop.Web.Controllers
 
         public async Task<JsonResult> MappingItems(int itemId)
         {
-            //List<ItemDTO> items = await _inventoryApiClient.GetAllItemsAsync(0, 0, 0);
-
-            //List<CategoryDTO> allCategories = await _inventoryApiClient.GetAllCategoriesAsync();
-            //List<UnitDTO> allUnits = await _inventoryApiClient.GetAllUnitDDL();
             var _item = await _inventoryApiClient.GetItemByIdAsync(itemId);
-            //var result = _item.Select(item => new
-            //{
-            //    Code=item.Code,
-            //    Name= lang == "en" ? item.primaryName : item.secondaryName
-
-            //}).ToList();
+        
             return Json(_item);
         }
 
@@ -2293,7 +2284,7 @@ namespace Workshop.Web.Controllers
             UpdateWIPStatusDTO updateWIPStatusDTO = new UpdateWIPStatusDTO()
             {
                 WIPId = WIPId,
-                StatusId = 2030,
+                StatusId = 2031,
             };
             int? Updated = await _apiClient.UpdateWIPStatus(updateWIPStatusDTO);
             return Json(new { success = isSuccess, data = Reverse });
@@ -3021,7 +3012,8 @@ namespace Workshop.Web.Controllers
                 unitPrimaryName = u.UnitPrimaryName,
                 unitSecondaryName = u.UnitSecondaryName,
                 conversionFactor = u.ConversionFactor,
-                isBaseUnit = u.IsBaseUnit
+                isBaseUnit = u.IsBaseUnit,
+                IsDecimalUnit = u.IsDecimalUnit
             }).ToList();
 
             return Json(result);

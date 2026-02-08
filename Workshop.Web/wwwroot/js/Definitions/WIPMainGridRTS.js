@@ -259,7 +259,10 @@ $(function () {
                         hint: "Assign",
                         icon: "fad fa-regular fa-user act-booking",
                         visible: function (e) {
-                            return !(wipStatus === Gone || wipStatus === Invoiced) && e.row.data.Status != 1;//&& e.row.data.Status === 23;
+                            return !(wipStatus === Gone || wipStatus === Invoiced) &&
+                                e.row.data.Status != 1 && //&& e.row.data.Status === 23;
+                                parseInt(e.row.data.Status) !== 24 &&
+                                parseInt(e.row.data.Status) !== 26;
                         },
                         onClick: function (e) {
                             console.log(e.row.data.Id);
@@ -273,6 +276,7 @@ $(function () {
                         visible: function (e) {
                             return !(wipStatus === Gone || wipStatus === Invoiced) &&
                                 parseInt(e.row.data.Status) !== 19 &&
+                                parseInt(e.row.data.Status) !== 20 &&
                                 parseInt(e.row.data.Status) !== 24 &&
                                 parseInt(e.row.data.Status) !== 25 &&
                                 parseInt(e.row.data.Status) !== 26;
@@ -450,45 +454,46 @@ function openScheduleModal(e) {
 
     // default date = today
     const todayStr = new Date().toISOString().slice(0, 10);
-    $('#schDate').val(todayStr);
-
     // default start = 08:00, no allowed times yet
     initSchStartTimepicker([], "08:00");
+
+    $('#schDate').val(todayStr).trigger('change');
+
 
     $('table tr').removeClass('selected-row');
     $tr.addClass('selected-row');
 
-    $.get(window.RazorVars.scheduleGetByIdUrl, { RTSId: rtsId, WIPId: wipId, KeyId:keyId }, function (data) {
-        if (data) {
-            // handle date, ignore 0001-01-01T00:00:00
-            if (data.date && !data.date.startsWith("0001-01-01")) {
-                $('#schDate').val(data.date.split('T')[0]);
-            }
+    //$.get(window.RazorVars.scheduleGetByIdUrl, { RTSId: rtsId, WIPId: wipId, KeyId:keyId }, function (data) {
+    //    if (data) {
+    //        // handle date, ignore 0001-01-01T00:00:00
+    //        if (data.date && !data.date.startsWith("0001-01-01")) {
+    //            $('#schDate').val(data.date.split('T')[0]).trigger('change');
+    //        }
 
-            if (data.technicianId) {
-                $('#schTech').val(data.technicianId);
-            }
+    //        if (data.technicianId) {
+    //            $('#schTech').val(data.technicianId).trigger('change');
+    //        }
 
-            if (data.startTime) {
-                // normalize to HH:mm
-                let timeStr = data.startTime;
-                if (timeStr.indexOf('T') >= 0) {
-                    timeStr = timeStr.split('T')[1];
-                }
-                const parts = timeStr.split(':');
-                const hh = (parts[0] || "00").padStart(2, '0');
-                const mm = (parts[1] || "00").padStart(2, '0');
-                scheduledStartHHMM = `${hh}:${mm}`;
-                $('#schStart').val(scheduledStartHHMM);
-            }
+    //        if (data.startTime) {
+    //            // normalize to HH:mm
+    //            let timeStr = data.startTime;
+    //            if (timeStr.indexOf('T') >= 0) {
+    //                timeStr = timeStr.split('T')[1];
+    //            }
+    //            const parts = timeStr.split(':');
+    //            const hh = (parts[0] || "00").padStart(2, '0');
+    //            const mm = (parts[1] || "00").padStart(2, '0');
+    //            scheduledStartHHMM = `${hh}:${mm}`;
+    //            $('#schStart').val(scheduledStartHHMM);
+    //        }
 
-            if (data.duration && data.duration > 0) {
-                $('#schDuration').val(data.duration);
-            }
+    //        if (data.duration && data.duration > 0) {
+    //            $('#schDuration').val(data.duration);
+    //        }
 
-            recompute();
-        }
-    });
+    //        recompute();
+    //    }
+    //});
 
     if (e.StandardHours != null && e.StandardHours !== undefined && e.StandardHours > 0) {
         $('#schDuration').val(parseFloat(e.StandardHours));
