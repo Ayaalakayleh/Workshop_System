@@ -46,6 +46,9 @@ namespace Workshop.Core
             services.AddScoped<IPriceWorkflowService, PriceWorkflowService>();
             services.AddScoped<IReportsService, ReportsService>();
 
+
+            services.AddScoped<IInsuranceClaimsDataService, InsuranceClaimsDataService>();
+
             return services;
 
         }
