@@ -418,6 +418,8 @@
         if (isVehicleChassisSyncing) return;
 
         const vehicleId = $(this).val();
+        const vehicleType = $("#vehicleTypeDropdown").val();
+        
         if (!vehicleId) return;
 
         const vehicleName = $(this).find('option:selected').text();
@@ -429,7 +431,7 @@
 
         // 1️⃣ Vehicle → chassis
         callApi({
-            url: `${window.API_BASE.getVehicleDefentionById}?id=${vehicleId}&lang=en`,
+            url: `${window.API_BASE.getVehicleDefentionById}?id=${vehicleId}&vehicleType=${vehicleType}&lang=en`,
             onSuccess: (res) => {
                 if (res?.success && res.data?.vehicle?.id) {
                     const chassisId = res.data.vehicle.id;
@@ -453,24 +455,36 @@
         });
 
         callApi({
-            url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${vehicleId}`,
+            url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${vehicleId}&VehicleTypeId=${vehicleType}`,
             onSuccess: (res) => {
                 if (isCustomerSource) return;
 
-                if (!res?.isSuccess || !Array.isArray(res.data) || !res.data.length) {
+                if (!res?.isSuccess || !res.data) {
                     $('#CustomerId').val(null).trigger('change.select2');
                     return;
                 }
 
-                const customerId = res.data[0]?.customerId;
-                if (customerId) {
-                    $('#CustomerId')
-                        .val(String(customerId))
-                        .trigger('change.select2');
+                const dataObj = Array.isArray(res.data) ? (res.data[0] || null) : res.data;
 
-                    lockCustomerDropdown();
+                if (!dataObj) {
+                    $('#CustomerId').val(null).trigger('change.select2');
+                    return;
                 }
 
+                // VehicleTypeId=2 → companyId
+                // VehicleTypeId=1 → customerId
+                const idToSet = (Number(vehicleType) === 2) ? dataObj.companyId : dataObj.customerId;
+
+                if (!idToSet || Number(idToSet) <= 0) {
+                    $('#CustomerId').val(null).trigger('change.select2');
+                    unlockCustomerDropdown();
+                    return;
+                }
+
+
+                $('#CustomerId').val(String(idToSet)).trigger('change.select2');
+                  
+                lockCustomerDropdown();
             }
         });
 
@@ -505,7 +519,8 @@
 
         isVehicleChassisSyncing = true;
 
-       
+        const vehicleType = $("#vehicleTypeDropdown").val();
+
         
         $('#vehicleDropdown')
             .val(String(chassisId))
@@ -513,7 +528,7 @@
 
         // Get vehicle info first
         callApi({
-            url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&lang=en`,
+            url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&vehicleType=${vehicleType}&lang=en`,
             onSuccess: (res) => {
                 if (res?.success && res.data) {
 
@@ -521,7 +536,7 @@
 
                     // Now get agreement info
                     callApi({
-                        url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${chassisId}`,
+                        url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${chassisId}&VehicleTypeId=${vehicleType}`,
                         onSuccess: (agreementRes) => {
                             if (isCustomerSource) return;
 
@@ -529,7 +544,9 @@
                             let finalCustomerId = null;
 
                             if (agreementRes?.isSuccess && Array.isArray(agreementRes.data) && agreementRes.data.length) {
-                                finalCustomerId = agreementRes.data[0]?.customerId;
+                                finalCustomerId = (Number(vehicleType) === 2)
+                                    ? agreementRes.data[0]?.companyId
+                                    : agreementRes.data[0]?.customerId;
                             } else if (vehicleCustomerId) {
                                 finalCustomerId = vehicleCustomerId;
                             }
@@ -566,6 +583,7 @@
 
         const customerId = $('#CustomerId').val();
         state.customerId = toNumber(customerId);
+        const vehicleType = $("#vehicleTypeDropdown").val();
 
         isCustomerSource = true;
         
@@ -606,7 +624,7 @@
         }
 
         callApi({
-            url: `${window.RazorVars.getOpenAgreementInfoUrl}?customerId=${customerId}`,
+            url: `${window.RazorVars.getOpenAgreementInfoUrl}?customerId=${customerId}&VehicleTypeId=${vehicleType}`,
             onSuccess: (res) => {
                 if (!res?.isSuccess || !Array.isArray(res.data)) return;
 
@@ -674,6 +692,23 @@
 
         const $vehicle = $('#vehicleDropdown');
         const $chassis = $('#chassisDropdown');
+
+        state.vehicleId = null;
+        state.chassisId = null;
+        state.plate = null;
+
+        isCustomerSource = false;
+
+        $('#CustomerId').val(null).trigger('change.select2');
+        unlockCustomerDropdown();
+
+        $('#CompanyId').val(null).trigger('change');
+
+        allVehicleOptionsCache = [];
+        $vehicle.empty().append('<option value="">Select</option>').trigger('change.select2');
+        $chassis.empty().append('<option value="">Select</option>').trigger('change.select2');
+
+        if (!vehicleTypeId) return;
 
         const existingCustomer = ($('#CustomerName').val() || '').toString().trim();
         allVehicleOptionsCache = [];

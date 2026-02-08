@@ -149,25 +149,34 @@ namespace Workshop.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(Permissions.Reservations.View)]
-        public async Task<JsonResult> GetVehicleDefentionById(int id, string lang)
-               {
-                   try
-                   {
-                       var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(id);
+        public async Task<JsonResult> GetVehicleDefentionById(int id, int vehicleType, string lang)
+        {
+            try
+            {
+                var vehicle = new VehicleDefinitions();
+                if (vehicleType == 2)
+                {
+                     vehicle = await _vehicleApiClient.GetExternalVehicleDetails(id, lang);
+                }
+                else
+                {
+                     vehicle = await _vehicleApiClient.VehicleDefinitions_Find(id);
+                }
+
                 return Json(new
-                       {
-                           success = true,
-                           data = new
-                           {
-                               Vehicle = vehicle,
-                           }
+                {
+                    success = true,
+                    data = new
+                    {
+                        Vehicle = vehicle,
+                    }
                 });
-                   }
-                   catch (Exception ex)
-                   {
-                       return Json(new { success = false, message = ex.Message });
-                   }
-               }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         /*[HttpGet]
         public async Task<JsonResult> GetAvailableTechnicians(DateTime date, decimal duration)
         {
@@ -434,7 +443,7 @@ namespace Workshop.Web.Controllers
             }
         }
 
-        public async Task<JsonResult> GetOpenAgreementInfoByCustomerIdOrVehicleId(int? customerId, int? vehicleId)
+        public async Task<JsonResult> GetOpenAgreementInfoByCustomerIdOrVehicleId(int? customerId, int VehicleTypeId, int? vehicleId)
         {   
             if (!customerId.HasValue && !vehicleId.HasValue)
             {
@@ -447,13 +456,18 @@ namespace Workshop.Web.Controllers
 
             try
             {
-                    var data = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(customerId, vehicleId);
-
-                    return Json(new
+                var data = new Object();
+                if(VehicleTypeId == 2)
                 {
-                    isSuccess = true,
-                    data
-                });
+                    data = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById((int)vehicleId);
+                }
+                else
+                {
+                    data = await _vehicleApiClient.M_GetOpenAgreementByVehicleOrCustomer(customerId, vehicleId);
+
+                }
+
+                return Json(new { isSuccess = true, data});
             }
             catch (Exception ex)
             {
