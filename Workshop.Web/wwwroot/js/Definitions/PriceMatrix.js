@@ -358,6 +358,13 @@ function onAccountTypeChange(select) {
                 text: item.text
             }));
         });
+
+        if (id == 1) {
+            $("#Customers").val("").trigger("change");
+            $("#Customers").prop("disabled", true);
+        } else {
+            $("#Customers").prop("disabled", false);
+        }
     });
 }
 
