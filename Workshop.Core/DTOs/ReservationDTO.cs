@@ -43,6 +43,7 @@ namespace Workshop.Core.DTOs
     {
 
         public int? VehicleId { get; set; }
+        public int? VehicleTypeId { get; set; }
         public int? Status { get; set; }
 
         public DateTime? DateFrom { get; set; }

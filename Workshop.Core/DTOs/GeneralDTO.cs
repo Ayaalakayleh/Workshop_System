@@ -127,6 +127,7 @@ namespace Workshop.Core.DTOs.General
     {
         public Int64 AgreementId { get; set; }
         public string CustomerName { set; get; }
+        public string CustomerPrimaryName { set; get; }
         public int? LeaseCustomerId { get; set; }
         public Reservation refReservation { get; set; }
         public Int64 ReservationId { get; set; }
@@ -134,6 +135,7 @@ namespace Workshop.Core.DTOs.General
         public int? VehicleDefinitionId { get; set; }
         public int CustomerId { get; set; }
         public DateTime? GregorianReturnDate { get; set; }
+        public string CustomerPhoneNumber { get; set; }
     }
 
     public class Reservation

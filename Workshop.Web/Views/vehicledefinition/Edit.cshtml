@@ -142,7 +142,7 @@
                                 @Html.DropDownListFor(
                                                                 m => m.CompanyId,
                                                                 new SelectList((IEnumerable<dynamic>)ViewBag.Customers,
-                                                                "Id", lang == "en" ? "CustomerName" : "CustomerName", Model.CompanyId),
+                                                                "Id", lang == "en" ? "CustomerPrimaryName" : "CustomerSecondaryname", Model.CompanyId),
                                                                 Common["Select"],
                                                                 new { @class = "form-control select2", id = "CompanyId" }
                                                                 )

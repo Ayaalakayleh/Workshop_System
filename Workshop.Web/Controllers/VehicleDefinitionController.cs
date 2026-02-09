@@ -154,7 +154,7 @@ namespace Workshop.Controllers
 
             vehicle.ColManufacturers = await _vehicleApiClient.GetAllManufacturers(lang);
             var isCompanyCenterialized = 1;
-            var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
+            var allCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
             ViewBag.Customers = allCustomers;
             vehicle.ColVehicleModels = await _vehicleApiClient.GetAllVehicleModel(vehicle.ManufacturerId, lang);
             vehicle.ColClasses = await _vehicleApiClient.GetAllVehicleClass(lang);

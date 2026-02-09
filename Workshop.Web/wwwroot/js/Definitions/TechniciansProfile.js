@@ -298,6 +298,14 @@ $(document).ready(function () {
                                 
                 }
                 return doSave(form, formData);
+            
+            }).fail(function (xhr) {  
+                console.error("isValid failed:", xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: RazorVars.ErrorHappend,
+                    confirmButtonText: RazorVars.btnTryAgain
+                });
             });
 
             return false;

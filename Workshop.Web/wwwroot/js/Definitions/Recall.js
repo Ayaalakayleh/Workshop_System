@@ -39,7 +39,7 @@ $(function () {
                 MakeID: null,
                 ModelID: null,
                 Chassis: '',
-                RecallStatus: null,
+                RecallStatus: 1,
                 isPlaceholder: true
             }).then(() => grid.refresh());
         }

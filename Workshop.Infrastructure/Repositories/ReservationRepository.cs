@@ -23,6 +23,7 @@ namespace Workshop.Infrastructure.Repositories
             var parameters = new
             {
                 VehicleId = filterDTO.VehicleId,
+                VehicleTypeId = filterDTO.VehicleTypeId,
                 Status = filterDTO.Status,
                 DateFrom = filterDTO.DateFrom,
                 DateTo = filterDTO.DateTo,

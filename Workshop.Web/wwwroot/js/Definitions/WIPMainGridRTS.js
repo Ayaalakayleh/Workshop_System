@@ -661,20 +661,19 @@ $("#btnSaveSchedule").on("click", function (e) {
     }).done(function (result) {
         if (result && result.success) {
             const grid = $('#mainRTSGrid').dxDataGrid('instance');
-            const rowIndex = grid.getRowIndexByKey(result.keyId);
-            if (rowIndex >= 0) {
-                var data = grid.option("dataSource");
-                const target = data.find(x => x.KeyId === result.keyId);
-                if (target) {
-                    target.Status = result.status;
-                    target.StatusText = "B-Booked";
-                    grid.cellValue(rowIndex, "TechnicianId", parseInt($('#schTech').val()));
 
-                }
+            const store = grid.getDataSource().store();
+            store.update(result.keyId, {
+                Status: result.status,
+                StatusText: "B-Booked",
+                TechnicianId: parseInt($('#schTech').val())
+            }).then(() => {
+                grid.cancelEditData(); 
+                return grid.getDataSource().reload();
+            }).then(() => {
+                grid.refresh(true);
+            });
 
-                //getRate(WIPSChedule.RTSId, WIPSChedule.TechnicianId);
-                grid.refresh();
-            }
             updateTotalLabourFieldsFromGrid();
             Swal.fire(theMainLang == "en" ? 'Success' : "تمت العملية بنجاح", "", "success");
             evaluateAndUpdateWIPStatus();
@@ -829,7 +828,7 @@ function updateStatusInGrid(KeyId, newStatus, statusText) {
 
     var data = grid.option("dataSource");
     if (Array.isArray(data)) {
-        const target = data.find(x => x.Id === KeyId);
+        const target = data.find(x => x.KeyId === KeyId);
         if (target) {
             target.Status = newStatus;
             target.StatusText = statusText;

@@ -297,7 +297,7 @@
 											</div>
 											<div class="customer-card__body">
 												<h4>@Common["Label_CustomerName"]: <span class="val"><label id="customerName"></label></span></h4>
-												<h4>@Common["Label_PhoneNo"]: <span class="val"><label id="CustomerPhone"></label></span></h4>
+												<h4>@Common["Label_PhoneNo"]: <span class="val"><label id="customerPhone"></label></span></h4>
 											</div>
 										</div>
 									</div>
@@ -664,7 +664,7 @@
 @await Html.PartialAsync("_RecallModal", new RecallDTO())
 
 <input type="hidden" id="VehicleFromReservation" value="@ViewBag.FromReservationVehicleId" />
-<input type="hidden" id="VehicleTypeFromReservation" value="@ViewBag.FromReservationVehicleTypeId" />
+<input type="hidden" id="VehicleTypeFromReservation" value="@(ViewBag.FromReservationVehicleTypeId??ViewBag.VehicleTypeId)" />
 
 <script src="~/js/site.js"></script>
 <script src="~/smartadmin-5-styles/plugins/dynameter/js/jquery.dynameter.js"></script>
