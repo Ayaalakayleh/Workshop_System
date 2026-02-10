@@ -564,6 +564,6 @@ namespace Workshop.Core.DTOs.Vehicle
         public int MovementId { get; set; }
         public string?  Brand { get; set; }
         public string? DOT { get; set; }
-        public decimal? WearLevel { get; set; }
+        public string? WearLevel { get; set; }
     }
 }

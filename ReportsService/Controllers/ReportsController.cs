@@ -185,7 +185,7 @@ namespace ReportsService.Controllers
                 dtTires.Columns.Add("LookupPrimaryDescription", typeof(string));
                 dtTires.Columns.Add("Brand", typeof(string));
                 dtTires.Columns.Add("DOT", typeof(string));
-                dtTires.Columns.Add("WearLevel", typeof(decimal));
+                dtTires.Columns.Add("WearLevel", typeof(string));
 
                 foreach (var v in model.TyreCkecklist ?? new List<TyreChecklist>())
                 {
