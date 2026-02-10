@@ -409,10 +409,37 @@ $(document).ready(function () {
         $("#ResignedDate").prop("disabled", true).val("");
     }
 
-    $('#IsResigned').on('change', function () {
-        $('#IsActive').prop('checked', !this.checked).trigger('change');
-    });
 });
+
+function syncIsActiveByResignedDate() {
+    const v = $('#ResignedDate').val(); 
+
+    let shouldBeActive = true;
+
+    if (v) {
+        const [y, m, d] = v.split('-').map(Number);
+        const resigned = new Date(y, m - 1, d); 
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (resigned <= today) {
+            shouldBeActive = false;
+        }
+    }
+
+    $('#IsActive').prop('checked', shouldBeActive).trigger('change');
+}
+
+$('#ResignedDate').on('change', syncIsActiveByResignedDate);
+
+$('#IsResigned').on('change', syncIsActiveByResignedDate);
+
+$(function () {
+    syncIsActiveByResignedDate();
+});
+
+
 
 
 // ---------- List load + pager ----------
