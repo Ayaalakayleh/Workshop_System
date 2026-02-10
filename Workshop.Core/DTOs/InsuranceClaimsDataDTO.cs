@@ -37,7 +37,7 @@ namespace Workshop.Core.DTOs
         public int WipNo { get; set; }
         public int AccountNumber { get; set; }
         public int InvoiceNo { get; set; }
-        public DateTime InvoiceDate { get; set; }
+        public DateTime? InvoiceDate { get; set; }
         public string? DriverName { get; set; }
         public int CompanyId { get; set; }
         public int OriBRN { get; set; }
