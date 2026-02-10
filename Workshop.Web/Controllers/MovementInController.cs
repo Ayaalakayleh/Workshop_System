@@ -210,6 +210,34 @@ namespace Workshop.Web.Controllers
                 movement.IsExternal = IsExternal;
                 //card.Cards[0].WorkOrderId;
 
+
+                if (!movement.GregorianMovementDate.HasValue && GregorianMovementDate != default)
+                    movement.GregorianMovementDate = GregorianMovementDate;
+
+                if (!movement.VehicleID.HasValue || movement.VehicleID.Value <= 0)
+                {
+                    resultJson.IsSuccess = false;
+                    resultJson.Message = "Vehicle is required.";
+                    return Json(resultJson);
+                }
+
+                if (!movement.GregorianMovementDate.HasValue)
+                {
+                    resultJson.IsSuccess = false;
+                    resultJson.Message = "Movement Date is required.";
+                    return Json(resultJson);
+                }
+
+                if (!movement.ReceivedTime.HasValue)
+                {
+                    resultJson.IsSuccess = false;
+                    resultJson.Message = "Received Time is required.";
+                    return Json(resultJson);
+                }
+
+
+
+
                 // Vehicle Movement validation , date and type and with vehicle
                 var VehicleMovementStatus = await _workshopapiClient.CheckVehicleMovementStatusAsync(movement.VehicleID.Value);
 
@@ -240,7 +268,19 @@ namespace Workshop.Web.Controllers
                     }
                     var vehicleNams = new List<VehicleNams>();
                     //var workOrder = new MWorkOrderDTO();
+                    if (!movement.VehicleID.HasValue || movement.VehicleID.Value <= 0)
+                    {
+                        resultJson.IsSuccess = false;
+                        resultJson.Message = "Vehicle is required.";
+                        return Json(resultJson);
+                    }
 
+                    if (!movement.VehicleSubStatusId.HasValue || movement.VehicleSubStatusId.Value <= 0)
+                    {
+                        resultJson.IsSuccess = false;
+                        resultJson.Message = "Vehicle sub status is required.";
+                        return Json(resultJson);
+                    }
                     MWorkOrderDTO workOrder = null;
 
                     if (movement.WorkOrderId.HasValue)
