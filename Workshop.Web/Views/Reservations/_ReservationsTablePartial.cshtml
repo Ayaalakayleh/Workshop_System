@@ -64,7 +64,7 @@
                                 {
                                     hasAction = true;
                                     <div class="dropdown-item p-2">
-                                        <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId, vehicleTypeId = item.vehicleTypeId })"
+                                        <a href="@Url.Action("Index", "MovementIn", new { vehicleId = item.VehicleId, vehicleTypeId = item.vehicleTypeId, allowSelectVehicle=false })"
                                            class="btn btn-sm btn-outline-primary reservations-button w-100"
                                            title="@Common["Label_MovementIn"]">
                                             <i class="fad fa-clipboard-list"></i>&nbsp;@Common["Label_MovementIn"]

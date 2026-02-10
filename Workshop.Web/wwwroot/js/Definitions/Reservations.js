@@ -247,6 +247,8 @@
             url.searchParams.set('vehicleTypeId', vehicleTypeId);
         }
 
+        url.searchParams.set('allowSelectVehicle', false);
+
         return url.toString();
     }
 

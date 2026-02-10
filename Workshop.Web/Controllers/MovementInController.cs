@@ -47,13 +47,14 @@ namespace Workshop.Web.Controllers
         }
 
         [CustomAuthorize(Permissions.MovementIn.View)]
-        public async Task<IActionResult> Index(int? vehicleId, int? vehicleTypeId)
+        public async Task<IActionResult> Index(int? vehicleId, int? vehicleTypeId, bool allowSelectVehicle = true)
         {
 
             ViewBag.Makes = await GetMakes();
             ViewBag.SubStatuses = await GetSubStatuses();
             ViewBag.FromReservationVehicleId = vehicleId ?? 0;
             ViewBag.FromReservationVehicleTypeId = vehicleTypeId ?? 0;
+            ViewBag.AllowSelectVehicle = allowSelectVehicle;
             var obj = new VehicleMovement();
             obj.GregorianMovementDate = DateTime.Now;
             var vLookups = await _apiClient.GetVehicleChecklistLookup();
