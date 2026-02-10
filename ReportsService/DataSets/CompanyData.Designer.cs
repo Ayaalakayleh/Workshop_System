@@ -20,17 +20,17 @@ namespace ReportsService.DataSets {
     [global::System.ComponentModel.DesignerCategoryAttribute("code")]
     [global::System.ComponentModel.ToolboxItem(true)]
     [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedDataSetSchema")]
-    [global::System.Xml.Serialization.XmlRootAttribute("VehicleChecklist")]
+    [global::System.Xml.Serialization.XmlRootAttribute("CompanyData")]
     [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.DataSet")]
-    public partial class VehicleChecklist : global::System.Data.DataSet {
+    public partial class CompanyData : global::System.Data.DataSet {
         
-        private ChecklistDataTable tableChecklist;
+        private CompanyDataDataTable tableCompanyData;
         
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        public VehicleChecklist() {
+        public CompanyData() {
             this.BeginInit();
             this.InitClass();
             global::System.ComponentModel.CollectionChangeEventHandler schemaChangedHandler = new global::System.ComponentModel.CollectionChangeEventHandler(this.SchemaChanged);
@@ -41,7 +41,7 @@ namespace ReportsService.DataSets {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        protected VehicleChecklist(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+        protected CompanyData(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                 base(info, context, false) {
             if ((this.IsBinarySerialized(info, context) == true)) {
                 this.InitVars(false);
@@ -54,8 +54,8 @@ namespace ReportsService.DataSets {
             if ((this.DetermineSchemaSerializationMode(info, context) == global::System.Data.SchemaSerializationMode.IncludeSchema)) {
                 global::System.Data.DataSet ds = new global::System.Data.DataSet();
                 ds.ReadXmlSchema(new global::System.Xml.XmlTextReader(new global::System.IO.StringReader(strSchema)));
-                if ((ds.Tables["Checklist"] != null)) {
-                    base.Tables.Add(new ChecklistDataTable(ds.Tables["Checklist"]));
+                if ((ds.Tables["CompanyData"] != null)) {
+                    base.Tables.Add(new CompanyDataDataTable(ds.Tables["CompanyData"]));
                 }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
@@ -79,9 +79,9 @@ namespace ReportsService.DataSets {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public ChecklistDataTable Checklist {
+        public CompanyDataDataTable _CompanyData {
             get {
-                return this.tableChecklist;
+                return this.tableCompanyData;
             }
         }
         
@@ -127,7 +127,7 @@ namespace ReportsService.DataSets {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         public override global::System.Data.DataSet Clone() {
-            VehicleChecklist cln = ((VehicleChecklist)(base.Clone()));
+            CompanyData cln = ((CompanyData)(base.Clone()));
             cln.InitVars();
             cln.SchemaSerializationMode = this.SchemaSerializationMode;
             return cln;
@@ -152,8 +152,8 @@ namespace ReportsService.DataSets {
                 this.Reset();
                 global::System.Data.DataSet ds = new global::System.Data.DataSet();
                 ds.ReadXml(reader);
-                if ((ds.Tables["Checklist"] != null)) {
-                    base.Tables.Add(new ChecklistDataTable(ds.Tables["Checklist"]));
+                if ((ds.Tables["CompanyData"] != null)) {
+                    base.Tables.Add(new CompanyDataDataTable(ds.Tables["CompanyData"]));
                 }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
@@ -188,10 +188,10 @@ namespace ReportsService.DataSets {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         internal void InitVars(bool initTable) {
-            this.tableChecklist = ((ChecklistDataTable)(base.Tables["Checklist"]));
+            this.tableCompanyData = ((CompanyDataDataTable)(base.Tables["CompanyData"]));
             if ((initTable == true)) {
-                if ((this.tableChecklist != null)) {
-                    this.tableChecklist.InitVars();
+                if ((this.tableCompanyData != null)) {
+                    this.tableCompanyData.InitVars();
                 }
             }
         }
@@ -199,18 +199,18 @@ namespace ReportsService.DataSets {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         private void InitClass() {
-            this.DataSetName = "VehicleChecklist";
+            this.DataSetName = "CompanyData";
             this.Prefix = "";
-            this.Namespace = "http://tempuri.org/VehicleChecklist.xsd";
+            this.Namespace = "http://tempuri.org/CompanyData.xsd";
             this.EnforceConstraints = true;
             this.SchemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
-            this.tableChecklist = new ChecklistDataTable();
-            base.Tables.Add(this.tableChecklist);
+            this.tableCompanyData = new CompanyDataDataTable();
+            base.Tables.Add(this.tableCompanyData);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        private bool ShouldSerializeChecklist() {
+        private bool ShouldSerialize_CompanyData() {
             return false;
         }
         
@@ -225,7 +225,7 @@ namespace ReportsService.DataSets {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedDataSetSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
-            VehicleChecklist ds = new VehicleChecklist();
+            CompanyData ds = new CompanyData();
             global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
             global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
             global::System.Xml.Schema.XmlSchemaAny any = new global::System.Xml.Schema.XmlSchemaAny();
@@ -270,27 +270,27 @@ namespace ReportsService.DataSets {
         }
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        public delegate void ChecklistRowChangeEventHandler(object sender, ChecklistRowChangeEvent e);
+        public delegate void CompanyDataRowChangeEventHandler(object sender, CompanyDataRowChangeEvent e);
         
         /// <summary>
         ///Represents the strongly named DataTable class.
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class ChecklistDataTable : global::System.Data.TypedTableBase<ChecklistRow> {
+        public partial class CompanyDataDataTable : global::System.Data.TypedTableBase<CompanyDataRow> {
             
-            private global::System.Data.DataColumn columnLookupPrimaryDescription;
+            private global::System.Data.DataColumn columnCompanyPrimaryName;
             
-            private global::System.Data.DataColumn columnLookupSecondaryDescription;
+            private global::System.Data.DataColumn columnImg;
             
-            private global::System.Data.DataColumn columnPass;
+            private global::System.Data.DataColumn columnBranch;
             
-            private global::System.Data.DataColumn columnDescription;
+            private global::System.Data.DataColumn columnTitle;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ChecklistDataTable() {
-                this.TableName = "Checklist";
+            public CompanyDataDataTable() {
+                this.TableName = "CompanyData";
                 this.BeginInit();
                 this.InitClass();
                 this.EndInit();
@@ -298,7 +298,7 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            internal ChecklistDataTable(global::System.Data.DataTable table) {
+            internal CompanyDataDataTable(global::System.Data.DataTable table) {
                 this.TableName = table.TableName;
                 if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
                     this.CaseSensitive = table.CaseSensitive;
@@ -315,40 +315,40 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            protected ChecklistDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+            protected CompanyDataDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                     base(info, context) {
                 this.InitVars();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public global::System.Data.DataColumn LookupPrimaryDescriptionColumn {
+            public global::System.Data.DataColumn CompanyPrimaryNameColumn {
                 get {
-                    return this.columnLookupPrimaryDescription;
+                    return this.columnCompanyPrimaryName;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public global::System.Data.DataColumn LookupSecondaryDescriptionColumn {
+            public global::System.Data.DataColumn ImgColumn {
                 get {
-                    return this.columnLookupSecondaryDescription;
+                    return this.columnImg;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public global::System.Data.DataColumn PassColumn {
+            public global::System.Data.DataColumn BranchColumn {
                 get {
-                    return this.columnPass;
+                    return this.columnBranch;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public global::System.Data.DataColumn DescriptionColumn {
+            public global::System.Data.DataColumn TitleColumn {
                 get {
-                    return this.columnDescription;
+                    return this.columnTitle;
                 }
             }
             
@@ -363,48 +363,48 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ChecklistRow this[int index] {
+            public CompanyDataRow this[int index] {
                 get {
-                    return ((ChecklistRow)(this.Rows[index]));
+                    return ((CompanyDataRow)(this.Rows[index]));
                 }
             }
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public event ChecklistRowChangeEventHandler ChecklistRowChanging;
+            public event CompanyDataRowChangeEventHandler CompanyDataRowChanging;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public event ChecklistRowChangeEventHandler ChecklistRowChanged;
+            public event CompanyDataRowChangeEventHandler CompanyDataRowChanged;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public event ChecklistRowChangeEventHandler ChecklistRowDeleting;
+            public event CompanyDataRowChangeEventHandler CompanyDataRowDeleting;
             
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public event ChecklistRowChangeEventHandler ChecklistRowDeleted;
+            public event CompanyDataRowChangeEventHandler CompanyDataRowDeleted;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void AddChecklistRow(ChecklistRow row) {
+            public void AddCompanyDataRow(CompanyDataRow row) {
                 this.Rows.Add(row);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ChecklistRow AddChecklistRow(string LookupPrimaryDescription, string LookupSecondaryDescription, bool Pass, string Description) {
-                ChecklistRow rowChecklistRow = ((ChecklistRow)(this.NewRow()));
+            public CompanyDataRow AddCompanyDataRow(string CompanyPrimaryName, byte[] Img, string Branch, string Title) {
+                CompanyDataRow rowCompanyDataRow = ((CompanyDataRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
-                        LookupPrimaryDescription,
-                        LookupSecondaryDescription,
-                        Pass,
-                        Description};
-                rowChecklistRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowChecklistRow);
-                return rowChecklistRow;
+                        CompanyPrimaryName,
+                        Img,
+                        Branch,
+                        Title};
+                rowCompanyDataRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowCompanyDataRow);
+                return rowCompanyDataRow;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public override global::System.Data.DataTable Clone() {
-                ChecklistDataTable cln = ((ChecklistDataTable)(base.Clone()));
+                CompanyDataDataTable cln = ((CompanyDataDataTable)(base.Clone()));
                 cln.InitVars();
                 return cln;
             }
@@ -412,55 +412,57 @@ namespace ReportsService.DataSets {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override global::System.Data.DataTable CreateInstance() {
-                return new ChecklistDataTable();
+                return new CompanyDataDataTable();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             internal void InitVars() {
-                this.columnLookupPrimaryDescription = base.Columns["LookupPrimaryDescription"];
-                this.columnLookupSecondaryDescription = base.Columns["LookupSecondaryDescription"];
-                this.columnPass = base.Columns["Pass"];
-                this.columnDescription = base.Columns["Description"];
+                this.columnCompanyPrimaryName = base.Columns["CompanyPrimaryName"];
+                this.columnImg = base.Columns["Img"];
+                this.columnBranch = base.Columns["Branch"];
+                this.columnTitle = base.Columns["Title"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             private void InitClass() {
-                this.columnLookupPrimaryDescription = new global::System.Data.DataColumn("LookupPrimaryDescription", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLookupPrimaryDescription);
-                this.columnLookupSecondaryDescription = new global::System.Data.DataColumn("LookupSecondaryDescription", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLookupSecondaryDescription);
-                this.columnPass = new global::System.Data.DataColumn("Pass", typeof(bool), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnPass);
-                this.columnDescription = new global::System.Data.DataColumn("Description", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnDescription);
+                this.columnCompanyPrimaryName = new global::System.Data.DataColumn("CompanyPrimaryName", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCompanyPrimaryName);
+                this.columnImg = new global::System.Data.DataColumn("Img", typeof(byte[]), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnImg);
+                this.columnBranch = new global::System.Data.DataColumn("Branch", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnBranch);
+                this.columnTitle = new global::System.Data.DataColumn("Title", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnTitle);
+                this.ExtendedProperties.Add("Generator_TablePropName", "_CompanyData");
+                this.ExtendedProperties.Add("Generator_UserTableName", "CompanyData");
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ChecklistRow NewChecklistRow() {
-                return ((ChecklistRow)(this.NewRow()));
+            public CompanyDataRow NewCompanyDataRow() {
+                return ((CompanyDataRow)(this.NewRow()));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new ChecklistRow(builder);
+                return new CompanyDataRow(builder);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override global::System.Type GetRowType() {
-                return typeof(ChecklistRow);
+                return typeof(CompanyDataRow);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanged(e);
-                if ((this.ChecklistRowChanged != null)) {
-                    this.ChecklistRowChanged(this, new ChecklistRowChangeEvent(((ChecklistRow)(e.Row)), e.Action));
+                if ((this.CompanyDataRowChanged != null)) {
+                    this.CompanyDataRowChanged(this, new CompanyDataRowChangeEvent(((CompanyDataRow)(e.Row)), e.Action));
                 }
             }
             
@@ -468,8 +470,8 @@ namespace ReportsService.DataSets {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowChanging(e);
-                if ((this.ChecklistRowChanging != null)) {
-                    this.ChecklistRowChanging(this, new ChecklistRowChangeEvent(((ChecklistRow)(e.Row)), e.Action));
+                if ((this.CompanyDataRowChanging != null)) {
+                    this.CompanyDataRowChanging(this, new CompanyDataRowChangeEvent(((CompanyDataRow)(e.Row)), e.Action));
                 }
             }
             
@@ -477,8 +479,8 @@ namespace ReportsService.DataSets {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleted(e);
-                if ((this.ChecklistRowDeleted != null)) {
-                    this.ChecklistRowDeleted(this, new ChecklistRowChangeEvent(((ChecklistRow)(e.Row)), e.Action));
+                if ((this.CompanyDataRowDeleted != null)) {
+                    this.CompanyDataRowDeleted(this, new CompanyDataRowChangeEvent(((CompanyDataRow)(e.Row)), e.Action));
                 }
             }
             
@@ -486,14 +488,14 @@ namespace ReportsService.DataSets {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
                 base.OnRowDeleting(e);
-                if ((this.ChecklistRowDeleting != null)) {
-                    this.ChecklistRowDeleting(this, new ChecklistRowChangeEvent(((ChecklistRow)(e.Row)), e.Action));
+                if ((this.CompanyDataRowDeleting != null)) {
+                    this.CompanyDataRowDeleting(this, new CompanyDataRowChangeEvent(((CompanyDataRow)(e.Row)), e.Action));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void RemoveChecklistRow(ChecklistRow row) {
+            public void RemoveCompanyDataRow(CompanyDataRow row) {
                 this.Rows.Remove(row);
             }
             
@@ -502,7 +504,7 @@ namespace ReportsService.DataSets {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                VehicleChecklist ds = new VehicleChecklist();
+                CompanyData ds = new CompanyData();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -520,7 +522,7 @@ namespace ReportsService.DataSets {
                 type.Attributes.Add(attribute1);
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "ChecklistDataTable";
+                attribute2.FixedValue = "CompanyDataDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -564,128 +566,127 @@ namespace ReportsService.DataSets {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class ChecklistRow : global::System.Data.DataRow {
+        public partial class CompanyDataRow : global::System.Data.DataRow {
             
-            private ChecklistDataTable tableChecklist;
+            private CompanyDataDataTable tableCompanyData;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            internal ChecklistRow(global::System.Data.DataRowBuilder rb) : 
+            internal CompanyDataRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
-                this.tableChecklist = ((ChecklistDataTable)(this.Table));
+                this.tableCompanyData = ((CompanyDataDataTable)(this.Table));
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string LookupPrimaryDescription {
+            public string CompanyPrimaryName {
                 get {
                     try {
-                        return ((string)(this[this.tableChecklist.LookupPrimaryDescriptionColumn]));
+                        return ((string)(this[this.tableCompanyData.CompanyPrimaryNameColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'LookupPrimaryDescription\' in table \'Checklist\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'CompanyPrimaryName\' in table \'CompanyData\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableChecklist.LookupPrimaryDescriptionColumn] = value;
+                    this[this.tableCompanyData.CompanyPrimaryNameColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string LookupSecondaryDescription {
+            public byte[] Img {
                 get {
                     try {
-                        return ((string)(this[this.tableChecklist.LookupSecondaryDescriptionColumn]));
+                        return ((byte[])(this[this.tableCompanyData.ImgColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'LookupSecondaryDescription\' in table \'Checklist\' is DBNull." +
-                                "", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Img\' in table \'CompanyData\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableChecklist.LookupSecondaryDescriptionColumn] = value;
+                    this[this.tableCompanyData.ImgColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public bool Pass {
+            public string Branch {
                 get {
                     try {
-                        return ((bool)(this[this.tableChecklist.PassColumn]));
+                        return ((string)(this[this.tableCompanyData.BranchColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Pass\' in table \'Checklist\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Branch\' in table \'CompanyData\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableChecklist.PassColumn] = value;
+                    this[this.tableCompanyData.BranchColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string Description {
+            public string Title {
                 get {
                     try {
-                        return ((string)(this[this.tableChecklist.DescriptionColumn]));
+                        return ((string)(this[this.tableCompanyData.TitleColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Description\' in table \'Checklist\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'Title\' in table \'CompanyData\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableChecklist.DescriptionColumn] = value;
+                    this[this.tableCompanyData.TitleColumn] = value;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public bool IsLookupPrimaryDescriptionNull() {
-                return this.IsNull(this.tableChecklist.LookupPrimaryDescriptionColumn);
+            public bool IsCompanyPrimaryNameNull() {
+                return this.IsNull(this.tableCompanyData.CompanyPrimaryNameColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void SetLookupPrimaryDescriptionNull() {
-                this[this.tableChecklist.LookupPrimaryDescriptionColumn] = global::System.Convert.DBNull;
+            public void SetCompanyPrimaryNameNull() {
+                this[this.tableCompanyData.CompanyPrimaryNameColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public bool IsLookupSecondaryDescriptionNull() {
-                return this.IsNull(this.tableChecklist.LookupSecondaryDescriptionColumn);
+            public bool IsImgNull() {
+                return this.IsNull(this.tableCompanyData.ImgColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void SetLookupSecondaryDescriptionNull() {
-                this[this.tableChecklist.LookupSecondaryDescriptionColumn] = global::System.Convert.DBNull;
+            public void SetImgNull() {
+                this[this.tableCompanyData.ImgColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public bool IsPassNull() {
-                return this.IsNull(this.tableChecklist.PassColumn);
+            public bool IsBranchNull() {
+                return this.IsNull(this.tableCompanyData.BranchColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void SetPassNull() {
-                this[this.tableChecklist.PassColumn] = global::System.Convert.DBNull;
+            public void SetBranchNull() {
+                this[this.tableCompanyData.BranchColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public bool IsDescriptionNull() {
-                return this.IsNull(this.tableChecklist.DescriptionColumn);
+            public bool IsTitleNull() {
+                return this.IsNull(this.tableCompanyData.TitleColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void SetDescriptionNull() {
-                this[this.tableChecklist.DescriptionColumn] = global::System.Convert.DBNull;
+            public void SetTitleNull() {
+                this[this.tableCompanyData.TitleColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -693,22 +694,22 @@ namespace ReportsService.DataSets {
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        public class ChecklistRowChangeEvent : global::System.EventArgs {
+        public class CompanyDataRowChangeEvent : global::System.EventArgs {
             
-            private ChecklistRow eventRow;
+            private CompanyDataRow eventRow;
             
             private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ChecklistRowChangeEvent(ChecklistRow row, global::System.Data.DataRowAction action) {
+            public CompanyDataRowChangeEvent(CompanyDataRow row, global::System.Data.DataRowAction action) {
                 this.eventRow = row;
                 this.eventAction = action;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ChecklistRow Row {
+            public CompanyDataRow Row {
                 get {
                     return this.eventRow;
                 }

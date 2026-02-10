@@ -175,7 +175,8 @@ namespace Workshop.Web.Controllers
     [FromForm] string driverSignatureBase64,
     [FromForm] string employeeSignatureBase64,
     [FromForm] string EType,
-    [FromForm] DateTime GregorianMovementDate
+    [FromForm] DateTime GregorianMovementDate,
+    [FromForm] string damageSnapshotBase64
             )
         {
             var resultJson = new TempData();
@@ -268,6 +269,19 @@ namespace Workshop.Web.Controllers
                         workOrder.Id = createdWo.Id;
                         movement.WorkOrderId = createdWo.Id;
                     }
+
+                    if (!string.IsNullOrWhiteSpace(damageSnapshotBase64))
+                    {
+                        damageSnapshotBase64 = NormalizeBase64(damageSnapshotBase64);
+
+                        var subFolder = Path.Combine("MovementDamageSnapshots", movement.MasterId.ToString());
+                        var (filePath, fileName) = await _fileService.SaveBase64FileAsync(damageSnapshotBase64, subFolder);
+
+                        movement.DamageImagePath = filePath;
+                        movement.DamageImageName = fileName;
+                    }
+
+
                     checkpoint = "InsertMovement";
                     VehicleMovement newMovement = await _workshopapiClient.InsertVehicleMovementAsync(movement);
 
@@ -441,6 +455,33 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        string NormalizeBase64(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input;
+
+            input = input.Trim();
+
+            var commaIndex = input.IndexOf(',');
+            if (input.StartsWith("data:", StringComparison.OrdinalIgnoreCase) && commaIndex > -1)
+                input = input.Substring(commaIndex + 1);
+
+            if (input.StartsWith("["))
+            {
+                try
+                {
+                    var arr = System.Text.Json.JsonSerializer.Deserialize<string[]>(input);
+                    if (arr?.Length >= 2 && !string.IsNullOrWhiteSpace(arr[1]))
+                        input = arr[1];
+                }
+                catch { }
+            }
+
+            input = input.Replace("\r", "").Replace("\n", "").Trim();
+
+            return input;
+        }
+
+
         public async Task<JsonResult> GetAgreementbyVehicleId(int id)
         {
             try
@@ -531,6 +572,53 @@ namespace Workshop.Web.Controllers
             return subStatuses;
         }
         #endregion
+
+        [HttpPost]
+        public async Task<IActionResult> UploadWipDamageImage([FromForm] string img, [FromForm] int wipId)
+        {
+            if (wipId <= 0 || string.IsNullOrWhiteSpace(img))
+                return Json(new { isSuccess = false, message = "Invalid data" });
+
+            var base64 = img
+                .Replace("data:image/png;base64,", "")
+                .Replace("data:image/jpeg;base64,", "")
+                .Replace("data:image/jpg;base64,", "");
+
+            byte[] bytes;
+            try
+            {
+                bytes = Convert.FromBase64String(base64);
+            }
+            catch
+            {
+                return Json(new { isSuccess = false, message = "Invalid base64" });
+            }
+
+            var relativeRoot = base._configuration["FileUpload:DirectoryPath"] ?? "Uploads";
+
+            var folderPath = Path.Combine(base._env.WebRootPath, relativeRoot, "WipDamageImages", wipId.ToString());
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var fileName = "VehicleDamages.png";
+          
+            // var fileName = $"VehicleDamages_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+
+            var fullPath = Path.Combine(folderPath, fileName);
+
+            await System.IO.File.WriteAllBytesAsync(fullPath, bytes);
+
+            var filePath = Path.Combine("WipDamageImages", wipId.ToString()).Replace("\\", "/");
+
+            return Json(new
+            {
+                isSuccess = true,
+                filePath = filePath,  
+                fileName = fileName,  
+                publicUrl = "/" + Path.Combine(relativeRoot, filePath, fileName).Replace("\\", "/")
+            });
+        }
+
 
     }
 

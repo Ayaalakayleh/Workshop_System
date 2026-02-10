@@ -646,19 +646,33 @@
 
         fd.append('EType', Etype);
 
-        $.ajax({
-            url: RazorVars.vehicleMovementInInsertUrl,
-            type: 'POST',
-            data: fd,
-            dataType: 'JSON',
-            contentType: false,
-            cache: false,
-            processData: false
-        }).done(CreateMovementSuccess)
-            .fail(function () {
-                Swal.fire(RazorVars.swalErrorHappened, RazorVars.error, 'error');
-                endSubmit();
-            });
+        var node = document.getElementById('panel');
+        domtoimage.toPng(node).then(function (dataUrl) {
+            fd.set('damageSnapshotBase64', dataUrl);
+            $('#damageSnapshotBase64').val(dataUrl);
+
+            $.ajax({
+                url: RazorVars.vehicleMovementInInsertUrl,
+                type: 'POST',
+                data: fd,
+                dataType: 'JSON',
+                contentType: false,
+                cache: false,
+                processData: false
+            }).done(CreateMovementSuccess)
+                .fail(function () {
+                    Swal.fire(RazorVars.swalErrorHappened, RazorVars.error, 'error');
+                    endSubmit();
+                });
+
+        }).catch(function (e) {
+            console.error(e);
+            Swal.fire('Error', 'Failed to capture damage snapshot', 'error');
+            endSubmit();
+        });
+
+        return false;
+        
     }
 
     /* ==================================================
@@ -756,25 +770,25 @@
     /* ==================================================
        Data (AJAX)
     ================================================== */
-    $(document).on('click change', 'input.maintenance-radio', function (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+    //$(document).on('click change', 'input.maintenance-radio', function (e) {
+    //    e.preventDefault();
+    //    e.stopImmediatePropagation();
 
-        $(this).prop('checked', $(this).data('lockedChecked') === true);
-    });
+    //    $(this).prop('checked', $(this).data('lockedChecked') === true);
+    //});
 
-    $(document).on('keydown', 'input.maintenance-radio', function (e) {
-        if (e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        }
-    });
+    //$(document).on('keydown', 'input.maintenance-radio', function (e) {
+    //    if (e.key === ' ' || e.key === 'Enter') {
+    //        e.preventDefault();
+    //        e.stopImmediatePropagation();
+    //    }
+    //});
 
-    $(function () {
-        $('input.maintenance-radio').each(function () {
-            $(this).data('lockedChecked', this.checked);
-        });
-    });
+    //$(function () {
+    //    $('input.maintenance-radio').each(function () {
+    //        $(this).data('lockedChecked', this.checked);
+    //    });
+    //});
 
     function GetVehicleData(vehicleId) {
         $('.MaintenanceDesc').val("");

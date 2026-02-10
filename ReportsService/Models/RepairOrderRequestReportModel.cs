@@ -40,5 +40,10 @@ namespace ReportsService.Models
         public List<TyreChecklist> TyreCkecklist { get; set; } = new List<TyreChecklist>();
         public List<CreateWIPServiceModel> Services { get; set; } = new List<CreateWIPServiceModel>();
         public List<ItemModel> Items { get; set; } = new List<ItemModel>();
+        public byte[] DamageImageBytes { get; set; }
+        public string RecallListText { get; set; } = null;
+        public string Branch { get; set; } = null;
+        public string Note { get; set; } = null;
+        public CompanyDataModel CompanyData { get; set; } = new CompanyDataModel();
     }
 }

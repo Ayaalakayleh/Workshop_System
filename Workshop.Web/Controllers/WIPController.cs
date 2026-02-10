@@ -2373,12 +2373,20 @@ namespace Workshop.Web.Controllers
                 var services = await _apiClient.WIP_GetServicesById(Id);
                 var workOrderDetials = await _apiClient.GetMWorkOrderByID((int)Details.WorkOrderId);
                 var Complaint = workOrderDetials != null ? workOrderDetials.Description : string.Empty;
-               
+                var Branche = await _erpApiClient.GetBranchById((int)BranchId);
+                var companyInfo = await _erpApiClient.GetCompanyById(CompanyId);
 
                 RepairOrderRequestReportModel model = new RepairOrderRequestReportModel();
                 model.WIPId = Details.Id;
                 model.MovementId = Details.MovementId;
                 model.VehicleNo = Details.VehicleId;
+                model.Branch = Branche != null ? (lang == "en" ? Branche.BranchPrimaryName : Branche.BranchSecondaryName) : string.Empty;
+                model.CompanyData.Branch = Branche != null ? (lang == "en" ? Branche.BranchPrimaryName : Branche.BranchSecondaryName) : string.Empty;
+                model.Note = Details.Note;
+                model.CompanyData.CompanyPrimaryName = companyInfo != null ? companyInfo.CompanyPrimaryName : string.Empty;
+
+                // Logo
+                model.CompanyData.Img = companyInfo.Img;
 
                 //var customer = "";
                 if (accountDetails.CustomerId != null)
@@ -2397,6 +2405,19 @@ namespace Workshop.Web.Controllers
                     model.CustomerName = agreement.CustomerName;
                     model.CustomerMobileNumber = agreement.CustomerPhoneNumber;
                 }
+
+                if (!string.IsNullOrWhiteSpace(movement.DamageImagePath) && !string.IsNullOrWhiteSpace(movement.DamageImageName))
+    
+                {
+                    var root = _configuration["FileUpload:DirectoryPath"]; 
+                    var physicalPath = Path.Combine(_env.WebRootPath, root,
+                        movement.DamageImagePath.Replace("/", Path.DirectorySeparatorChar.ToString()),
+                        movement.DamageImageName);
+
+                    if (System.IO.File.Exists(physicalPath))
+                        model.DamageImageBytes = await System.IO.File.ReadAllBytesAsync(physicalPath);
+                }
+
 
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);
@@ -2443,12 +2464,17 @@ namespace Workshop.Web.Controllers
                 var options = await _apiClient.WIP_GetOptionsById(Id);
                 model.RepeatRepair = options.RepeatRepair == true ? "Yes" : "No";
 
-                //if(vehicleInfo.VIN != null)
-                //{
+                if (vehicleInfo.VIN != null)
+                {
 
-                //    var recallResponse = await _apiClient.GetActiveRecallsByChassis(vehicleInfo.VIN);
-                //     ViewBag.HasRecall = recallResponse?.HasActiveRecall ?? false;
-                //}
+                    var recallResponse = await _apiClient.GetActiveRecallsByChassis(vehicleInfo.VIN);
+                    model.Recalls = recallResponse?.Recalls ?? new List<ActiveRecallDto>();
+                    model.RecallListText = string.Join(", ", model.Recalls
+                            .Where(r => !string.IsNullOrWhiteSpace(r.Title))
+                            .Select(r => r.Title.Trim())
+                    );
+
+                }
 
 
                 //return View(model);

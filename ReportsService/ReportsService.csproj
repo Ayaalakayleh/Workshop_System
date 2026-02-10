@@ -171,6 +171,11 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="DataSets\CompanyData.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CompanyData.xsd</DependentUpon>
+    </Compile>
     <Compile Include="DataSets\RepairItemsDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -199,6 +204,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CompanyDataModel.cs" />
     <Compile Include="Models\CreateWIPServiceModel.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\RepairOrderRequestReportModel.cs" />
@@ -206,6 +212,12 @@
     <Compile Include="Models\VehicleInfoModel.cs" />
     <Compile Include="Models\WIPModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\CryHeaderEn.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CryHeaderEn.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Reports\SubTiresChecklistReport.cs">
       <DependentUpon>SubTiresChecklistReport.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -263,6 +275,17 @@
     <Content Include="DataSets\RepairItemsDataSet.xsc">
       <DependentUpon>RepairItemsDataSet.xsd</DependentUpon>
     </Content>
+    <Content Include="DataSets\CompanyData.xsc">
+      <DependentUpon>CompanyData.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\CompanyData.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CompanyData.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\CompanyData.xss">
+      <DependentUpon>CompanyData.xsd</DependentUpon>
+    </Content>
     <None Include="DataSets\RepairItemsDataSet.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
@@ -315,6 +338,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Reports\CryHeaderEn.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>CryHeaderEn.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\SubTiresChecklistReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>SubTiresChecklistReport.cs</LastGenOutput>
@@ -333,7 +360,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\RepairOrderReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>RepairOrderReport.cs</LastGenOutput>
+      <LastGenOutput>RepairOrderReport1.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
