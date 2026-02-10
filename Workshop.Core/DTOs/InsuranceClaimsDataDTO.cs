@@ -17,6 +17,7 @@ namespace Workshop.Core.DTOs
         public DateTime SentForApprovalDate { get; set; }
         public DateTime ApprovalDate { get; set; }
         public string IncidentNo { get; set; }
+        public int VehicleId { get; set; }
         public int ReportType { get; set; }
         public int InvLaborCharge { get; set; }
         public int InvPartsCharge { get; set; }
