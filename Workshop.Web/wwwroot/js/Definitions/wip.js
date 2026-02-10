@@ -12,6 +12,10 @@
         //        $("#tabPartialAccountBTN").hide();
         //    }
         //});
+
+        var noteHidden = $("#_Note").val();
+        $("#WipNote").val(noteHidden);
+
         function togglePartialBtn() {
             const on = $("#optPartialInv").is(":checked");
 
@@ -1265,18 +1269,18 @@ async function evaluateAndUpdateWIPStatus() {
     }//Compleated or Transfer Compleated
     else if (serviceStatuses.length > 0 && itemStatuses.length == 0 && serviceStatuses.every(s => s === 25 || s === 26)) { 
         targetStatusId = 2031;
-    }//Waiting Parts
-    else if (itemStatuses.length > 0 && itemStatuses.includes(41)) { 
-        targetStatusId = 2027;
-    }//Waiting Labour
-    else if (serviceStatuses.length > 0 && serviceStatuses.includes(23)) { 
-        targetStatusId = 2028;
     }//Booked
-    else if (serviceStatuses.length > 0 && serviceStatuses.every(s => s === 19 || s === 24 || s===26)) { //24: Transfer
+    else if (serviceStatuses.length > 0 && serviceStatuses.every(s => s === 19 || s === 24 || s===25 || s === 26)) { //24: Transfer
         targetStatusId = 2025;
     }//WIP
     else if (serviceStatuses.length > 0 && serviceStatuses.every(s => s === 20 || s === 24)) { 
         targetStatusId = 2026;
+    }//Waiting Parts
+    else if (itemStatuses.length > 0 && itemStatuses.includes(41)) {
+        targetStatusId = 2027;
+    }//Waiting Labour
+    else if (serviceStatuses.length > 0 && serviceStatuses.includes(23)) {
+        targetStatusId = 2028;
     }
 
     if (!targetStatusId) return;

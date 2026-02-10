@@ -40,5 +40,11 @@ namespace Workshop.Web.Models
         public List<TyreChecklist>? TyreCkecklist { get; set; }
         public List<CreateWIPServiceDTO>? Services { get; set; }
         public List<ItemModel>? Items { get; set; }
+        public byte[] DamageImageBytes { get; set; }
+        public List<ActiveRecallDto> Recalls { get; set; } = new List<ActiveRecallDto>();
+        public string RecallListText { get; set; } = null;
+        public string Branch { get; set; } = null;
+        public string Note { get; set; } = null;
+        public CompanyDataModel CompanyData { get; set; } = new CompanyDataModel();
     }
 }

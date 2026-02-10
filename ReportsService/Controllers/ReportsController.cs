@@ -27,75 +27,7 @@ namespace ReportsService.Controllers
             _httpClient.BaseAddress = new Uri(_apiBaseUrl);
         }
 
-        //[HttpGet]
-        //[Route("api/reports/test")]
-        //public IHttpActionResult Test()
-        //{
-        //    return Ok(new
-        //    {
-        //        message = "ReportsService is running!",
-        //        timestamp = DateTime.Now,
-        //        baseUrl = _apiBaseUrl
-        //    });
-        //}
-
-        //[HttpGet]
-        //[Route("api/reports/wip/{id}")]
-        //public HttpResponseMessage GetWipReport(int id)
-        //{
-        //    try
-        //    {
-        //        var reportDocument = new CrystalDecisions.CrystalReports.Engine.ReportDocument();
-        //        var reportPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Reports/CrystalReport1.rpt");
-                
-        //        if (!System.IO.File.Exists(reportPath))
-        //        {
-        //            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Report file not found.");
-        //        }
-
-        //        reportDocument.Load(reportPath);
-
-        //        // Attempt to set connection credentials - Update these to match your DB
-        //        // Ideally reading from config
-        //        // reportDocument.SetDatabaseLogon("acs@workshop", "ACS@Worksh0p_#2025_", "94.249.88.254,1433", "DB_WorkshopCore");
-        //        // Because connection handling in Crystal can be tricky depending on how the report was designed (OLEDB vs ODBC etc)
-        //        // We will try standard Initialize but often need concrete Logon info.
-                
-        //        try
-        //        {
-        //             reportDocument.SetDatabaseLogon("acs@workshop", "ACS@Worksh0p_#2025_", "94.249.88.254,1433", "DB_WorkshopCore");
-        //        }
-        //        catch
-        //        {
-        //            // Ignore or log if logon fails (might be using saved data or integrated security)
-        //        }
-
-        //        // Try setting parameter 'Id' if it exists
-        //        if (reportDocument.ParameterFields["Id"] != null) 
-        //            reportDocument.SetParameterValue("Id", id);
-        //        else if (reportDocument.ParameterFields["@Id"] != null)
-        //             reportDocument.SetParameterValue("@Id", id);
-
-        //        var stream = reportDocument.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
-                
-        //        var result = new HttpResponseMessage(HttpStatusCode.OK)
-        //        {
-        //            Content = new StreamContent(stream)
-        //        };
-        //        result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
-        //        result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
-        //        {
-        //            FileName = $"WIP_Report_{id}.pdf"
-        //        };
-
-        //        return result;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
-        //    }
-        //}
-
+       
         [HttpPost]
         [Route("api/reports/wip/")]
         public HttpResponseMessage GetWipReport(RepairOrderRequestReportModel model )
@@ -104,6 +36,14 @@ namespace ReportsService.Controllers
             
             try
             {
+
+                //Test Image
+                if (model.DamageImageBytes?.Length > 0)
+                {
+                    var dbg = Path.Combine(Path.GetTempPath(), "damage_debug.jpg");
+                    System.IO.File.WriteAllBytes(dbg, model.DamageImageBytes);
+                }
+
                 var ds = new DataSet("RepairOrderDataSet");
                 var dt = new DataTable("DataTable1");
 
@@ -119,6 +59,7 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("Complaint", typeof(string));
                 dt.Columns.Add("Make", typeof(string));
                 dt.Columns.Add("Model", typeof(string));
+                dt.Columns.Add("Year", typeof(string));
                 dt.Columns.Add("ContractExpDate", typeof(string));
                 dt.Columns.Add("WIPId", typeof(int));
                 dt.Columns.Add("FuelLevel", typeof(string));
@@ -132,6 +73,14 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("DateOut", typeof(string));
                 dt.Columns.Add("TimeOut", typeof(string));
                 dt.Columns.Add("MovementId", typeof(int));
+                dt.Columns.Add("DamageImage", typeof(byte[]));
+                dt.Columns.Add("RecallListText", typeof(string));
+                dt.Columns.Add("PlateNumber", typeof(string));
+                dt.Columns.Add("VIN", typeof(string));
+                dt.Columns.Add("Mileage", typeof(decimal));
+                dt.Columns.Add("ColorName", typeof(string));
+                dt.Columns.Add("Note", typeof(string));
+
 
                 var r = dt.NewRow();
 
@@ -145,10 +94,9 @@ namespace ReportsService.Controllers
                 r["CustomerMobileNumber"] = model.CustomerMobileNumber ?? "";
                 r["MVPIExpDate"] = model.MVPIExpDate ?? "";
                 r["Complaint"] = model.Complaint ?? "";
-
                 r["Make"] = model.VehicleInfo?.Make ?? "";
                 r["Model"] = model.VehicleInfo?.Model ?? "";
-
+                r["Year"] = model.VehicleInfo?.Year ?? 0;
                 r["ContractExpDate"] = model.ContractExpDate ?? "";
                 r["WIPId"] = model.WIPId ?? 0;
                 r["FuelLevel"] = model.FuelLevel ?? "";
@@ -162,6 +110,14 @@ namespace ReportsService.Controllers
                 r["DateOut"] = model.DateOut ?? "";
                 r["TimeOut"] = model.TimeOut ?? "";
                 r["MovementId"] = model.MovementId ?? 0;
+                r["DamageImage"] = (object)model.DamageImageBytes ?? DBNull.Value;
+                r["RecallListText"] = model.RecallListText ?? "";
+                r["PlateNumber"] = model.VehicleInfo.PlateNumber ?? "";
+                r["VIN"] = model.VehicleInfo.VIN ?? "";
+                r["Mileage"] = model.VehicleInfo.Mileage ?? 0;
+                r["ColorName"] = model.VehicleInfo.ColorName ?? "";
+                r["Note"] = model.Note ?? "";
+
 
                 dt.Rows.Add(r);
 
@@ -243,6 +199,23 @@ namespace ReportsService.Controllers
                 ds.Tables.Add(dtTires);
                 // End Vehicle Tires Checklist Table
 
+                // CompanyData Table ========================
+                var dtCompanyData = new DataTable("CompanyData");
+                dtCompanyData.Columns.Add("CompanyPrimaryName", typeof(string));
+                dtCompanyData.Columns.Add("Branch", typeof(string));
+                dtCompanyData.Columns.Add("Img", typeof(byte[]));
+                dtCompanyData.Columns.Add("Title", typeof(string));
+
+                dtCompanyData.Rows.Add(
+                    model.CompanyData.CompanyPrimaryName ?? "",
+                    model.CompanyData.Branch ?? "",
+                    (object)model.CompanyData.Img ?? DBNull.Value,
+                    "OPERATIONAL LEASE - OPL REPAIR ORDER REQUEST"
+
+                );
+                ds.Tables.Add(dtCompanyData);
+                // End CompanyData Table
+
                 rpt.Load(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "RepairOrderReport.rpt"));
                 
                 foreach (CrystalDecisions.CrystalReports.Engine.Table t in rpt.Database.Tables)
@@ -265,6 +238,10 @@ namespace ReportsService.Controllers
                 //Tires Subreport
                 var sub_Tires = rpt.OpenSubreport("SubTiresChecklistReport.rpt");
                 sub_Tires.Database.Tables["Tires"].SetDataSource(ds.Tables["Tires"]);
+               
+                //Header Subreport
+                var sub_Header = rpt.OpenSubreport("CryHeaderEn.rpt");
+                sub_Header.Database.Tables["CompanyData"].SetDataSource(ds.Tables["CompanyData"]);
 
                 string contentType;
                 string fileName;

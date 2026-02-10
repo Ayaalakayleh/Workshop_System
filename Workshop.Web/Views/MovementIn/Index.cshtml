@@ -18,6 +18,7 @@
 <link href="~/smartadmin-5-styles/plugins/dynameter/css/index.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.min.css">
 <link rel="stylesheet" href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
+<script src="~/js/dom-to-image.min.js"></script>
 
 <style>
 	/* === SCRATCH CANVAS + CURSORS === */
@@ -486,6 +487,9 @@
 												<div id="panel" class="scratch-inner"></div>
 											</div>
 
+											<input type="hidden" id="damageSnapshotBase64" name="damageSnapshotBase64" />
+
+
 											<div class="text-center mt-3">
 												<button type="button" class="btn btn-secondary btn-sm btn-w-m" id="undo-button">
 													<i class="fa fa-history"></i>&nbsp;@Common["Label_Undo"]
@@ -687,6 +691,7 @@
 		vehicleMovementInInsertUrl: '@Url.Action("VehicleMovementInInsert", "MovementIn")',
 		getAgreementByVehicleIdUrl: '@Url.Action("GetAgreementbyVehicleId", "MovementIn")',
 		getRecallsByVehicleIdUrl: '@Url.Action("GetRecallsByVehicleId", "MovementIn")',
+		UploadWipDamageImageUrl: '@Url.Action("UploadWipDamageImage", "MovementIn")',
 
 		getDetailsUrl: '@Url.Action("GetDetails", "VehicleDefinition")',
 		vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',

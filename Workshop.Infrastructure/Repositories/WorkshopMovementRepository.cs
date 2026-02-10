@@ -123,7 +123,9 @@ namespace Workshop.Infrastructure.Repositories
                     LastVehicleStatus = movement.LastVehicleStatus ?? (object)DBNull.Value,
                     IsExternal = movement.IsExternal ?? (object)DBNull.Value,
                     WorkOrderId = movement.WorkOrderId ?? (object)DBNull.Value,
-                    isPart = movement.isPart
+                    isPart = movement.isPart,
+                    DamageImageName = movement.DamageImageName,
+                    DamageImagePath = movement.DamageImagePath
                 };
 
                 var result = await _database.ExecuteAddStoredProcedure<VehicleMovement>(
