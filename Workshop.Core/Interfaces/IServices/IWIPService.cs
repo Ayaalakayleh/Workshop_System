@@ -68,5 +68,7 @@ namespace Workshop.Core.Interfaces.IServices
         Task<bool> WIP_HasOpenByVehicleAsync(int vehicleId, bool isExternal);
         Task<IEnumerable<WIPDTO>> GetWIPByMovementId(int movementId);
         Task<IEnumerable<VehicleNoServiceReportDTO>> GetVehiclesWithoutWIPInPeriodAsync(string vehicleIds, int branchId, DateTime fromDate, DateTime toDate);
+        Task<bool> WIP_IsClosed(int WIPId);
+        Task<bool> WIP_ToggleReturnParts(int WIPId, bool Toggle);
     }
 }

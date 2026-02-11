@@ -203,7 +203,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public decimal CurrentMeter { get; set; }
 		public int VehicleStatusId { get; set; }
 		public string ChassisNo { get; set; }
-		public int CompanyId { get; set; }
+		public int? CompanyId { get; set; }
 		public int BranchId { get; set; }
 		public string CreatedBy { get; set; }
 		public string path { get; set; }
@@ -564,6 +564,6 @@ namespace Workshop.Core.DTOs.Vehicle
         public int MovementId { get; set; }
         public string?  Brand { get; set; }
         public string? DOT { get; set; }
-        public decimal? WearLevel { get; set; }
+        public string? WearLevel { get; set; }
     }
 }

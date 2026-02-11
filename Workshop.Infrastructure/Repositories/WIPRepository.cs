@@ -905,6 +905,28 @@ namespace Workshop.Infrastructure.Repositories
             );
         }
 
+        public async Task<bool> WIP_IsClosed(int WIPId)
+        {
+            var parameters = new
+            {
+                WIPId = WIPId,
+            };
+
+            return await _database.ExecuteGetByIdProcedure<bool>( "WIP_IsClosed", parameters);
+         
+        }
+        public async Task<bool> WIP_ToggleReturnParts(int WIPId, bool Toggle)
+        {
+            var parameters = new
+            {
+                WIPId = WIPId,
+                Toggle= Toggle
+            };
+
+            return await _database.ExecuteGetByIdProcedure<bool>("WIP_ToggleReturnParts", parameters);
+         
+        }
+
 
 
 

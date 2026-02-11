@@ -228,9 +228,13 @@
 				<div class="panel-hdr">
 					<h2 class="fw-bold">@Common["Label_MovementIn"]</h2>
 					<div class="panel-toolbar">
-						<button type="button" id="openVehicleList" class="btn btn-info btn-w-m mx-2" data-bs-toggle="modal" data-bs-target="#OpenAddVehicleModal">
-							<i class="fa fa-cars"></i>&nbsp;@Common["Label_VehiclesList"]
-						</button>
+						@if (ViewBag.AllowSelectVehicle)
+						{
+							<button type="button" id="openVehicleList" class="btn btn-info btn-w-m mx-2" data-bs-toggle="modal" data-bs-target="#OpenAddVehicleModal">
+								<i class="fa fa-cars"></i>&nbsp;@Common["Label_VehiclesList"]
+							</button>
+							
+						}
 					</div>
 				</div>
 

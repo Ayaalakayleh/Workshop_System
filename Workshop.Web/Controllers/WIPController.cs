@@ -271,7 +271,7 @@ namespace Workshop.Web.Controllers
                             }
                             else
                             {
-                                var vehicleDetails = (await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId)) ?? new CreateVehicleDefinitionsModel();
+                                var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId);
                                 dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
                                 dto.VehicleTab.ModelId = vehicleDetails.VehicleModelId;
                                 dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
@@ -283,7 +283,15 @@ namespace Workshop.Web.Controllers
                                 dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
                                 dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
                                 dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
+                                if(vehicleDetails.CompanyId != null && vehicleDetails.CompanyId > 0)
+                                {
+                                    var companyInfo = await _erpApiClient.GetCompanyById((int)vehicleDetails.CompanyId);
+                                    if(companyInfo != null)
+                                    {
+                                        dto.CompanyName = lang == "en" ? companyInfo.CompanyPrimaryName : companyInfo.CompanySecondaryName;
+                                    }
 
+                                }
                             }
                         }
                         ViewBag.Makes = await GetMakesList();

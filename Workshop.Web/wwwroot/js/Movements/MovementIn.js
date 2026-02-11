@@ -858,7 +858,7 @@
         $("#GettingVehicleId").val(selectedVehicleId);
         GetVehicleData(selectedVehicleId);
         $("#ModalOutsideSearch").modal('hide');
-        $("#openVehicleList").css("display", "none");
+
         GetWIPByVehicleId(selectedVehicleId);
         // Get recalls for the selected vehicle
         GetRecallsByVehicleId($("#GettingVehicleId").val());

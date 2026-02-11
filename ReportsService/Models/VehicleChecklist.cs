@@ -24,6 +24,6 @@ namespace ReportsService.Models
         public int MovementId { get; set; }
         public string Brand { get; set; } = null;
         public string DOT { get; set; } = null;
-        public decimal? WearLevel { get; set; }
+        public string WearLevel { get; set; } = null;
     }
 }
