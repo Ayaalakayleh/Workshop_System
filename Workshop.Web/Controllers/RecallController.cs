@@ -13,6 +13,7 @@ using Workshop.Core.DTOs.Vehicle;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
 using Workshop.Resources;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 
 namespace Workshop.Web.Controllers
 {
@@ -73,7 +74,12 @@ namespace Workshop.Web.Controllers
                 ViewBag.VehcilesRecall = recallItem?.Vehicles;
                 return View(recallItem);
             }
-            return View(new RecallDTO());
+            else
+            {
+                var RecallDTO = new RecallDTO();
+                RecallDTO.IsActive = true;
+                return View(RecallDTO);
+            }
         }
 
         [HttpPost]
