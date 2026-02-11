@@ -271,7 +271,7 @@ namespace Workshop.Web.Controllers
                             }
                             else
                             {
-                                var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(dto.VehicleId);
+                                var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById((int)dto.VehicleId);
                                 dto.VehicleTab.ManufacturerId = vehicleDetails.ManufacturerId;
                                 dto.VehicleTab.ModelId = vehicleDetails.VehicleModelId;
                                 dto.VehicleTab.PlateNumber = vehicleDetails.PlateNumber;
@@ -283,17 +283,17 @@ namespace Workshop.Web.Controllers
                                 dto.VehicleTab.ManufacturerSecondaryName = allManufacturers?.Where(i => i.Id == vehicleDetails?.ManufacturerId).Select(s => s.ManufacturerSecondaryName).FirstOrDefault();
                                 dto.VehicleTab.VehicleModelPrimaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelPrimaryName).FirstOrDefault();
                                 dto.VehicleTab.VehicleModelSecondaryName = allModels?.Where(i => i.Id == vehicleDetails?.VehicleModelId).Select(s => s.VehicleModelSecondaryName).FirstOrDefault();
-                                if(vehicleDetails.CompanyId != null && vehicleDetails.CompanyId > 0)
-                                {
-                                    var companyInfo = await _erpApiClient.GetCompanyById((int)vehicleDetails.CompanyId);
-                                    if(companyInfo != null)
-                                    {
-                                        dto.CompanyName = lang == "en" ? companyInfo.CompanyPrimaryName : companyInfo.CompanySecondaryName;
-                                    }
+                                var allCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
 
+                                if (vehicleDetails?.CompanyId is int companyId && companyId > 0)
+                                {
+                                    var companyCustomer = allCustomers?.FirstOrDefault(c => c.Id == vehicleDetails?.CompanyId);
+
+                                    dto.CompanyName = lang=="en" ? companyCustomer?.CustomerPrimaryName : companyCustomer.CustomerSecondaryname; 
                                 }
-                            }
+
                         }
+                    }
                         ViewBag.Makes = await GetMakesList();
                         ViewBag.Models = await GetModelsList(dto.VehicleTab.ManufacturerId ?? 0);
                         ViewBag.Classes = await GetClasses();
@@ -2484,6 +2484,18 @@ namespace Workshop.Web.Controllers
 
                 }
 
+                if ((int)workOrderDetials?.VehicleType == 2)
+                {
+                    var vehicleDetails = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(Details.VehicleId);
+                    var allCustomers = await _vehicleApiClient.Get_CustomerInformation(BranchId, "en", null);
+
+                    if (vehicleDetails?.CompanyId is int companyId && companyId > 0)
+                    {
+                        var companyCustomer = allCustomers?.FirstOrDefault(c => c.Id == vehicleDetails?.CompanyId);
+
+                        model.CompanyName = lang == "en" ? companyCustomer?.CustomerPrimaryName : companyCustomer.CustomerSecondaryname;
+                    }
+                }
 
                 //return View(model);
                 //Crystal Report
