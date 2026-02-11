@@ -578,5 +578,13 @@ namespace Workshop.API.Controllers
             var result = await _service.GetVehiclesWithoutWIPInPeriodAsync(filter.VehicleIds, filter.BranchId, filter.FromDate, filter.ToDate);
             return Ok(result);
         }
+
+        [HttpGet("WIP_IsClosed")]
+        public async Task<IActionResult> WIP_IsClosed([FromQuery] int WIPId)
+        {
+            var result = await _service.WIP_IsClosed(WIPId);
+            if(result == null) return Ok(new { IsClosed = false });
+            return Ok(result);
+        }
     }
 }

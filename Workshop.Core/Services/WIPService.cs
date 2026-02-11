@@ -49,7 +49,7 @@ namespace Workshop.Core.Services
         {
             return await _repository.DeleteAsync(dto);
         }
-        
+
         public async Task<int> DeleteItem(DeleteWIPDTO dto)
         {
             return await _repository.DeleteItem(dto);
@@ -65,18 +65,18 @@ namespace Workshop.Core.Services
         }
         public async Task<IEnumerable<CreateItemDTO?>> WIP_GetItemsById(int id, string lang)
         {
-            var result =  await _repository.WIP_GetItemsById(id);
+            var result = await _repository.WIP_GetItemsById(id);
             foreach (var item in result)
             {
                 //item.StatusText = lang == "en" ? (item.StatusCode + "-" + item.StatusPrimaryName) : (item.StatusCode + "-" + item.StatusSecondaryName);
-                item.StatusText = lang == "en" ? item.StatusPrimaryName :  item.StatusSecondaryName;
+                item.StatusText = lang == "en" ? item.StatusPrimaryName : item.StatusSecondaryName;
             }
             return result;
         }
         public async Task<IEnumerable<CreateWIPServiceDTO?>> WIP_GetServicesById(int id, string lang)
         {
-            var result =  await _repository.WIP_GetServicesById(id);
-            foreach(var item in result)
+            var result = await _repository.WIP_GetServicesById(id);
+            foreach (var item in result)
             {
                 item.StatusText = lang == "en" ? (item.StatusCode + "-" + item.StatusPrimaryName) : (item.StatusCode + "-" + item.StatusSecondaryName);
             }
@@ -87,7 +87,7 @@ namespace Workshop.Core.Services
             var result = await _repository.WIP_SChedule_GetAll();
             return result;
         }
-        public async Task<IEnumerable<WIPGetItems>> WIP_Get(int Id=0)
+        public async Task<IEnumerable<WIPGetItems>> WIP_Get(int Id = 0)
         {
             return await _repository.WIP_Get(Id);
         }
@@ -125,7 +125,7 @@ namespace Workshop.Core.Services
         {
             return await _repository.InsertWIPVehicleDetailsAsync(dto);
         }
-        
+
         public async Task<VehicleTabDTO?> WIP_GetVehicleDetailsById(int id)
         {
             return await _repository.WIP_GetVehicleDetailsById(id);
@@ -156,7 +156,7 @@ namespace Workshop.Core.Services
 
         public async Task<decimal?> WIP_GetLabourRate(LabourRateFilterDTO filter)
         {
-              return await _repository.WIP_GetLabourRate(filter);
+            return await _repository.WIP_GetLabourRate(filter);
         }
 
 
@@ -212,7 +212,7 @@ namespace Workshop.Core.Services
         {
             return await _repository.UpdateWIPServicesIsExternalAsync(ids);
         }
-        
+
         public async Task<int> UpdateWIPServicesIsFixedAsync(string ids)
         {
             return await _repository.UpdateWIPServicesIsFixedAsync(ids);
@@ -261,17 +261,17 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_UpdatePartWarehouseForSingleItem(dto);
         }
-        
+
         public async Task<int> WIP_Invoice_Insert(CreateWIPInvoiceDTO dto)
         {
             return await _repository.WIP_Invoice_Insert(dto);
         }
-        
+
         public async Task<IEnumerable<WIPInvoiceDTO?>> WIP_Invoice_GetById(int? id, int? TransactionMasterId)
         {
             return await _repository.WIP_Invoice_GetById(id, TransactionMasterId);
         }
-        
+
         public async Task<IEnumerable<WIPInvoiceDTO?>> WIP_Invoice_GetVehicleById(int? VehicleId)
         {
             return await _repository.WIP_Invoice_GetVehicleById(VehicleId);
@@ -311,6 +311,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.GetVehiclesWithoutWIPInPeriodAsync(vehicleIds, branchId, fromDate, toDate);
 
+        }
+        public async Task<bool> WIP_IsClosed(int WIPId)
+        {
+            return await _repository.WIP_IsClosed(WIPId);
         }
 
     }
