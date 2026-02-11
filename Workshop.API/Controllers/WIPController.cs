@@ -586,5 +586,13 @@ namespace Workshop.API.Controllers
             if(result == null) return Ok(new { IsClosed = false });
             return Ok(result);
         }
+
+        [HttpGet("WIP_ToggleReturnParts")]
+        public async Task<IActionResult> WIP_ToggleReturnParts([FromQuery] int WIPId, bool Toggle)
+        {
+            var result = await _service.WIP_ToggleReturnParts(WIPId, Toggle);
+            if(result == null) return Ok(new { IsSuccess = false });
+            return Ok(result);
+        }
     }
 }

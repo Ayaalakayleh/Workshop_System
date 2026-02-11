@@ -316,6 +316,11 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_IsClosed(WIPId);
         }
+        
+        public async Task<bool> WIP_ToggleReturnParts(int WIPId, bool Toggle)
+        {
+            return await _repository.WIP_ToggleReturnParts(WIPId, Toggle);
+        }
 
     }
 }
