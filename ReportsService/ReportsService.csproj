@@ -218,6 +218,11 @@
       <DependentUpon>CryHeaderEn.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Reports\RepairOrderReport1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RepairOrderReport.rpt</DependentUpon>
+    </Compile>
     <Compile Include="Reports\SubTiresChecklistReport.cs">
       <DependentUpon>SubTiresChecklistReport.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
