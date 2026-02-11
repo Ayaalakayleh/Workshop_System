@@ -14,8 +14,8 @@ namespace Workshop.Core.DTOs
         public string AccidentPlace { get; set; }
         public DateTime AccidentDate { get; set; }
         public int WorkshopId { get; set; }
-        public DateTime SentForApprovalDate { get; set; }
-        public DateTime ApprovalDate { get; set; }
+        public DateTime? SentForApprovalDate { get; set; }
+        public DateTime? ApprovalDate { get; set; }
         public string IncidentNo { get; set; }
         public int VehicleId { get; set; }
         public int ReportType { get; set; }
@@ -41,7 +41,7 @@ namespace Workshop.Core.DTOs
         public string? DriverName { get; set; }
         public int CompanyId { get; set; }
         public int OriBRN { get; set; }
-        public int CNDate { get; set; }
+        public DateTime? CNDate { get; set; }
         public int CreditNoteAmount { get; set; }
         public int CnDocNo { get; set; }
         public int BatchNumber { get; set; }
