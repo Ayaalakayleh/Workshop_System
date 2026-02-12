@@ -315,7 +315,7 @@ namespace Workshop.Web.Controllers
                     {
                         damageSnapshotBase64 = NormalizeBase64(damageSnapshotBase64);
 
-                        var subFolder = Path.Combine("MovementDamageSnapshots", movement.MasterId.ToString());
+                        var subFolder = Path.Combine("WipDamageImages");
                         var (filePath, fileName) = await _fileService.SaveBase64FileAsync(damageSnapshotBase64, subFolder);
 
                         movement.DamageImagePath = filePath;
@@ -642,10 +642,14 @@ namespace Workshop.Web.Controllers
                 Directory.CreateDirectory(folderPath);
 
             var fileName = "VehicleDamages.png";
-          
+
             // var fileName = $"VehicleDamages_{DateTime.Now:yyyyMMdd_HHmmss}.png";
 
             var fullPath = Path.Combine(folderPath, fileName);
+
+            _logger.LogInformation("WebRootPath: {wr}", base._env.WebRootPath);
+            _logger.LogInformation("FolderPath: {fp}", folderPath);
+            _logger.LogInformation("FullPath: {p}", fullPath);
 
             await System.IO.File.WriteAllBytesAsync(fullPath, bytes);
 

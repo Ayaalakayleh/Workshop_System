@@ -40,11 +40,11 @@ namespace ReportsService.Controllers
             {
 
                 //Test Image
-                if (model.DamageImageBytes?.Length > 0)
-                {
-                    var dbg = Path.Combine(Path.GetTempPath(), "damage_debug.jpg");
-                    System.IO.File.WriteAllBytes(dbg, model.DamageImageBytes);
-                }
+                //if (model.DamageImageBytes?.Length > 0)
+                //{
+                //    var dbg = Path.Combine(Path.GetTempPath(), "damage_debug.jpg");
+                //    System.IO.File.WriteAllBytes(dbg, model.DamageImageBytes);
+                //}
 
                 var ds = new DataSet("RepairOrderDataSet");
                 var dt = new DataTable("DataTable1");
