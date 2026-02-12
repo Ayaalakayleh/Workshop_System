@@ -3,7 +3,9 @@ using CrystalDecisions.Shared;
 using ReportsService.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -285,6 +287,14 @@ namespace ReportsService.Controllers
             }
             catch (Exception ex)
             {
+                string LogDirectory = "C:\\LogFiles";
+                
+                LogDirectory = (LogDirectory + "Log_" + DateTime.Now.ToString("dd_MM_yyyy", new CultureInfo("en-us")) + ".txt");
+                var sLogFormat = DateTime.Now.ToString("dd/MM/yyyy", new CultureInfo("en-us")) + " " + DateTime.Now.ToString("HH:mm:ss", new CultureInfo("en-us")) + " ==> ";
+                StreamWriter sw = new StreamWriter(LogDirectory, true);
+                sw.WriteLine(sLogFormat + ex.Message + "" + ex.StackTrace);
+                sw.Flush();
+                sw.Close();
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
                     Content = new StringContent(ex.ToString())
