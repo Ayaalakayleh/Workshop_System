@@ -2457,8 +2457,7 @@ namespace Workshop.Web.Controllers
                 }
                 if(movement.FuelLevelId != null)
                 {
-                    var f = await _vehicleApiClient.GetFuleLevelById((int)movement.FuelLevelId)?? new FuleLevel();
-                    model.FuelLevel = f.FuelLevelPercentage!=null ? f.FuelLevelPercentage +"%" : 0 + "%";
+                    model.FuelLevel = movement.FuelLevelId + "%" ;
                 }
                 model.Services = services?.ToList();
                 var Items = await GetItemsModelsAsync(Id, lang);

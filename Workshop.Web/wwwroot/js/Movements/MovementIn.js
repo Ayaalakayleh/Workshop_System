@@ -342,7 +342,9 @@
         }
 
         $('#fuelSlider').on('input', function () {
+            debugger
             var val = Number($(this).val());
+            $("#FuelLevelId").val(val);
             $('#fuelSliderValue').html(String(val));
             if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
                 $myFuelMeter.changeValue(val.toFixed(1));
