@@ -11,7 +11,7 @@
     <div class="col-12">
         <div id="panel-1" class="panel">
             <div class="panel-hdr px-2">
-                <h2 class="font-weight-bold">@Common["Movement"]</h2>
+                <h2 class="font-weight-bold">@Common["Movements History"]</h2>
             </div>
             <div class="panel-container show">
                 <div class="panel-content text-start">
@@ -21,14 +21,14 @@
 
                             <div class="col-md-3 col-sm-12">
                                 <div class="form-group">
-                                    <label>@Common["vehicleNams"]</label>
+                                    <label>@Common["Label_Vehicle"]</label>
                                     @Html.DropDownListFor(model => model.VehicleID, new SelectList(Model.vehicleNams, "id", "VehicleName"), Common["Select"], htmlAttributes: new { @class = "form-control select2" })
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-12" ShowDate">
                                 <div class="form-group" id="mYear">
-                                    <label>@Common["FromDate"]</label>
+                                    <label>@Common["Label_FromDate"]</label>
                                     <div class="input-group">
                                         @Html.EditorFor(model => model.FromDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "FromDate", type = "date" } })
                                      
@@ -37,7 +37,7 @@
                             </div>
                             <div class="col-md-3 col-sm-12" ShowDate">
                                 <div class="form-group" id="mYear">
-                                    <label>@Common["ToDate"]</label>
+                                    <label>@Common["Label_ToDate"]</label>
                                     <div class="input-group">
                                         @Html.EditorFor(model => model.ToDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "ToDate", type = "date"} })
                                      
@@ -51,14 +51,14 @@
                                 </div>
                                 <div class="custom-control custom-switch mt-1">
                                     @Html.CheckBox("MovementOut", new { @class = "custom-control-input" })
-                                    <label class="custom-control-label" for="MovementOut">@Common["MovementOut"]</label>
+                                    <label class="custom-control-label" for="MovementOut">@Common["Label_MovementOut"]</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="text-center mt-3">
-                            <button id="searchVehicleMovment" type="button" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Search"]</button>
-                            <button id="reset-fields" type="reset" class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Reset"]</button>
+                            <button id="searchVehicleMovment" type="button" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]</button>
+                            <button id="reset-fields" type="reset" class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
                             <input type="hidden" id="hidSearchVehicleDefinitions" value="0" />
                         </div>
                     </form>

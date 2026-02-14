@@ -2817,4 +2817,10 @@
   <data name="Label_CreditNote" xml:space="preserve">
     <value>Credit Note</value>
   </data>
+  <data name="NoOfLateDays" xml:space="preserve">
+    <value>No Of Late Days</value>
+  </data>
+  <data name="WorkshopType" xml:space="preserve">
+    <value>Workshop Type</value>
+  </data>
 </root>
