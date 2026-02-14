@@ -269,6 +269,10 @@ namespace Workshop.Infrastructure.Repositories
             var parameters = new
             {
                 VehicleID = filter.VehicleID ?? (object)DBNull.Value,
+                MovementIN = filter.MovementIN,
+                MovementOut = filter.MovementOut,
+                FromDate = filter.FromDate,
+                ToDate = filter.ToDate,
                 PageNumber = filter.page ?? 1,
                 branchId = filter.WorkshopId,
                 GregorianDate = filter.GregorianDate ?? (object)DBNull.Value,

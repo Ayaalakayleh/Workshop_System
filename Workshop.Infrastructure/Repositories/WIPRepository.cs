@@ -34,6 +34,7 @@ namespace Workshop.Infrastructure.Repositories
                     CustomerId = oFilter.CustomerId,
                     PlateNumber = oFilter.PlateNumber,
                     PageNumber = oFilter.PageNumber,
+                    RegistrationNo = oFilter.RegistrationNo,
                     WorkshopId = oFilter.WorkshopId
                 };
                 return await _database.ExecuteGetAllStoredProcedure<WIPDTO>("WIP_GetAll", parameters);

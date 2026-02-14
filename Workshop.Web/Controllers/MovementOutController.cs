@@ -68,19 +68,21 @@ namespace Workshop.Web.Controllers
 
             //Missed from DB
             movement.TotalWorkOrder = 0; //await _workshopApiClient.GetWorkOrderTotalByMasterId(movement.MasterId);
-            movement.RelatedItemId = BranchId;//((CompanyInfo)Session["CompanyInfo"]).workshopId;
+            movement.RelatedItemId = BranchId;
             movement.ColMaintenanceCard = new List<MaintenanceCardDTO>();
 
             if (movement.MovementId.HasValue)
                 movement.ColMaintenanceCard = await _workshopApiClient.GetDMaintenanceCardsByMovementIdAsync(movement.MovementId.Value);
-            var sameOrder = movement.WorkOrders.Find(x => x.Id == movement.ColMaintenanceCard.First().WorkOrderId);
-
-            foreach (var card in movement.ColMaintenanceCard)
+            if (movement.ColMaintenanceCard.Count > 0)
             {
-                if (card.WorkOrderId == sameOrder.Id)
-                    card.Description = sameOrder.Description;
-            }
+                var sameOrder = movement.WorkOrders.Find(x => x.Id == movement.ColMaintenanceCard.First().WorkOrderId);
 
+                foreach (var card in movement.ColMaintenanceCard)
+                {
+                    if (card.WorkOrderId == sameOrder.Id)
+                        card.Description = sameOrder.Description;
+                }
+            }
 
             movement.RefVehicledefinitions.ColVehicleSubStatus = await _vehicleApiClient.GetAllSubStatus(CompanyId, lang);
             if (movement.ColMaintenanceCard.Count == 0)

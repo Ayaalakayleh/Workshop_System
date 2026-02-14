@@ -1,0 +1,126 @@
+﻿@model Workshop.Core.DTOs.WorkshopMovement.WorkshopMovementFilter
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
+@inject IStringLocalizer<Messages> Message
+@{
+    ViewBag.Title = Common["Movement"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr px-2">
+                <h2 class="font-weight-bold">@Common["Movement"]</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content text-start">
+
+                    <form>
+                        <div class="row">
+
+                            <div class="col-md-3 col-sm-12">
+                                <div class="form-group">
+                                    <label>@Common["vehicleNams"]</label>
+                                    @Html.DropDownListFor(model => model.VehicleID, new SelectList(Model.vehicleNams, "id", "VehicleName"), Common["Select"], htmlAttributes: new { @class = "form-control select2" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-12" ShowDate">
+                                <div class="form-group" id="mYear">
+                                    <label>@Common["FromDate"]</label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(model => model.FromDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "FromDate", type = "date" } })
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-12" ShowDate">
+                                <div class="form-group" id="mYear">
+                                    <label>@Common["ToDate"]</label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(model => model.ToDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "ToDate", type = "date"} })
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-start mt-3">
+                                <div class="custom-control custom-switch mt-1">
+                                    @Html.CheckBox("MovementIN", new { @class = "custom-control-input" })
+                                    <label class="custom-control-label" for="MovementIN">@Common["MovementIn"]</label>
+                                </div>
+                                <div class="custom-control custom-switch mt-1">
+                                    @Html.CheckBox("MovementOut", new { @class = "custom-control-input" })
+                                    <label class="custom-control-label" for="MovementOut">@Common["MovementOut"]</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <button id="searchVehicleMovment" type="button" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Search"]</button>
+                            <button id="reset-fields" type="reset" class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Reset"]</button>
+                            <input type="hidden" id="hidSearchVehicleDefinitions" value="0" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MovementList"></div>
+<div id="contentPager"></div>
+<script>
+$(document).ready(function () {
+        getData(1);
+
+        $("#searchVehicleMovment").click(function () {
+            getData(1);
+        });
+
+        function getData(page) {
+            var MovementIn = $('#MovementIN').is(":checked");
+            var MovementOut = $('#MovementOut').is(":checked");
+            var VehicleID = $('#VehicleID').val();
+            var FromDate = $("#FromDate").val();
+            var ToDate = $("#ToDate").val();
+
+            vehicleMovementFilter = {
+                  VehicleID: VehicleID,
+                  page: page,
+                  FromDate: FromDate,
+                  ToDate:ToDate,
+                  MovementIN: MovementIn,
+                  MovementOut: MovementOut
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("MovementList", "MovementsHistory")',
+                dataType: 'html',
+                data: vehicleMovementFilter 
+
+            }).done(function (result) {
+
+                $("#MovementList").html(result);
+                if ($("#total_pages").val() != undefined) {
+                    $("#contentPager").attr("hidden", false);
+                    $('#contentPager').pagination({
+                        items: $("#total_pages").val(),
+                        itemOnPage: 25,
+                        currentPage: page,
+                        cssStyle: 'light-theme',
+                        onInit: function () {
+                            // fire first page loading
+                        },
+                        onPageClick: function (page, evt) {
+                            getData(page);
+                        }
+                    });
+                }
+                else {
+                    $("#contentPager").attr("hidden", true);
+                }
+            });
+        }
+});
+</script>

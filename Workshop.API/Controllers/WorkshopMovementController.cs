@@ -226,6 +226,22 @@ namespace Workshop.API.Controllers
 			await _workshopMovementService.UpdateVehicleMovementStatusAync(workshopId, masterId);
 			return Ok();
 		}
-		#endregion
-	}
+        #endregion
+
+        [HttpPost]
+        public async Task<IActionResult> WorkshopMovement_Filter(WorkshopMovementFilter vehicleMovementFilter)
+        {
+            try
+            {
+				var result = await _workshopMovementService.GetAllDWorkshopVehicleMovement(vehicleMovementFilter);
+				if (result == null) return Ok();
+                return Ok(result); 
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+    }
 }

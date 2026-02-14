@@ -183,6 +183,10 @@ namespace Workshop.Web.Controllers
                         ViewBag.HasExternalInvoices = false;
                     }
 
+                    //RegistrationNo
+                    var RegistrationNo = await VehicleDocumants(dto.VehicleId, 8);
+
+
                     var movementOperators = await GetMovementOperatorsAsync(movementId, dto);
 
                     ViewBag.DueInDate = movementOperators.DueInDate;
@@ -3034,10 +3038,11 @@ namespace Workshop.Web.Controllers
           
         }
 
-        public async Task<JsonResult> CheckExistWIP(int movementId)
+        public async Task<JsonResult> CheckExistWIP(int VehicleId)
         {
-            var getWIPByMovement = await _apiClient.GetWIPByMovementId(movementId);
-            if(getWIPByMovement.Count() > 0)
+            //var getWIPByMovement = await _apiClient.GetWIPByMovementId(movementId);
+            var getOpenWIP = await _apiClient.GetWIPByVehicleId(VehicleId);
+            if(getOpenWIP != null && getOpenWIP.OpenWIPCount > 0)
             {
                 return Json(new { exist = true });
             }

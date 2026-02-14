@@ -9,6 +9,8 @@ namespace Workshop.Core.DTOs
     public static class CacheKeys
     {
         public const string Users = "Users";
+        public const string VehiclesDDL = "VehiclesDDL_{0}"; // language
+        public const string ExternalVehiclesDDL = "ExternalVehiclesDDL";
 
     }
 }

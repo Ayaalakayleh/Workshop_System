@@ -882,10 +882,9 @@
                                     {
                                         @* buttons were commented *@
                                     }
-                                    if (true && Model.LastMovementDetails.HasWorkorder == 0)
+                                    if (true )
                                     {
-                                        @* <a href="@Url.Action("CreateJobCard", "WIP", new { movementId = Model.MovementId })" class="btn btn-success btn-w-m my-1"><i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]</a> *@
-                                        <a href="javascript:void(0);" id="createJobCardBtn" data-movement-id="@Model.MovementId" class="btn btn-success btn-w-m my-1">
+                                        <a href="javascript:void(0);" id="createJobCardBtn" data-movement-id="@Model.MovementId" class="btn btn-success btn-w-m my-1" style="display:none;">
                                             <i class="fa fa-user-hard-hat"></i>&nbsp;@Common["Label_CreateWIP"]
                                         </a>
                                     }
@@ -1057,11 +1056,11 @@
 <script>
     $(document).on('click', '#createJobCardBtn', function () {
         var movementId = $(this).data('movement-id');
-
+        var vehicleId = $("#GettingVehicleId").val();
         $.ajax({
             url: '@Url.Action("CheckExistWIP", "WIP")',
             type: 'GET',
-            data: { movementId: movementId },
+            data: { VehicleId: vehicleId },
             success: function (response) {
                 if(response.exist){
                     Swal.fire({
@@ -1081,5 +1080,19 @@
         });
         
     });
-    
+
+    $(function () {
+        const $btn = $("#createJobCardBtn");
+        const movementId = $btn.data("movement-id");
+         var vehicleId = $("#GettingVehicleId").val();
+
+        $.get('@Url.Action("CheckExistWIP", "WIP")', { VehicleId: vehicleId })
+         .done(function (res) {
+             if (res && res.exist) $btn.remove(); 
+             else $btn.show(); 
+         })
+         .fail(function () {
+             $btn.remove(); 
+         });
+    });
 </script>

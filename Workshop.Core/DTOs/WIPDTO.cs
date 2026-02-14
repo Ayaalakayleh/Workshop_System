@@ -101,6 +101,7 @@ namespace Workshop.Core.DTOs
         public int? WIPNo { get; set; }
         public int? Status { get; set; }
         public int? CustomerId { get; set; }
+        public int? RegistrationNo { get; set; }
         public string? PlateNumber { get; set; }
         public int? PageNumber { get; set; }
     }

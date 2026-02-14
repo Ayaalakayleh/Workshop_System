@@ -379,7 +379,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public List<int>? Recalls { get; set; }
 		public string? DamageImageName { get; set; }
 		public string? DamageImagePath { get; set; }
-    }
+	}
 
 	public class VehicleMovementDocument
 	{
