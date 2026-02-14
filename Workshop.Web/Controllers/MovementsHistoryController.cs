@@ -110,56 +110,6 @@ namespace Workshop.Web.Controllers
             }
         }
 
-        public async Task<ActionResult> VehicleMovementFind(int MovementId)
-        {
-            VehicleMovement ovehicleMovement = new VehicleMovement();
-            ovehicleMovement = await _apiClient.GetVehicleMovementByIdAsync(MovementId);
-            ovehicleMovement.LastVehicleMovementDocuments = new List<VehicleMovementDocument>();
-            ovehicleMovement.ColMaintenanceCard = new List<MaintenanceCardDTO>();
-            ovehicleMovement.ColMaintenanceCard = await _apiClient.GetDMaintenanceCardsByMovementIdAsync(MovementId);
-           
-            if (ovehicleMovement.ColMaintenanceCard.Count == 0 && ovehicleMovement.MasterId.HasValue)
-            {
-                ovehicleMovement.ColMaintenanceCard = await _apiClient.GetDMaintenanceCardsByMasterIdAsync(ovehicleMovement.MasterId.Value);
-            }
-            else if (ovehicleMovement.ColMaintenanceCard.Count == 0)
-            {
-                ovehicleMovement.ColMaintenanceCard = new List<MaintenanceCardDTO>(); 
-            }
-
-            WorkOrderFilterDTO damageFilter = new WorkOrderFilterDTO();
-            damageFilter.VehicleID = ovehicleMovement.VehicleID;
-            damageFilter.CompanyId = CompanyId;
-            damageFilter.language = lang;
-            damageFilter.IsExternal = ovehicleMovement.IsExternal;
-            ovehicleMovement.WorkOrders = await _apiClient.GetMWorkOrdersAsync(damageFilter);
-            if(ovehicleMovement.MovementId != null)
-            {
-                ovehicleMovement.VehicleMovementDocuments = await _apiClient.GetMovementDocumentsAsync((int)ovehicleMovement.MovementId);
-            }
-            else
-            {
-                ovehicleMovement.VehicleMovementDocuments = new List<VehicleMovementDocument>();
-            }
-            ovehicleMovement.MovementInvoice = await _apiClient.GetWorkshopInvoiceByMovementId(MovementId);
-
-            if (ovehicleMovement.ColMaintenanceCard.Count == 0)
-            {
-                ovehicleMovement.ColMaintenanceCard.Add(new MaintenanceCardDTO());
-                ovehicleMovement.AddService = true;
-                if (ovehicleMovement.WorkOrders.Count > 0)
-                {
-                    var LastDamage = ovehicleMovement.WorkOrders.FirstOrDefault();
-                    ovehicleMovement.WorkOrders = new List<MWorkOrderDTO>
-                    {
-                        LastDamage
-                    };
-                }
-            }
-
-            ovehicleMovement.LastMovementDetails = new VehicleMovement();
-            ovehicleMovement.LastMovementDetails = await _apiClient.GetLastVehicleMovementByVehicleIdAsync((int)ovehicleMovement.VehicleID);
-            return View(ovehicleMovement);
-        }
+        
     }
 }
