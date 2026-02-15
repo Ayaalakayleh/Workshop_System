@@ -785,7 +785,7 @@ namespace Workshop.Web.Controllers
                 .ToList();
 
             var others = items
-                .Where(i => !myWarehouseIds.Contains(i.WarehouseId))
+                .Where(i => !myWarehouseIds.Contains(i.WarehouseId) && i.AvailableQty > 0)
                 .Select(Map)
                 .ToList();
 
