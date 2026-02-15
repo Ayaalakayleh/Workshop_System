@@ -1459,7 +1459,7 @@ function CreateIssueVoucher(row) {
         Quantity: row.RequestQuantity,
         UnitQuantity: row.Quantity,
         Price: row.Price || 0,
-        Total: row.Total,
+        Total: row.CostPrice * row.Quantity,
         FK_LocatorId: row.LocatorId,
         FK_WarehouseId: row.WarehouseId
     }];
