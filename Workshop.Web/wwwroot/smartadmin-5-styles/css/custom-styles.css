@@ -1705,10 +1705,10 @@ html[dir="rtl"] .toggle-pin {
     font-size: .92rem;
 }
 
-    .the-movements .status-btn:hover {
+/*    .the-movements .status-btn:hover { Anan
         border-color: #5b3ec8;
         background: #f7f6ff;
-    }
+    }*/
 
     .the-movements .status-btn img {
         width: 24px;
@@ -3255,6 +3255,16 @@ html[dir="rtl"] .toggle-pin {
     background-color: var(--bg-body);
     color: var(--bs-body-color);
 }
+/* Make Select2 look like bootstrap invalid */
+.select2-container .select2-selection.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+    .select2-container .select2-selection.is-invalid:focus,
+    .select2-container--focus .select2-selection.is-invalid {
+        box-shadow: 0 0 0 .25rem rgba(220, 53, 69, .25);
+    }
+
 /*Start fix change Lang/Branch on mobile menu*/
 @media (max-width: 576px) {
     .header-icon .dropdown-menu,

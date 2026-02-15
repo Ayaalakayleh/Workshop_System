@@ -481,18 +481,28 @@
         });
 
         $("#hasRecall").on("change", function () {
-            if ($(this).is(":checked")) {
-                $("#recallList").prop('disabled', false);
+            var checked = $(this).is(":checked");
+            var $recall = $("#recallList");
 
-                
+            $recall.prop("disabled", !checked);
+
+            if (checked) {
+                // init select2 when enabling
+                if ($.fn.select2 && !$recall.hasClass("select2-hidden-accessible")) {
+                    $recall.select2({ width: "100%" });
+                }
             } else {
-                $("#recallList").prop('disabled', true);
-
-
-                
+                // clear selection when disabling
+                $recall.val(null).trigger("change");
             }
+
+            // force re-validation (also clears error when disabled)
+            var validator = $("form#movements").data("validator");
+            if (validator) validator.element($recall[0]);
         });
+
         $("#hasRecall").trigger("change");
+
     }
 
     /* ==================================================
@@ -595,6 +605,27 @@
                 Complaint: { requireOneGroup: RazorVars.requiredField }
             }
         });
+
+        // ✅ Make recallList required ONLY when hasRecall is checked
+        var $recall = $("#recallList");
+        if ($recall.length && $.isFunction($recall.rules)) {
+            $recall.rules("add", {
+                required: {
+                    depends: function () {
+                        return $("#hasRecall").is(":checked");
+                    }
+                },
+                messages: {
+                    required: RazorVars.requiredField
+                }
+            });
+
+            // validate on selection change (Select2/multi-select UX)
+            $recall.on("change", function () {
+                $(this).valid();
+            });
+        }
+
     }
 
     /* ==================================================
@@ -626,12 +657,12 @@
             endSubmit();
             return false;
         }
-
-        if (!$("input[name='Type']:checked").val()) {
-            Swal.fire(RazorVars.chooseMovementType, '', 'error');
-            endSubmit();
-            return false;
-        }
+        // Commented By Abdullah (Business needed)
+        //if (!$("input[name='Type']:checked").val()) {
+        //    Swal.fire(RazorVars.chooseMovementType, '', 'error');
+        //    endSubmit();
+        //    return false;
+        //}
 
         if (!validateOdometer()) { endSubmit(); return false; }
 
