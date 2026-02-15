@@ -75,7 +75,7 @@ $(function () {
             paging: true
         },
         columns: [
-            { dataField: "KeyId", visible: false },
+            { dataField: "KeyId", caption: "#", visible: true, allowEditing: false, width: 50 },
             { dataField: "Id", caption: "ID", visible: false, alignment: "left" },
             { dataField: "ItemId", caption: "ID", visible: false, alignment: "left" },
             {
@@ -93,6 +93,69 @@ $(function () {
             },
             { dataField: "Code", caption: window.RazorVars.DXCode, allowEditing: false, alignment: "left" },
             { dataField: "Name", caption: window.RazorVars.DXName, allowEditing: false, alignment: "left" },
+            {
+                dataField: "RequestQuantity",
+                caption: window.RazorVars.DXRequestQuantity,
+                dataType: "number",
+                //allowEditing: generalRequest == false ? true : false,
+                allowEditing: true,
+                alignment: "left",
+                editCellTemplate: function (cellElement, cellInfo) {
+                    const row = cellInfo.data;
+                    const canEdit = Number(row.Status) != 42;
+
+                    const available = Number(row.AvailableQty) || 0;
+                    const initialVal = cellInfo.value != null ? cellInfo.value : 0;
+
+                    $("<div>").dxNumberBox({
+                        value: initialVal,
+                        min: 0,
+                        max: available,
+                        showSpinButtons: true,
+                        readOnly: !canEdit,
+                        disabled: !canEdit,
+                        inputAttr: { "autocomplete": "off" },
+                        onValueChanged: function (e) {
+                            const allowDecimal = !!row.isDecimalUnit;
+                            let v = Number(e.value);
+
+                            if (!isFinite(v)) v = 0;
+
+                            if (!allowDecimal) {
+                                v = Math.floor(v);
+                            } else {
+                                v = +v.toFixed(2);
+                            }
+
+                            if (v < 0) {
+                                v = 0;
+                                e.component.option("value", 0);
+                            }
+
+                            if (v > available) {
+                                v = available;
+                                e.component.option("value", available);
+                            }
+
+                            cellInfo.setValue(v);
+                            row.RequestQuantity = v;
+                            row.Quantity = v;
+                            if ((Number(row.Quantity) || 0) > v) {
+                                row.Quantity = v;
+                                const grid = $("#mainItemsGrid").dxDataGrid("instance");
+                                const idx = grid.getRowIndexByKey(row.KeyId);
+                                if (idx >= 0) grid.cellValue(idx, "Quantity", v);
+                            }
+                        },
+                        onKeyDown: function (e) {
+                            if (e.event?.key === "-") e.event.preventDefault();
+                        },
+
+
+                    }).appendTo(cellElement);
+                }
+
+            },
             {
                 dataField: "WarehouseId",
                 caption: theMainLang == "en" ? "Warehouse" : "المستودع",
@@ -262,69 +325,6 @@ $(function () {
                 cellTemplate: function (container, options) {
                     $(container).text(options.value ? "TRUE" : "FALSE");
                 }
-            },
-            {
-                dataField: "RequestQuantity",
-                caption: window.RazorVars.DXRequestQuantity,
-                dataType: "number",
-                //allowEditing: generalRequest == false ? true : false,
-                allowEditing: true,
-                alignment: "left",
-                editCellTemplate: function (cellElement, cellInfo) {
-                    const row = cellInfo.data;
-                    const canEdit =  Number(row.Status) != 42;
-
-                    const available = Number(row.AvailableQty) || 0;   
-                    const initialVal = cellInfo.value != null ? cellInfo.value : 0;
-
-                    $("<div>").dxNumberBox({
-                        value: initialVal,
-                        min: 0,
-                        max: available,
-                        showSpinButtons: true,
-                        readOnly: !canEdit,
-                        disabled: !canEdit,
-                        inputAttr: { "autocomplete": "off" },
-                        onValueChanged: function (e) {
-                            const allowDecimal = !!row.isDecimalUnit;
-                            let v = Number(e.value);
-
-                            if (!isFinite(v)) v = 0;
-
-                            if (!allowDecimal) {
-                                v = Math.floor(v);
-                            } else {
-                                v = +v.toFixed(2);
-                            }
-
-                            if (v < 0) {
-                                v = 0;
-                                e.component.option("value", 0);
-                            }
-
-                            if (v > available) {
-                                v = available;
-                                e.component.option("value", available);
-                            }
-
-                            cellInfo.setValue(v);
-                            row.RequestQuantity = v;
-                            row.Quantity = v;
-                            if ((Number(row.Quantity) || 0) > v) {
-                                row.Quantity = v;
-                                const grid = $("#mainItemsGrid").dxDataGrid("instance");
-                                const idx = grid.getRowIndexByKey(row.KeyId);
-                                if (idx >= 0) grid.cellValue(idx, "Quantity", v);
-                            }
-                        },
-                        onKeyDown: function (e) {
-                            if (e.event?.key === "-") e.event.preventDefault();
-                        },
-
-
-                    }).appendTo(cellElement);
-                }
-
             },
             {
                 dataField: "MaxQty",
