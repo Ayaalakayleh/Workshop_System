@@ -232,7 +232,7 @@ namespace Workshop.Web.Controllers
 
                     main.ClockingList = main.ClockingList ?? new List<ClockingDTO>();
 
-                    var currentClocking = main.ClockingList.Any(e => e.TechnicianID == clocking.ClockingForm.TechnicianID);
+                    var currentClocking = main.ClockingList.Any(e => e.TechnicianID == clocking.ClockingForm.TechnicianID && e.StatusID == (int)Status.Working);
                     var checkForNullValues = (clocking.ClockingForm.RTSID == null || clocking.ClockingForm.WIPID == null);
                     if (!currentClocking && !checkForNullValues)
                     {
@@ -398,6 +398,7 @@ namespace Workshop.Web.Controllers
                         {
                             existing.EndedAt = clockItem.EndedAt;
                             existing.Elapsed = clockItem.Elapsed;
+                            existing.StatusID = (int)Status.Break;
                         }
 
                         main.ClockingBreakForm = main.ClockingBreakForm ?? new ClockingBreakDTO();
@@ -438,6 +439,17 @@ namespace Workshop.Web.Controllers
                 }
                 else if (state == Status.Working)
                 {
+                    var techId = clockItem.TechnicianID;
+                    var allClocks = (await _apiClient.GetClocksAsync())?.ToList() ?? new List<ClockingDTO>();
+                    var hasOtherWorking = allClocks.Any(c => c.TechnicianID == techId && c.StatusID == (int)Status.Working && c.ID != clockItem.ID );
+
+                    if (hasOtherWorking)
+                    {
+                        // show message in UI 
+                        TempData["ClockingError"] = lang == "en" ? "Cannot resume. Another task is already Working" : "لا يمكن الاستئناف، يوجد مهمة أخرى قيد العمل";
+                        return RedirectToAction(nameof(Clocking));
+                    }
+
                     clockItem.StatusID = (int)Status.Working;
                     clockItem.StartedAt = clockItem.StartedAt ?? DateTime.Now;
 

@@ -176,7 +176,7 @@
 													</td>
 													<td>@item.AllowedTime</td>
 													<td class="text-center">
-											@if (item.StatusID.Equals((int)Status.Break))
+														@if (item.StatusID.Equals((int)Status.Break))
 														{
 															<button type="submit" class="btn btn-primary btn-w-m my-1" onclick="return setListClockStatus(this, 1)">
 																<i class="fas fa-play"></i>&nbsp;@Common["Button_Resume"]
@@ -336,6 +336,7 @@
 	</div>
 
 	<script>
+		 window.clockingError = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ClockingError"]));
 		// Always initialize resources object first
 		window.resources = Object.assign({}, window.resources || {}, {
 			// Titles / text
@@ -448,6 +449,20 @@
 		});
 			});
 
+
+
+		 document.addEventListener('DOMContentLoaded', function () {
+		  if (window.clockingError) {
+			Swal.fire({
+			  icon: 'warning',
+			  title: 'Warning',
+			  text: window.clockingError,
+			  timer: 3500,
+			  timerProgressBar: true,
+			  showConfirmButton: false
+			});
+		  }
+		});
 	</script>
 
 	<script src="~/js/Definitions/Clocking.js"></script>
