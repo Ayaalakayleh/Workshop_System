@@ -1664,20 +1664,20 @@ namespace Workshop.Web.Controllers
                         case -101:
                             return Json(new { success = false, message = "WIP NOT FOUND" });
                         case -102:
-                            return Json(new { success = false, message = "ALREADY CLOSED" });
+                            return Json(new { success = false, message = lang == "en" ? "ALREADY CLOSED" : "أمر العمل مغلق مسبقاً" });
                         case -103:
-                            return Json(new { success = false, message = "SERVICE NOT COMPLETED" });
+                            return Json(new { success = false, message = lang == "en" ? "SERVICE NOT COMPLETED" : "الخدمة غير مكتملة" });
                         case -104:
-                            return Json(new { success = false, message = "SERVICE TIME MISSING" });
+                            return Json(new { success = false, message = lang == "en" ? "SERVICE TIME MISSING" : "وقت الخدمة غير مُدخل" });
                         case -105:
-                            return Json(new { success = false, message = "PARTS RETURN PENDING" });
+                            return Json(new { success = false, message = lang == "en" ? "PARTS RETURN PENDING" : "إرجاع القطع قيد الانتظار" });
                         case -106:
-                            return Json(new { success = false, message = "PARTIAL INVOICE INCOMPLETE" });
+                            return Json(new { success = false, message = lang == "en" ? "PARTIAL INVOICE INCOMPLETE" : "الفاتورة الجزئية غير مكتملة" });
                         case -107:
-                            return Json(new { success = false, message = "UPDATE AFFECTED UNEXPECTED ROWS" });
+                            return Json(new { success = false, message = lang == "en" ? "UPDATE AFFECTED UNEXPECTED ROWS" : "تم تحديث عدد صفوف غير متوقع" });
                         case -999:
                         default:
-                            return Json(new { success = false, message = "An unknown error occurred." });
+                            return Json(new { success = false, message = lang == "en" ? "An unknown error occurred." : "حدث خطأ غير معروف" });
                     }
                 }
             }

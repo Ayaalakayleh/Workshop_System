@@ -426,7 +426,7 @@
 
             //var Services_Items = $("#mainRTSGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
             //var gridItems = $("#mainItemsGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
-
+        
             const gServices = $("#mainRTSGrid").dxDataGrid("instance");
             const gItems = $("#mainItemsGrid").dxDataGrid("instance");
 
@@ -605,13 +605,14 @@
                                         dataType: 'json',
                                         data: close
                                     }).done(function (result) {
+                                        debugger
                                         if (result.success) {
                                             Swal.fire(theMainLang == "en" ? "WIP has been closed successfully." : "تم اغلاق العملية بنجاح", "", "success").then(() => {
                                                 window.location.href = window.URLs.indexUrl;
                                             });
                                         } else {
                                             const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
-                                            Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
+                                            Swal.fire({ icon: "error", title: msg });
                                         }
                                     }).fail(function (xhr, status, error) {
                                         console.error("Error:", error);

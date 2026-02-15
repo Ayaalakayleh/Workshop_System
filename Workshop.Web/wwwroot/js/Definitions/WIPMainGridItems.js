@@ -61,6 +61,50 @@ function normalizeQtyValue(v, allowDecimal, digits = 2) {
     return n;
 }
 
+//===========================================================
+function getStatusEstimateText(forPopup = false) {
+    const t =
+        window.RazorVars?.DXPartWaitingApproval ||
+        window.RazorVars?.DXPartApprovalReq ||
+        window.RazorVars?.DXPartRequestApproval;
+
+    if (t) return t;
+
+    // fallback
+    if (theMainLang === "en") return "Estimate";
+    return "Estimate";
+}
+
+function isRowApproved(row) {
+    const st = Number(row?.Status);
+    if (st === 36) return true;
+
+    const txt = String(row?.StatusText || "").trim().toLowerCase();
+    if (txt === "approved") return true;
+
+    const approvedTxt = String(window.RazorVars?.DXPartApproved || "").trim().toLowerCase();
+    if (approvedTxt && txt === approvedTxt) return true;
+
+    return false;
+}
+
+function resetRowToEstimateIfApproved(row, grid, rowIndex) {
+    if (!row) return false;
+
+    if (isRowApproved(row)) {
+        row.Status = 35;
+        row.StatusText = getStatusEstimateText(false);
+
+        if (grid && rowIndex >= 0) {
+            grid.cellValue(rowIndex, "Status", 35);
+            grid.cellValue(rowIndex, "StatusText", row.StatusText);
+        }
+        return true;
+    }
+    return false;
+}
+
+//===========================================================
 $(function () {
     let locatorsLoadedOnInit = false;
     let unitsLoadedOnce = false;
@@ -280,6 +324,8 @@ $(function () {
                                 row.AvailableLocators = [];
 
                                 cellInfo.setValue(selectedUnitId);
+
+                                resetRowToEstimateIfApproved(row, grid, rowIndex);
 
                                 grid.beginUpdate();
                                 try {
@@ -648,7 +694,6 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
-                            debugger
                             const stRaw = e?.row?.data?.Status;
                             if (stRaw === undefined || stRaw === null || stRaw === "") return false;
 
@@ -1122,13 +1167,15 @@ function UpdatePartStatus(newStatus, statusText) {
 
 function statusTextById(statusId, forPopup = false) {
     if (forPopup) {
-        return statusId == 36 ? "Approved" :
+        return statusId == 35 ? getStatusEstimateText(true) :
+         statusId == 36 ? "Approved" :
             statusId == 37 ? "Rejected" :
                 statusId == 41 ? "Waiting Part" :
                     statusId == 42 ? "Part Received" :
                         "Updated";
     } else {
-        return statusId == 36 ? window.RazorVars.DXPartApproved :
+        return statusId == 35 ? getStatusEstimateText(false) :
+        statusId == 36 ? window.RazorVars.DXPartApproved :
             statusId == 37 ? window.RazorVars.DXPartRejected :
                 statusId == 41 ? window.RazorVars.DXPartTransferReq :
                     statusId == 42 ? window.RazorVars.DXPartReceived :
@@ -1403,23 +1450,7 @@ function saveData() {
         Options: optionsTab
     };
 
-    //$.ajax({
-    //    type: 'POST',
-    //    url: window.URLs.editPostUrl,
-    //    dataType: 'json',
-    //    data: model
-    //}).done(function (result) {
-    //    if (result) {
-    //        Swal.fire(
-    //            "Success",
-    //            'WIP Saved Successfully!'
-    //        ).then(() => {
-    //            window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-    //        });
-    //    }
-    //}).fail(function (xhr, status, error) {
-    //    console.error("Error:", error);
-    //});
+ 
     $.ajax({
         type: 'POST',
         url: window.URLs.editPostUrl,
@@ -1601,7 +1632,7 @@ function handleFailure(data, isConflict) {
         (isConflict ? (theMainLang == "en" ? "Insufficient stock for one or more items." : "المخزون غير كافٍ لعنصر/عناصر.")
             : (theMainLang == "en" ? "Validation error." : "خطأ تحقق."));
 
-    // shortages ممكن تكون Shortages أو shortages
+    // shortages 
     const shortages = (data && (data.shortages || data.Shortages)) || [];
 
     if (shortages && shortages.length) {
