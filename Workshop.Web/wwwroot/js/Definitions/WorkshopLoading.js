@@ -5,7 +5,7 @@ const SHIFT_MINS = 9 * 60; // 08:00 → 17:00
 
 // ✅ Backend saves schedules on NEXT DAY => compensate by -1.
 // If backend is fixed later, set this back to 0.
-const SAVE_DATE_COMPENSATION_DAYS = -1;
+const SAVE_DATE_COMPENSATION_DAYS = 0;
 
 const technicians = []; // [{ id,name,workingHoursList:[{date,startTime,endTime}], reservationsList:[...] }]
 const AvailableTechnicians = [];
@@ -24,6 +24,70 @@ let currentGroupId = null;  // selected WIP/group id in modal
 
 // ====== HELPERS ======
 const pad2 = n => n.toString().padStart(2, "0");
+
+// ====== TIME DISPLAY MODE (UI 12H, STORAGE 24H) ======
+const UI_USE_12H = true; // ✅ المستخدم يرى 12 ساعة، التخزين 24 ساعة
+
+function normalizeHHMM24(v) {
+    if (!v) return "";
+    const s = String(v).trim();
+    const m = /^(\d{1,2}):(\d{2})/.exec(s); // accepts HH:MM or HH:MM:SS...
+    if (!m) return "";
+    const h = Number(m[1]), min = Number(m[2]);
+    if (!Number.isFinite(h) || !Number.isFinite(min)) return "";
+    return `${pad2(h)}:${pad2(min)}`;
+}
+
+// 24 -> 12 (hh:mm AM/PM)
+function time24To12(hhmm24) {
+    const t = normalizeHHMM24(hhmm24);
+    if (!t) return "";
+    let [h, m] = t.split(":").map(Number);
+    const ampm = h >= 12 ? "PM" : "AM";
+    if (h === 0) h = 12;
+    else if (h > 12) h -= 12;
+    return `${pad2(h)}:${pad2(m)} ${ampm}`;
+}
+
+// 12 -> 24 (HH:MM)  (accepts "08:05 AM", "8:05 am", etc.)
+function time12To24(v) {
+    if (!v) return "";
+    const s0 = String(v).trim();
+    if (!s0) return "";
+
+    // already 24h
+    if (/^\d{1,2}:\d{2}/.test(s0) && !/[AaPp][Mm]/.test(s0)) {
+        return normalizeHHMM24(s0);
+    }
+
+    const s = s0.replace(/\s+/g, " ");
+    const m = /^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/.exec(s);
+    if (!m) return "";
+
+    let h = Number(m[1]);
+    const min = Number(m[2]);
+    const ampm = m[3].toUpperCase();
+
+    if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) return "";
+
+    if (h === 12) h = 0;
+    if (ampm === "PM") h += 12;
+
+    return `${pad2(h)}:${pad2(min)}`;
+}
+
+// unified UI formatter: give it a 24h time, it returns what user should see
+function toUITime(hhmm24) {
+    const t24 = normalizeHHMM24(hhmm24);
+    if (!t24) return hhmm24 ? String(hhmm24) : "";
+    return UI_USE_12H ? time24To12(t24) : t24;
+}
+
+// unified "storage" getter: read from UI input (12h) and return 24h
+function uiInputTo24(v) {
+    if (!UI_USE_12H) return normalizeHHMM24(v);
+    return time12To24(v);
+}
 
 // tolerant time parser: HH:MM, HH:MM:SS, HH:MM:SS.fff...
 const HHMMSS_to_min = (s) => {
@@ -76,10 +140,8 @@ function parseYMD(s) {
 function between(min, max, val) { return Math.max(min, Math.min(max, val)); }
 
 function fmtHuman(hhmm) {
-    let [h, m] = hhmm.split(":").map(Number);
-    const ampm = h >= 12 ? "PM" : "AM";
-    if (h === 0) h = 12; else if (h > 12) h -= 12;
-    return `${pad2(h)}:${pad2(m)} ${ampm}`;
+    // keep same name for existing calls, but make it robust + consistent
+    return time24To12(hhmm);
 }
 
 // normalize API date into YYYY-MM-DD
@@ -187,7 +249,7 @@ function renderHeaderHours() {
     for (let h = 8; h < 17; h++) {
         const div = document.createElement("div");
         div.className = "wl-hour";
-        div.textContent = `${pad2(h)}:00`;
+        div.textContent = toUITime(`${pad2(h)}:00`);
         hours.appendChild(div);
     }
 }
@@ -448,7 +510,7 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         const pos = lanePosFromMinutes(w.start, w.end);
         setOverlayPlacement(div, pos.left, pos.width);
 
-        div.title = `${tech.name} • Working ${fromMinutes(w.start)}–${fromMinutes(w.end)}`;
+        div.title = `${tech.name} • Working ${toUITime(fromMinutes(w.start))}–${toUITime(fromMinutes(w.end))}`;
         lane.appendChild(div);
     });
 
@@ -465,7 +527,7 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         const pos = lanePosFromMinutes(b.start, b.end);
         setOverlayPlacement(div, pos.left, pos.width);
 
-        div.title = `${tech.name} • Busy ${fromMinutes(b.start)}–${fromMinutes(b.end)}`;
+        div.title = `${tech.name} • Busy ${toUITime(fromMinutes(b.start))}–${toUITime(fromMinutes(b.end))}`;
         lane.appendChild(div);
     });
 
@@ -482,7 +544,7 @@ function drawLaneOverlays(lane, tech, dayISO, maps) {
         const pos = lanePosFromMinutes(r.start, r.end);
         setOverlayPlacement(div, pos.left, pos.width);
 
-        div.title = `${tech.name} • Reserved ${fromMinutes(r.start)}–${fromMinutes(r.end)}`;
+        div.title = `${tech.name} • Reserved ${toUITime(fromMinutes(r.start))}–${toUITime(fromMinutes(r.end))}`;
         lane.appendChild(div);
     });
 }
@@ -500,9 +562,12 @@ function makePeriodElement(e) {
     el.style.left = `${between(0, 100, leftPct)}%`;
     el.style.width = `${between(0, 100, widthPct)}%`;
 
+    const startDisp = toUITime(e.start);
+    const endDisp = toUITime(addMinutes(e.start, e.duration));
+
     el.innerHTML = `
     <div>
-      <div class="fw-semibold">${e.ro} • ${e.rts} • ${e.start}–${addMinutes(e.start, e.duration)}</div>
+      <div class="fw-semibold">${e.ro} • ${e.rts} • ${startDisp}–${endDisp}</div>
       <span class="wl-small">${e.title} • ${e.techName ?? ""}</span>
     </div>
   `;
@@ -561,7 +626,7 @@ function renderUnscheduled() {
 function hhmm(v) {
     if (!v) return "";
     const s = String(v);
-    const t = s.includes("T") ? s.split("T")[1] : s;   
+    const t = s.includes("T") ? s.split("T")[1] : s;
     return t.slice(0, 5); // "08:00:00" -> "08:00"
 }
 
@@ -605,7 +670,7 @@ function renderAvailability() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${t.name}</td>
-          <td>${shiftStart}–${shiftEnd}</td>
+          <td>${toUITime(shiftStart)}–${toUITime(shiftEnd)}</td>
           <td>${(workingMins / 60).toFixed(1)}</td>
           <td>${(assignedMins / 60).toFixed(1)}</td>
           <td class="fw-bold">${(availableMins / 60).toFixed(1)}</td>
@@ -750,14 +815,15 @@ function initStartTimePicker($start, allowedTimes, defaultTime, onPicked) {
 
     // if plugin not loaded -> fallback (no crash)
     if (typeof $start.datetimepicker !== "function") {
-        $start.val(defaultTime || SHIFT_START);
+        const d24 = defaultTime || SHIFT_START;
+        $start.val(UI_USE_12H ? toUITime(d24) : d24);
         if (typeof onPicked === "function") onPicked();
         return;
     }
 
     const opts = {
         datepicker: false,
-        format: 'H:i',
+        format: (UI_USE_12H ? 'h:i A' : 'H:i'),
         step: 5,
         scrollInput: false,
         closeOnTimeSelect: true,
@@ -772,16 +838,21 @@ function initStartTimePicker($start, allowedTimes, defaultTime, onPicked) {
         }
     };
 
-    if (Array.isArray(allowedTimes) && allowedTimes.length) {
-        opts.allowTimes = allowedTimes;
+    const allowTimesUI = (Array.isArray(allowedTimes) && allowedTimes.length)
+        ? (UI_USE_12H ? allowedTimes.map(t => toUITime(t)) : allowedTimes)
+        : null;
+
+    if (allowTimesUI && allowTimesUI.length) {
+        opts.allowTimes = allowTimesUI;
     }
 
     $start.datetimepicker(opts);
-    $start.val(defaultTime || (allowedTimes?.[0]) || SHIFT_START).trigger("change");
+    const default24 = defaultTime || (allowedTimes?.[0]) || SHIFT_START;
+    $start.val(UI_USE_12H ? toUITime(default24) : default24).trigger("change");
 }
 
 function schedule2UpdateEnds(els) {
-    const startVal = (els.start.value || "").trim();
+    const startRaw = (els.start.value || "").trim();
 
     const durationHours = parseFloat(els.duration.value);
     if (!Number.isFinite(durationHours) || durationHours <= 0) {
@@ -790,8 +861,17 @@ function schedule2UpdateEnds(els) {
     }
     const durationMins = Math.round(durationHours * 60);
 
-    const end24 = addMinutes(startVal, durationMins);
-    els.ends.value = fmtHuman(end24);
+    // ✅ read UI (12h) -> convert to 24h for math/storage
+    const start24 = uiInputTo24(startRaw);
+    if (!start24) {
+        els.ends.value = "";
+        return;
+    }
+
+    const end24 = addMinutes(start24, durationMins);
+
+    // ✅ show to user as 12h
+    els.ends.value = toUITime(end24);
 
     if (els.overdue) {
         const idx = Number(els.jobIndex.value);
@@ -982,7 +1062,7 @@ function initModal2() {
 
         const dateISO = convertDateFormat(els.date.value);
         const techId = Number(els.tech.value || 0);
-        const start24 = (els.start.value || "").trim();
+        const start24 = uiInputTo24((els.start.value || "").trim());
         const durationHours = parseFloat(els.duration.value);
         const durationMins = Math.round(durationHours * 60);
 
@@ -1514,7 +1594,7 @@ function renderJobsInGroupModal(jobs) {
       <div class="small text-muted">${job.title}</div>
       <div class="small">${window.i18n?.label_allowed || "Allowed"}: ${(job.allowed ?? 0)}h</div>
     `;
-  
+
         const btns = document.createElement("div");
         btns.className = "d-flex gap-2";
 
@@ -1577,7 +1657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         TechnicianAvailabilty(),
     ]);
 
-    initModal2();       // ✅ scheduleModal2 with timepicker for schedStart
+    initModal2();
     initGroupModal();
     wireControls();
     refreshAll();
