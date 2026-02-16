@@ -2823,4 +2823,7 @@
   <data name="WorkshopType" xml:space="preserve">
     <value>نوع الورشة</value>
   </data>
+  <data name="Label_ServiceCode" xml:space="preserve">
+    <value>Service Code</value>
+  </data>
 </root>
