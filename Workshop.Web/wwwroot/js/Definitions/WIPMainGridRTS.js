@@ -614,7 +614,11 @@ function initSchStartTimepicker(allowedTimes, defaultTime) {
         },
         onChangeDateTime: function () {
             recompute();
-        }
+        },
+        allowTimes: allowedTimes,
+        validateOnBlur: true,
+        closeOnWithoutClick: true
+
     };
 
     if (Array.isArray(allowedTimes) && allowedTimes.length > 0) {
@@ -651,7 +655,41 @@ $("#btnSaveSchedule").on("click", function (e) {
         Duration: Math.round(parseFloat($('#schDuration').val()) * 60), //For Minutes
         EndTime: $('#schEnd').val() + ":00"
     };
-    debugger
+
+    var startMin = toMinutes($('#schStart').val());
+    var endMin = toMinutes($('#schEnd').val());
+    var durationMin = normalizeDurationToMinutes($('#schDuration').val());
+
+    var $selected = $("#schTech").find('option:selected');
+    var freeIntervals = [];
+
+    try {
+        freeIntervals = JSON.parse($selected.attr('data-free-intervals') || '[]');
+    } catch { }
+
+    let valid = false;
+
+    for (const interval of freeIntervals) {
+        const s = toMinutes(interval.startFree);
+        const e = toMinutes(interval.endFree);
+
+        if (startMin >= s && (startMin + durationMin) <= e) {
+            valid = true;
+            break;
+        }
+    }
+
+    if (!valid) {
+        Swal.fire(
+            theMainLang == "en" ? "Invalid time selection" : "الوقت المختار خارج الشفت",
+            theMainLang == "en"
+                ? "Selected time exceeds technician shift."
+                : "الوقت المختار يتجاوز نهاية الشفت.",
+            "error"
+        );
+        return;
+    }
+
     $.ajax({
         type: 'POST',
         url: window.RazorVars.wipScheduleUrl,
@@ -687,7 +725,7 @@ $("#btnSaveSchedule").on("click", function (e) {
 $("#schDate").on("change", function () {
     var date = $("#schDate").val();
     var duration = parseFloat($('#schDuration').val()) || 0;
-    var parsedDuration = duration / 60;
+    var parsedDuration = duration;// / 60;
 
     $.ajax({
         type: 'GET',
@@ -717,6 +755,17 @@ $("#schDate").on("change", function () {
     });
 });
 
+function maxFreeMinutes(freeIntervals) {
+    if (!Array.isArray(freeIntervals) || !freeIntervals.length) return 0;
+    let max = 0;
+    freeIntervals.forEach(i => {
+        const s = toMinutes(i.startFree);
+        const e = toMinutes(i.endFree);
+        if (e > s) max = Math.max(max, e - s);
+    });
+    return max;
+}
+
 $("#schTech").on("change", function () {
     var $selected = $(this).find('option:selected');
     var techId = $selected.val();
@@ -738,6 +787,30 @@ $("#schTech").on("change", function () {
     }
 
     var durationMin = normalizeDurationToMinutes($('#schDuration').val());
+    const maxMin = maxFreeMinutes(freeIntervals);
+
+    if (durationMin <= 0) {
+        initSchStartTimepicker([], null);
+        return;
+    } 
+
+
+    if (maxMin < durationMin) {
+        initSchStartTimepicker([], null);
+        $("#schStart").val('');
+        $("#schEnd").val('');
+
+        Swal.fire(
+            theMainLang == "en" ? "No slot fits duration" : "لا توجد فترة زمنية تكفي للمدة المطلوبة",
+            theMainLang == "en"
+                ? `Max available: ${maxMin} min, required: ${durationMin} min`
+                : `أقصى مدة متاحة: ${maxMin} دقيقة، المطلوبة: ${durationMin} دقيقة`,
+            "warning"
+        );
+        return;
+    }
+
+
     var $schEndLocal = $("#schEnd");
 
     if (!freeIntervals.length || durationMin <= 0) {
