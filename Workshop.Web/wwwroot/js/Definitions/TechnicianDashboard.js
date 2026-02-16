@@ -59,7 +59,8 @@ function normalizeTech(raw) {
         pattern: raw.Pattern ?? raw.pattern ?? null,
         numericPin: raw.PIN ?? raw.pin ?? raw.NumericPin ?? raw.numericPin ?? null,
         time: raw.Time ?? raw.time ?? null,
-        status: raw.Status ?? raw.status ?? 'normal'
+        status: raw.Status ?? raw.status ?? 'normal',
+        code: raw.code ?? ''
     };
 }
 
@@ -107,7 +108,7 @@ function createTechnicianCard(tech, index) {
       <div class="status-badge ${statusClass}"></div>
       <div class="technician-icon">${photoContent}</div>
       <div class="technician-info">
-        <div class="technician-id">${tech.id}, ${escapeHtml(tech.primaryName)}</div>
+        <div class="technician-id">${tech.code}, ${escapeHtml(tech.primaryName)}</div>
         <div class="technician-status">${escapeHtml(statusText)}</div>
         ${tech.time ? `<div class="technician-time">${escapeHtml(tech.time)}</div>` : ''}
       </div>
