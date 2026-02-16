@@ -1192,12 +1192,91 @@
             if (targetUrl && targetUrl !== "#") window.location.href = targetUrl;
         });
 
-        $(".plate-mask").inputmask("9999 - A A A", {
+(function () {
+    // Allowed KSA plate letters (from your table)
+    const KSA_ALLOWED = "ABJDRSXTEGKLZNHUV";
+
+    // Latin -> Arabic letters (Saudi plate mapping)
+    const letterToArabic = {
+        A: "ا",
+        B: "ب",
+        J: "ح",
+        D: "د",
+        R: "ر",
+        S: "س",
+        X: "ص",
+        T: "ط",
+        E: "ع",
+        G: "ق",
+        K: "ك",
+        L: "ل",
+        Z: "م",
+        N: "ن",
+        H: "ه",
+        U: "و",
+        V: "ى"
+    };
+
+    // Western digits -> Arabic-Indic digits
+    const digitToArabic = {
+        "0": "٠", "1": "١", "2": "٢", "3": "٣", "4": "٤",
+        "5": "٥", "6": "٦", "7": "٧", "8": "٨", "9": "٩"
+    };
+
+    function toArabicPlate(value) {
+        if (!value) return "";
+
+        // Remove mask placeholders
+        const cleaned = value.replace(/_/g, "");
+
+        let out = "";
+        for (const ch of cleaned) {
+            const up = ch.toUpperCase();
+            if (letterToArabic[up]) out += letterToArabic[up];
+            else if (digitToArabic[ch]) out += digitToArabic[ch];
+            else out += ch; // keep spaces/dash as-is
+        }
+        return out;
+    }
+
+    function syncArabicField() {
+        const val = $("#PlateNumber").val() || "";
+        $("#PlateNumberAr").val(toArabicPlate(val));
+        // Optional: if you still want the old text preview
+        $("#plateText").text(toArabicPlate(val));
+    }
+
+    // Keep your old button working (if present in some branch)
+    window.convertPlateNumber = function () {
+        syncArabicField();
+    };
+
+    $(function () {
+        // Inputmask: 9999 - L L L where L is ONLY from the allowed set
+        $(".plate-mask").inputmask("9999 - L L L", {
             definitions: {
-                'A': { validator: "[A-Za-z]", casing: "upper" }
+                "L": {
+                    validator: "[" + KSA_ALLOWED + "]",
+                    casing: "upper"
+                }
             },
-            placeholder: "_"
+            placeholder: "_",
+            clearIncomplete: true,
+            onBeforePaste: function (pastedValue) {
+                // Uppercase + remove anything not allowed (digits, allowed letters, spaces, dash)
+                const re = new RegExp("[^0-9" + KSA_ALLOWED + "\\s\\-]", "g");
+                return (pastedValue || "").toUpperCase().replace(re, "");
+            }
         });
+
+        // Live convert while typing
+        $(document).on("input keyup change", "#PlateNumber", syncArabicField);
+
+        // Initial fill (in case Model.PlateNumber has value)
+        syncArabicField();
+    });
+})();
+
     });
 </script>
 
