@@ -286,7 +286,7 @@ namespace Workshop.Controllers
 
                         }
                         oAccountSales.AccountSalesMaster.UserId = UserId.ToString();//SessionManager.GetSessionUserInfo.UserID.ToString();
-                        oAccountSales.AccountSalesMaster.CurrencyID = 1;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
+                        oAccountSales.AccountSalesMaster.CurrencyID = Supplier.CurrencyId;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
                         oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
                         oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
                         oAccountSales.CompanyId = CompanyId;

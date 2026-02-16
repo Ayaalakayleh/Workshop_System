@@ -357,7 +357,7 @@ namespace Workshop.Web.Controllers
                                 CustomerAccountNo = AccountList.Where(x => x.ID == Supplier.AccountNoPayableId).FirstOrDefault().AccountNo,
                             };
                             oAccountSales.AccountSalesMaster.UserId = UserId.ToString();
-                            oAccountSales.AccountSalesMaster.CurrencyID = 1;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
+                            oAccountSales.AccountSalesMaster.CurrencyID = Supplier.CurrencyId;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
                             oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
                             oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
                             oAccountSales.CompanyId = CompanyId;

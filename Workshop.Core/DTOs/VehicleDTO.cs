@@ -198,6 +198,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public int VehicleModelId { get; set; }
 		public int ManufacturingYear { get; set; }
 		public string PlateNumber { get; set; }
+		public string PlateNumberAr { get; set; }
 		public int FuleLevel { get; set; }
 		public int Color { get; set; }
 		public decimal CurrentMeter { get; set; }
