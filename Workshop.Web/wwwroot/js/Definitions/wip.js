@@ -421,57 +421,76 @@
             });
         }
 
+        function loadAllRows(grid) {
+            const ds = grid.getDataSource();
+            const oldPaginate = ds.paginate();
+
+            ds.paginate(false);            
+            return ds.load().always(() => {
+                ds.paginate(oldPaginate);   
+            });
+        }
+
+        function toInt(v) {
+            const n = Number(v);
+            return Number.isFinite(n) ? Math.trunc(n) : null;
+        }
+
+
         /* ------- Close WIP ------- */
         $("#closeBTN").on("click", function () {
 
             //var Services_Items = $("#mainRTSGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
             //var gridItems = $("#mainItemsGrid").dxDataGrid('instance')._controllers.data._dataSource._items;
-
+        
             const gServices = $("#mainRTSGrid").dxDataGrid("instance");
             const gItems = $("#mainItemsGrid").dxDataGrid("instance");
 
             $.when(gServices.saveEditData(), gItems.saveEditData()).done(function () {
-                const Services_Items = gServices.getDataSource().items();
-                const gridItems = gItems.getDataSource().items();
+                $.when(loadAllRows(gServices), loadAllRows(gItems)).done(function (servicesRes, itemsRes) {
 
-                var ServicesJson = JSON.stringify(Services_Items);
-                $("#Services").val(ServicesJson);
+                    const Services_Items = Array.isArray(servicesRes[0]) ? servicesRes[0] : servicesRes;
 
-                if (Services_Items.length == 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: theMainLang == "en" ? "You dont have services" : "لا يوجد لديك خدمات",
+                    const gridItems = Array.isArray(itemsRes[0]) ? itemsRes[0] : itemsRes;
+
+                    var ServicesJson = JSON.stringify(Services_Items);
+                    $("#Services").val(ServicesJson);
+
+                    if (Services_Items.length == 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "You dont have services" : "لا يوجد لديك خدمات",
+                        });
+                        return;
+                    }
+
+                    debugger
+                    var notCompletedService = (Services_Items || []).filter(function (row) {
+                        const st = toInt(row.Status);
+                        return !(st === 25 || st === 26);
                     });
-                    return;
-                }
+                    if (notCompletedService.length > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة",
+                        });
+                        return;
+                    }
 
-                debugger
-                var notCompletedService = Services_Items.filter(function (row) {
-                    return parseInt(row.Status) !== 25 && parseInt(row.Status) !== 26;
-                });
-                if (notCompletedService.length > 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة",
-                    });
-                    return;
-                }
-
-
-                    var notCompletedItems = gridItems.filter(function (row) {
-
-                        return parseInt(row.Status) !== 42;
+                    const notCompletedItems = (gridItems || []).filter(function (row) {
+                        const st = toInt(row.Status);
+                        return st !== 42;
                     });
 
-                if (notCompletedItems.length > 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة"
-                    });
-                    return;
-                }
+                    if (notCompletedItems.length > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة"
+                        });
+                        return;
+                    }
 
-                    var invalidItems = gridItems.filter(function (row) {
+                    var invalidItems = (gridItems || []).filter(function (row) {
                         debugger
                         return row.UsedQuantity === null ||
                             row.UsedQuantity === undefined ||
@@ -479,16 +498,17 @@
                         //row.UsedQuantity === 0;
                     });
 
-                if (invalidItems.length > 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: theMainLang == "en" ? "Used  Quantity Is Required" : "الكمية المستخدمة مطلوبة"
-                    });
-                    return;
-                }
+                    if (invalidItems.length > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "Used  Quantity Is Required" : "الكمية المستخدمة مطلوبة"
+                        });
+                        return;
+                    }
 
                     var itemsJson = JSON.stringify(gridItems);
-                $("#Items").val(itemsJson);
+
+                    $("#Items").val(itemsJson);
 
                     var WIPId = $('#Id').val();
                     var VehId = $('#_vehicleId').val();
@@ -572,8 +592,7 @@
                         Options: optionsTab
                     };
 
-                    hasExternalPendingInvoice(WIPId)
-                        .done(function (res) {
+                    hasExternalPendingInvoice(WIPId).done(function (res) {
 
                             if (!res.success) {
                                 Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
@@ -605,13 +624,14 @@
                                         dataType: 'json',
                                         data: close
                                     }).done(function (result) {
+                                        debugger
                                         if (result.success) {
                                             Swal.fire(theMainLang == "en" ? "WIP has been closed successfully." : "تم اغلاق العملية بنجاح", "", "success").then(() => {
                                                 window.location.href = window.URLs.indexUrl;
                                             });
                                         } else {
                                             const msg = (result && (result.message || result.error)) || "An unknown error occurred.";
-                                            Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
+                                            Swal.fire({ icon: "error", title: msg });
                                         }
                                     }).fail(function (xhr, status, error) {
                                         console.error("Error:", error);
@@ -620,12 +640,13 @@
                                 }
                             });
 
-                        })
-                        .fail(function () {
-                        Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
+                    })
+                    .fail(function () {
+                            Swal.fire({ icon: "error", title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما" });
                     });
                 });
-        });
+            });
+        });// End Close WIP 
 
 
         /* ------- View swapping (Search cars <-> WIP form) ------- */

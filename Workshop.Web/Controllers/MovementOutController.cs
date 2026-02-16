@@ -51,6 +51,25 @@ namespace Workshop.Web.Controllers
             VehicleMovement movement = await _workshopApiClient.GetVehicleMovementByIdAsync(movementId);
             ViewBag.LastMovementDate = movement.GregorianMovementDate;
 
+            // Get WIP Id
+            var WIPId = 0;
+            
+            var WIPByMovementId = await _workshopApiClient.GetWIPByMovementId(movementId);
+            if(WIPByMovementId != null)
+            {
+                WIPId = WIPByMovementId.FirstOrDefault().Id;
+            }
+
+            // Get Invoice Net value
+            if(WIPId != null && WIPId > 0)
+            {
+                var invoice = await _workshopApiClient.WIPInvoiceGetById(WIPId, null);
+                if(invoice !=null && invoice.Count() > 0)
+                {
+                    var NetValue = invoice.FirstOrDefault().Net;
+                    movement.TotalCost = NetValue;
+                }
+            }
             //WorkOrders
             WorkOrderFilterDTO workOrderFilter = new WorkOrderFilterDTO();
             workOrderFilter.VehicleID = movement.VehicleID;
