@@ -1192,12 +1192,91 @@
             if (targetUrl && targetUrl !== "#") window.location.href = targetUrl;
         });
 
-        $(".plate-mask").inputmask("9999 - A A A", {
+(function () {
+    // Allowed KSA plate letters (from your table)
+    const KSA_ALLOWED = "ABJDRSXTEGKLZNHUV";
+
+    // Latin -> Arabic letters (Saudi plate mapping)
+    const letterToArabic = {
+        A: "ا",
+        B: "ب",
+        J: "ح",
+        D: "د",
+        R: "ر",
+        S: "س",
+        X: "ص",
+        T: "ط",
+        E: "ع",
+        G: "ق",
+        K: "ك",
+        L: "ل",
+        Z: "م",
+        N: "ن",
+        H: "ه",
+        U: "و",
+        V: "ى"
+    };
+
+    // Western digits -> Arabic-Indic digits
+    const digitToArabic = {
+        "0": "٠", "1": "١", "2": "٢", "3": "٣", "4": "٤",
+        "5": "٥", "6": "٦", "7": "٧", "8": "٨", "9": "٩"
+    };
+
+    function toArabicPlate(value) {
+        if (!value) return "";
+
+        // Remove mask placeholders
+        const cleaned = value.replace(/_/g, "");
+
+        let out = "";
+        for (const ch of cleaned) {
+            const up = ch.toUpperCase();
+            if (letterToArabic[up]) out += letterToArabic[up];
+            else if (digitToArabic[ch]) out += digitToArabic[ch];
+            else out += ch; // keep spaces/dash as-is
+        }
+        return out;
+    }
+
+    function syncArabicField() {
+        const val = $("#PlateNumber").val() || "";
+        $("#PlateNumberAr").val(toArabicPlate(val));
+        // Optional: if you still want the old text preview
+        $("#plateText").text(toArabicPlate(val));
+    }
+
+    // Keep your old button working (if present in some branch)
+    window.convertPlateNumber = function () {
+        syncArabicField();
+    };
+
+    $(function () {
+        // Inputmask: 9999 - L L L where L is ONLY from the allowed set
+        $(".plate-mask").inputmask("9999 - L L L", {
             definitions: {
-                'A': { validator: "[A-Za-z]", casing: "upper" }
+                "L": {
+                    validator: "[" + KSA_ALLOWED + "]",
+                    casing: "upper"
+                }
             },
-            placeholder: "_"
+            placeholder: "_",
+            clearIncomplete: true,
+            onBeforePaste: function (pastedValue) {
+                // Uppercase + remove anything not allowed (digits, allowed letters, spaces, dash)
+                const re = new RegExp("[^0-9" + KSA_ALLOWED + "\\s\\-]", "g");
+                return (pastedValue || "").toUpperCase().replace(re, "");
+            }
         });
+
+        // Live convert while typing
+        $(document).on("input keyup change", "#PlateNumber", syncArabicField);
+
+        // Initial fill (in case Model.PlateNumber has value)
+        syncArabicField();
+    });
+})();
+
     });
 </script>
 
@@ -1406,6 +1485,223 @@ $.fn.dataTable.ext.errMode = 'none';
 $(document).on('error.dt', function (e, settings, techNote, message) {
   console.warn('DataTables:', message);
 });
+
+
+
+// Harden ONLY disabled controls; allow JS to enable; revert DevTools Elements-panel edits (best-effort UI hardening)
+(function () {
+  let observer = null;
+
+  const LOCK_MARK = "data-hard-disabled";
+  const TRUST_MS = 250; // time window to treat a removal as "JS-intended"
+
+  // Debounced restore queue (prevents crash / mutation loops)
+  const pending = new Set();
+  let scheduled = false;
+  let internalWrite = 0;
+
+  // "Trusted" removals done by JS we can observe
+  const trustedUntil = new WeakMap(); // Element -> timestamp
+
+  function now() { return Date.now(); }
+
+  function markTrusted(el) {
+    if (!(el instanceof Element)) return;
+    trustedUntil.set(el, now() + TRUST_MS);
+  }
+
+  function isTrusted(el) {
+    const t = trustedUntil.get(el) || 0;
+    return t > now();
+  }
+
+  function shouldSkip(el, excludeSelector) {
+    return excludeSelector && el.matches && el.matches(excludeSelector);
+  }
+
+  function isLocked(el) {
+    return el.hasAttribute(LOCK_MARK);
+  }
+
+  function markLocked(el) {
+    if (!el.hasAttribute(LOCK_MARK)) el.setAttribute(LOCK_MARK, "1");
+  }
+
+  function unmarkLocked(el) {
+    try { el.removeAttribute(LOCK_MARK); } catch {}
+  }
+
+  function hardDisable(el) {
+    // minimize writes
+    const needsProp = ("disabled" in el) && el.disabled !== true;
+    const needsAttr = !el.hasAttribute("disabled");
+    if (!needsProp && !needsAttr) return;
+
+    internalWrite++;
+    try {
+      if ("disabled" in el) el.disabled = true;
+      if (!el.hasAttribute("disabled")) {
+        try { el.setAttribute("disabled", "disabled"); } catch {}
+      }
+    } finally {
+      internalWrite--;
+    }
+  }
+
+  function scheduleDisable(el) {
+    pending.add(el);
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      for (const x of pending) {
+        if (x?.isConnected) hardDisable(x);
+      }
+      pending.clear();
+    });
+  }
+
+  function protectIfDisabled(el, exclude) {
+    if (!(el instanceof Element)) return;
+    if (shouldSkip(el, exclude)) return;
+
+    // protect if it currently has disabled OR already locked
+    if (el.hasAttribute("disabled") || isLocked(el)) {
+      markLocked(el);
+      scheduleDisable(el);
+    }
+  }
+
+  // --- Patch JS paths so your code can enable controls without being re-locked ---
+  function patchRemoveAttribute() {
+    const orig = Element.prototype.removeAttribute;
+    if (orig.__hardDisablePatched) return;
+
+    function wrapped(name) {
+      if (String(name).toLowerCase() === "disabled") markTrusted(this);
+      return orig.call(this, name);
+    }
+    wrapped.__hardDisablePatched = true;
+    Element.prototype.removeAttribute = wrapped;
+  }
+
+  function patchDisabledSetter(ctor) {
+    if (!ctor?.prototype) return;
+    const proto = ctor.prototype;
+
+    const desc = Object.getOwnPropertyDescriptor(proto, "disabled");
+    if (!desc || typeof desc.set !== "function" || desc.set.__hardDisablePatched) return;
+
+    const origSet = desc.set;
+    const origGet = desc.get;
+
+    Object.defineProperty(proto, "disabled", {
+      configurable: desc.configurable,
+      enumerable: desc.enumerable,
+      get: origGet,
+      set: function (v) {
+        // if JS enables it, mark as trusted
+        if (v === false) markTrusted(this);
+        return origSet.call(this, v);
+      }
+    });
+
+    // mark to avoid double patching
+    const newDesc = Object.getOwnPropertyDescriptor(proto, "disabled");
+    if (newDesc?.set) newDesc.set.__hardDisablePatched = true;
+  }
+
+  function installPatches() {
+    patchRemoveAttribute();
+    // cover common form controls
+    patchDisabledSetter(HTMLInputElement);
+    patchDisabledSetter(HTMLSelectElement);
+    patchDisabledSetter(HTMLTextAreaElement);
+    patchDisabledSetter(HTMLButtonElement);
+    // optional (harmless to try)
+    patchDisabledSetter(HTMLOptionElement);
+    patchDisabledSetter(HTMLOptGroupElement);
+  }
+
+  function protectAll({ root = document, selector = "input, select", exclude = "" } = {}) {
+    root.querySelectorAll(selector).forEach((el) => protectIfDisabled(el, exclude));
+  }
+
+  function startObserver({ root = document, selector = "input, select", exclude = "" } = {}) {
+    if (observer) observer.disconnect();
+
+    observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.type === "childList" && m.addedNodes.length) {
+          m.addedNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+
+            if (node.matches?.(selector)) protectIfDisabled(node, exclude);
+            node.querySelectorAll?.(selector).forEach((el) => protectIfDisabled(el, exclude));
+          });
+        }
+
+        if (m.type === "attributes" && m.attributeName === "disabled") {
+          if (internalWrite) continue; // ignore our own writes
+
+          const el = m.target;
+          if (!(el instanceof Element)) continue;
+          if (!el.matches?.(selector)) continue;
+          if (shouldSkip(el, exclude)) continue;
+
+          if (el.hasAttribute("disabled")) {
+            // if something disables it, start protecting it
+            markLocked(el);
+            scheduleDisable(el);
+          } else if (isLocked(el)) {
+            // disabled removed from a protected control:
+            // - allow if it was done by JS (trusted)
+            // - otherwise restore (DevTools Elements panel edits typically fall here)
+            if (isTrusted(el)) {
+              unmarkLocked(el);
+              if ("disabled" in el) el.disabled = false;
+            } else {
+              scheduleDisable(el);
+            }
+          }
+        }
+      }
+    });
+
+    observer.observe(root === document ? document.documentElement : root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["disabled"]
+    });
+  }
+
+  // Public API
+  window.lockFormControls = function (options = {}) {
+    installPatches();
+
+    const opts = {
+      selector: "input, select",
+      exclude: ".allow-enabled, [data-allow-enabled]",
+      root: document,
+      ...options
+    };
+
+    protectAll(opts);
+    startObserver(opts);
+    return true;
+  };
+
+  window.unlockFormControls = function () {
+    if (observer) observer.disconnect();
+    observer = null;
+    pending.clear();
+    scheduled = false;
+    return true;
+  };
+})();
+
+lockFormControls();
 
 </script>
 

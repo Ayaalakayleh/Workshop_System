@@ -28,7 +28,7 @@
                         @Html.AntiForgeryToken()
 
                         <div class="row">
-                            <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label>@Common["Label_Manufacturer"] <span class="text-danger">*</span></label>
                                     @Html.DropDownListFor(
@@ -40,7 +40,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_Model"] <span class="text-danger">*</span></label>
                                 @Html.DropDownListFor(
@@ -52,7 +52,7 @@
                             </div>
 
                         </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_Class"] <span class="text-danger">*</span></label>
                                 @Html.DropDownListFor(
@@ -65,7 +65,7 @@
 
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_ManufacturerYear"] <span class="text-danger">*</span></label>
                                 @Html.TextBoxFor(a => a.ManufacturingYear,
@@ -80,7 +80,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             @if ("(((POCO.CompanyBranch)Session[\"BranchInfo\"]).CountryCode)" == "JOR")
                                 {
                                     <div class="form-group">
@@ -97,8 +97,20 @@
                                      </div>
                                 }
                             </div>
-
-                            <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label>@Common["Label_PlateNumberAR"]</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="PlateNumberAr"
+                                           name="PlateNumberAr"
+                                           disabled
+                                           dir="rtl"
+                                           style="unicode-bidi: plaintext;"
+                                           value="">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label>@Common["Color"] <span class="text-danger">*</span></label>
                                     @Html.DropDownListFor(
@@ -110,7 +122,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12" hidden>
+                        <div class="col-lg-3 col-md-6 col-sm-12" hidden>
                             <div class="form-group">
                                 <label>@Common["Label_Status"] <span class="text-danger">*</span></label>
                                 <select class="select2 form-control" id="VehicleStatusId" name="VehicleStatusId">
@@ -122,21 +134,21 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_Kilometres"] <span class="text-danger">*</span></label>
                                 @Html.EditorFor(a => a.CurrentMeter, new { htmlAttributes = new { @class = "form-control", @type = "number", step = "any" } })
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_ChassisNumber"] <span class="text-danger">*</span></label>
                                 @Html.EditorFor(a => a.ChassisNo, new { htmlAttributes = new { @class = "form-control" } })
                             </div>
                         </div>  
 
-                        <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="form-group">
                                 <label>@Common["Label_Company"]</label> @* Company now NOT required *@
                                 @Html.DropDownListFor(
@@ -149,7 +161,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-6 col-sm-12" hidden>
+                        <div class="col-lg-3 col-md-6 col-sm-12" hidden>
                             <div class="form-group">
                                 <label>@Common["Label_Upload"]<span class="text-warning font-normal"> @Common["AllowedExtensions"]: pdf, png , jpeg</span></label>
                                 <input type="file" id="Uploadfile" name="Uploadfile" />

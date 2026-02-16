@@ -1080,12 +1080,12 @@ $(document).ready(function () {
 
         Swal.fire({
             icon: "warning",
-            title: "window.resources.are_you_sure",
+            title: window.resources.are_you_sure,
             text: window.RazorVars.RecallConfirmation,
             showCancelButton: true,
-            confirmButtonText: "resources.yes",
-            cancelButtonText: "resources.no",
-            confirmButtonColor: "#d33"
+            confirmButtonText: resources.yes,
+            cancelButtonText: resources.no,
+            confirmButtonColor: "var(--primary-600)"
         }).then(result => {
 
             if (!result.isConfirmed) return;

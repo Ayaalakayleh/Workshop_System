@@ -2823,4 +2823,10 @@
   <data name="WorkshopType" xml:space="preserve">
     <value>Workshop Type</value>
   </data>
+  <data name="Label_ServiceCode" xml:space="preserve">
+    <value>Service Code</value>
+  </data>
+  <data name="Label_PlateNumberAR" xml:space="preserve">
+    <value>Plate Number AR</value>
+  </data>
 </root>
