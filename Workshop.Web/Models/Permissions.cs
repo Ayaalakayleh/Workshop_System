@@ -244,5 +244,15 @@
             public const int Edit = 1;
         }
         #endregion
+
+        #region PettyCash
+        public static class PettyCash
+        {
+            public const int Expenses = 1;
+            public const int History = 1;
+            public const int Request = 1;
+            public const int Close = 1;
+        }
+        #endregion
     }
 }

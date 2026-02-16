@@ -785,7 +785,7 @@ namespace Workshop.Web.Controllers
                 .ToList();
 
             var others = items
-                .Where(i => !myWarehouseIds.Contains(i.WarehouseId))
+                .Where(i => !myWarehouseIds.Contains(i.WarehouseId) && i.AvailableQty > 0)
                 .Select(Map)
                 .ToList();
 
@@ -1597,11 +1597,7 @@ namespace Workshop.Web.Controllers
                             await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
 
                         }
-                        if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
-                        {
-                            ExternalInvoice = await SaveInvoice(dto);
 
-                        }
                     }
                     else if (Internalinvoice.TranNo == -1)
                     {
@@ -1622,37 +1618,42 @@ namespace Workshop.Web.Controllers
                         return Json(new { success = true });
 
                     }
-                    if ((ExternalInvoice.ID > 0 || Internalinvoice.ID > 0))
-                    {// Insert External Invoice
-                        if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
-                        {
-                            CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
+                    if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
+                    {
+                        ExternalInvoice = await SaveInvoice(dto);
+                        if (ExternalInvoice.ID > 0 )
+                        {// Insert External Invoice
+                            if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
                             {
-                                WIPId = dto.Id,
-                                InvoiceNo = (int)ExternalInvoice.AccSalesNo,
-                                InvoiceDate = ExternalInvoice.AccSalesDate,
-                                TransactionMasterId = (int)ExternalInvoice.MasterId,
-                                Total = ExternalInvoice.Total,
-                                Tax = ExternalInvoice.Tax,
-                                Discount = ExternalInvoice.Discount,
-                                Net = ExternalInvoice.Net,
-                                InvoiceType = (int)AccountTypeEnum.Internal,
-                                AccountType = (int)AccountTypeEnum.External,
-                                TransactionCostMasterId = (int)Internalinvoice.ID,
-                                CreatedBy = UserId
+                                CreateWIPInvoiceDTO wIPInvoiceDTO = new CreateWIPInvoiceDTO
+                                {
+                                    WIPId = dto.Id,
+                                    InvoiceNo = (int)ExternalInvoice.AccSalesNo,
+                                    InvoiceDate = ExternalInvoice.AccSalesDate,
+                                    TransactionMasterId = (int)ExternalInvoice.MasterId,
+                                    Total = ExternalInvoice.Total,
+                                    Tax = ExternalInvoice.Tax,
+                                    Discount = ExternalInvoice.Discount,
+                                    Net = ExternalInvoice.Net,
+                                    InvoiceType = (int)AccountTypeEnum.Internal,
+                                    AccountType = (int)AccountTypeEnum.External,
+                                    TransactionCostMasterId = (int)Internalinvoice.ID,
+                                    CreatedBy = UserId
 
-                            };
-                            await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+                                };
+                                await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+
+                            }
+                            await _apiClient.WIP_Close(dto.Id, (int)dto.ClosedBy);
 
                         }
-                        await _apiClient.WIP_Close(dto.Id, (int)dto.ClosedBy);
+                        else 
+                        {
+                            return Json(new { success = false });
+                        }
+                    }
 
-                    }
-                    else
-                    {
-                        return Json(new { success = false });
-                    }
-                    return Json(new { success = true });
+                        return Json(new { success = true });
                 }
                 else
                 {
@@ -1716,7 +1717,7 @@ namespace Workshop.Web.Controllers
                 saveTransaction = await _accountingApiClient.SaveTransaction(VehicleDetails, AccountTable, account, CompanyId, BranchId, UserId, account.JournalId, totalInternal, totalExternal, DateTime.Now, "Close WIP No : " + oWIPDTO.Id, CurrencyId, InternalType);
 
             }
-            else
+            else if(oWIPDTO.AccountDetails.AccountType== AccountTypeEnum.Internal)
             {
                 saveTransaction = new TransactionMaster()
                 {
@@ -1997,14 +1998,15 @@ namespace Workshop.Web.Controllers
             // Save the transaction
             var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
                 TranTypeNo,
-                (decimal)model.Details.Sum(x => x.Total),
+                (decimal)model.Details.Sum(x => x.Total), // avg cost * Qty 
+                //(decimal)model.Details.Sum(x => x.CostPrice * x.Quantity), // avg cost * Qty // 
                 DebitAccount,
                 CompanyId,
                 BranchId,
                 UserId,
                 CreditAccount,
                 model.TransactionDate,
-                model.Description,
+                "WIP :"+ wipId,
                 CurrencyId,
                 null
             );
@@ -2258,10 +2260,10 @@ namespace Workshop.Web.Controllers
                             InvoiceNo = (int)Reverse.TranNo,
                             InvoiceDate = Reverse.TranDate,
                             TransactionMasterId = (int)Reverse.ID,
-                            Total = 0,
-                            Tax = 0,
-                            Discount = 0,
-                            Net = 0,
+                            Total = item.Total,
+                            Tax = item.Tax,
+                            Discount = item.Discount,
+                            Net = item.Net,
                             InvoiceType = -3,
                             AccountType = (int)AccountTypeEnum.External,
                             CreatedBy = UserId,

@@ -29,6 +29,15 @@ function initializeItemSelectionGrid() {
             },
             { dataField: "primaryName", caption: theMainLang == "en" ? "Primary Name" : "الاسم الأساسي", visible: false },
             { dataField: "secondaryName", caption: theMainLang == "en" ? "Secondary Name" : "الاسم الثانوي", visible: false },
+
+            { dataField: "availableQty", caption: theMainLang == "en" ? "Available Qty" : "الكمية المتاحة", allowEditing: false, visible: true },
+
+            { dataField: "warehouseId", caption: theMainLang == "en" ? "Warehouse ID" : "رقم المستودع", allowEditing: false, visible: false },
+            { dataField: "warehouse", caption: theMainLang == "en" ? "Warehouse" : "المستودع", allowEditing: false, visible: true },
+
+            { dataField: "locatorId", caption: theMainLang == "en" ? "Locator Id" : "رقم الموقع", dataType: "number", allowEditing: false, visible: false },
+            { dataField: "locatorCode", caption: theMainLang == "en" ? "Locator Code" : "رمز الموقع", allowEditing: false, visible: true },
+
             { dataField: "fK_CategoryId", caption: theMainLang == "en" ? "CategoryId" : "رمز الفئة", visible: false },
             {
                 dataField: "CategoryName",
@@ -68,14 +77,6 @@ function initializeItemSelectionGrid() {
             { dataField: "price", caption: theMainLang == "en" ? "Price" : "السعر", dataType: "number", allowEditing: false, visible: false },
             { dataField: "costPrice", caption: theMainLang == "en" ? "Cost" : "التكلفة", dataType: "number", allowEditing: false, visible: false },
             { dataField: "salePrice", caption: theMainLang == "en" ? "Sale Price" : "سعر البيع", dataType: "number", allowEditing: false, visible: false },
-
-            { dataField: "warehouseId", caption: theMainLang == "en" ? "Warehouse ID" : "رقم المستودع", allowEditing: false, visible: false },
-            { dataField: "warehouse", caption: theMainLang == "en" ? "Warehouse" : "المستودع", allowEditing: false, visible: true },
-
-            { dataField: "locatorId", caption: theMainLang == "en" ? "Locator Id" : "رقم الموقع", dataType: "number", allowEditing: false, visible: false },
-            { dataField: "locatorCode", caption: theMainLang == "en" ? "Locator Code" : "رمز الموقع", allowEditing: false, visible: true },
-
-            { dataField: "availableQty", caption: theMainLang == "en" ? "Available Qty" : "الكمية المتاحة", allowEditing: false, visible: true },
         ],
 
         showBorders: true,
