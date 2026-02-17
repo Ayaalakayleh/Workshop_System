@@ -781,21 +781,21 @@ $(function () {
         ],
         allowColumnReordering: true,
         allowColumnResizing: true,
-        columnAutoWidth: false,
-        columnMinWidth: 50,
-        wordWrapEnabled: false,
+        columnAutoWidth: true,
+        //columnMinWidth: 50,if the comment removed, make the columnAutoWidth is true
+        //wordWrapEnabled: false,
         hoverStateEnabled: true,
         paging: {
             pageSize: 10
         },
         rowAlternationEnabled: true,
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: [5, 10, 20, 50],
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        //pager: {
+        //    visible: true,
+        //    showPageSizeSelector: true,
+        //    allowedPageSizes: [5, 10, 20, 50],
+        //    showInfo: true,
+        //    showNavigationButtons: true
+        //},
         editing: {
             mode: "cell",
             allowDeleting: true,
