@@ -668,7 +668,7 @@
                                         <legend>@Common["Label_InvoiceDetails"]</legend>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <label>@Common["Label_YourUploadedFile"]</label>
+                                                <label>@Common["Label_UploadedFile"]</label>
                                                 <input type="file" class="movementDocument" id="dd" multiple>
                                             </div>
                                             <div class="col-lg-6">
@@ -1020,11 +1020,14 @@
 
         @foreach (var item in Model.MovementInvoice)
         {
-                    <text>
-                        var source = @FileService.GetFileFullPath(@item.FileName, @item.FilePath);
-                        var fi = { "source": source, options: { type: 'local' } };
-                        file.files.push(fi);
-                    </text>
+             <text>
+                   var source = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        FileService.GetFileFullPath(item.FileName, item.FilePath)
+                   ));
+
+                   var fi = { "source": source, options: { type: 'local' } };
+                   file.files.push(fi);
+           </text>
         }
 
         cuspond = FilePond.create(inputElement, {
