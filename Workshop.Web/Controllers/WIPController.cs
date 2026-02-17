@@ -1407,7 +1407,7 @@ namespace Workshop.Web.Controllers
                         AccSalesDate = DateTime.Now,
                         InvoiceType = 2,
                         TypeSalesPurchasesID = (int)movement.InvoiceTypeId,
-                        Notes = "Maintenance",
+                        Notes = "Maintenance" + " WIP : " , // Get WIP No.
                         SupplierInvoiceNo = invoice.InvoiceNo,
                         CustomerId = (int)Supplier.Id,
                         Customer_DimensionsId = Supplier.Customer_DimensionsId,
@@ -1707,7 +1707,7 @@ namespace Workshop.Web.Controllers
 
             if (oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal || oWIPDTO.AccountDetails.PartialAccountType == AccountTypeEnum.Internal)
             {
-                var InternalList = await _apiClient.GetLookupDetailByIdAsync(oWIPDTO.AccountDetails.SalesType == null ? (int)oWIPDTO.AccountDetails.PartialSalesType : (int)oWIPDTO.AccountDetails.SalesType, 9, CompanyId);
+                var InternalList = await _apiClient.GetLookupDetailByIdAsync((oWIPDTO.AccountDetails.SalesType > 0 && oWIPDTO.AccountDetails.AccountType == AccountTypeEnum.Internal) ? (int)oWIPDTO.AccountDetails.SalesType : (int)oWIPDTO.AccountDetails.PartialSalesType, 9, CompanyId);
 
                 InternalType = InternalList.Code;
             }
@@ -1999,7 +1999,6 @@ namespace Workshop.Web.Controllers
             var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
                 TranTypeNo,
                 (decimal)model.Details.Sum(x => x.Total), // avg cost * Qty 
-                //(decimal)model.Details.Sum(x => x.CostPrice * x.Quantity), // avg cost * Qty // 
                 DebitAccount,
                 CompanyId,
                 BranchId,

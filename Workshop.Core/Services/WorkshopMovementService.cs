@@ -95,6 +95,11 @@ namespace Workshop.Core.Services
 			return await _workshopMovementRepository.GetAllDWorkshopVehicleMovement(filter);
 		}
 
+        public async Task<List<VehicleMovement>> MovementsHistory_Filter(WorkshopMovementFilter filter)
+        {
+			return await _workshopMovementRepository.MovementsHistory_Filter(filter);
+		}
+
 		public async Task<VehicleMovement> GetVehicleMovementByIdAsync(int movementId)
 		{
 			return await _workshopMovementRepository.GetVehicleMovementByIdAsync(movementId);

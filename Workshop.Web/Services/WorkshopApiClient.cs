@@ -792,7 +792,7 @@ namespace Workshop.Web.Services
 
         public async Task<VehicleMovement> InsertVehicleMovementAsync(VehicleMovement movement)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/InsertVehicleMovement", movement);
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/c", movement);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<VehicleMovement>();
         }
@@ -834,6 +834,20 @@ namespace Workshop.Web.Services
             {
 
                 var response = await _httpClient.PostAsJsonAsync("api/WorkshopMovement/GetAllDWorkshopVehicleMovement", filter);
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<VehicleMovement>>();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<List<VehicleMovement>> GetAllMovementsHistoryFilter(WorkshopMovementFilter filter)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/WorkshopMovement/GetAllMovementsHistoryFilter", filter);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<List<VehicleMovement>>();
             }

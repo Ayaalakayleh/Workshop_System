@@ -100,8 +100,8 @@ namespace Workshop.Infrastructure.Repositories
                     ReceivedTime = movement.ReceivedTime ?? (object)DBNull.Value,
                     Note = movement.Note ?? (object)DBNull.Value,
                     CreatedBy = movement.CreatedBy ?? (object)DBNull.Value,
-                    MovementOut = movement.MovementOut ?? (object)DBNull.Value,
-                    MovementIN = movement.MovementIN ?? (object)DBNull.Value,
+                    MovementOut = movement.MovementOut ?? false,
+                    MovementIN = movement.MovementIN ?? false,
                     GregorianMovementDate = movement.GregorianMovementDate ?? (object)DBNull.Value,
                     HijriMovementDate = movement.hijriMovementDate ?? (object)DBNull.Value,
                     IsHijriMovement = movement.ishijriMovement ?? (object)DBNull.Value,
@@ -279,6 +279,24 @@ namespace Workshop.Infrastructure.Repositories
             };
 
             var result = await _database.ExecuteGetAllStoredProcedure<VehicleMovement>("D_WorkshopVehicleMovement_Filter", parameters);
+            return result?.ToList();
+        }
+        public async Task<List<VehicleMovement>> MovementsHistory_Filter(WorkshopMovementFilter filter)
+        {
+
+            var parameters = new
+            {
+                VehicleID = filter.VehicleID ?? (object)DBNull.Value,
+                MovementIN = filter.MovementIN,
+                MovementOut = filter.MovementOut,
+                FromDate = filter.FromDate,
+                ToDate = filter.ToDate,
+                PageNumber = filter.page ?? 1,
+                branchId = filter.WorkshopId,
+                //GregorianDate = filter.GregorianDate ?? (object)DBNull.Value,
+            };
+
+            var result = await _database.ExecuteGetAllStoredProcedure<VehicleMovement>("D_MovementsHistory_Filter", parameters);
             return result?.ToList();
         }
 

@@ -137,6 +137,14 @@ namespace Workshop.API.Controllers
 			var result = await _workshopMovementService.GetAllDWorkshopVehicleMovement(filter);
 			return Ok(result);
 		}
+
+        [HttpPost("GetAllMovementsHistoryFilter")]
+		public async Task<IActionResult> MovementsHistory_Filter([FromBody] WorkshopMovementFilter filter)
+        {
+			var result = await _workshopMovementService.MovementsHistory_Filter(filter);
+			return Ok(result);
+		}
+
 		[HttpPost("GetAllDWorkshopVehicleMovementDDL")]
 		public async Task<IActionResult> GetAllDWorkshopVehicleMovementDDL([FromBody] WorkshopMovementFilter filter)
 		{
