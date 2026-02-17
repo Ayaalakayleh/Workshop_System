@@ -293,9 +293,9 @@ $(function () {
         ],
         allowColumnReordering: true,
         allowColumnResizing: true,
-        columnAutoWidth: false,
-        columnMinWidth: 50,
-        wordWrapEnabled: false,
+        columnAutoWidth: true,
+        //columnMinWidth: 50,if the comment removed, make the columnAutoWidth
+        //wordWrapEnabled: false,
         hoverStateEnabled: false,
         paging: {
             pageSize: 10
