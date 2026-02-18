@@ -239,19 +239,19 @@
         #region PriceWorkflow
         public static class PriceWorkflow
         {
-            public const int View = 1;
-            public const int Create = 1;
-            public const int Edit = 1;
+            public const int View = 2059;
+            public const int Create = 2060;
+            public const int Edit = 2061;
         }
         #endregion
 
         #region PettyCash
         public static class PettyCash
         {
-            public const int Expenses = 1;
-            public const int History = 1;
-            public const int Request = 1;
-            public const int Close = 1;
+            public const int Expenses = 2055;
+            public const int History = 2056;
+            public const int Request = 2057;
+            public const int Close = 2058;
         }
         #endregion
     }
