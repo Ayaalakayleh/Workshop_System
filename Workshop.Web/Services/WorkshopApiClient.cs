@@ -792,7 +792,7 @@ namespace Workshop.Web.Services
 
         public async Task<VehicleMovement> InsertVehicleMovementAsync(VehicleMovement movement)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/c", movement);
+            var response = await _httpClient.PostAsJsonAsync("api/workshopmovement/InsertVehicleMovement", movement);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<VehicleMovement>();
         }
