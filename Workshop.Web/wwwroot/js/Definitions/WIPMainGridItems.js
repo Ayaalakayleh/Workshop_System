@@ -567,6 +567,12 @@ $(function () {
                 allowEditing: false, 
                 alignment: "left",
                 calculateCellValue: function (rowData) {
+
+                    if (Number(rowData.AccountType) === 1) {
+                        rowData.Tax = 0;
+                        return 0;
+                    }
+
                     var vatId = $("#Vat").val();
                     var vatPercent = parseFloat(GetVatValueById(vatId)) || 0;
                     vatPercent = vatPercent > 1 ? vatPercent / 100 : vatPercent; 
