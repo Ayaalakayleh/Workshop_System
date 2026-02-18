@@ -373,5 +373,11 @@ namespace Workshop.Web.Services
             return await SendRequest<IEnumerable<ItemUnitsDTO>>(url, HttpMethod.Get, null, requireAuth: false);
 
         }
+
+        public async Task<IEnumerable<ItemDTO>> GetAlternativeItems(int ItemId, bool includeIndirectAlternatives)
+        {
+            string url = $"Item/{ItemId}/alternative-items?includeIndirectAlternatives={includeIndirectAlternatives}";
+            return await SendRequest<IEnumerable<ItemDTO>>(url, HttpMethod.Get, null, requireAuth: false);
+        }
     }
 }

@@ -1,6 +1,41 @@
 ﻿//var allCategories = [];
 let allItemsOurs = [];
 let allItemsOthers = [];
+let altFilterState = { active: false, ids: [] };
+
+function getActiveBaseItems() {
+    return $("#ours-tab").hasClass("active") ? allItemsOurs : allItemsOthers;
+}
+
+function applyAlternativeFilter(ids) {
+    const grid = $("#gridContainer").dxDataGrid("instance");
+    if (!grid) return;
+
+    const set = new Set((ids || []).filter(Boolean));
+    const base = getActiveBaseItems();
+
+    const filtered = base.filter(x => set.has(x.id));
+
+    grid.option("dataSource", filtered);
+
+    altFilterState.active = true;
+    altFilterState.ids = Array.from(set);
+}
+
+function clearAlternativeFilter() {
+    const grid = $("#gridContainer").dxDataGrid("instance");
+    if (!grid) return;
+
+    grid.option("dataSource", getActiveBaseItems());
+
+    altFilterState.active = false;
+    altFilterState.ids = [];
+}
+
+$("#btnShowAllItems").on("click", function () {
+    clearAlternativeFilter();
+});
+
 function initializeItemSelectionGrid() {
 
     $("#gridContainer").dxDataGrid({
@@ -77,6 +112,85 @@ function initializeItemSelectionGrid() {
             { dataField: "price", caption: theMainLang == "en" ? "Price" : "السعر", dataType: "number", allowEditing: false, visible: false },
             { dataField: "costPrice", caption: theMainLang == "en" ? "Cost" : "التكلفة", dataType: "number", allowEditing: false, visible: false },
             { dataField: "salePrice", caption: theMainLang == "en" ? "Sale Price" : "سعر البيع", dataType: "number", allowEditing: false, visible: false },
+            {
+                type: "buttons",
+                width: 70,
+                alignment: "left",
+                buttons: [
+                    {
+                        hint: "Alternatives",
+                        icon: "search",
+                        type: "success",
+                        stylingMode: "contained",
+                        visible: function (e) {
+                            return (e.row.data.availableQty == 0 );
+                        },
+                        onClick: function (e) {
+
+                            const itemId = e.row.data.id;
+
+                            Swal.fire({
+                                icon: "question",
+                                title: theMainLang == "en"
+                                    ? "Do you want to include alternative of alternatives?"
+                                    : "هل تود عرض البدائل؟",
+                                showDenyButton: true,
+                                confirmButtonText: theMainLang == "en" ? "Yes" : "نعم",
+                                denyButtonText: theMainLang == "en" ? "No" : "لا",
+                                allowOutsideClick: false
+                            }).then(function (r) {
+
+                                if (!r.isConfirmed && !r.isDenied) return;
+
+                                const includeIndirectAlternatives = r.isConfirmed;
+
+                                const grid = $("#gridContainer").dxDataGrid("instance");
+
+                                $.ajax({
+                                    url: window.RazorVars.getAlternativeItemsUrl,
+                                    method: "GET", 
+                                    dataType: "json",
+                                    data: {
+                                        ItemId: itemId,
+                                        includeIndirectAlternatives: includeIndirectAlternatives
+                                    },
+                                    beforeSend: function () {
+                                        grid?.option("loadPanel.enabled", true);
+                                    },
+                                    success: function (res) {
+                                        const ids = (res?.items || []).map(x => x.id);
+
+                                        if (!ids.length) {
+                                            Swal.fire({
+                                                icon: "info",
+                                                title: theMainLang == "en" ? "No alternatives found" : "لا يوجد بدائل",
+                                                showConfirmButton: true,
+                                                confirmButtonText: theMainLang == "en" ? "Ok" : "حسناً",
+                                            });
+                                            return;
+                                        }
+
+                                        //Filter
+                                        applyAlternativeFilter(ids);
+                                    },
+                                    error: function () {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: theMainLang == "en" ? "Error Happened" : "حصل خطأ ما",
+                                            showConfirmButton: true,
+                                            confirmButtonText: theMainLang == "en" ? "Ok" : "حسناً",
+                                        });
+                                    },
+                                    complete: function () {
+                                        grid?.option("loadPanel.enabled", false);
+                                    }
+                                });
+                            });
+                        }
+
+                    },
+                ]
+            }
         ],
 
         showBorders: true,
@@ -330,15 +444,7 @@ function loadItemsData() {
     });
 }
 
-//$("#ours-tab").on("click", function () {
-//    const grid = $("#gridContainer").dxDataGrid("instance");
-//    grid.option("dataSource", allItemsOurs);
-//});
 
-//$("#others-tab").on("click", function () {
-//    const grid = $("#gridContainer").dxDataGrid("instance");
-//    grid.option("dataSource", allItemsOthers);
-//});
 
 $("#ours-tab, #others-tab").on("click", function () {
     // toggle active class
@@ -353,6 +459,10 @@ $("#ours-tab, #others-tab").on("click", function () {
         grid.option("dataSource", allItemsOurs);
     } else {
         grid.option("dataSource", allItemsOthers);
+    }
+
+    if (altFilterState.active) {
+        applyAlternativeFilter(altFilterState.ids);
     }
 });
 

@@ -792,6 +792,12 @@ namespace Workshop.Web.Controllers
             return Json(new { ours, others });
         }
 
+        public async Task<JsonResult> GetAlternativeItems (int ItemId, bool includeIndirectAlternatives)
+        {
+            var items = await _inventoryApiClient.GetAlternativeItems(ItemId, includeIndirectAlternatives);
+            if (items == null) items = new List<ItemDTO>(); 
+            return Json(new { items });
+        }
 
         public async Task<JsonResult> GeneralRequest(int WIPId, string RequestDescription)
         {
