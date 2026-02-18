@@ -2829,4 +2829,10 @@
   <data name="Label_PlateNumberAR" xml:space="preserve">
     <value>Plate Number AR</value>
   </data>
+  <data name="Label_InvoiceDetails" xml:space="preserve">
+    <value>Invoice Details</value>
+  </data>
+  <data name="Label_UploadedFile" xml:space="preserve">
+    <value>Uploaded File</value>
+  </data>
 </root>

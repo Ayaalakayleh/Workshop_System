@@ -50,6 +50,9 @@ namespace Workshop.Web.Controllers
                     cache.Set(string.Format(CacheKeys.VehiclesDDL, lang), ovehicleMovement.vehicleNams, DateTimeOffset.Now.AddDays(10));
                 }
 
+                var external = (await _vehicleApiClient.GetExteralVehicleName(lang)) ?? new List<VehicleNams>();
+                ovehicleMovement.vehicleNams.AddRange(external);
+
                 return View(ovehicleMovement);
             }
             catch (Exception ex)
@@ -68,7 +71,7 @@ namespace Workshop.Web.Controllers
                 ovehicleMovement.ColMovements = new List<VehicleMovement>();
                 vehicleMovementFilter.WorkshopId = BranchId;
                 vehicleMovementFilter.page ??= 1;
-                ovehicleMovement.ColMovements = await _apiClient.GetAllDWorkshopVehicleMovementAsync(vehicleMovementFilter);
+                ovehicleMovement.ColMovements = await _apiClient.GetAllMovementsHistoryFilter(vehicleMovementFilter);
                 ovehicleMovement.ColBranches = await _erpApiClient.GetActiveBranchesByCompanyId(CompanyId);
                 List<VehicleNams> ExternalVehicles = new List<VehicleNams>();
 

@@ -153,6 +153,7 @@
             public const int Invoice = 1943;
             public const int Transfer = 1944;
             public const int AddDiscount = 1945;
+            public const int ChangeDate = 1945;
         }
         #endregion
 
@@ -252,6 +253,16 @@
             public const int History = 2056;
             public const int Request = 2057;
             public const int Close = 2058;
+        }
+        #endregion
+
+        #region Procurement
+        public static class Procurement
+        {
+            public const int RFQ = 1;
+            public const int InternalPurchaseRequest = 1;
+            public const int PurchaseOrder = 1;
+            public const int PurchaseInvoice = 1;
         }
         #endregion
     }

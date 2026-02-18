@@ -198,15 +198,26 @@
             return $.Deferred().resolve(ds.items ? ds.items() : []).promise();
         }
 
-        function saveData() {
+        function saveDataCore(options) {
+            options = options || {};
+
             const servicesGrid = $('#mainRTSGrid').dxDataGrid('instance');
             const itemsGrid = $('#mainItemsGrid').dxDataGrid('instance');
 
             servicesGrid?.closeEditCell();
             itemsGrid?.closeEditCell();
 
-            if (servicesGrid) servicesGrid.saveEditData();
-            if (itemsGrid) itemsGrid.saveEditData();
+            var saleType = $("#SalesType").val();
+            var saleTypePartial = $("#PartialSalesType").val();
+            var customer = $("#CustomerId").val();
+            var customerPartial = $("#PartialCustomerId").val();
+            if ((saleType == 2035 && customer == 0) || (saleTypePartial == 2035 && customerPartial ==0)) {
+                Swal.fire({
+                    icon: "warning",
+                    title: theMainLang == "en" ? "Customer Is Required" : "اسم العميل مطلوب"
+                });
+                return $.Deferred().reject("validation_failed").promise();
+            }
 
             return $.when(
                 servicesGrid ? servicesGrid.saveEditData() : $.Deferred().resolve(),
@@ -223,57 +234,49 @@
                 Services_Items = Array.isArray(Services_Items) ? Services_Items : (Services_Items?.[0] || []);
                 gridItems = Array.isArray(gridItems) ? gridItems : (gridItems?.[0] || []);
 
-                // RTS - Services
-                var Services_grid = servicesGrid;
+                if (typeof options.validate === "function") {
+                    const ok = options.validate({ Services_Items, gridItems });
+                    if (ok === false) return $.Deferred().reject("validation_failed").promise();
+                }
 
                 var ServicesJson = JSON.stringify(Services_Items);
                 $("#Services").val(ServicesJson);
 
-                // Items
-                var grid = itemsGrid;
-
                 var itemsJson = JSON.stringify(gridItems);
                 $("#Items").val(itemsJson);
 
-            var WIPId = $('#Id').val();
-            var WsId = 10;//$("#FK_WarehouseId").val();
-            var VehId = $('#_vehicleId').val();
-            var MovId = $('#_movementId').val();
-            var AgreementId = $('#_AgreementId').val();
-            var accountType = $("#AccountType").val();
-            var salesType = $("#SalesType").val();
-            var customer = $("#CustomerId").val();
-            var currency = $("#CurrencyId").val();
-            var terms = $("#TermsId").val();
-            var vat = $("#Vat").val();
-            var partialAccountType = $("#PartialAccountType").val();
-            var partialSalesType = $("#PartialSalesType").val();
-            var partialCustomer = $("#PartialCustomerId").val();
-            var partialCurrency = $("#PartialCurrencyId").val();
-            var partialTerms = $("#PartialTermsId").val();
-            var partialVat = $("#PartialVat").val();
-            var status = $("#statusId").val();
-            var wipDate = $("#WipDate").val();
-            var note = $("#WipNote").val();
-            var dep = $("#DepartmentId").val();
-            var bark = $("#CarPark").val();
-            var vehServiceId = $("#VehServiceId").val();
-            var vehServiceDesc = $("#VehServiceDesc").val();
-            var vehConcerns = $("#VehConcerns").val();
-            var vehAdvisorNotes = $("#VehAdvisorNotes").val();
-            var odometerPrevious = $('#OdoPrev').val();
-            var odometerCurrentIN = $('#OdoCurrentIn').val();
-            var odometerCurrentOUT = $('#OdoCurrentOut').val();
-            var optPartialInv = $("#optPartialInv").is(":checked");
-            var optReturnParts = $("#optReturnParts").is(":checked");
-            var optRepeatRepair = $("#optRepeatRepair").is(":checked");
-            var optUpdateDemand = $("#optUpdateDemand").is(":checked");
-            var inv_AccountType = $("#invAccountType").val();
-            var inv_InvoiceNo = $("#InvoiceNo").val();
-            var inv_Date = $("#invDate").val();
-            var inv_Total = $("#invTotal").val();
-            var inv_Tax = $("#invTax").val();
-            var inv_Net = $("#invNet").val();
+                var WIPId = $('#Id').val();
+                var WsId = 10;
+                var VehId = $('#_vehicleId').val();
+                var MovId = $('#_movementId').val();
+                var AgreementId = $('#_AgreementId').val();
+                var accountType = $("#AccountType").val();
+                var salesType = $("#SalesType").val();
+                var customer = $("#CustomerId").val();
+                var currency = $("#CurrencyId").val();
+                var terms = $("#TermsId").val();
+                var vat = $("#Vat").val();
+                var partialAccountType = $("#PartialAccountType").val();
+                var partialSalesType = $("#PartialSalesType").val();
+                var partialCustomer = $("#PartialCustomerId").val();
+                var partialCurrency = $("#PartialCurrencyId").val();
+                var partialTerms = $("#PartialTermsId").val();
+                var partialVat = $("#PartialVat").val();
+                var status = $("#statusId").val();
+                var wipDate = $("#WipDate").val();
+                var note = $("#WipNote").val();
+                var dep = $("#DepartmentId").val();
+                var bark = $("#CarPark").val();
+                var vehServiceDesc = $("#VehServiceDesc").val();
+                var vehConcerns = $("#VehConcerns").val();
+                var vehAdvisorNotes = $("#VehAdvisorNotes").val();
+                var odometerPrevious = $('#OdoPrev').val();
+                var odometerCurrentIN = $('#OdoCurrentIn').val();
+                var odometerCurrentOUT = $('#OdoCurrentOut').val();
+                var optPartialInv = $("#optPartialInv").is(":checked");
+                var optReturnParts = $("#optReturnParts").is(":checked");
+                var optRepeatRepair = $("#optRepeatRepair").is(":checked");
+                var optUpdateDemand = $("#optUpdateDemand").is(":checked");
 
                 var accountDetails = {
                     WIPId: WIPId ?? 0,
@@ -291,35 +294,25 @@
                     PartialVat: partialVat
                 };
 
-            //var invoiceDetails = {
-            //    WIPId: WIPId ?? 0,
-            //    AccountType: inv_AccountType,
-            //    InvoiceNo: inv_InvoiceNo,
-            //    InvoiceDate: inv_Date,
-            //    Total: inv_Total,
-            //    Tax: inv_Tax,
-            //    Net: inv_Net
-            //};
-
-            var vehicleTab = {
-                WIPId: WIPId,
-                VehicleId: VehId,
-                PlateNumber: $('#VehPlate').val(),
-                ManufacturerId: $('#VehMakeModel').val(),
-                ModelId: $('#VehModel').val(),
-                ClassId: $('#VehClass').val(),
-                ManufacturingYear: $('#VehYear').val(),
-                Color: $('#VehColor').val(),
-                ChassisNo: $('#VehVIN').val(),
-                VehServiceDesc: vehServiceDesc,
-                VehConcerns: vehConcerns,
-                VehAdvisorNotes: vehAdvisorNotes,
-                DepartmentId: dep,
-                CarPark: bark,
-                OdometerPrevious: odometerPrevious,
-                OdometerCurrentIN: odometerCurrentIN,
-                OdometerCurrentOUT: odometerCurrentOUT
-            };
+                var vehicleTab = {
+                    WIPId: WIPId,
+                    VehicleId: VehId,
+                    PlateNumber: $('#VehPlate').val(),
+                    ManufacturerId: $('#VehMakeModel').val(),
+                    ModelId: $('#VehModel').val(),
+                    ClassId: $('#VehClass').val(),
+                    ManufacturingYear: $('#VehYear').val(),
+                    Color: $('#VehColor').val(),
+                    ChassisNo: $('#VehVIN').val(),
+                    VehServiceDesc: vehServiceDesc,
+                    VehConcerns: vehConcerns,
+                    VehAdvisorNotes: vehAdvisorNotes,
+                    DepartmentId: dep,
+                    CarPark: bark,
+                    OdometerPrevious: odometerPrevious,
+                    OdometerCurrentIN: odometerCurrentIN,
+                    OdometerCurrentOUT: odometerCurrentOUT
+                };
 
                 var optionsTab = {
                     WIPId: WIPId,
@@ -345,10 +338,7 @@
                     Options: optionsTab
                 };
 
-                var grid = $("#mainRTSGrid").dxDataGrid("instance");
-                var items = grid.getDataSource().items();
-
-                var hasInvalidStandardHours = items.some(function (row) {
+                var hasInvalidStandardHours = (Services_Items || []).some(function (row) {
                     var v = row.StandardHours;
                     if (v === null || v === undefined || String(v).trim() === "") return true;
                     return Number.isNaN(Number(v));
@@ -359,7 +349,7 @@
                         icon: "warning",
                         title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
                     });
-                    return;
+                    return $.Deferred().reject("validation_failed").promise();
                 }
 
                 return $.ajax({
@@ -367,32 +357,98 @@
                     url: window.URLs.editPostUrl,
                     dataType: 'json',
                     data: model
-                }).done(function (result) {
-                    console.log("Edit_Post result:", result);
-                    debugger
-                    if (result && result.success && result.wipId) {
-                        if (theMainLang == "en") {
-                            Swal.fire("Success", "WIP " + result.wipId + " Saved Successfully!").then(() => {
-                                window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-                            });
-                        } else {
-                            Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId, "success").then(() => {
-                                window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-                            });
-                        }
-                        evaluateAndUpdateWIPStatus();
-
-                    } else {
+                }).then(function (result) {
+                    if (!(result && result.success && result.wipId)) {
                         Swal.fire({
                             icon: "error",
                             title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
                         });
+                        return $.Deferred().reject("save_failed").promise();
                     }
-
+                    return result;
                 });
-
             });
         }
+
+        function saveData() {
+            return saveDataCore().done(function (result) {
+                var MovId = $('#_movementId').val();
+                if (theMainLang == "en") {
+                    Swal.fire("Success", "WIP " + result.wipId + " Saved Successfully!").then(() => {
+                        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+                    });
+                } else {
+                    Swal.fire("تمت العملية بنجاح", "الرقم هو: " + result.wipId, "success").then(() => {
+                        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
+                    });
+                }
+                evaluateAndUpdateWIPStatus();
+            });
+        }
+
+
+
+        $("#completedBTN").on('click', function () {
+            const $btn = $(this).prop("disabled", true);
+
+            var statusModel = {
+                WIPId: $("#Id").val(),
+                StatusId: 2030
+            };
+
+            return saveDataCore({
+                validate: function ({ gridItems }) {
+                    var invalidItems = (gridItems || []).filter(function (row) {
+                        return row.UsedQuantity === null ||
+                            row.UsedQuantity === undefined ||
+                            String(row.UsedQuantity).trim() === "";
+                    });
+
+                    if (invalidItems.length > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "Used Quantity Is Required" : "الكمية المستخدمة مطلوبة"
+                        });
+                        return false;
+                    }
+                    return true;
+                }
+            }).then(function (saveResult) {
+
+                statusModel.WIPId = saveResult.wipId || statusModel.WIPId;
+
+                return $.ajax({
+                    type: 'POST',
+                    url: window.URLs.UpdateWIPStatus,
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(statusModel)
+                });
+
+            }).done(function (updateRes) {
+
+                if (!updateRes) return;
+
+                $("#statusId").val(2030);
+
+                Swal.fire({
+                    icon: "success",
+                    title: theMainLang == "en" ? "Completed" : "تم الإكمال"
+                }).then(() => {
+                    location.reload(); 
+                });
+
+                const gServices = $("#mainRTSGrid").dxDataGrid("instance");
+                const gItems = $("#mainItemsGrid").dxDataGrid("instance");
+                gServices?.getDataSource()?.reload();
+                gItems?.getDataSource()?.reload();
+
+            }).fail(function (err) {
+                console.error(err);
+            }).always(function () {
+                $btn.prop("disabled", false);
+            });
+        });
 
         /* ------- Submit ------- */
         $("#btnSave2").on("click", function (e) {
@@ -1199,25 +1255,6 @@ $("#statusId").change(function () {
     }); 
 });
 
-$("#completedBTN").on('click',function () {
-    var model = {
-        WIPId: $("#Id").val(),
-        StatusId: 2030
-    };
-
-    return $.ajax({
-        type: 'Post',
-        url: window.URLs.UpdateWIPStatus,
-        dataType: 'json',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(model)
-    }).done(function (result) {
-        if (!result) return;
-        location.reload();
-      
-    }); 
-});
-
 function getCurrentWipStatus() {
     return parseInt($("#statusId").val()) || null;
 }
@@ -1290,6 +1327,9 @@ async function evaluateAndUpdateWIPStatus() {
     }//Compleated or Transfer Compleated
     else if (serviceStatuses.length > 0 && itemStatuses.length == 0 && serviceStatuses.every(s => s === 25 || s === 26)) { 
         targetStatusId = 2031;
+    }
+    else if (serviceStatuses.length > 0 && itemStatuses.length > 0 && serviceStatuses.every(s => s === 25 || s === 26) && itemStatuses.every(s => s === 35 || s===36)) {
+        targetStatusId = 2027;
     }//Booked
     else if (serviceStatuses.length > 0 && serviceStatuses.every(s => s === 19 || s === 24 || s===25 || s === 26)) { //24: Transfer
         targetStatusId = 2025;

@@ -2829,4 +2829,10 @@
   <data name="Label_PlateNumberAR" xml:space="preserve">
     <value>رقم اللوحة باللغة العربية</value>
   </data>
+  <data name="Label_InvoiceDetails" xml:space="preserve">
+    <value>تفاصيل الفاتورة</value>
+  </data>
+  <data name="Label_UploadedFile" xml:space="preserve">
+    <value>الملفات المرفقة</value>
+  </data>
 </root>

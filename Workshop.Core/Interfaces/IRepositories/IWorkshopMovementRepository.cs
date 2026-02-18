@@ -12,6 +12,7 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task InsertMWorkshopMovementStrikesAsync(int movementId, string strikes);
         Task InsertMovementDocumentAsync(VehicleMovementDocument movmentDoc);
         Task<List<VehicleMovement>> GetAllDWorkshopVehicleMovement(WorkshopMovementFilter filter);
+        Task<List<VehicleMovement>> MovementsHistory_Filter(WorkshopMovementFilter filter);
         Task<VehicleMovement> GetVehicleMovementByIdAsync(int movementId);
         Task<List<VehicleMovementDocument>> GetMovementDocumentsAsync(int movementId);
         Task<List<MovementInvoice>> GetWorkshopInvoiceByMovementIdAsync(int movementId);

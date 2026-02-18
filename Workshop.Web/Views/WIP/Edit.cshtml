@@ -17,6 +17,7 @@
 	var AddParts = PermissionHelper.UserHasPermission(Permissions.WIP.AddParts);
 	var Issue = PermissionHelper.UserHasPermission(Permissions.WIP.Issue);
 	var Approve = PermissionHelper.UserHasPermission(Permissions.WIP.Approve);
+	var ChangeDate = PermissionHelper.UserHasPermission(Permissions.WIP.ChangeDate);
 }
 @{
 	var userInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.User>(Context.Session.GetString("UserInfo"));
@@ -201,7 +202,15 @@
 						<div class="col-lg-3 col-md-6 col-sm-12">
 							<label>@Common["Label_Date"]</label>
 							<div class="d-flex flex-column">
-								@Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate", disabled = "disabled" })
+								@* @Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate", disabled = @ChangeDate==true?"":"disabled" }) *@
+								@if (ChangeDate)
+								{
+									@Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate" })
+								}
+								else
+								{
+									@Html.TextBoxFor(m => m.WipDate, "{0:yyyy-MM-dd}", new { @class = "form-control flat-picker", type = "date", id = "WipDate", disabled = "disabled" })
+								}
 								@Html.ValidationMessageFor(m => m.WipDate, "", new { @class = "text-danger" })
 							</div>
 						</div>
@@ -477,7 +486,8 @@
 			getVehicleByManufacturerIdURL: '@Url.Action("GetVehicleByManufacturerId", "WIP")',
 			insertItemsUrl: '@Url.Action("Insert_Items", "WIP")',
 			getItemUnitsUrl: '@Url.Action("GetItemUnits", "WIP")',
-		
+			getAlternativeItemsUrl: '@Url.Action("GetAlternativeItems", "WIP")',
+
 
 		  // ============================
 		  // URLs - Services
