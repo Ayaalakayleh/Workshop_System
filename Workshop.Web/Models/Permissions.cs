@@ -254,5 +254,15 @@
             public const int Close = 1;
         }
         #endregion
+
+        #region Procurement
+        public static class Procurement
+        {
+            public const int RFQ = 1;
+            public const int InternalPurchaseRequest = 1;
+            public const int PurchaseOrder = 1;
+            public const int PurchaseInvoice = 1;
+        }
+        #endregion
     }
 }
