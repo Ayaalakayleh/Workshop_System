@@ -379,5 +379,11 @@ namespace Workshop.Web.Services
             string url = $"Item/{ItemId}/alternative-items?includeIndirectAlternatives={includeIndirectAlternatives}";
             return await SendRequest<IEnumerable<ItemDTO>>(url, HttpMethod.Get, null, requireAuth: false);
         }
+        public async Task<UpdateInventoryTransactionFinancialFieldsResultDTO> UpdateFinancialFieldsAsync(UpdateInventoryTransactionFinancialFieldsDTO request)
+        {
+            string url = $"api/InventoryTransaction/UpdateFinancialFields";
+            return await SendRequest<UpdateInventoryTransactionFinancialFieldsResultDTO>(url, HttpMethod.Post, request, requireAuth: false);
+
+        }
     }
 }

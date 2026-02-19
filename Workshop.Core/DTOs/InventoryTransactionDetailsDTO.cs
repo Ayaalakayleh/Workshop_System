@@ -126,4 +126,23 @@ namespace Workshop.Core.DTOs
         public int ModifiedBy { get; set; }
         public long FK_FinancialTransactionReverseId { get; set; }
     }
+
+    public class UpdateInventoryTransactionFinancialFieldsDTO
+    {
+        public long HeaderId { get; set; }
+        public long? FinancialTransactionNo { get; set; }
+        public int? FinancialTransactionTypeNo { get; set; }
+        public long? Fk_FinancialTransactionMasterId { get; set; }
+        public int? Fk_InvoiceType { get; set; }
+    }
+
+    public class UpdateInventoryTransactionFinancialFieldsResultDTO
+    {
+        public long ID { get; set; }
+        public long? FinancialTransactionNo { get; set; }
+        public int? FinancialTransactionTypeNo { get; set; }
+        public long? Fk_FinancialTransactionMasterId { get; set; }
+        public int? Fk_InvoiceType { get; set; }
+    }
+
 }

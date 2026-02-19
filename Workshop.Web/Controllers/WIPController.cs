@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Transactions;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.AccountingDTOs;
 using Workshop.Core.DTOs.General;
@@ -1982,50 +1983,22 @@ namespace Workshop.Web.Controllers
         {
             var rawDetails = HttpContext.Request.Form["Details"];
             var wipId = int.Parse(HttpContext.Request.Form["WIPId"]);
-            // From base controller
+            
             model.CompanyId = CompanyId;
             model.BranchId = BranchId;
             model.CreatedBy = UserId;
+            model.TransactionDate = DateTime.Now;
+
+            model.FK_TransactionStatusId = 2; //Posted;
 
             if (!string.IsNullOrEmpty(rawDetails))
             {
                 model.Details = JsonConvert.DeserializeObject<List<InventoryTransactionDetailsDTO>>(rawDetails);
             }
             int keyId = int.Parse(model.Details.First().KeyId);
-            //var result = string.Empty;
-            var result = new CreateInventoryTransactionResult();
-            var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
-            var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
-            var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
-            var CreditAccount = AccountTable?.FirstOrDefault(a => a.ID == warehouse.FK_AccountId).AccountNo;
-            var DebitAccount = AccountTable?.FirstOrDefault(a => a.ID == accountDefinitions.FK_WIPAccountId).AccountNo;
-            var TranTypeNo = accountDefinitions.FK_JournalNameId;
-            model.TransactionDate = DateTime.Now;
-            // Save the transaction
-            var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
-                TranTypeNo,
-                (decimal)model.Details.Sum(x => x.Total), // avg cost * Qty 
-                DebitAccount,
-                CompanyId,
-                BranchId,
-                UserId,
-                CreditAccount,
-                model.TransactionDate,
-                "WIP :"+ wipId,
-                CurrencyId,
-                null
-            );
 
-            // If successful, add the ISSUE
-            if (accountingResponse != null && accountingResponse.ID > 0)
-            {
-                model.FinancialTransactionNo = accountingResponse.TranNo;
-                model.FinancialTransactionTypeNo = accountingResponse.TranTypeNo;
-                model.Fk_FinancialTransactionMasterId = accountingResponse.ID;
-                model.Fk_InvoiceType = accountDefinitions.FK_InvoiceTypeId;
-
-                result = await _inventoryApiClient.GRNAdd(model); // step 2
-            }
+            // Step 1: Create the inventory transaction first (without financial fields)
+            var result = await _inventoryApiClient.GRNAdd(model);
 
             if (!result.Success)
             {
@@ -2037,6 +2010,62 @@ namespace Workshop.Web.Controllers
                 });
             }
 
+
+            // Step 2: If inventory transaction succeeded, create the accounting transaction
+            try {
+                var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
+                var TranTypeNo = accountDefinitions.FK_JournalNameId;
+                var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
+                var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
+                var CreditAccount = AccountTable?.FirstOrDefault(a => a.ID == warehouse.FK_AccountId).AccountNo;
+                var DebitAccount = AccountTable?.FirstOrDefault(a => a.ID == accountDefinitions.FK_WIPAccountId).AccountNo;
+
+                var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
+                   TranTypeNo,
+                   (decimal)model.Details.Sum(x => x.Total),// avg cost * Qty 
+                   DebitAccount,
+                   CompanyId,
+                   BranchId,
+                   UserId,
+                   CreditAccount,
+                   model.TransactionDate,
+                   "WIP :" + wipId,
+                   CurrencyId,
+                   null
+                );
+
+                // Step 3: If accounting transaction succeeded, update financial fields
+                if (accountingResponse != null && accountingResponse.ID > 0)
+                {
+                    var updateFinancialFieldsRequest = new UpdateInventoryTransactionFinancialFieldsDTO
+                    {
+                        HeaderId = result.HeaderId!.Value,
+                        FinancialTransactionNo = accountingResponse.TranNo,
+                        FinancialTransactionTypeNo = accountingResponse.TranTypeNo,
+                        Fk_FinancialTransactionMasterId = accountingResponse.ID,
+                        Fk_InvoiceType = accountDefinitions.FK_InvoiceTypeId
+                    };
+
+                    await _inventoryApiClient.UpdateFinancialFieldsAsync(updateFinancialFieldsRequest);
+                }
+                else
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        message = "Inventory transaction created but accounting transaction failed. Please contact administrator."
+                    });
+                }
+            }
+            catch (Exception accountingEx)
+            {
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    message = $"Inventory transaction created but accounting process failed: {accountingEx.Message}"
+                });
+            }
+
             long headerId = result.HeaderId!.Value;
 
             UpdateIssueIdDTO dto = new UpdateIssueIdDTO
@@ -2045,7 +2074,7 @@ namespace Workshop.Web.Controllers
                 WIPId = wipId,
                 Id = keyId
             };
-
+          
             var addIssueToWIP = await _apiClient.UpdateIssueIdToWIP(dto);
 
             var responseString = await _inventoryApiClient.GetAllGRNByIdHead(headerId);
@@ -2100,7 +2129,6 @@ namespace Workshop.Web.Controllers
             };
 
             return JsonConvert.SerializeObject(responseToClient);
-            //return result;
         }
 
 

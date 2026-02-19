@@ -143,7 +143,7 @@ $(function () {
                 }
             },
             {
-                dataField: "Discount", caption: window.RazorVars.DXDiscount, dataType: "number", allowEditing: true, alignment: "left",
+                dataField: "Discount", caption: window.RazorVars.DXDiscount, dataType: "number", allowEditing: Permission_AddDiscount, alignment: "left",
                 editorOptions: {
                     min: 0,
                     max: 100
