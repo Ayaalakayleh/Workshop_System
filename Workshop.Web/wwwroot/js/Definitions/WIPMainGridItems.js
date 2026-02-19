@@ -750,9 +750,10 @@ $(function () {
                         visible: function (e) {
                             return Permission_AddParts && (
                                 AllowActions &&
-                                parseInt(e.row.data.Status) !== 35 &&
-                                parseInt(e.row.data.Status) !== 42 &&
-                                parseInt(e.row.data.Status) !== 41 &&
+                                //parseInt(e.row.data.Status) !== 35 &&
+                                //parseInt(e.row.data.Status) !== 42 &&
+                                //parseInt(e.row.data.Status) !== 41 &&
+                                parseInt(e.row.data.Status) == 36 &&
                                 !OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                             );
                         },
@@ -1325,11 +1326,20 @@ function TransferParts() {
                     });
                 });
             } else {
-                Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
+                //Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
+                handleFailure(res);
             }
         }).fail(function (err) {
             console.error("Error updating status:", err);
-            Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
+
+            let data = xhr.responseJSON;
+            if (!data && xhr.responseText) {
+                try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+            }
+            const isConflict = (xhr.status === 409);
+            handleFailure(data, isConflict);
+
+            //Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
         }).always(function () {
             btn.prop("disabled", false).html(oldTxt);
         });

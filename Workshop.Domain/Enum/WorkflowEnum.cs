@@ -30,6 +30,8 @@ namespace Workshop.Domain.Enum
         PartsThirdLevel = 20,
         PartsFourthLevel = 21,
         PartsFifthLevel = 22,
+        RFQ = 23,
+        RFQIndirect = 24
 
     }
 }

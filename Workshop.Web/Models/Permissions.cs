@@ -243,6 +243,7 @@
             public const int View = 2059;
             public const int Create = 2060;
             public const int Edit = 2061;
+            public const int Delete = 1;
         }
         #endregion
 

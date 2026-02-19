@@ -30,6 +30,8 @@ namespace Workshop.Web.Controllers
             _logger = logger;
             _common = common;
         }
+
+        [CustomAuthorize(Permissions.PriceWorkflow.View)]
         public async Task<IActionResult> Index()
         {
             PriceWorkflowDTO dto = new PriceWorkflowDTO
@@ -114,6 +116,7 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        [CustomAuthorize(Permissions.PriceWorkflow.Delete)]
         public async Task<JsonResult> Delete([FromBody] int Id)
         {
             var response = await _apiClient.DeletePriceWorkflowDefinitionAsync(Id);

@@ -1973,9 +1973,22 @@ namespace Workshop.Web.Controllers
             dto.CompanyId = CompanyId;
             dto.TransactionDate = DateTime.Now.Date;
             var result = await _inventoryApiClient.GRNAdd(dto);
+           
+            if (!result.Success)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = result.Message,
+                    shortages = result.Shortages
+                });
+            }
+            else
+            {
+                return Json(new { success = true, data = result });
+            }
 
-            bool isSuccess = result != null;
-            return Json(new { success = isSuccess, data = result });
+                //bool isSuccess = result != null;
 
         }
 
