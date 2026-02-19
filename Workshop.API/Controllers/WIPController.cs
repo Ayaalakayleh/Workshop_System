@@ -594,5 +594,13 @@ namespace Workshop.API.Controllers
             if(result == null) return Ok(new { IsSuccess = false });
             return Ok(result);
         }
+
+        [HttpGet("WIP_CheckRowExists")]
+        public async Task<IActionResult> WIP_CheckRowExists([FromQuery] int KeyId, int WIPId)
+        {
+            var result = await _service.WIP_CheckRowExists(KeyId, WIPId);
+            if(result == null) return Ok(new { IsSuccess = false });
+            return Ok(result);
+        }
     }
 }

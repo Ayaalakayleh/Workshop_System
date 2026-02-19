@@ -750,6 +750,7 @@ $(function () {
                         visible: function (e) {
                             return Permission_AddParts && (
                                 AllowActions &&
+                                parseInt(e.row.data.Status) !== 35 &&
                                 parseInt(e.row.data.Status) !== 42 &&
                                 parseInt(e.row.data.Status) !== 41 &&
                                 !OurWarehouses.includes(parseInt(e.row.data.WarehouseId))

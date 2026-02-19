@@ -321,6 +321,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_ToggleReturnParts(WIPId, Toggle);
         }
+        public async Task<bool> WIP_CheckRowExists(int KeyId, int WIPId)
+        {
+            return await _repository.WIP_CheckRowExists(KeyId, WIPId);
+        }
 
     }
 }

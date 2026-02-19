@@ -926,6 +926,17 @@ namespace Workshop.Infrastructure.Repositories
             return await _database.ExecuteGetByIdProcedure<bool>("WIP_ToggleReturnParts", parameters);
          
         }
+        public async Task<bool> WIP_CheckRowExists(int KeyId, int WIPId)
+        {
+            var parameters = new
+            {
+                KeyId = KeyId,
+                WIPId = WIPId
+            };
+
+            return await _database.ExecuteGetByIdProcedure<bool>("WIP_CheckRowExists", parameters);
+
+        }
 
 
 
