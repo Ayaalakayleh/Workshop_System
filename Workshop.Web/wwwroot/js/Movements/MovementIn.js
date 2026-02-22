@@ -63,6 +63,37 @@
         $('#submitMovement').prop("disabled", false);
     }
 
+     //===============================================
+
+    var DEFAULT_FUEL = 50;
+
+    function clamp(n, min, max) {
+        n = Number(n);
+        if (!isFinite(n)) return min;
+        return Math.max(min, Math.min(max, n));
+    }
+
+    function setFuel(val) {
+        val = clamp(val, 0, 100);
+
+        // slider
+        $('#fuelSlider').val(val);
+
+        $('#FuelLevelId').val(val);
+
+        // label
+        $('#fuelSliderValue').html(String(val));
+
+        // meter
+        if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
+            $myFuelMeter.changeValue(String(val));
+        } else {
+            try {
+                $("div#fuelMeterDiv").dynameter && $("div#fuelMeterDiv").dynameter('setValue', val);
+            } catch (_) { }
+        }
+    }
+
     /* ==================================================
        Date/Time restriction helpers
        Rule: if date is today => allow only [now-3h, now]
@@ -341,18 +372,14 @@
             console.error('DynaMeter plugin not loaded');
         }
 
-        $('#fuelSlider').on('input', function () {
-            debugger
+        var initialFuel = Number($('#FuelLevelId').val());
+        if (!isFinite(initialFuel) || initialFuel <= 0) initialFuel = DEFAULT_FUEL;
+
+        setFuel(initialFuel);
+
+        $('#fuelSlider').on('input change', function () {
             var val = Number($(this).val());
-            $("#FuelLevelId").val(val);
-            $('#fuelSliderValue').html(String(val));
-            if ($myFuelMeter && typeof $myFuelMeter.changeValue === 'function') {
-                $myFuelMeter.changeValue(val.toFixed(1));
-            } else {
-                try {
-                    $("div#fuelMeterDiv").dynameter && $("div#fuelMeterDiv").dynameter('setValue', val);
-                } catch (_) { }
-            }
+            setFuel(val);
         });
     }
 
@@ -666,7 +693,17 @@
 
         if (!validateOdometer()) { endSubmit(); return false; }
 
+        var fuel = Number($('#FuelLevelId').val());
+        if (!isFinite(fuel) || fuel <= 0) {
+            fuel = DEFAULT_FUEL;
+            setFuel(fuel);
+        }
+
         var fd = new FormData(form);
+
+        if (fd.set) fd.set('FuelLevelId', String(fuel));
+        else { fd.delete('FuelLevelId'); fd.append('FuelLevelId', String(fuel)); }
+
         for (var i = 0; i < files.length; i++) fd.append('Photos', files[i].file);
 
         if ($.fn && $.fn.jSignature) {
