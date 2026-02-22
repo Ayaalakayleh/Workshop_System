@@ -794,7 +794,7 @@
                 CustomerId: { required: false },
                 ChassisId: { required: true },
                 Start_Time: { required: true },
-                Duration: { required: true, min: 1 },
+                Duration: { required: true, min: 0 },
                 End_Time: { required: true }
                 // Description is OPTIONAL (no rule)
             },
