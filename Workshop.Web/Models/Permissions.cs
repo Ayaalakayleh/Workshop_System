@@ -153,8 +153,8 @@
             public const int Invoice = 1943;
             public const int Transfer = 1944;
             public const int AddDiscount = 1945;
-            public const int ChangeDate = 1;
-            public const int PriceApproval = 1;
+            public const int ChangeDate = 2071;
+            public const int PriceApproval = 2072;
         }
         #endregion
 
@@ -252,7 +252,7 @@
             public const int View = 2059;
             public const int Create = 2060;
             public const int Edit = 2061;
-            public const int Delete = 1;
+            public const int Delete = 2070;
         }
         #endregion
 
@@ -269,10 +269,10 @@
         #region Procurement
         public static class Procurement
         {
-            public const int RFQ = 1;
-            public const int InternalPurchaseRequest = 1;
-            public const int PurchaseOrder = 1;
-            public const int PurchaseInvoice = 1;
+            public const int RFQ = 2063;
+            public const int InternalPurchaseRequest = 2064;
+            public const int PurchaseOrder = 2066;
+            public const int PurchaseInvoice = 2069;
         }
         #endregion
     }
