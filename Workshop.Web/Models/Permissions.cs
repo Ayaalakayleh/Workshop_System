@@ -228,6 +228,14 @@
         }
         #endregion
 
+        #region Movements History
+        public static class MovementsHistory
+        {
+            public const int View = 1965;
+            public const int Details = 1966;
+        }
+        #endregion
+
         #region StockCard
         public static class StockCard
         {

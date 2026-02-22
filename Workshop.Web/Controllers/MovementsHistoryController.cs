@@ -34,6 +34,8 @@ namespace Workshop.Web.Controllers
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
+
+        [CustomAuthorize(Permissions.MovementsHistory.View)]
         public async Task<IActionResult> Index()
         {
             try
