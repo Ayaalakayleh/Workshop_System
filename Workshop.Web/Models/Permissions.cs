@@ -153,7 +153,8 @@
             public const int Invoice = 1943;
             public const int Transfer = 1944;
             public const int AddDiscount = 1945;
-            public const int ChangeDate = 1945;
+            public const int ChangeDate = 1;
+            public const int PriceApproval = 1;
         }
         #endregion
 

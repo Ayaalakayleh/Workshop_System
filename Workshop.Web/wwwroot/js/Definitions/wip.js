@@ -239,134 +239,163 @@
                     if (ok === false) return $.Deferred().reject("validation_failed").promise();
                 }
 
-                var ServicesJson = JSON.stringify(Services_Items);
-                $("#Services").val(ServicesJson);
+                const needApproval = (gridItems || []).some(x =>
+                    x?.requiresPriceApproval === true ||
+                    x?.RequiresPriceApproval === true ||
+                    x?.requiresPriceApproval === 1 ||
+                    x?.RequiresPriceApproval === 1 ||
+                    String(x?.requiresPriceApproval).toLowerCase() === "true" ||
+                    String(x?.RequiresPriceApproval).toLowerCase() === "true"
+                );
 
-                var itemsJson = JSON.stringify(gridItems);
-                $("#Items").val(itemsJson);
+                const buildAndSave = function () {
 
-                var WIPId = $('#Id').val();
-                var WsId = 10;
-                var VehId = $('#_vehicleId').val();
-                var MovId = $('#_movementId').val();
-                var AgreementId = $('#_AgreementId').val();
-                var accountType = $("#AccountType").val();
-                var salesType = $("#SalesType").val();
-                var customer = $("#CustomerId").val();
-                var currency = $("#CurrencyId").val();
-                var terms = $("#TermsId").val();
-                var vat = $("#Vat").val();
-                var partialAccountType = $("#PartialAccountType").val();
-                var partialSalesType = $("#PartialSalesType").val();
-                var partialCustomer = $("#PartialCustomerId").val();
-                var partialCurrency = $("#PartialCurrencyId").val();
-                var partialTerms = $("#PartialTermsId").val();
-                var partialVat = $("#PartialVat").val();
-                var status = $("#statusId").val();
-                var wipDate = $("#WipDate").val();
-                var note = $("#WipNote").val();
-                var dep = $("#DepartmentId").val();
-                var bark = $("#CarPark").val();
-                var vehServiceDesc = $("#VehServiceDesc").val();
-                var vehConcerns = $("#VehConcerns").val();
-                var vehAdvisorNotes = $("#VehAdvisorNotes").val();
-                var odometerPrevious = $('#OdoPrev').val();
-                var odometerCurrentIN = $('#OdoCurrentIn').val();
-                var odometerCurrentOUT = $('#OdoCurrentOut').val();
-                var optPartialInv = $("#optPartialInv").is(":checked");
-                var optReturnParts = $("#optReturnParts").is(":checked");
-                var optRepeatRepair = $("#optRepeatRepair").is(":checked");
-                var optUpdateDemand = $("#optUpdateDemand").is(":checked");
+                    var ServicesJson = JSON.stringify(Services_Items);
+                    $("#Services").val(ServicesJson);
 
-                var accountDetails = {
-                    WIPId: WIPId ?? 0,
-                    AccountType: accountType,
-                    SalesType: salesType,
-                    CustomerId: customer,
-                    CurrencyId: currency,
-                    TermsId: terms,
-                    Vat: vat,
-                    PartialAccountType: partialAccountType,
-                    PartialSalesType: partialSalesType,
-                    PartialCustomerId: partialCustomer,
-                    PartialCurrencyId: partialCurrency,
-                    PartialTermsId: partialTerms,
-                    PartialVat: partialVat
-                };
+                    var itemsJson = JSON.stringify(gridItems);
+                    $("#Items").val(itemsJson);
 
-                var vehicleTab = {
-                    WIPId: WIPId,
-                    VehicleId: VehId,
-                    PlateNumber: $('#VehPlate').val(),
-                    ManufacturerId: $('#VehMakeModel').val(),
-                    ModelId: $('#VehModel').val(),
-                    ClassId: $('#VehClass').val(),
-                    ManufacturingYear: $('#VehYear').val(),
-                    Color: $('#VehColor').val(),
-                    ChassisNo: $('#VehVIN').val(),
-                    VehServiceDesc: vehServiceDesc,
-                    VehConcerns: vehConcerns,
-                    VehAdvisorNotes: vehAdvisorNotes,
-                    DepartmentId: dep,
-                    CarPark: bark,
-                    OdometerPrevious: odometerPrevious,
-                    OdometerCurrentIN: odometerCurrentIN,
-                    OdometerCurrentOUT: odometerCurrentOUT
-                };
+                    var WIPId = $('#Id').val();
+                    var WsId = 10;
+                    var VehId = $('#_vehicleId').val();
+                    var MovId = $('#_movementId').val();
+                    var AgreementId = $('#_AgreementId').val();
+                    var accountType = $("#AccountType").val();
+                    var salesType = $("#SalesType").val();
+                    var customer = $("#CustomerId").val();
+                    var currency = $("#CurrencyId").val();
+                    var terms = $("#TermsId").val();
+                    var vat = $("#Vat").val();
+                    var partialAccountType = $("#PartialAccountType").val();
+                    var partialSalesType = $("#PartialSalesType").val();
+                    var partialCustomer = $("#PartialCustomerId").val();
+                    var partialCurrency = $("#PartialCurrencyId").val();
+                    var partialTerms = $("#PartialTermsId").val();
+                    var partialVat = $("#PartialVat").val();
+                    var status = $("#statusId").val();
+                    var wipDate = $("#WipDate").val();
+                    var note = $("#WipNote").val();
+                    var dep = $("#DepartmentId").val();
+                    var bark = $("#CarPark").val();
+                    var vehServiceDesc = $("#VehServiceDesc").val();
+                    var vehConcerns = $("#VehConcerns").val();
+                    var vehAdvisorNotes = $("#VehAdvisorNotes").val();
+                    var odometerPrevious = $('#OdoPrev').val();
+                    var odometerCurrentIN = $('#OdoCurrentIn').val();
+                    var odometerCurrentOUT = $('#OdoCurrentOut').val();
+                    var optPartialInv = $("#optPartialInv").is(":checked");
+                    var optReturnParts = $("#optReturnParts").is(":checked");
+                    var optRepeatRepair = $("#optRepeatRepair").is(":checked");
+                    var optUpdateDemand = $("#optUpdateDemand").is(":checked");
 
-                var optionsTab = {
-                    WIPId: WIPId,
-                    PartialInvoicing: optPartialInv,
-                    ReturnParts: optReturnParts,
-                    RepeatRepair: optRepeatRepair,
-                    UpdateDemand: optUpdateDemand
-                };
-
-                var model = {
-                    Id: WIPId,
-                    VehicleId: VehId,
-                    MovementId: MovId,
-                    AgreementId: AgreementId,
-                    Items: itemsJson,
-                    FK_WarehouseId: WsId,
-                    Services: ServicesJson,
-                    AccountDetails: accountDetails,
-                    VehicleTab: vehicleTab,
-                    Status: status,
-                    WipDate: wipDate,
-                    Note: note,
-                    Options: optionsTab
-                };
-
-                var hasInvalidStandardHours = (Services_Items || []).some(function (row) {
-                    var v = row.StandardHours;
-                    if (v === null || v === undefined || String(v).trim() === "") return true;
-                    return Number.isNaN(Number(v));
-                });
-
-                if (hasInvalidStandardHours) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
+                    var hasInvalidStandardHours = (Services_Items || []).some(function (row) {
+                        var v = row.StandardHours;
+                        if (v === null || v === undefined || String(v).trim() === "") return true;
+                        return Number.isNaN(Number(v));
                     });
-                    return $.Deferred().reject("validation_failed").promise();
+
+                    if (hasInvalidStandardHours) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? 'Service Standard Hours is required' : "ساعات العمل القياسية للخدمة مطلوبة",
+                        });
+                        return $.Deferred().reject("validation_failed").promise();
+                    }
+
+                    var accountDetails = {
+                        WIPId: WIPId ?? 0,
+                        AccountType: accountType,
+                        SalesType: salesType,
+                        CustomerId: customer,
+                        CurrencyId: currency,
+                        TermsId: terms,
+                        Vat: vat,
+                        PartialAccountType: partialAccountType,
+                        PartialSalesType: partialSalesType,
+                        PartialCustomerId: partialCustomer,
+                        PartialCurrencyId: partialCurrency,
+                        PartialTermsId: partialTerms,
+                        PartialVat: partialVat
+                    };
+
+                    var vehicleTab = {
+                        WIPId: WIPId,
+                        VehicleId: VehId,
+                        PlateNumber: $('#VehPlate').val(),
+                        ManufacturerId: $('#VehMakeModel').val(),
+                        ModelId: $('#VehModel').val(),
+                        ClassId: $('#VehClass').val(),
+                        ManufacturingYear: $('#VehYear').val(),
+                        Color: $('#VehColor').val(),
+                        ChassisNo: $('#VehVIN').val(),
+                        VehServiceDesc: vehServiceDesc,
+                        VehConcerns: vehConcerns,
+                        VehAdvisorNotes: vehAdvisorNotes,
+                        DepartmentId: dep,
+                        CarPark: bark,
+                        OdometerPrevious: odometerPrevious,
+                        OdometerCurrentIN: odometerCurrentIN,
+                        OdometerCurrentOUT: odometerCurrentOUT
+                    };
+
+                    var optionsTab = {
+                        WIPId: WIPId,
+                        PartialInvoicing: optPartialInv,
+                        ReturnParts: optReturnParts,
+                        RepeatRepair: optRepeatRepair,
+                        UpdateDemand: optUpdateDemand
+                    };
+
+                    var model = {
+                        Id: WIPId,
+                        VehicleId: VehId,
+                        MovementId: MovId,
+                        AgreementId: AgreementId,
+                        Items: itemsJson,
+                        FK_WarehouseId: WsId,
+                        Services: ServicesJson,
+                        AccountDetails: accountDetails,
+                        VehicleTab: vehicleTab,
+                        Status: status,
+                        WipDate: wipDate,
+                        Note: note,
+                        Options: optionsTab,
+                        NeedPriceApproval: needApproval
+                    };
+
+                    return $.ajax({
+                        type: 'POST',
+                        url: window.URLs.editPostUrl,
+                        dataType: 'json',
+                        data: model
+                    }).then(function (result) {
+                        if (!(result && result.success && result.wipId)) {
+                            Swal.fire({
+                                icon: "error",
+                                title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                            });
+                            return $.Deferred().reject("save_failed").promise();
+                        }
+                        return result;
+                    });
+                };
+
+                if (needApproval) {
+                    return Swal.fire({
+                        icon: "warning",
+                        title: theMainLang == "en" ? "Price approval required" : "مطلوب اعتماد سعر",
+                        text: theMainLang == "en"
+                            ? "One or more selected parts require price approval. Workflow will start after saving."
+                            : "يوجد قطع تحتاج اعتماد سعر. سيتم بدء سير العمل بعد الحفظ.",
+                        confirmButtonText: theMainLang == "en" ? "OK" : "حسناً",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => buildAndSave());
                 }
 
-                return $.ajax({
-                    type: 'POST',
-                    url: window.URLs.editPostUrl,
-                    dataType: 'json',
-                    data: model
-                }).then(function (result) {
-                    if (!(result && result.success && result.wipId)) {
-                        Swal.fire({
-                            icon: "error",
-                            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-                        });
-                        return $.Deferred().reject("save_failed").promise();
-                    }
-                    return result;
-                });
+                return buildAndSave();
+              
             });
         }
 

@@ -40,7 +40,7 @@ namespace Workshop.Web.Controllers
             HttpContext.Session.SetInt32("CompanyId", company.Id);
             HttpContext.Session.SetString("CompanyInfo", System.Text.Json.JsonSerializer.Serialize(company));
             HttpContext.Session.SetString("Role", _oUser.Role_Id.ToString());
-            HttpContext.Session.SetInt32("UserGroupId", _oUser.UserGroupId);
+            HttpContext.Session.SetString("UserGroupId", _oUser.UserGroupId.ToString());
             HttpContext.Session.SetInt32("UserId", _oUser.UserID);
 
             HttpContext.Session.SetString("UserInfo", System.Text.Json.JsonSerializer.Serialize(_oUser));
@@ -156,8 +156,8 @@ namespace Workshop.Web.Controllers
                     user.UserID, "11", companyId, branch
                 );
 
-                HttpContext.Session.SetString("Permission", permissionData.Permissions);
-                HttpContext.Session.SetString("UserGroupId", permissionData.Groups);
+                HttpContext.Session.SetString("Permission", permissionData?.Permissions ?? "");
+                HttpContext.Session.SetString("UserGroupId", permissionData?.Groups ?? "");
 
                 var primaryMenu =await _erpapicient.GetUserMenu("en", user.UserID, "11", companyId, branch);
                 

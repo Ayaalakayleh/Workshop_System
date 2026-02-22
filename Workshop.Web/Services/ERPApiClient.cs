@@ -267,5 +267,30 @@ namespace Workshop.Web.Services
 
         }
 
+        public async Task<StateResponse> GetWorkflowStateByMasterIdAndCompanyId(Guid? MasterId, int CompanyId)
+        {
+            string url = $"/WorkflowInstance/GetStates?MasterId={MasterId}&CompanyId={CompanyId}";
+            return await SendRequest<StateResponse>(url, HttpMethod.Get);
+        }
+        public async Task<Response> RejectWorkflowInstance(Guid? MasterId, int CompanyId, int UserId, string Reason)
+        {
+            string url = $"/WorkflowInstance/Reject?MasterId={MasterId}&CompanyId={CompanyId}&UserId={UserId}&Reason={Reason}";
+            return await SendRequest<Response>(url, HttpMethod.Post);
+        }
+        public async Task<Response> ApproveWorkflowInstance(Guid? MasterId, int CompanyId, int UserId, int ActionId, string Reason)
+        {
+            string url = $"/WorkflowInstance/Approve?MasterId={MasterId}&CompanyId={CompanyId}&UserId={UserId}&ActionId={ActionId}&Reason={Reason}";
+            return await SendRequest<Response>(url, HttpMethod.Post);
+        }
+        public async Task<List<WorkflowHistory>> GetHistory(Guid? MasterId, int CompanyId, string lang)
+        {
+            string url = $"/WorkflowInstance/GetHistory?MasterId={MasterId}&CompanyId={CompanyId}&lang={lang}";
+            return await SendRequest<List<WorkflowHistory>>(url, HttpMethod.Post);
+        }
+        public async Task<bool> InsertWorkflowInstance(int WorkflowEnum, Guid? MasterId, int CompanyId, int CreatedBy, string groupId)
+        {
+            string url = $"/WorkflowInstance/Insert?DocId={WorkflowEnum}&MasterId={MasterId}&CompanyId={CompanyId}&CreatedBy={CreatedBy}&GroupId={groupId}";
+            return await SendRequest<bool>(url, HttpMethod.Get);
+        }
     }
 }

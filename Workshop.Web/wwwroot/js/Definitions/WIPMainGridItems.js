@@ -1,5 +1,11 @@
 ﻿window.transferLocatorsCache = [];
-
+const PriceWorkflowStatusEnum = {
+    None: 0,
+    Pending: 1,
+    Approved: 2,
+    Rejected: 3,
+    Failed: 9
+};
 function fixedNum(v, digits = 2) {
     const n = Number(v);
     return +((Number.isFinite(n) ? n : 0).toFixed(digits));
@@ -120,6 +126,70 @@ $(function () {
         },
         columns: [
             { dataField: "KeyId", caption: "#", visible: true, allowEditing: false, width: 50 },
+            {
+                caption: theMainLang === "en" ? "Price WF" : "إجراءات اعتماد السعر",
+                alignment: "center",
+                allowEditing: false,
+                width: 60,
+                cellTemplate: function (container, options) {
+                    const row = options.data || {};
+
+                    // ! Workflow 
+                    if (!row.PriceWorkflowMasterId) return;
+
+                    const status = Number(row.PriceWorkflowStatus ?? 0);
+                    const isPending = status === PriceWorkflowStatusEnum.Pending;
+
+                    // History 
+                    const historyItem = { id: "history", text: theMainLang === "en" ? "History" : "السجل", icon: "info" };
+
+                    // ! Pending => display History 
+                    if (!isPending) {
+                        $("<div>").dxButton({
+                            icon: "info",
+                            hint: theMainLang === "en" ? "History" : "السجل",
+                            stylingMode: "contained",
+                            type: "default",
+                            onClick: function () {
+                                priceWfHistory(row);
+                            }
+                        }).appendTo(container);
+                        return;
+                    }
+
+                    // if Pending => display Approve/Reject + History
+                    const items = [
+                        ...(Permission_PriceApproval ? [
+                            { id: "approve", text: theMainLang === "en" ? "Approve" : "اعتماد", icon: "check" },
+                            { id: "reject", text: theMainLang === "en" ? "Reject" : "رفض", icon: "close" }
+                        ] : []),
+                        historyItem
+                    ];
+
+
+                    $("<div>").dxDropDownButton({
+                        icon: "overflow",
+                        text: "",
+                        hint: theMainLang === "en" ? "Actions" : "إجراءات",
+                        stylingMode: "contained",
+                        type: "default",
+                        items: items,
+                        displayExpr: "text",
+                        keyExpr: "id",
+                        useItemTextAsTitle: false,
+                        dropDownOptions: { width: 180 },
+                        onItemClick: function (e) {
+                            const id = e.itemData?.id;
+
+                            if ((id === "approve" || id === "reject") && !Permission_PriceApproval) return;
+
+                            if (id === "approve") priceWfApprove(row);
+                            else if (id === "reject") priceWfReject(row);
+                            else if (id === "history") priceWfHistory(row);
+                        }
+                    }).appendTo(container);
+                }
+            },
             { dataField: "Id", caption: "ID", visible: false, alignment: "left" },
             { dataField: "ItemId", caption: "ID", visible: false, alignment: "left" },
             {
@@ -138,8 +208,58 @@ $(function () {
             { dataField: "Code", caption: window.RazorVars.DXCode, allowEditing: false, alignment: "left" },
             { dataField: "Name", caption: window.RazorVars.DXName, allowEditing: false, alignment: "left" },
             {
+                dataField: "RequiresApproval",
+                caption: theMainLang == "en" ? "Price Approval" : "اعتماد السعر",
+                visible:  false,          
+                allowEditing: false
+            },
+            {
+                dataField: "PriceWorkflowStatusText",
+                caption: theMainLang === "en" ? "Price WF Status" : "حالة اعتماد السعر",
+                allowEditing: false,
+                width: 110,
+                cellTemplate: function (container, options) {
+                    const row = options.data || {};
+
+                    const st = Number(row.PriceWorkflowStatus ?? 0);     // 0/1/2/3/9
+                    let txt = (row.PriceWorkflowStatusText || "").trim();
+
+                    if (st === 0) {
+                        return;
+                    }
+
+                    if (!txt) {
+                        if (st === 1) txt = (theMainLang === "en" ? "Pending" : "قيد الانتظار");
+                        else if (st === 2) txt = (theMainLang === "en" ? "Approved" : "تم الاعتماد");
+                        else if (st === 3) txt = (theMainLang === "en" ? "Rejected" : "مرفوض");
+                        else if (st === 9) txt = (theMainLang === "en" ? "Failed" : "فشل");
+                        else txt = (theMainLang === "en" ? "N/A" : "لا يوجد");
+                    } else {
+                        const t = txt.toLowerCase();
+                        if (!st) {
+                            if (t.includes("pending")) row.PriceWorkflowStatus = 1;
+                            else if (t.includes("approved")) row.PriceWorkflowStatus = 2;
+                            else if (t.includes("rejected")) row.PriceWorkflowStatus = 3;
+                        }
+                    }
+
+                    const cls =
+                        st === 1 ? "pwf-badge pwf-pending" :
+                            st === 2 ? "pwf-badge pwf-approved" :
+                                st === 3 ? "pwf-badge pwf-rejected" :
+                                    st === 9 ? "pwf-badge pwf-failed" :
+                                        "pwf-badge";
+
+                    $("<span>")
+                        .addClass(cls)
+                        .text(txt)
+                        .appendTo(container);
+                }
+            },
+            {
                 dataField: "RequestQuantity",
                 caption: window.RazorVars.DXRequestQuantity,
+                width: 70,
                 dataType: "number",
                 //allowEditing: generalRequest == false ? true : false,
                 allowEditing: true,
@@ -382,6 +502,7 @@ $(function () {
             {
                 dataField: "Quantity",
                 caption: window.RazorVars.DXQuantity,
+                width: 70,
                 dataType: "number",
                 allowEditing: Permission_AddParts,
                 alignment: "left",
@@ -427,6 +548,7 @@ $(function () {
             {
                 dataField: "UsedQuantity",
                 caption: window.RazorVars.DXUsedQuantity,
+                width: 70,
                 dataType: "number",
                 allowEditing: true,
                 alignment: "left",
@@ -510,6 +632,7 @@ $(function () {
             {
                 dataField: "DiscountPct",
                 caption: window.RazorVars.DXDiscount,
+                width: 70,
                 dataType: "number",
                 allowEditing: Permission_AddDiscount,
                 alignment: "left",
@@ -641,6 +764,7 @@ $(function () {
             {
                 dataField: "AccountType",
                 caption: window.RazorVars.DXAccountType,
+                width: 90,
                 dataType: "number",
                 allowEditing: true,
                 alignment: "left",
@@ -665,7 +789,7 @@ $(function () {
             },
             {
                 type: "buttons",
-                width: 170,
+                width: 150,
                 alignment: "left",
                 buttons: [
                     {
@@ -674,7 +798,9 @@ $(function () {
                         type: "success",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35);
+                            debugger
+                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                                (Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35));
                         },
                         onClick: function (e) {
                             console.log("Approve clicked", e.row.data);
@@ -687,7 +813,8 @@ $(function () {
                         type: "danger",
                         stylingMode: "contained",
                         visible: function (e) {
-                            return Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35);
+                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                                (Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35));
                         },
                         onClick: function (e) {
                             console.log("Reject clicked", e.row.data);
@@ -703,11 +830,12 @@ $(function () {
                             const stRaw = e?.row?.data?.Status;
                             if (stRaw === undefined || stRaw === null || stRaw === "") return false;
 
-                            return Permission_Issue && (
-                                AllowActions &&
-                                parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
-                                OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
-                            );
+                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                                (Permission_Issue && (
+                                    AllowActions &&
+                                    parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
+                                    OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                                ));
                         },
                         disabled: function (e) {
                             return parseInt(e.row.data.Status) === 42;
@@ -733,11 +861,12 @@ $(function () {
                             const stRaw = e?.row?.data?.Status;
                             if (stRaw === undefined || stRaw === null || stRaw === "") return false;
 
-                            return Permission_Issue && (
-                                AllowActions &&
-                                parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
-                                OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
-                            );
+                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                                (Permission_Issue && (
+                                    AllowActions &&
+                                    parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
+                                    OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                                ));
                         },
                         onClick: function (e) {
                             UndoIssueVoucher(e.row.data);
@@ -748,14 +877,15 @@ $(function () {
                         icon: "repeat",
                         type: "default",
                         visible: function (e) {
-                            return Permission_AddParts && (
+                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                                (Permission_AddParts && (
                                 AllowActions &&
                                 //parseInt(e.row.data.Status) !== 35 &&
                                 //parseInt(e.row.data.Status) !== 42 &&
                                 //parseInt(e.row.data.Status) !== 41 &&
                                 parseInt(e.row.data.Status) == 36 &&
                                 !OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
-                            );
+                            ));
                         },
                         onClick: function (e) {
                             if (parseInt(e.row.data.Status) !== 36) {
@@ -822,6 +952,13 @@ $(function () {
             if (e.column.dataField === "AccountType") {
                 e.component.refresh().done(safeUpdateFieldsFromGrid);
                 return;
+            }
+
+            if (["Price", "DiscountPct"].includes(e.column.dataField)) {
+                const row = e.data;
+                if (row && row.requiresPriceApproval) {
+                    resetRowToEstimateIfApproved(row, e.component, e.row?.rowIndex ?? -1);
+                }
             }
 
             safeUpdateFieldsFromGrid();
@@ -1355,8 +1492,12 @@ function saveData() {
 
     // Items
     var grid = $('#mainItemsGrid').dxDataGrid('instance');
-    var gridItems = grid.getDataSource().items();
-
+    //var gridItems = grid.getDataSource().items();
+    var gridItems = grid.getDataSource().items().map(x => ({
+        ...x,
+        requiresPriceApproval: !!x.requiresPriceApproval,
+        RequiresPriceApproval: !!x.requiresPriceApproval
+    }));
     var itemsJson = JSON.stringify(gridItems);
     $("#Items").val(itemsJson);
 
@@ -1871,3 +2012,275 @@ function safeUpdateFieldsFromGrid() {
     }
 }
 
+//============================================================================================
+//function priceWfHistory(row) {
+//    return $.ajax({
+//        url: window.RazorVars.priceWfHistoryUrl,
+//        type: "POST",
+//        dataType: "json",
+//        data: { MasterId: row.PriceWorkflowMasterId }
+//    }).done(hist => {
+//        const html = (hist || []).map(h => `
+//      <div style="text-align:${theMainLang === "en" ? "left" : "right"}">
+//        <b>${h.actionName || ""}</b> - ${h.createdAt || ""}<br/>
+//        ${h.reason || ""}
+//      </div>
+//    `).join("<hr/>");
+
+//        Swal.fire({
+//            title: theMainLang === "en" ? "Workflow History" : "سجل الاعتماد",
+//            html: html || (theMainLang === "en" ? "No history" : "لا يوجد سجل"),
+//            width: 700
+//        });
+//    });
+//}
+
+
+function priceWfHistory(row) {
+    return $.ajax({
+        url: window.RazorVars.priceWfHistoryUrl,
+        type: "POST",
+        dataType: "json",
+        data: { MasterId: row.PriceWorkflowMasterId }
+    }).done(hist => {
+
+        function parseNetDate(val) {
+            if (!val) return null;
+
+            if (val instanceof Date) {
+                if (val.getFullYear() <= 1900) return null;
+                return val;
+            }
+
+            if (typeof val === "number") {
+                const d = new Date(val);
+                if (isNaN(d) || d.getFullYear() <= 1900) return null;
+                return d;
+            }
+
+            if (typeof val === "string") {
+                const m = /\/Date\((\d+)(?:[+-]\d+)?\)\//.exec(val);
+                if (m) {
+                    const d = new Date(parseInt(m[1], 10));
+                    if (d.getFullYear() <= 1900) return null;
+                    return d;
+                }
+
+                const d = new Date(val);
+                if (!isNaN(d) && d.getFullYear() > 1900) return d;
+            }
+
+            return null;
+        }
+
+        function formatDateTime(d) {
+            const dd = (d.getDate() < 10 ? "0" : "") + d.getDate();
+            const mm = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+            const yyyy = d.getFullYear();
+
+            const hh = (d.getHours() < 10 ? "0" : "") + d.getHours();
+            const min = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
+
+            return { date: `${dd}-${mm}-${yyyy}`, time: `${hh}:${min}` };
+        }
+
+
+        const timeline = (hist || []).map((h, i) => {
+            const actionName = h.ActionName ?? h.actionName ?? "";
+            const stateName = h.StateName ?? h.stateName ?? "";
+            const groupName = h.GroupName ?? h.groupName ?? "";
+            const userName = h.UserName ?? h.userName ?? "";
+            const reason = h.Reason ?? h.reason ?? "";
+
+            const created = h.CreatedDate ?? h.createdDate ?? h.CreatedAt ?? h.createdAt ?? null;
+            const updated = h.UpdatedDate ?? h.updatedDate ?? null;
+
+            const when = updated || created;
+
+            const title = stateName
+                ? `${actionName} - ${stateName}`
+                : actionName;
+
+            return {
+                order: i,
+                date: when,
+                noDateNormal: false,
+                StateName: title,
+                GroupName: groupName,
+                UserName: userName ? ` - ${userName}` : "",
+                Reason: reason
+            };
+        });
+
+        timeline.sort((a, b) => {
+            const da = parseNetDate(a.date);
+            const db = parseNetDate(b.date);
+            if (!da && !db) return a.order - b.order;
+            if (!da) return 1;
+            if (!db) return -1;
+            return da - db;
+        });
+
+        let html = "";
+        for (let i = 0; i < timeline.length; i++) {
+            const item = timeline[i];
+            const d = parseNetDate(item.date);
+
+            if (!d) {
+                html += `
+                  <section class="${item.noDateNormal ? "year" : "notE year"}">
+                    <section>
+                      <ul>
+                        <li style="${item.noDateNormal ? "" : "color:#ccc;"}">
+                          <b>${item.StateName}</b><br>
+                          ${item.GroupName || ""}
+                        </li>
+                      </ul>
+                    </section>
+                  </section>
+                `;
+                continue;
+            }
+
+            const dt = formatDateTime(d);
+
+            html += `
+                <section class="year">
+                  <h3>${dt.date} ${dt.time}</h3>
+                  <section>
+                    <ul>
+                      <li>
+                        <b>${item.StateName}</b>
+                        ${item.UserName || ""}
+                        ${item.GroupName ? `<br><small>${item.GroupName}</small>` : ""}
+                      </li>
+                    </ul>
+                  </section>
+                </section>
+              `;
+        }
+
+        const emptyMsg = (theMainLang === "en" ? "No history" : "لا يوجد سجل");
+        const align = (theMainLang === "en" ? "left" : "right");
+        const dir = (theMainLang === "en" ? "ltr" : "rtl");
+
+        Swal.fire({
+            title: theMainLang === "en" ? "Workflow History" : "سجل الاعتماد",
+            html: `
+                <div style="text-align:${align}; direction:${dir}; max-height:70vh; overflow:auto;">
+                  <div id="WfTrackHistory">
+                    ${html || `<div style="padding:10px;">${emptyMsg}</div>`}
+                  </div>
+                </div>
+              `,
+            width: 800
+     
+        });
+
+    });
+}
+function priceWfApprove(row) {
+    return $.ajax({
+        url: window.RazorVars.priceWfApproveUrl,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify({
+            MasterId: row.PriceWorkflowMasterId,
+            WipItemId: row.Id,
+            ActionId: 1,
+            Reason: ""
+        })
+    }).done(function (res) {
+
+        if (!res || res.success !== true) {
+            Swal.fire({
+                icon: "error",
+                title: (res && res.message) ? res.message : (theMainLang === "en" ? "Error" : "خطأ")
+            });
+            return;
+        }
+
+        row.PriceWorkflowStatus = res.priceWorkflowStatus ?? PriceWorkflowStatusEnum.Pending;
+        row.PriceWorkflowStatusText = res.priceWorkflowStatusText ?? (theMainLang === "en" ? "Pending" : "قيد الانتظار");
+
+        updateRowInGrid(row).then(scheduleGridRepaint);
+
+        Swal.fire({
+            icon: "success",
+            title: row.PriceWorkflowStatus === PriceWorkflowStatusEnum.Approved
+                ? (theMainLang === "en" ? "Approved" : "تم الاعتماد")
+                : (theMainLang === "en" ? "Step approved (Pending next)" : "تمت الموافقة (بانتظار المرحلة التالية)")
+        });
+    }).fail(function (xhr) {
+        let msg = theMainLang === "en" ? "Request failed" : "فشل الطلب";
+        const data = xhr.responseJSON || (() => { try { return JSON.parse(xhr.responseText); } catch { return null; } })();
+        if (data && (data.message || data.Message)) msg = data.message || data.Message;
+        Swal.fire({ icon: "error", title: msg });
+    });
+}
+
+function askReason(title) {
+    return Swal.fire({
+        title: title,
+        input: "textarea",
+        inputPlaceholder: theMainLang === "en" ? "Write reason..." : "اكتب السبب...",
+        showCancelButton: true,
+        confirmButtonText: theMainLang === "en" ? "OK" : "موافق",
+        cancelButtonText: theMainLang === "en" ? "Cancel" : "إلغاء"
+    }).then(r => r.isConfirmed ? (r.value || "").trim() : null);
+}
+
+function priceWfReject(row) {
+    return askReason(theMainLang === "en" ? "Reject reason" : "سبب الرفض")
+        .then(function (reason) {
+            if (reason === null) return; // cancel
+
+            return $.ajax({
+                url: window.RazorVars.priceWfRejectUrl,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify({
+                    MasterId: row.PriceWorkflowMasterId, 
+                    WipItemId: row.Id,
+                    Reason: reason
+                })
+            }).done(function (res) {
+
+                if (!res || res.success !== true) {
+                    Swal.fire({
+                        icon: "error",
+                        title: (res && (res.message || res.Message))
+                            ? (res.message || res.Message)
+                            : (theMainLang === "en" ? "Error" : "خطأ")
+                    });
+                    return;
+                }
+
+                row.PriceWorkflowStatus = res.priceWorkflowStatus ?? PriceWorkflowStatusEnum.Rejected;
+                row.PriceWorkflowStatusText = res.priceWorkflowStatusText ?? (theMainLang === "en" ? "Rejected" : "مرفوض");
+
+                updateRowInGrid(row).then(scheduleGridRepaint);
+
+                Swal.fire({
+                    icon: "success",
+                    title: theMainLang === "en" ? "Rejected" : "تم الرفض"
+                });
+
+            }).fail(function (xhr) {
+                let msg = theMainLang === "en" ? "Request failed" : "فشل الطلب";
+                const data = xhr.responseJSON || (() => { try { return JSON.parse(xhr.responseText); } catch { return null; } })();
+                if (data && (data.message || data.Message)) msg = data.message || data.Message;
+
+                Swal.fire({ icon: "error", title: msg });
+            });
+        });
+}
+
+function stackCaption(caption) {
+    return String(caption || "")
+        .trim()
+        .split(/\s+/)           // split by spaces
+        .join("<br/>");         // put each word on new line
+}

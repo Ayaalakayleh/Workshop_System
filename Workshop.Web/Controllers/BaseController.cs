@@ -6,8 +6,14 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Mail;
+using System.Reflection;
+using System.Text;
 using Workshop.Core.DTOs.General;
+using Workshop.Web.Models;
 using Workshop.Web.Services;
 
 namespace Workshop.Web.Controllers
@@ -21,12 +27,14 @@ namespace Workshop.Web.Controllers
         protected int BranchId { get; private set; }
         protected int UserId { get; private set; }
         protected int CurrencyId { get; private set; }
+        protected string GroupId { get; private set; }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             CompanyId = HttpContext.Session.GetInt32("CompanyId") ?? 0;
             BranchId = HttpContext.Session.GetInt32("BranchId") ?? 0;
             UserId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            GroupId = HttpContext.Session.GetString("UserGroupId") ?? "";
             var branchInfoStr = HttpContext.Session.GetString("BranchInfo");
             CurrencyId = !string.IsNullOrEmpty(branchInfoStr)
                 ? System.Text.Json.JsonSerializer.Deserialize<CompanyBranch>(branchInfoStr)?.CurrencyIDH ?? 0

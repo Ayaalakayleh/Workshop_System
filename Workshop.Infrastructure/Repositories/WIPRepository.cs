@@ -10,6 +10,7 @@ using Workshop.Core.DTOs.Vehicle;
 using Workshop.Core.Interfaces.IRepositories;
 using Workshop.Core.Services;
 using Workshop.Domain.Entities;
+using Workshop.Domain.Enum;
 using Workshop.Infrastructure.Contexts;
 
 namespace Workshop.Infrastructure.Repositories
@@ -194,11 +195,13 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("Total", typeof(decimal));
             table.Columns.Add("ModifyBy", typeof(int));
             table.Columns.Add("AccountType", typeof(int));
+            table.Columns.Add("RequiresPriceApproval", typeof(bool));
+            table.Columns.Add("PriceWorkflowEnumId", typeof(int));
 
             foreach (var item in Items)
             {
                 table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.RequestId, item.ItemId, item.fk_UnitId, item.WarehouseId, item.LocatorId, item.RequestQuantity, item.Quantity, item.UsedQuantity,
-                   item.Price, item.CostPrice, item.SalePrice, item.Discount, item.Total, item.ModifyBy, item.AccountType);
+                   item.Price, item.CostPrice, item.SalePrice, item.Discount, item.Total, item.ModifyBy, item.AccountType, item.RequiresPriceApproval, item.PriceWorkflowEnumId);
             }
 
             return table;
@@ -224,6 +227,8 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("Discount", typeof(decimal));
             table.Columns.Add("Total", typeof(decimal));
             table.Columns.Add("AccountType", typeof(int));
+            table.Columns.Add("RequiresPriceApproval", typeof(bool));
+            table.Columns.Add("PriceWorkflowEnumId", typeof(int));
 
 
             foreach (var item in dto)
@@ -234,7 +239,7 @@ namespace Workshop.Infrastructure.Repositories
                 foreach (var i in item.Items)
                 {
                     table.Rows.Add(item.Id, i.KeyId, i.RequestId, i.ItemId, i.fk_UnitId, i.WarehouseId, i.LocatorId, i.RequestQuantity, i.Quantity, i.UsedQuantity,
-                        i.Price, i.CostPrice, i.SalePrice,i.Discount, i.Total, i.ModifyBy, i.AccountType);
+                        i.Price, i.CostPrice, i.SalePrice,i.Discount, i.Total, i.ModifyBy, i.AccountType, i.RequiresPriceApproval, i.PriceWorkflowEnumId);
                 }
             }
 

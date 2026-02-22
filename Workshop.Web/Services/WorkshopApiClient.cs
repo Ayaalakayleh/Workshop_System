@@ -2887,6 +2887,33 @@ namespace Workshop.Web.Services
             });
             return response.IsSuccessStatusCode;
         }
+        public async Task<List<WipItemPriceWorkflowDTO>> WipPriceWorkflow_GetPendingLines(int wipId)
+        {
+            return await _httpClient.GetFromJsonAsync<List<WipItemPriceWorkflowDTO>>($"api/WipPriceWorkflow/PendingLines/{wipId}");
+        }
+
+        public async Task<int> WipPriceWorkflow_Apply(ApplyWipPriceWorkflowResult dto)
+        {
+            var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, $"api/WipPriceWorkflow/SetPending")
+            {
+                Content = JsonContent.Create(dto)
+            });
+            var result = await response.Content.ReadFromJsonAsync<int>();
+            return result;
+
+        }
+
+        public async Task<bool> WipPriceWorkflow_Finish(FinishWipPriceWorkflowRequest request)
+        {
+         
+            var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, "api/WipPriceWorkflow/Finish")
+            {
+                Content = JsonContent.Create(request)
+            });
+            return response.IsSuccessStatusCode;
+        }
+
+
 
         #endregion
 

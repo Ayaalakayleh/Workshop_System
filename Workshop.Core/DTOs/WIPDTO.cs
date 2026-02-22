@@ -40,7 +40,9 @@ namespace Workshop.Core.DTOs
         public IEnumerable<WIPInvoiceDTO>? InvoiceDetailsList { get; set; }
         //public int? InternalCostTransaction { get; set; }
         //public int? ExternalCostCostTransaction { get; set; }
-       
+
+        public bool? NeedPriceApproval { get; set; }
+
     }
 
     public class WIPDTO : WIPBaseDTO

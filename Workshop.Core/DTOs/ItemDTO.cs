@@ -127,6 +127,15 @@ namespace Workshop.Core.DTOs
         public string StatusCode { get; set; }
         public string? StatusPrimaryName { get; set; }
         public string? StatusSecondaryName { get; set; }
+        public Guid? PriceWorkflowMasterId { get; set; }
+        public int? PriceWorkflowEnumId { get; set; }
+        public int PriceWorkflowStatus { get; set; } // PriceWorkflowStatusEnum
+        public string PriceWorkflowStatusText { get; set; } // PriceWorkflowStatusEnum
+        public string? PriceWorkflowReason { get; set; }
+        public bool RequiresPriceApproval { get; set; } // for UI 
+        public string RequiresApproval { get; set; } // for UI 
+        public string? PriceWorkflowName { get; set; }  // for UI 
+
     }
 
     public class BaseItemDTO
@@ -149,6 +158,12 @@ namespace Workshop.Core.DTOs
         public decimal Discount { get; set; }
         public int? ModifyBy { get; set; }
         public int? AccountType { get; set; }
+        public Guid? PriceWorkflowMasterId { get; set; }
+        public int? PriceWorkflowEnumId { get; set; }
+        public int PriceWorkflowStatus { get; set; } // PriceWorkflowStatusEnum
+        public string? PriceWorkflowReason { get; set; }
+        public bool RequiresPriceApproval { get; set; } // for UI 
+        public string? PriceWorkflowName { get; set; }  // for UI 
     }
     public class ReturnDetailsDTO
     {

@@ -12,8 +12,10 @@ using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -48,6 +50,7 @@ namespace Workshop.Web.Controllers
         private readonly IFileValidationService _fileValidationService;
         private readonly ILogger<WIPController> _logger;
         private readonly IStringLocalizer<Common> _common;
+        //private readonly MsegatHelper _msegat;
 
         public readonly string lang;
         public WIPController(
@@ -76,6 +79,7 @@ namespace Workshop.Web.Controllers
             _erpApiClient = erpApiClient;
             _logger = logger;
             _common = common;
+            //_msegat = msegat;
         }
 
 
@@ -155,7 +159,9 @@ namespace Workshop.Web.Controllers
                     }
                 }
 
-               
+                //var priceWfDto = new PriceWorkflowDTO { CompanyId = CompanyId, BranchId = BranchId };
+                //ViewBag.PriceWorkflowDefinitions = await _apiClient.GetPriceWorkflowDefinitionAsync(priceWfDto);
+
                 var _WIPID = 0;
 
                 if (id.HasValue && id.Value > 0)
@@ -555,6 +561,41 @@ namespace Workshop.Web.Controllers
                     }
                 }
 
+                var defs = await _apiClient.GetPriceWorkflowDefinitionAsync(
+                    new PriceWorkflowDTO { CompanyId = CompanyId, BranchId = BranchId });
+
+                foreach (var item in dto.ItemsList)
+                {
+                    //d.KeyId == "SalePrice" &&
+                    var saleMatch = defs
+                        .Where(d => item.SalePrice >= d.Price)
+                        .OrderByDescending(d => d.Price)
+                        .FirstOrDefault();
+
+                    //d.KeyId == "CostPrice" &&
+                    var costMatch = defs
+                        .Where(d => item.CostPrice >= d.Price)
+                        .OrderByDescending(d => d.Price)
+                        .FirstOrDefault();
+
+                    if (saleMatch == null && costMatch == null)
+                    {
+                        item.RequiresPriceApproval = false;
+                        item.PriceWorkflowEnumId = null;
+                    }
+                    else
+                    {
+                        var chosen = (saleMatch == null) ? costMatch
+                                   : (costMatch == null) ? saleMatch
+                                   : (saleMatch.Price >= costMatch.Price ? saleMatch : costMatch);
+
+                        item.RequiresPriceApproval = true;
+                        item.PriceWorkflowEnumId = chosen.WorkflowID;
+                    }
+                }
+
+                bool needApproval = dto.ItemsList.Any(x => x.RequiresPriceApproval == true);
+
                 dto.ServicesList = !string.IsNullOrEmpty(dto.Services)
                     ? System.Text.Json.JsonSerializer.Deserialize<IEnumerable<CreateWIPServiceDTO>>(dto.Services)
                     : new List<CreateWIPServiceDTO>();
@@ -596,6 +637,44 @@ namespace Workshop.Web.Controllers
                     if (dto.Status == (int)WIPStatusEnum.C)
                     {
                         await GetReturnParts(dto.Id);
+                    }
+
+
+                    if (needApproval)
+                    {
+                        var pendingLines = await _apiClient.WipPriceWorkflow_GetPendingLines(success);
+
+                        if (pendingLines != null && pendingLines.Any())
+                        {
+
+                            foreach (var line in pendingLines)
+                            {
+                                // 1) create master id for this line
+                                var masterId = Guid.NewGuid();
+
+                                // 2) create workflow instance in ERP 
+                                var done = await _erpApiClient.InsertWorkflowInstance(line.PriceWorkflowEnumId.Value,masterId,CompanyId, UserId, GroupId);
+
+                                if (!done)
+                                {
+                                    //  Error 
+                                    continue;
+                                }
+
+                                // 3) mark WIP item as pending in workshop DB
+                                await _apiClient.WipPriceWorkflow_Apply(new ApplyWipPriceWorkflowResult
+                                {
+                                    WipItemId = line.Id,
+                                    MasterId = masterId,
+                                    WorkflowEnumId = line.PriceWorkflowEnumId,
+                                    Created = true,
+                                    UserId = UserId
+                                });
+
+                                // 4) notifications (optional)
+                                await SendWorkflowEmailAndNotification(masterId, Action: 0, CreatedBy: UserId, wipItemId: line.Id);
+                            }
+                        }
                     }
                     return Json(new { success = true, wipId = success });
                 }
@@ -745,8 +824,44 @@ namespace Workshop.Web.Controllers
             var catById = allCategories.ToDictionary(c => c.Id);
             var unitById = allUnits.ToDictionary(u => u.Id);
 
+            //var defs = await _apiClient.GetPriceWorkflowDefinitionAsync(new PriceWorkflowDTO { CompanyId = CompanyId, BranchId = BranchId });
+
+            //(int? wfId, bool requires) Resolve(decimal salePrice, string keyId = "SalePrice")
+            //{
+            //    var matches = defs.Where(d => d.KeyId == keyId && salePrice >= d.Price).OrderByDescending(d => d.Price).FirstOrDefault();
+
+            //    return matches is null ? (null, false) : (matches.WorkflowID, true);
+            //}
+            var defs = await _apiClient.GetPriceWorkflowDefinitionAsync(new PriceWorkflowDTO { CompanyId = CompanyId, BranchId = BranchId });
+
+            (int? wfId, bool requires) ResolveAny(ItemDTO item)
+            {
+                var saleMatch = defs
+                    .Where(d => d.KeyId == "SalePrice" && item.SalePrice >= d.Price)
+                    .OrderByDescending(d => d.Price)
+                    .FirstOrDefault();
+
+                var costValue = item.AvgCost; 
+                var costMatch = defs
+                    .Where(d => d.KeyId == "CostPrice" && costValue >= d.Price)
+                    .OrderByDescending(d => d.Price)
+                    .FirstOrDefault();
+
+         
+
+                if (saleMatch is null && costMatch is null)
+                    return (null, false);
+
+                var chosen = (saleMatch is null) ? costMatch
+                           : (costMatch is null) ? saleMatch
+                           : (saleMatch.Price >= costMatch.Price ? saleMatch : costMatch);
+
+                return (chosen.WorkflowID, true);
+            }
+
             object Map(ItemDTO item)
             {
+                var resolved = ResolveAny(item);
                 catById.TryGetValue(item.FK_CategoryId, out var cat);
                 unitById.TryGetValue(item.FK_UnitId, out var unit);
 
@@ -776,7 +891,10 @@ namespace Workshop.Web.Controllers
 
                     isDecimalUnit = unit?.IsDecimal ?? false,
                     unitPrimaryName = unit?.primaryName,
-                    unitSecondaryName = unit?.secondaryName
+                    unitSecondaryName = unit?.secondaryName,
+
+                    requiresPriceApproval = resolved.requires,
+                    priceWorkflowEnumId = resolved.wfId
                 };
             }
 
@@ -2977,6 +3095,9 @@ namespace Workshop.Web.Controllers
 
                          item.fk_UnitId = item.fk_UnitId;
                         item.Status = item.Status;
+                        item.RequiresApproval = (bool)item.RequiresPriceApproval ? "Requires Approval" : "";
+                        item.PriceWorkflowStatusText = ((PriceWorkflowStatusEnum)item.PriceWorkflowStatus).ToString();
+
                     }
                     catch (Exception ex)
                     {
@@ -3571,6 +3692,341 @@ namespace Workshop.Web.Controllers
                 resultJson.Type = "error";
                 resultJson.Message = "An error occurred while processing the petty cash expense";
                 return Json(resultJson);
+            }
+        }
+
+        #endregion
+        //=====================================================================================================
+        #region Price WF
+
+        [HttpPost]
+        public async Task<IActionResult> Approve([FromBody] ApproveDto dto)
+        {
+            try
+            {
+                var state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
+                if (state == null)
+                    return Json(new { success = false, message = "State not found" });
+
+                var groupIds = (GroupId?.ToString() ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToList();
+
+                if (!groupIds.Contains(state.NextGroupId))
+                    return Json(new { success = false, message = "No permission" });
+
+                var responseApprove = await _erpApiClient.ApproveWorkflowInstance(
+                    dto.MasterId, CompanyId, UserId, dto.ActionId, dto.Reason
+                );
+
+                if (!responseApprove.IsScusses)
+                    return Json(new { success = false, message = "Approve failed" });
+
+                state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
+
+                var isFinished = state?.IsFinished ?? false;
+
+                if (isFinished)
+                {
+                    await _apiClient.WipPriceWorkflow_Finish(new FinishWipPriceWorkflowRequest
+                    {
+                        WipItemId = dto.WipItemId,  
+                        MasterId = dto.MasterId,
+                        Status = 2,               
+                        Reason = dto.Reason,
+                        UserId = UserId
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    isFinished = isFinished,
+
+                    priceWorkflowStatus = isFinished ? 2 : 1, // 2 Approved, 1 Pending
+                    priceWorkflowStatusText = isFinished
+                        ? (lang == "en" ? "Approved" : "تم الاعتماد")
+                        : (lang == "en" ? "Pending" : "قيد الانتظار")
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Reject([FromBody] RejectDto dto)
+        {
+            try
+            {
+                var state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
+                if (state == null)
+                    return Json(new { success = false, message = "State not found" });
+
+                var groupIds = (GroupId?.ToString() ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse).ToList();
+
+                if (!groupIds.Contains(state.NextGroupId))
+                    return Json(new { success = false, message = "No permission" });
+
+                var responseReject = await _erpApiClient.RejectWorkflowInstance(dto.MasterId, CompanyId, UserId, dto.Reason);
+
+                if (!responseReject.IsScusses)
+                    return Json(new { success = false, message = "Reject failed" });
+
+                state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
+                var isRejected = state?.IsRejected ?? false;
+
+                if (isRejected)
+                {
+                    await _apiClient.WipPriceWorkflow_Finish(new FinishWipPriceWorkflowRequest
+                    {
+                        WipItemId = dto.WipItemId,
+                        MasterId = dto.MasterId,
+                        Status = 3,
+                        Reason = dto.Reason,
+                        UserId = UserId
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    isRejected = isRejected,
+                    priceWorkflowStatus = 3,
+                    priceWorkflowStatusText = (lang == "en" ? "Rejected" : "مرفوض")
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> GetHistory(Guid MasterId)
+        {
+            List<WorkflowHistory> data = new List<WorkflowHistory>();
+
+            try
+            {
+                data = await _erpApiClient.GetHistory(MasterId, CompanyId, lang);
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                return Json(data);
+
+            }
+        }
+        public async Task<TempData> SendWorkflowEmailAndNotification(Guid? MasterId,int Action = 0, int CreatedBy = 0, int wipItemId = 0)
+        {
+            var resultJson = new TempData
+            {
+                Notification = new List<Notification>()
+            };
+
+            try
+            {
+                if (MasterId is null || MasterId == Guid.Empty)
+                    return resultJson;
+
+                var state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(MasterId.Value, CompanyId);
+                if (state == null)
+                    return resultJson;
+
+
+                WipPriceWorkflowItem ctx = new WipPriceWorkflowItem();
+                //WipPriceWorkflowItem ctx = await _apiClient.WIP_GetItemsById(wipItemId);
+
+                ctx ??= new WipPriceWorkflowItem
+                {
+                    WipItemId = wipItemId,
+                    MasterId = MasterId
+                };
+
+                // ItemName/Code،   Inventory ItemId
+                if (ctx.ItemId.HasValue && (string.IsNullOrWhiteSpace(ctx.ItemName) || string.IsNullOrWhiteSpace(ctx.ItemCode)))
+                {
+                    try
+                    {
+                        var item = await _inventoryApiClient.GetItemByIdAsync(ctx.ItemId.Value);
+                        if (item != null)
+                        {
+                            ctx.ItemCode ??= item.Code;
+                            ctx.ItemName ??= (lang == "en" ? item.PrimaryName : item.SecondaryName);
+                        }
+                    }
+                    catch
+                    {
+                       
+                    }
+                }
+
+                // 3)  Action text
+                string subject;
+                string primaryTitle;
+                string secondaryTitle;
+
+                //  Action  (1 approve / 2 reject / 3 review / default new)
+                switch (Action)
+                {
+                    case 1:
+                        primaryTitle = "Price approval step completed — next action required.";
+                        secondaryTitle = "تمت خطوة اعتماد السعر — يوجد إجراء مطلوب للمرحلة التالية.";
+                        break;
+
+                    case 2:
+                        primaryTitle = "Price approval rejected — action required.";
+                        secondaryTitle = "تم رفض اعتماد السعر — يرجى اتخاذ إجراء.";
+                        break;
+
+                    case 3:
+                        primaryTitle = "Price approval reviewed — action required.";
+                        secondaryTitle = "تمت مراجعة اعتماد السعر — يرجى اتخاذ إجراء.";
+                        break;
+
+                    default:
+                        primaryTitle = "New price approval request — action required.";
+                        secondaryTitle = "طلب اعتماد سعر جديد — يرجى اتخاذ إجراء.";
+                        break;
+                }
+
+                // Title
+                var partLabelEn = $"{ctx.ItemCode ?? ("Item#" + (ctx.ItemId?.ToString() ?? ""))} {ctx.ItemName}".Trim();
+                var partLabelAr = $"{ctx.ItemCode ?? ("قطعة#" + (ctx.ItemId?.ToString() ?? ""))} {ctx.ItemName}".Trim();
+
+                // Subject
+                subject = $"Price Approval - WIP {(ctx.WipId > 0 ? ctx.WipId.ToString() : "-")} - Line #{ctx.WipItemId}";
+
+                // 4) Link  WIP 
+                string? baseLink = null;
+                if (ctx.WipId > 0)
+                {
+                    baseLink = Url.Action("Edit", "WIP", new { id = ctx.WipId }, Request.Scheme);
+                }
+                var link = string.IsNullOrWhiteSpace(baseLink)
+                    ? ""
+                    : $"{baseLink}#item-{ctx.WipItemId}";
+
+                // 5)  (HTML) + SMS (Plain text)
+                var qtyText = ctx.Quantity.HasValue ? ctx.Quantity.Value.ToString("0.##") : "-";
+                var priceText = ctx.SalePrice.HasValue ? ctx.SalePrice.Value.ToString("0.##") : "-";
+
+                var bodyHtml = $@"
+                        <div style='font-family:Arial; font-size:14px'>
+                          <h3>{primaryTitle}</h3>
+                          <h3 style='text-align:right'>{secondaryTitle}</h3>
+
+                          <hr />
+
+                          <p><b>WIP:</b> {(ctx.WipId > 0 ? ctx.WipId.ToString() : "-")}</p>
+                          <p><b>WIP Item Line:</b> {ctx.WipItemId}</p>
+                          <p><b>Part:</b> {System.Net.WebUtility.HtmlEncode(partLabelEn)}</p>
+                          <p style='text-align:right'><b>القطعة:</b> {System.Net.WebUtility.HtmlEncode(partLabelAr)}</p>
+
+                          <p><b>Qty:</b> {qtyText} &nbsp; | &nbsp; <b>Price:</b> {priceText}</p>
+                          <p style='text-align:right'><b>الكمية:</b> {qtyText} &nbsp; | &nbsp; <b>السعر:</b> {priceText}</p>
+
+                          <p><b>Workflow MasterId:</b> {MasterId}</p>
+
+                          {(string.IsNullOrWhiteSpace(link) ? "" : $"<p><a href='{link}'>Open WIP / فتح أمر العمل</a></p>")}
+                        </div>";
+
+                // SMS
+                var smsText = $"Price approval: WIP {(ctx.WipId > 0 ? ctx.WipId.ToString() : "-")}, Line {ctx.WipItemId}, Part: {partLabelEn}, Qty: {qtyText}, Price: {priceText}";
+
+                // NotificationType (1 SMS, 2 Email, 3 Both)
+                //foreach (var u in state.UsersContactInformation ?? new List<dynamic>())
+                //{
+                    // SMS
+                    //if ((state.NotificationType == 1 || state.NotificationType == 3) && !string.IsNullOrWhiteSpace(u.PhoneNo))
+                    //{
+                    //    try
+                    //    {
+                    //        var phone = NormalizeKsaPhone(u.PhoneNo);
+                    //        if (!string.IsNullOrWhiteSpace(phone))
+                    //            await _msegat.SendSmsAsync(phone, smsText);
+                    //    }
+                    //    catch
+                    //    {
+                           
+                    //    }
+                    //}
+
+                    // Email
+                    //if ((state.NotificationType == 2 || state.NotificationType == 3) && !string.IsNullOrWhiteSpace(u.Email))
+                    //{
+                    //    try
+                    //    {
+                    //        var mail = new Mail
+                    //        {
+                    //            To = u.Email,
+                    //            Subject = subject,
+                    //            Body = bodyHtml
+                    //        };
+                    //        // SendEmail(mail, lang);
+                    //    }
+                    //    catch
+                    //    {
+                           
+                    //    }
+                    //}
+
+                    // Notification 
+                    /*
+                    try
+                    {
+                        var notif = new Notification
+                        {
+                            Type = 4,
+                            RelatedItemId = ctx.WipId > 0 ? ctx.WipId : ctx.WipItemId, // حسب ما بدك تربطها
+                            CreatedBy = CreatedBy,
+                            PrimaryMessage = primaryTitle + $" (WIP {ctx.WipId}, Line {ctx.WipItemId})",
+                            SecondaryMessage = secondaryTitle + $" (أمر عمل {ctx.WipId}، بند {ctx.WipItemId})",
+                            UserId = u.Id,
+                            ModuleId = 1,
+                            Link = link,
+                            PrimaryType = "Price Approval",
+                            SecondaryType = "اعتماد سعر"
+                        };
+
+                        var inserted = await _erpApiClient.Notification_Insert(notif);
+                        // CurrentModuleHubConnection(inserted);
+                    }
+                    catch { }
+                    */
+                //}
+
+                return resultJson;
+            }
+            catch
+            {
+                return resultJson;
+            }
+
+            static string NormalizeKsaPhone(string raw)
+            {
+                if (string.IsNullOrWhiteSpace(raw)) return "";
+                var phone = raw.Trim().Replace(" ", "").Replace("-", "");
+                if (phone.StartsWith("+")) phone = phone.Substring(1);
+                if (phone.StartsWith("0")) phone = phone.Substring(1);
+                if (!phone.StartsWith("966")) phone = "966" + phone;
+                return phone;
+            }
+        }
+        public void FinishRequest(VehicleTransferRequest vehicleTransferRequest)
+        {
+            try
+            {
+                
+            }
+            catch (Exception ex)
+            {
+               
             }
         }
 

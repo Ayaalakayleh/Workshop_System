@@ -240,6 +240,21 @@ function updateSelectionCount(count) {
 
             const selectedRows = sourceGrid.getSelectedRowsData();
 
+
+            const needApproval = selectedRows.some(x => x.requiresPriceApproval === true);
+            if (needApproval) {
+                Swal.fire({
+                    icon: "warning",
+                    title: theMainLang == "en" ? "Price approval required" : "مطلوب اعتماد سعر",
+                    text: theMainLang == "en"
+                        ? "One or more selected parts require price approval. Workflow will start after saving."
+                        : "يوجد قطع مختارة تحتاج اعتماد سعر. سيتم بدء سير العمل بعد الحفظ.",
+                    confirmButtonText: theMainLang == "en" ? "OK" : "حسناً"
+                });
+            }
+
+
+
             if (selectedRows.length > 0) {
 
                 const _existingData = targetGrid.option("dataSource") || [];
@@ -276,6 +291,12 @@ function updateSelectionCount(count) {
                     MaxQty: item.availableQty,
                     WarehouseId: item.warehouseId,
                     isDecimalUnit: item.isDecimalUnit,
+
+                    RequiresPriceApproval: !!item.requiresPriceApproval,
+                    PriceWorkflowEnumId: item.priceWorkflowEnumId ?? null,
+                    PriceWorkflowStatus: 0,       
+                    PriceWorkflowReason: null,
+                    PriceWorkflowMasterId: null
 
                 }));
                 const existingData = targetGrid.option("dataSource") || [];
