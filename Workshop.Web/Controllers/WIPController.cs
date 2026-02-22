@@ -4018,18 +4018,7 @@ namespace Workshop.Web.Controllers
                 return phone;
             }
         }
-        public void FinishRequest(VehicleTransferRequest vehicleTransferRequest)
-        {
-            try
-            {
-                
-            }
-            catch (Exception ex)
-            {
-               
-            }
-        }
-
+      
         #endregion
     }
 }
