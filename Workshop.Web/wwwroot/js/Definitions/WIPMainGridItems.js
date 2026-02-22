@@ -131,41 +131,21 @@ $(function () {
                 alignment: "center",
                 allowEditing: false,
                 width: 60,
+                visible: Permission_PriceApproval,
                 cellTemplate: function (container, options) {
                     const row = options.data || {};
 
-                    // ! Workflow 
                     if (!row.PriceWorkflowMasterId) return;
 
                     const status = Number(row.PriceWorkflowStatus ?? 0);
                     const isPending = status === PriceWorkflowStatusEnum.Pending;
 
-                    // History 
-                    const historyItem = { id: "history", text: theMainLang === "en" ? "History" : "السجل", icon: "info" };
+                    if (!isPending) return;
 
-                    // ! Pending => display History 
-                    if (!isPending) {
-                        $("<div>").dxButton({
-                            icon: "info",
-                            hint: theMainLang === "en" ? "History" : "السجل",
-                            stylingMode: "contained",
-                            type: "default",
-                            onClick: function () {
-                                priceWfHistory(row);
-                            }
-                        }).appendTo(container);
-                        return;
-                    }
-
-                    // if Pending => display Approve/Reject + History
                     const items = [
-                        ...(Permission_PriceApproval ? [
-                            { id: "approve", text: theMainLang === "en" ? "Approve" : "اعتماد", icon: "check" },
-                            { id: "reject", text: theMainLang === "en" ? "Reject" : "رفض", icon: "close" }
-                        ] : []),
-                        historyItem
+                        { id: "approve", text: theMainLang === "en" ? "Approve" : "اعتماد", icon: "check" },
+                        { id: "reject", text: theMainLang === "en" ? "Reject" : "رفض", icon: "close" }
                     ];
-
 
                     $("<div>").dxDropDownButton({
                         icon: "overflow",
@@ -181,11 +161,8 @@ $(function () {
                         onItemClick: function (e) {
                             const id = e.itemData?.id;
 
-                            if ((id === "approve" || id === "reject") && !Permission_PriceApproval) return;
-
                             if (id === "approve") priceWfApprove(row);
                             else if (id === "reject") priceWfReject(row);
-                            else if (id === "history") priceWfHistory(row);
                         }
                     }).appendTo(container);
                 }
@@ -897,6 +874,19 @@ $(function () {
                                 return;
                             }
                             TransferItem(e.row.data);
+                        }
+                    },
+                    {
+                        hint: theMainLang === "en" ? "Price WF History" : "سجل اعتماد السعر",
+                        icon: "info",
+                        type: "default",
+                        stylingMode: "contained",
+                        visible: function (e) {
+                            const row = e?.row?.data || {};
+                            return !!row.PriceWorkflowMasterId;
+                        },
+                        onClick: function (e) {
+                            priceWfHistory(e.row.data);
                         }
                     },
                     {
