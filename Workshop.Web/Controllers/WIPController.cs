@@ -1111,21 +1111,29 @@ namespace Workshop.Web.Controllers
                     .Distinct()
                     .ToList();
 
-                var productLookup = new Dictionary<int, string>();
+
+                var productLookup = new Dictionary<int, (string Name, string Code)>();
 
                 foreach (var productId in productIds)
                 {
                     var item = await _inventoryApiClient.GetItemByIdAsync(productId);
                     if (item != null)
-                        productLookup[productId] = lang=="en" ? item.PrimaryName : item.SecondaryName;
+                    {
+                        productLookup[productId] = (
+                            Name: lang == "en" ? item.PrimaryName : item.SecondaryName,
+                            Code: item.Code
+                            );
+
+                    }
                 }
 
                 foreach (var part in partsHistory)
                 {
                     if (part.Product.HasValue &&
-                        productLookup.TryGetValue(part.Product.Value, out var name))
+                        productLookup.TryGetValue(part.Product.Value, out var productData))
                     {
-                        part.ProductName = name;
+                        part.ProductName = productData.Name;
+                        part.Code = productData.Code;   
                     }
                 }
 

@@ -330,6 +330,7 @@ namespace Workshop.Core.DTOs
     public class WIPServiceHistoryDetails_Parts
     {
         public int FK_WIPId { get; set; }
+        public string? Code { get; set; }
         public int? Product { get; set; }
         public string? ProductName { get; set; }
         public decimal? Quantity { get; set; }
