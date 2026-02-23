@@ -1085,7 +1085,7 @@ function initModal2() {
             Date: apiDateISOFixed,
             StartTime: `${start24}:00`,
             Duration: durationMins,
-            //Duration: durationMins + END_TIME_EXTRA_MINS, Abood
+            //Duration: durationMins + END_TIME_EXTRA_MINS,
             EndTime: `${end24}:00`,
             KeyId: job.KeyId,
         };
