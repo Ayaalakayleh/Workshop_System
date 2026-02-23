@@ -55,7 +55,7 @@ namespace Workshop.Web.Controllers
             var WIPId = 0;
             
             var WIPByMovementId = await _workshopApiClient.GetWIPByMovementId(movementId);
-            if(WIPByMovementId != null)
+            if(WIPByMovementId != null  && WIPByMovementId.Count() > 0)
             {
                 WIPId = WIPByMovementId.FirstOrDefault().Id;
             }
