@@ -2,6 +2,8 @@
 const SHIFT_START = "08:00";
 const SHIFT_END = "17:00";
 const SHIFT_MINS = 9 * 60; // 08:00 → 17:00
+// Add +1 hour to the computed EndTime ("To hour")
+const END_TIME_EXTRA_MINS = 60;
 
 // ✅ Backend saves schedules on NEXT DAY => compensate by -1.
 // If backend is fixed later, set this back to 0.
@@ -868,7 +870,7 @@ function schedule2UpdateEnds(els) {
         return;
     }
 
-    const end24 = addMinutes(start24, durationMins);
+    const end24 = addMinutes(start24, durationMins + END_TIME_EXTRA_MINS);
 
     // ✅ show to user as 12h
     els.ends.value = toUITime(end24);
@@ -1073,7 +1075,7 @@ function initModal2() {
 
         const uiDateISO = normalizeISODateOnly(dateISO);
         const apiDateISOFixed = shiftISODateLocal(uiDateISO, SAVE_DATE_COMPENSATION_DAYS);
-        const end24 = addMinutes(start24, durationMins);
+        const end24 = addMinutes(start24, durationMins + END_TIME_EXTRA_MINS);
 
         const WIPSCheduleObject = {
             Id: Number(job.id),
@@ -1082,7 +1084,7 @@ function initModal2() {
             TechnicianId: techId,
             Date: apiDateISOFixed,
             StartTime: `${start24}:00`,
-            Duration: durationMins,
+            Duration: durationMins + END_TIME_EXTRA_MINS,
             EndTime: `${end24}:00`,
             KeyId: job.KeyId,
         };
