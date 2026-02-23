@@ -847,8 +847,8 @@
         });
 
 (function () {
-    // Allowed KSA plate letters (from your table)
-    const KSA_ALLOWED = "ABJDRSXTEGKLZNHUV";
+    // Allowed KSA plate letters (Latin, from your table)
+    const KSA_ALLOWED_LATIN = "ABJDRSXTEGKLZNHUV";
 
     // Latin -> Arabic letters (Saudi plate mapping)
     const letterToArabic = {
@@ -877,6 +877,13 @@
         "5": "٥", "6": "٦", "7": "٧", "8": "٨", "9": "٩"
     };
 
+    // Arabic letters allowed in the mask (exact Arabic equivalents of your allowed Latin set)
+    // + optional "ي" as a common keyboard alternative for "ى" (will stay as-is in Arabic output)
+    const KSA_ALLOWED_ARABIC = Object.values(letterToArabic).join("") + "ي";
+
+    // Arabic-Indic digits allowed in the numeric part
+    const ARABIC_INDIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+
     function toArabicPlate(value) {
         if (!value) return "";
 
@@ -886,18 +893,25 @@
         let out = "";
         for (const ch of cleaned) {
             const up = ch.toUpperCase();
+
+            // Convert ONLY English letters/digits -> Arabic
             if (letterToArabic[up]) out += letterToArabic[up];
             else if (digitToArabic[ch]) out += digitToArabic[ch];
-            else out += ch; // keep spaces/dash as-is
+
+            // If already Arabic (letters/digits), keep as-is
+            else out += ch; // keep spaces/dash/Arabic chars as-is
         }
         return out;
     }
 
     function syncArabicField() {
         const val = $("#PlateNumber").val() || "";
-        $("#PlateNumberAr").val(toArabicPlate(val));
-        // Optional: if you still want the old text preview
-        $("#plateText").text(toArabicPlate(val));
+        const ar = toArabicPlate(val);
+
+        $("#PlateNumberAr").val(ar);
+
+        // Optional preview (safe even if #plateText doesn't exist)
+        $("#plateText").text(ar);
     }
 
     // Keep your old button working (if present in some branch)
@@ -906,20 +920,50 @@
     };
 
     $(function () {
-        // Inputmask: 9999 - L L L where L is ONLY from the allowed set
+        // Inputmask: 9999 - L L L where:
+        // - 9 allows Western OR Arabic-Indic digits
+        // - L allows allowed Latin letters OR their Arabic equivalents
         $(".plate-mask").inputmask("9999 - L L L", {
             definitions: {
+                "9": {
+                    validator: "[0-9" + ARABIC_INDIC_DIGITS + "]"
+                },
                 "L": {
-                    validator: "[" + KSA_ALLOWED + "]",
-                    casing: "upper"
+                    validator: function (ch) {
+                        if (!ch) return false;
+
+                        const up = ch.toUpperCase();
+
+                        // Accept Latin allowed OR Arabic allowed
+                        return (
+                            KSA_ALLOWED_LATIN.indexOf(up) !== -1 ||
+                            KSA_ALLOWED_ARABIC.indexOf(ch) !== -1
+                        );
+                    },
+                    casing: "upper" // affects Latin only; Arabic unchanged
                 }
             },
             placeholder: "_",
             clearIncomplete: true,
             onBeforePaste: function (pastedValue) {
-                // Uppercase + remove anything not allowed (digits, allowed letters, spaces, dash)
-                const re = new RegExp("[^0-9" + KSA_ALLOWED + "\\s\\-]", "g");
-                return (pastedValue || "").toUpperCase().replace(re, "");
+                // Keep only:
+                // - Western digits 0-9
+                // - Arabic-Indic digits
+                // - allowed Latin letters
+                // - allowed Arabic letters
+                // - spaces and dash
+                const re = new RegExp(
+                    "[^0-9" +
+                        ARABIC_INDIC_DIGITS +
+                        KSA_ALLOWED_LATIN +
+                        KSA_ALLOWED_ARABIC +
+                        "\\s\\-]",
+                    "g"
+                );
+
+                return (pastedValue || "")
+                    .toUpperCase() // Latin only
+                    .replace(re, "");
             }
         });
 
