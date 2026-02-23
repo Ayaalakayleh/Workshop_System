@@ -256,7 +256,17 @@ namespace Workshop.Web.Controllers
                         {
                             clocking.ClockingForm.ID = result;
                             main.ClockingList.Add(clocking.ClockingForm);
+
+                            if (main.LabourlinesSelectList != null && clocking.ClockingForm.RTSID.HasValue)
+                            {
+                                string usedRts = clocking.ClockingForm.RTSID.Value.ToString();
+                                main.LabourlinesSelectList.RemoveAll(x => x.Value == usedRts);
+                            }
+
                             main.ClockingForm = clocking.ClockingForm;
+                            main.ClockingForm.RTSID = null;
+                            main.ClockingForm.KeyId = 0;
+
                             SaveMainModel(main);
                         }
                     }
