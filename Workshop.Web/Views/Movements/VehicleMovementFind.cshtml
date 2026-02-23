@@ -876,7 +876,7 @@
                         @if (Model.MaintenanceStatus != 3 || Model.MaintenanceStatus == null)
                         {
                             <div class="text-center mt-2">
-                                @if (Model.LastMovementDetails.MovementIN.HasValue)
+                                @if (Model.LastMovementDetails.MovementIN.HasValue && Model.LastMovementDetails.MovementIN == true)
                                 {
                                     if (true && Model.IsExternal == false)
                                     {
