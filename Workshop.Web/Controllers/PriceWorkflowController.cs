@@ -42,7 +42,7 @@ namespace Workshop.Web.Controllers
             ViewBag.Data = await _apiClient.GetPriceWorkflowDefinitionAsync(dto);
             ViewBag.Workflows = Enum.GetValues(typeof(WorkflowEnum))
                 .Cast<WorkflowEnum>()
-                .Where(e => (int)e >= 18)
+                .Where(e => (int)e >= 18 && (int)e <= 22)
                 .Select(e => new SelectListItem
                 {
                     Value = ((int)e).ToString(),
@@ -59,8 +59,8 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                if (data == null || data.Count == 0)
-                    return Json(new { success = false, errorMessage = "No data received" });
+                //if (data == null || data.Count == 0)
+                //    return Json(new { success = false, errorMessage = "No data received" });
 
                 var userId = UserId;
                 var now = DateTime.Now; 

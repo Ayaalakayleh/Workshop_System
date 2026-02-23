@@ -1,4 +1,14 @@
-﻿let isEditMode = false;
+﻿function newGuid() {
+    if (window.crypto && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+    // fallback
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+let isEditMode = false;
 
 function setGridEditMode(enabled) {
     const grid = $("#PriceWorkflowGrid").dxDataGrid("instance");
@@ -181,7 +191,7 @@ $(function () {
             }
         },
         onInitNewRow: function (e) {
-            e.data.KeyId = crypto.randomUUID();
+            e.data.KeyId = newGuid();
         },
         onRowInserting: function (e) {
             const grid = e.component;
@@ -196,7 +206,7 @@ $(function () {
             }
 
             if (!e.data.KeyId) {
-                e.data.KeyId = crypto.randomUUID();
+                e.data.KeyId = newGuid();
             }
         },
         onEditorPreparing: function (e) {
@@ -231,12 +241,13 @@ $(function () {
                     text: "Add",
                     visible: false,
                     onClick: function () {
-                        const count = grid.getDataSource().items().length;
+                        //const count = grid.getDataSource().items().length;
+                        const count = grid.totalCount ? grid.totalCount() : grid.getDataSource().items().length;
 
                         if (count >= 4) {  
                             return; 
                         }
-
+                        grid.pageIndex(0);
                         grid.addRow();
                     }
                 }
