@@ -260,7 +260,7 @@ $(function () {
                         icon: "fad fa-regular fa-user act-booking",
                         visible: function (e) {
                             return !(wipStatus === Gone || wipStatus === Invoiced) &&
-                                e.row.data.Status != 1 && //&& e.row.data.Status === 23;
+                                e.row.data.Status != 1 && e.row.data.Status != 20 //&& e.row.data.Status === 23;
                                 parseInt(e.row.data.Status) !== 24 &&
                                 parseInt(e.row.data.Status) !== 26;
                         },
