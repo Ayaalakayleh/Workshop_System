@@ -666,3 +666,46 @@
 	  };
 </script>
 <script src="~/js/definitions/wip.js"></script>
+<script>
+	(function () {
+	  let isDirty = false;
+	  let bypassNextUnload = false;
+
+	  function markDirty() { isDirty = true; }
+	  function clearDirty() { isDirty = false; }
+
+	  function bypassOnce(fn) {
+		bypassNextUnload = true;
+		try { return fn(); }
+		finally { setTimeout(() => { bypassNextUnload = false; }, 0); }
+	  }
+
+	  document.addEventListener("input", (e) => {
+		const el = e.target;
+		if (el && (el.matches("input, textarea, select") || el.isContentEditable)) markDirty();
+	  }, true);
+
+	  document.addEventListener("change", (e) => {
+		const el = e.target;
+		if (el && (el.matches("input, textarea, select") || el.isContentEditable)) markDirty();
+	  }, true);
+
+	  document.addEventListener("submit", () => clearDirty(), true);
+
+	  window.addEventListener("beforeunload", (e) => {
+		if (bypassNextUnload) return;   // <— skip prompt for programmatic reload/navigation
+		if (!isDirty) return;
+
+		e.preventDefault();
+		e.returnValue = "";
+	  });
+
+	  window.__unsavedChanges = {
+		markDirty,
+		clearDirty,
+		get isDirty() { return isDirty; },
+		bypassOnce,
+		reload() { return bypassOnce(() => window.location.reload()); }
+	  };
+	})();
+</script>
