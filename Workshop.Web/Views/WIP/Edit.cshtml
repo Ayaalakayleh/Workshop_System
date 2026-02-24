@@ -279,6 +279,11 @@
 
 
 							<div class="col-4 text-end">
+							<a href="@Url.Action("RepairOrderRequest", "WIP", new { id = Model.Id })"
+							   class="btn btn-info btn-sm btn-open-wip"
+							   data-wip-id="@Model.Id" target="_blank" rel="noopener noreferrer">
+								<i class="fad fa-print"></i>&nbsp;@Common["Button_Print"]
+							</a>
 							@if (ViewBag.HasRecall == true)
 							{
 								<button type="button"
