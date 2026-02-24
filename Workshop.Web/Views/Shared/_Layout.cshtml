@@ -1402,7 +1402,35 @@ $(document).on('error.dt', function (e, settings, techNote, message) {
 lockFormControls();
 
 </script>
+<script>
+  (function () {
+    let isDirty = false;
+    function markDirty() { isDirty = true; }
+    function clearDirty() { isDirty = false; }
+    document.addEventListener("input", (e) => {
+      const el = e.target;
+      if (el && (el.matches("input, textarea, select") || el.isContentEditable)) {
+        markDirty();
+      }
+    }, true);
 
+    document.addEventListener("change", (e) => {
+      const el = e.target;
+      if (el && (el.matches("input, textarea, select") || el.isContentEditable)) {
+        markDirty();
+      }
+    }, true);
+    document.addEventListener("submit", () => clearDirty(), true);
+    window.addEventListener("beforeunload", (e) => {
+      if (!isDirty) return;
+
+      e.preventDefault();
+      e.returnValue = "";
+      return ""; 
+    });
+    window.__unsavedChanges = { markDirty, clearDirty, get isDirty() { return isDirty; } };
+  })();
+</script>
 @await RenderSectionAsync("Scripts", required: false)
 
 </body>
