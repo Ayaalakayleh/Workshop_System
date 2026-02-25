@@ -12,7 +12,7 @@ namespace Workshop.Core.Interfaces.IServices
     {
         Task<IEnumerable<TechniciansNameDTO>> GetTechniciansName(int? Id);
         Task<IEnumerable<TechnicianScheduleDTO>> GetTechnicianSchedule(DateTime Date, DateTime? DateTO, int BranchId);
-        Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty();
+        Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty(DateTime Date);
         Task<IEnumerable<GroupedServicesDTO>> GetGroupedServices(int Id);
     }
 }

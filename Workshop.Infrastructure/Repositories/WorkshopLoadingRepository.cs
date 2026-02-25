@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.Core.DTOs;
 using Workshop.Core.Interfaces.IRepositories;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Workshop.Infrastructure.Repositories
 {
@@ -45,11 +46,15 @@ namespace Workshop.Infrastructure.Repositories
                 throw ex;
             }
         }
-        public async Task<IEnumerable<TechnicianAvailabiltyDTO>> GetTechnicianAvailabilty()
+        public async Task<IEnumerable<TechnicianAvailabiltyDTO>> GetTechnicianAvailabilty(DateTime Date)
         {
             try
             {
-                var obj = await _database.ExecuteGetAllStoredProcedure<TechnicianAvailabiltyDTO>("Get_TechnicianAvailabilty", null);
+                var parameter = new
+                {
+                     Date = Date
+                };
+                var obj = await _database.ExecuteGetAllStoredProcedure<TechnicianAvailabiltyDTO>("Get_TechnicianAvailabilty", parameter);
                 return obj.ToList();
             }
             catch (Exception ex)

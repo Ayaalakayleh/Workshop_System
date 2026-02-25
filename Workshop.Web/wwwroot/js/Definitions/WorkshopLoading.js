@@ -1445,12 +1445,16 @@ function SaveSchedule(WIPSCheduleObject) {
     });
 }
 
-function TechnicianAvailabilty() {
+function TechnicianAvailabilty(date) {
+    const reqISO = apiDateISO(date) || convertDateFormat(date);
+    if (reqISO) currentDate = parseYMD(reqISO);
+
     return $.ajax({
         url: window.RazorVars.getTechnicianAvailabilityUrl,
         type: 'GET',
         dataType: 'json',
         cache: false,
+        data: { Date: reqISO || date }
     }).then(function (res) {
         $.each(res, function (_index, value) {
             AvailableTechnicians.push({
@@ -1657,7 +1661,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await Promise.all([
         GetAllTechnicians(today),
         GetServicesById(),
-        TechnicianAvailabilty(),
+        TechnicianAvailabilty(today),
     ]);
 
     initModal2();

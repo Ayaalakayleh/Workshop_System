@@ -43,9 +43,9 @@ namespace Workshop.Core.Services
 
             return data;
         }
-        public async Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty()
+        public async Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty(DateTime Date)
         {
-            return await _LoadingRepository.GetTechnicianAvailabilty();
+            return await _LoadingRepository.GetTechnicianAvailabilty(Date);
         }
 
         public async Task<IEnumerable<GroupedServicesDTO>> GetGroupedServices(int Id)

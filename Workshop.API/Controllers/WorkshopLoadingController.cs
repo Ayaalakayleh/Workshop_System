@@ -32,9 +32,9 @@ namespace Workshop.API.Controllers
             return Ok(result);
         }
         [HttpGet("GetTechnicianAvailabilty")]
-        public async Task<ActionResult<IEnumerable<TechniciansNameDTO>>> GetTechnicianAvailabilty()
+        public async Task<ActionResult<IEnumerable<TechniciansNameDTO>>> GetTechnicianAvailabilty([FromQuery] DateTime Date)
         {
-            var result = await _service.Get_TechnicianAvailabilty();
+            var result = await _service.Get_TechnicianAvailabilty(Date);
             return Ok(result);
         }
 

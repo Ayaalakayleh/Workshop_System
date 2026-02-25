@@ -2583,10 +2583,10 @@ namespace Workshop.Web.Services
             return obj;
         }
 
-        public async Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty()
+        public async Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty(DateTime Date)
         {
 
-            var obj = await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianAvailabiltyDTO>>($"api/WorkshopLoading/GetTechnicianAvailabilty");
+            var obj = await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianAvailabiltyDTO>>($"api/WorkshopLoading/GetTechnicianAvailabilty?Date={Date}");
             return obj;
         }
         

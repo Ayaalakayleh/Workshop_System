@@ -86,11 +86,11 @@ namespace Workshop.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get_TechnicianAvailabilty()
+        public async Task<IActionResult> Get_TechnicianAvailabilty(DateTime Date)
         {
             try
             {
-                var Obj = await _apiclient.Get_TechnicianAvailabilty();
+                var Obj = await _apiclient.Get_TechnicianAvailabilty(Date);
                 return Ok(Obj);
             }
             catch (Exception ex)
