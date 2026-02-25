@@ -688,13 +688,18 @@ $(function () {
                 allowEditing: false, 
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-
+                    debugger
                     if (Number(rowData.AccountType) === 1) {
                         rowData.Tax = 0;
                         return 0;
                     }
 
-                    var vatId = $("#Vat").val();
+                    var vatId = getActiveVatId();
+                    if (!vatId) {
+                        rowData.Tax = 0;
+                        return 0;
+                    }
+
                     var vatPercent = parseFloat(GetVatValueById(vatId)) || 0;
                     vatPercent = vatPercent > 1 ? vatPercent / 100 : vatPercent; 
 
@@ -1127,7 +1132,7 @@ function fillLocators(rows) {
 }
 
 
-$('#AccountType, #Vat').on('change', safeRefreshMainItemsGrid);
+$('#AccountType, #Vat, #PartialVat').on('change', safeRefreshMainItemsGrid);
 
 function updateFieldsFromGrid() {
     var grid = $("#mainItemsGrid").dxDataGrid("instance");
@@ -1184,6 +1189,16 @@ function setAmount(sel, n) {
     $el.text("SAR " + value.toFixed(2));
 }
 
+function getActiveVatId() {
+    const v = $.trim($("#Vat").val() || "");
+    if (v) return v;
+
+    const pv = $.trim($("#PartialVat").val() || "");
+    if (pv) return pv;
+
+    return "";
+}
+
 function GetVatValueById(vatId) {
     var vatValue = 0;
     $.ajax({
@@ -1203,7 +1218,7 @@ function GetVatValueById(vatId) {
 }
 
 function getVatPercent() {
-    const v = $.trim($("#Vat").val());
+    const v = getActiveVatId();
     return v === "" ? 0 : (Number(GetVatValueById(v)) || 0);
 }
 
@@ -1251,7 +1266,7 @@ function updateVatAndTotal() {
     setAmount("#totTotal", total);
 }
 
-$(document).on("input change", "#Vat", function () {
+$(document).on("input change", "#Vat", "#PartialVat", function () {
     updateVatAndTotal();
 });
 

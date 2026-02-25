@@ -1,40 +1,42 @@
 ﻿$(document).ready(function () {
-    $("#AccountType").change(function () {
-        const selectedType = $(this).val();
-        const match = $("#SalesType");
 
-        //if (selectedType == 1) {
-        //    $("#CustomerId").val("").trigger("change");
-        //    $("#CustomerId").attr("disabled", true);
-        //} else {
-        //    $("#CustomerId").attr("disabled", false);
-        //    $("#CurrencyId").attr("disabled", true);
-        //    $("#Vat").attr("disabled", true);
-        //    $("#TermsId").attr("disabled", true);
-        //}
-        syncCustomerDisable();
-        
+    // ===== Clear VAT/Currency/Terms when AccountType goes 2 -> 1 =====
+    let prevAccType = String($("#AccountType").val() || "");
+    let prevPAccType = String($("#PartialAccountType").val() || "");
+    let isInitialLoad = true;
 
-        $.ajax({
-            type: 'GET',
-            url: window.appUrls.getSalesType,
-            dataType: 'json',
-            data: { accountId: selectedType }
-        }).done(function (result) {
-            if (result) {
-                match.empty();
-                match.append($('<option>', { value: "", text: "Select" }));
-                $.each(result, function (i, item) {
-                    match.append($('<option>', {
-                        value: item.value,
-                        text: item.text
-                    }));
-                });
+    function clearMainVatCurrencyTerms() {
+        $("#CurrencyId").val("").trigger("change.select2");
+        $("#Vat").val("").trigger("change.select2");
+        $("#TermsId").val("").trigger("change.select2");
+
+    }
+
+    function clearPartialVatCurrencyTerms() {
+        $("#PartialCurrencyId").val("").trigger("change.select2");
+        $("#PartialVat").val("").trigger("change.select2");
+        $("#PartialTermsId").val("").trigger("change.select2");
+    }
+
+    $("#AccountType")
+        .off("change.clearfields")
+        .on("change.clearfields", function () {
+            const now = String($(this).val() || "");
+            if (!isInitialLoad && prevAccType === "2" && now === "1") {
+                clearMainVatCurrencyTerms();
             }
-        }).fail(function (xhr, status, error) {
-            console.error("Error:", error);
+            prevAccType = now;
         });
-    });
+
+    $("#PartialAccountType")
+        .off("change.clearfields")
+        .on("change.clearfields", function () {
+            const now = String($(this).val() || "");
+            if (!isInitialLoad && prevPAccType === "2" && now === "1") {
+                clearPartialVatCurrencyTerms();
+            }
+            prevPAccType = now;
+        });
 
 
     $(function () {
@@ -91,22 +93,22 @@
  
 
     $("#CustomerId").change(function () {
+
+        if (String($("#AccountType").val()) === "1") return;
+
         var Id = $("#CustomerId").val();
+        if (!Id) return;
 
         $.ajax({
             type: 'GET',
             url: window.appUrls.getCustomerById,
             dataType: 'json',
-            data: {Id: Id}
+            data: { Id: Id }
         }).done(function (result) {
             if (result) {
-                debugger
-
                 $("#CurrencyId").val(result.currencyId).trigger("change.select2");
                 $("#Vat").val(result.salesTaxGroupId).trigger("change.select2");
                 $("#TermsId").val(result.oLDBPaymentType).trigger("change.select2");
-                
-
             }
         }).fail(function (xhr, status, error) {
             console.error("Error:", error);
@@ -114,6 +116,9 @@
     });
 
     $("#PartialCustomerId").on("change", function () {
+
+        if (String($("#PartialAccountType").val()) === "1") return;
+
         var id = $("#PartialCustomerId").val();
         if (!id) return;
 
@@ -125,7 +130,6 @@
         }).done(function (result) {
             if (!result) return;
 
-            // partial fields
             $("#PartialCurrencyId").val(result.currencyId).trigger("change.select2");
             $("#PartialVat").val(result.salesTaxGroupId).trigger("change.select2");
             $("#PartialTermsId").val(result.oLDBPaymentType).trigger("change.select2");
@@ -139,6 +143,11 @@
 
     var Id = $("#CustomerId").val();
     var vat = $("#Vat").val();
+
+    if (!Id) {
+        Id = $("#PartialCustomerId").val();
+        vat = $("#PartialVat").val();
+    }
 
     $.ajax({
         type: 'GET',
@@ -235,6 +244,7 @@
     $(function () {
         syncCustomerDisable();
         firstLoad = false;
+        isInitialLoad = false;
     });
 
 
