@@ -124,7 +124,7 @@
                                
                                     <label>@Common["Label_Type"]</label>
                                     @Html.DropDownListFor(m => m.RTSCode.TypeId, new SelectList(ViewBag.Types ?? new List<object>
-                                                                        (),"Value", "Text"), new { @class = "form-control", id = "TypeId" })
+                                                                (),"Value", "Text"), Common["Select"], new { @class = "form-control", id = "TypeId" })
              
                             </div>
                         </div>
