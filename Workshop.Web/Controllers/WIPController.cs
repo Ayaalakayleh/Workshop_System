@@ -1873,17 +1873,19 @@ namespace Workshop.Web.Controllers
 
 
             var result = new TempData();
+            var customerId =  oWIPDTO.AccountDetails.CustomerId ?? oWIPDTO.AccountDetails.PartialCustomerId;
+            var vat = oWIPDTO.AccountDetails.Vat ?? oWIPDTO.AccountDetails.PartialVat;
 
             var account = await _apiClient.GetAccountDefinitionGetAsync(CompanyId);
             var invoice = account.InvoiceTypeId; //to be invoice type only
             var AccountList = await _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId, lang);
-            var Customer = await _accountingApiClient.Customer_GetById((int)oWIPDTO.AccountDetails.CustomerId);
+            var Customer = await _accountingApiClient.Customer_GetById(customerId.Value);
             int? accountId = null;
             var accountTable = new AccountTable();
             var oAccountSalesDetails = new AccountSalesDetails();
             AccountSales oAccountSales = new AccountSales();
             var VehicleDetails = await _vehicleApiClient.GetVehicleDetails(oWIPDTO.VehicleId, lang);
-            var taxClass =await _accountingApiClient.GetTaxClassificationById(oWIPDTO.AccountDetails.Vat ?? 0);
+            var taxClass =await _accountingApiClient.GetTaxClassificationById(vat ?? 0);
             //oWIPDTO.AccountDetails.TaxClassificationId ?? oWIPDTO.AccountDetails.PartialVat
             var items = new List<Workshop.Core.DTOs.AccountingDTOs.Item>();
             items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
