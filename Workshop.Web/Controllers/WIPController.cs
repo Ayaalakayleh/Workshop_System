@@ -3054,11 +3054,14 @@ namespace Workshop.Web.Controllers
 
             try
             {
-                result.SalesType = await GetSalesTypeListAsync((int)accountDetails.AccountType, CompanyId, lang) ?? new List<SelectListItem>();
-                var reverseType = accountDetails.AccountType == AccountTypeEnum.Internal ? AccountTypeEnum.External : AccountTypeEnum.Internal;
-               
-                result.PartialSalesType = await GetSalesTypeListAsync((int)reverseType, CompanyId, lang)?? new List<SelectListItem>();
-                    
+                var accType = (int)accountDetails.AccountType;
+                var pAccType = (int)(accountDetails.PartialAccountType == 0
+                    ? accountDetails.AccountType
+                    : accountDetails.PartialAccountType);
+
+                result.SalesType = await GetSalesTypeListAsync(accType, CompanyId, lang) ?? new List<SelectListItem>();
+                result.PartialSalesType = await GetSalesTypeListAsync(pAccType, CompanyId, lang) ?? new List<SelectListItem>();
+
                 return result;
             }
             catch (Exception ex)

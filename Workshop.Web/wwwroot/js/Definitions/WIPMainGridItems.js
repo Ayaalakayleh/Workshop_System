@@ -6,6 +6,11 @@ const PriceWorkflowStatusEnum = {
     Rejected: 3,
     Failed: 9
 };
+
+let _tmpKeyId = -1; 
+function ensureKeyId(row) {
+    if (row.KeyId == null || row.KeyId === "") row.KeyId = _tmpKeyId--;
+}
 function fixedNum(v, digits = 2) {
     const n = Number(v);
     return +((Number.isFinite(n) ? n : 0).toFixed(digits));
@@ -23,6 +28,7 @@ function scheduleGridRepaint() {
 }
 
 function updateRowInGrid(row) {
+    ensureKeyId(row);
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     const store = grid.getDataSource().store();
 
@@ -405,7 +411,7 @@ $(function () {
                                 if (!row.isDecimalUnit) {
                                     row.RequestQuantity = Math.floor(Number(row.RequestQuantity) || 0);
                                     row.Quantity = Math.floor(Number(row.Quantity) || 0);
-                                    row.UsedQuantity = Math.floor(Number(row.UsedQuantity) || 0);
+                                    //row.UsedQuantity = Math.floor(Number(row.UsedQuantity));
                                 }
 
                                 if (!row.BaseCostPrice || Number(row.BaseCostPrice) === 0) {
@@ -426,11 +432,12 @@ $(function () {
 
                                 grid.beginUpdate();
                                 try {
+                                    grid.cellValue(rowIndex, "fk_UnitId", selectedUnitId);
                                     grid.cellValue(rowIndex, "isDecimalUnit", row.isDecimalUnit);
 
                                     grid.cellValue(rowIndex, "RequestQuantity", row.RequestQuantity);
                                     grid.cellValue(rowIndex, "Quantity", row.Quantity);
-                                    grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
+                                    //grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
 
                                     grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
                                     grid.cellValue(rowIndex, "Price", row.Price);
@@ -441,8 +448,11 @@ $(function () {
 
                                 grid.closeEditCell();
 
-                                grid.saveEditData().then(() => {
-                                    fillLocators([row]);
+                                updateRowInGrid(row).then(() => {
+                                    const freshRow =
+                                        grid.getDataSource().items().find(x => x.KeyId === row.KeyId) || row;
+
+                                    fillLocators([freshRow]);
                                     safeUpdateFieldsFromGrid();
                                 });
 
@@ -548,18 +558,29 @@ $(function () {
                             if (!canEdit) return;
                             //const v = e.value;
                             let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
-
                             const maxV = Number(row.Quantity) || 0;
+
+                            // clamp
                             if (v > maxV) v = maxV;
                             if (v < 0) v = 0;
 
-                            if (v !== e.value) e.component.option("value", v);
+                            if (!v) {
+                                v = null;
 
-                            cellInfo.setValue(v);
-                            row.UsedQuantity = v;        
+                                e.component.option("value", null);
+                                cellInfo.setValue(null);
+                                row.UsedQuantity = null;
 
-                            const isLess = (Number(v) || 0) < (Number(row.Quantity) || 0);
-                            $("#optReturnParts").prop("checked", isLess);
+                                $("#optReturnParts").prop("checked", true);
+                            } else {
+                                if (v !== e.value) e.component.option("value", v);
+
+                                cellInfo.setValue(v);
+                                row.UsedQuantity = v;
+
+                                const isLess = v < maxV;
+                                $("#optReturnParts").prop("checked", isLess);
+                            }
 
                             const grid = $("#mainItemsGrid").dxDataGrid("instance");
                             const idx = grid.getRowIndexByKey(row.KeyId);
@@ -758,7 +779,7 @@ $(function () {
                     const accountTypeVal = parseInt($("#AccountType").val()) || 0;
 
                     if (!partialInvoicing && (!rowData.AccountType || rowData.AccountType === 0)) {
-                        rowData.AccountType = accountTypeVal;
+                        return accountTypeVal;
                     }
 
                     return rowData.AccountType;
@@ -974,6 +995,10 @@ $(function () {
             }
         },
         onInitNewRow: function (e) {
+            if (e.data.KeyId == null || e.data.KeyId === "") {
+                e.data.KeyId = _tmpKeyId--;
+            }
+
             const accountTypeVal = parseInt($("#AccountType").val());
             const partialInvoicing = $("#optPartialInv").is(":checked");
 
@@ -1063,9 +1088,10 @@ function fillLocators(rows) {
     rows.forEach(function (row) {
         const dto = {
             ItemId: row.ItemId,
-            Fk_UnitId: Number(row.fk_UnitId),
-            Fk_WarehouseId: row.WarehouseId
+            Fk_UnitId: Number(row.fk_UnitId) || 0,
+            Fk_WarehouseId: Number(row.WarehouseId) || 0
         };
+        if (!dto.ItemId || !dto.Fk_UnitId || !dto.Fk_WarehouseId) return;
 
         const p = getLocatorsCached(dto).then(function (locators) {
             row.AvailableLocators = locators || [];
@@ -1092,6 +1118,7 @@ function fillLocators(rows) {
         });
 
         updates.push(p);
+        console.log("DTO sent:", dto);
     });
 
     $.when.apply($, updates).always(function () {
@@ -1260,7 +1287,8 @@ $("#ApproveRequestPartsBTN").on("click", function () {
 
 $("#FK_WarehouseId").on("change", function () {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
-    const data = grid.option("dataSource");
+    //const data = grid.option("dataSource");
+    const data = grid.getDataSource().items();
 
     fillLocators(data);
 });
