@@ -239,16 +239,32 @@
                     if (ok === false) return $.Deferred().reject("validation_failed").promise();
                 }
 
-                const needApproval = (gridItems || []).some(x =>
-                    x?.requiresPriceApproval === true ||
-                    x?.RequiresPriceApproval === true ||
-                    x?.requiresPriceApproval === 1 ||
-                    x?.RequiresPriceApproval === 1 ||
-                    String(x?.requiresPriceApproval).toLowerCase() === "true" ||
-                    String(x?.RequiresPriceApproval).toLowerCase() === "true"
-                );
+                const toIntSafe = (v) => {
+                    const n = Number(v);
+                    return Number.isFinite(n) ? Math.trunc(n) : null;
+                };
+
+                const isTrueish = (v) => {
+                    if (v === true || v === 1) return true;
+                    const s = String(v ?? "").toLowerCase();
+                    return s === "true" || s === "1";
+                };
+
+                const needApproval = (gridItems || []).some(x => {
+                    const st = toIntSafe(x?.PriceWorkflowStatus ?? x?.priceWorkflowStatus);  
+                    const req =
+                        isTrueish(x?.ReqApproval) ||
+                        isTrueish(x?.reqApproval) ||
+                        isTrueish(x?.RequiresPriceApproval) ||
+                        isTrueish(x?.requiresPriceApproval);
+
+                    return st === 1 && req;         
+                });
 
                 const buildAndSave = function () {
+                    (Services_Items || []).forEach(r => {
+                        r.IsExternal = (r.IsExternal === 1 || r.IsExternal === true);
+                    });
 
                     var ServicesJson = JSON.stringify(Services_Items);
                     $("#Services").val(ServicesJson);

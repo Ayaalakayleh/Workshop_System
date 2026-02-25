@@ -92,6 +92,7 @@ function injectMainGrid(count) {
                         StandardHours: item.hours,
                         Rate: 0,
                         BaseRate: 0,
+                        IsExternal: 0,
                         Total: 0,
                         Status: LabourLineEnum[1].value,
                         StatusText: LabourLineEnum[1].text

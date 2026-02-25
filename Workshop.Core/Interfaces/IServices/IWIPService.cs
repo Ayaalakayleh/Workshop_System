@@ -45,7 +45,7 @@ namespace Workshop.Core.Interfaces.IServices
         Task<int?> WIP_Close(CloseWIPDTO dto);
         Task<int?> WIP_Validation(int WIPId);
         Task TransferMaintenanceMovement(int movementId, int workshopId, Guid masterId, string reason);
-        Task<int> UpdateWIPServicesIsExternalAsync(string ids);
+        Task<int> UpdateWIPServicesIsExternalAsync(string ids, int WorkshopId);
         Task<int> UpdateWIPServicesIsFixedAsync(string ids);
         Task<List<VehicleMovement>> GetAllVehicleTransferMovementAsync(int? vehicleId, int? page, int workshopId);
         Task<IEnumerable<CreateWIPServiceDTO>> GetWIPServicesByMovementIdAsync(int movementId);

@@ -208,9 +208,9 @@ namespace Workshop.Core.Services
             await _repository.TransferMaintenanceMovement(movementId, workshopId, masterId, reason);
         }
 
-        public async Task<int> UpdateWIPServicesIsExternalAsync(string ids)
+        public async Task<int> UpdateWIPServicesIsExternalAsync(string ids, int WorkshopId)
         {
-            return await _repository.UpdateWIPServicesIsExternalAsync(ids);
+            return await _repository.UpdateWIPServicesIsExternalAsync(ids, WorkshopId);
         }
 
         public async Task<int> UpdateWIPServicesIsFixedAsync(string ids)

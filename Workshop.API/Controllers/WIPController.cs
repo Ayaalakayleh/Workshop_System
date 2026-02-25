@@ -401,11 +401,11 @@ namespace Workshop.API.Controllers
         }
 
         [HttpPost("UpdateWIPServicesIsExternal")]
-        public async Task<IActionResult> UpdateWIPServicesIsExternal(string ids)
+        public async Task<IActionResult> UpdateWIPServicesIsExternal(string ids, int WorkshopId)
         {
             try
             {
-                var result = await _service.UpdateWIPServicesIsExternalAsync(ids);
+                var result = await _service.UpdateWIPServicesIsExternalAsync(ids, WorkshopId);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -142,6 +142,7 @@ namespace Workshop.Core.DTOs
         public int? TechnicianId { get; set; }
         public int? tableId { get; set; }// The actual Id in WIP_Service table
         public bool IsExternal { get; set; }
+        public int? ExternalWorkshopId { get; set; }
         public bool IsFixed { get; set; } = false;
 
 

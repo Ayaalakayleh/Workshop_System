@@ -2276,9 +2276,9 @@ namespace Workshop.Web.Services
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task<int> UpdateWIPServicesIsExternalAsync(string ids)
+        public async Task<int> UpdateWIPServicesIsExternalAsync(string ids, int WorkshopId)
         {
-            var response = await _httpClient.PostAsync($"api/WIP/UpdateWIPServicesIsExternal?Ids={ids}", null);
+            var response = await _httpClient.PostAsync($"api/WIP/UpdateWIPServicesIsExternal?Ids={ids}&WorkshopId={WorkshopId}", null);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<int>();
         }

@@ -1282,7 +1282,7 @@ namespace Workshop.Web.Controllers
                 await _apiClient.TransferMaintenanceMovement(movements.MovementId.Value, (int)movement.MoveInWorkshopId, movement.MasterId.Value, movement.Reason);
 
                 var workshop = await _apiClient.GetWorkshopByIdAsync((int)movement.MoveInWorkshopId);
-                int updated = await _apiClient.UpdateWIPServicesIsExternalAsync(SelectedServicesIds);
+                int updated = await _apiClient.UpdateWIPServicesIsExternalAsync(SelectedServicesIds, (int)movement.MoveInWorkshopId);
                 //What will happen with the new service logic???
                 if (mian != null && mian.Count > 0)
                 {
@@ -1365,7 +1365,8 @@ namespace Workshop.Web.Controllers
 
             movement.VatRate = (await _accountingApiClient.GetTaxClassificationById(workshopDetails.VatClassificationId ?? 0))?.TaxRate;
             movement.InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetAll(CompanyId, BranchId, 1, 2);
-            movement.WIPServices = (await _apiClient.GetWIPServicesByMovementIdAsync(movement.MovementInId.Value))?.Where(s => s.IsExternal && s.Status == (int)LabourLineEnum.Tranfer).ToList();
+            movement.WIPServices = (await _apiClient.GetWIPServicesByMovementIdAsync(movement.MovementInId.Value))?.Where(s => s.IsExternal && s.Status == (int)LabourLineEnum.Tranfer 
+                && s.ExternalWorkshopId == movement.MoveInWorkshopId).ToList();
             movement.WIPServices ??= (new List<CreateWIPServiceDTO>());
 
             // Add AccountDefinition to ViewBag for Petty Cash functionality

@@ -375,6 +375,7 @@
                 success: function (data) {
 
                     if (data.isSuccess) {
+                        $('#transferModal').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: "@Html.Raw(Common["DoneSuccessfully"])",

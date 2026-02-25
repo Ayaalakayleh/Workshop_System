@@ -262,11 +262,13 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("Total", typeof(decimal));
             table.Columns.Add("Status", typeof(int));
             table.Columns.Add("AccountType", typeof(int));
+            table.Columns.Add("IsExternal", typeof(bool));
+            table.Columns.Add("ExternalWorkshopId", typeof(int));
 
             foreach (var item in Services)
             {
                 table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.Code, item.Description, item.LongDescription, item.StandardHours,
-                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.Total, item.Status, item.AccountType);
+                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.Total, item.Status, item.AccountType, item.IsExternal, item.ExternalWorkshopId);
             }
 
 
@@ -694,12 +696,13 @@ namespace Workshop.Infrastructure.Repositories
             await _database.ExecuteNonReturnProcedure("TransferMaintenanceMovement", parameters);
         }
 
-        public async Task<int> UpdateWIPServicesIsExternalAsync(string ids)
+        public async Task<int> UpdateWIPServicesIsExternalAsync(string ids, int WorkshopId)
         {
 
             var parameters = new
             {
-                Ids = ids
+                Ids = ids,
+                WorkshopId = WorkshopId
             };
 
             return await _database.ExecuteUpdateProcedure<int>("UpdateWIPServicesIsExternal", parameters);

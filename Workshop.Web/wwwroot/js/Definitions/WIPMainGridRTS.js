@@ -197,6 +197,8 @@ $(function () {
                     return rowData.Total;
                 }
             },
+            { dataField: "IsExternal", caption: "IsExternal", dataType: "boolean", allowEditing: false, visible: false },
+            { dataField: "ExternalWorkshopId", caption: "ExternalWorkshopId", dataType: "number", allowEditing: false, visible: false },
             { dataField: "TimeTaken", caption: window.RazorVars.DXTimeTaken, dataType: "number", allowEditing: false, alignment: "left" },
             { dataField: "Status", caption: "Status", dataType: "number", visible: false, alignment: "left" },
             {
@@ -260,7 +262,7 @@ $(function () {
                         icon: "fad fa-regular fa-user act-booking",
                         visible: function (e) {
                             return !(wipStatus === Gone || wipStatus === Invoiced) &&
-                                e.row.data.Status != 1 && e.row.data.Status != 20 //&& e.row.data.Status === 23;
+                                e.row.data.Status != 1 && e.row.data.Status != 20 && //&& e.row.data.Status === 23;
                                 parseInt(e.row.data.Status) !== 24 &&
                                 parseInt(e.row.data.Status) !== 26;
                         },
@@ -1016,8 +1018,12 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
         ? parseInt(rowAccountType)
         : parseInt($('#AccountType').val());
 
+    const _data = grid.option("dataSource") || [];
+    const _target = _data.find(r => r.KeyId === keyId);
+    if (!_target) return;
+
     var model = {
-        CustomerId: getEffectiveCustomerId(row),
+        CustomerId: getEffectiveCustomerId(_target),
         RTSId: parseInt(RTSId),
         WIPId: $('#Id').val(),
         AccountType: effectiveAccountType,
