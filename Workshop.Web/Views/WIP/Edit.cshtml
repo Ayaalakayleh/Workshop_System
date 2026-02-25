@@ -667,45 +667,55 @@
 </script>
 <script src="~/js/definitions/wip.js"></script>
 <script>
-	(function () {
+	(() => {
+	  const MESSAGE = "You have unsaved changes. Are you sure you want to leave this page?";
+
 	  let isDirty = false;
-	  let bypassNextUnload = false;
+	  let reloadIntent = false;
 
-	  function markDirty() { isDirty = true; }
-	  function clearDirty() { isDirty = false; }
+	  window.UnsavedChangesGuard = {
+		setDirty() { isDirty = true; },
+		setClean() { isDirty = false; },
+		isDirty() { return isDirty; }
+	  };
 
-	  function bypassOnce(fn) {
-		bypassNextUnload = true;
-		try { return fn(); }
-		finally { setTimeout(() => { bypassNextUnload = false; }, 0); }
+	  function shouldTrackTarget(el) {
+		if (!el) return false;
+		if (el.matches?.("input, textarea, select")) return true;
+		if (el.isContentEditable) return true;
+		return false;
 	  }
 
 	  document.addEventListener("input", (e) => {
-		const el = e.target;
-		if (el && (el.matches("input, textarea, select") || el.isContentEditable)) markDirty();
+		if (shouldTrackTarget(e.target)) isDirty = true;
 	  }, true);
 
 	  document.addEventListener("change", (e) => {
-		const el = e.target;
-		if (el && (el.matches("input, textarea, select") || el.isContentEditable)) markDirty();
+		if (shouldTrackTarget(e.target)) isDirty = true;
 	  }, true);
 
-	  document.addEventListener("submit", () => clearDirty(), true);
+	  document.addEventListener("keydown", (e) => {
+		const key = (e.key || "").toLowerCase();
+		const isF5 = e.key === "F5";
+		const isReloadCombo = (e.ctrlKey || e.metaKey) && key === "r";
+
+		if (isF5 || isReloadCombo) {
+		  reloadIntent = true;
+		  setTimeout(() => { reloadIntent = false; }, 1200);
+		}
+	  }, true);
+
+	  document.addEventListener("submit", () => {
+		isDirty = false;
+	  }, true);
 
 	  window.addEventListener("beforeunload", (e) => {
-		if (bypassNextUnload) return;   // <— skip prompt for programmatic reload/navigation
 		if (!isDirty) return;
+		if (reloadIntent) return;
 
 		e.preventDefault();
-		e.returnValue = "";
+		e.returnValue = MESSAGE;
+		return MESSAGE;
 	  });
-
-	  window.__unsavedChanges = {
-		markDirty,
-		clearDirty,
-		get isDirty() { return isDirty; },
-		bypassOnce,
-		reload() { return bypassOnce(() => window.location.reload()); }
-	  };
 	})();
 </script>
