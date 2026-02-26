@@ -972,7 +972,7 @@ function ensureDiscountedRate(rowData) {
     }
 
     const discounted = base - (base * (discount / 100));
-    rowData.Rate = discounted.toFixed(2);
+    //rowData.Rate = discounted.toFixed(2);
     //return rowData.Rate;
     return discounted;
 }
