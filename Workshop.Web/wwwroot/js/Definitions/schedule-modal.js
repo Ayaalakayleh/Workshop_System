@@ -23,8 +23,6 @@
         }
     }
 
-
-
     function ensureFlatpickr() {
         return new Promise((resolve, reject) => {
             if (window.flatpickr && typeof window.flatpickr === 'function') return resolve();
@@ -104,135 +102,6 @@
         document.head.appendChild(style);
     }
 
-    // Base allowed times (optional). If you later load business-hours times from API, set this array.
-    let schStartBaseAllowedTimes = [];
-
-    // optional: allowedTimes like ["08:00","08:05",...]
-    // Updated: hides all times before current time ONLY if selected date is today
-    function initSchStartTimepicker(allowedTimes = [], defaultTime = null) {
-        const $schStart = $("#schStart");
-        if (!$schStart.length) return;
-        if (!($.fn && typeof $.fn.datetimepicker === "function")) return;
-
-        // keep base times for dynamic filtering when "today"
-        schStartBaseAllowedTimes = Array.isArray(allowedTimes) ? allowedTimes.slice() : [];
-
-        // destroy previous instance if any
-        try { $schStart.datetimepicker("destroy"); } catch (e) { }
-
-        // always re-enable on init (in case we disabled it because no times left)
-        $schStart.prop('disabled', false);
-
-        const step = 5;
-
-        const opts = {
-            datepicker: false,
-            format: "H:i",
-            step: step,
-            scrollInput: false,
-            closeOnTimeSelect: true,
-            onSelectTime: function () {
-                recomputeEndTime();
-                $schStart.trigger("change");
-            },
-            onChangeDateTime: function () {
-                recomputeEndTime();
-            }
-        };
-
-        // ---------- helpers for "today" filtering (kept inside to avoid side-effects elsewhere) ----------
-        function localISODate(d = new Date()) {
-            return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-        }
-
-        function selectedDateISO() {
-            const raw = ($('#schDate').val() || state.date || '').toString().trim();
-            return formatDateISO(raw);
-        }
-
-        function isSelectedDateToday() {
-            const sel = selectedDateISO();
-            return !!sel && sel === localISODate();
-        }
-
-        function roundUpToStepMinutes(totalMinutes, stepMinutes) {
-            return Math.ceil(totalMinutes / stepMinutes) * stepMinutes;
-        }
-
-        function nowRoundedHHMM(stepMinutes) {
-            const d = new Date();
-            const nowMins = d.getHours() * 60 + d.getMinutes();
-            const rounded = roundUpToStepMinutes(nowMins, stepMinutes);
-            return minutesToHHMM(rounded);
-        }
-
-        function buildTimesFromMinutes(startMinutes, stepMinutes) {
-            const out = [];
-            const last = 24 * 60 - stepMinutes; // 23:55 for step=5
-            for (let m = startMinutes; m <= last; m += stepMinutes) out.push(minutesToHHMM(m));
-            return out;
-        }
-
-        function computeAllowedTimesForToday() {
-            const minHHMM = nowRoundedHHMM(step);
-            const minMins = toMinutes(minHHMM);
-
-            let times = [];
-            if (Array.isArray(schStartBaseAllowedTimes) && schStartBaseAllowedTimes.length > 0) {
-                times = schStartBaseAllowedTimes.filter(t => toMinutes(t) >= minMins);
-            } else {
-                times = buildTimesFromMinutes(minMins, step);
-            }
-
-            return { minHHMM, times };
-        }
-        // ---------------------------------------------------------------------------------------------
-
-        const isToday = isSelectedDateToday();
-
-        if (isToday) {
-            const { minHHMM, times } = computeAllowedTimesForToday();
-
-            // no times left today => disable the field safely
-            if (!times.length) {
-                $schStart.val('').prop('disabled', true);
-                recomputeEndTime();
-                return;
-            }
-
-            // key behavior: use allowTimes so earlier times are HIDDEN (not just disabled)
-            opts.allowTimes = times;
-            opts.minTime = minHHMM;
-
-            // keep it accurate as time moves forward
-            opts.onShow = function () {
-                if (!isSelectedDateToday()) return;
-                const { minHHMM: min2, times: times2 } = computeAllowedTimesForToday();
-                this.setOptions({ minTime: min2, allowTimes: times2 });
-            };
-        } else {
-            // future date: keep original behavior (unless you passed a fixed allowedTimes list)
-            if (Array.isArray(schStartBaseAllowedTimes) && schStartBaseAllowedTimes.length > 0) {
-                opts.allowTimes = schStartBaseAllowedTimes;
-            }
-        }
-
-        $schStart.datetimepicker(opts);
-
-        // Choose a safe value
-        const currentVal = $schStart.val();
-        let val = defaultTime || currentVal || (schStartBaseAllowedTimes && schStartBaseAllowedTimes[0]) || "08:00";
-
-        if (isToday && Array.isArray(opts.allowTimes) && opts.allowTimes.length > 0) {
-            // if the chosen value is not allowed anymore, pick the first allowed
-            if (!val || !opts.allowTimes.includes(val)) val = opts.allowTimes[0];
-        }
-
-        $schStart.val(val);
-        recomputeEndTime();
-    }
-    // ================================================================================
-
     function callApi({ url, type = 'GET', data = null, isFormData = false, onSuccess = null, onError = null }) {
         const ajaxOptions = {
             url, type, dataType: 'json',
@@ -254,22 +123,79 @@
         plate: null,
         vehicleId: null,
         customerId: null,
-        duration: 0,
-        startTime: null,
-        endTime: null,
+        duration: 0,      // minutes (computed)
+        startTime: null,  // 24h HH:MM (stored)
+        endTime: null,    // 24h HH:MM (stored)
         isSaving: false
     };
+
     let allVehicleOptionsCache = [];
     let isVehicleChassisSyncing = false;
     let isCustomerSource = false;
 
-
+    // =====================================================================================
+    // ✅ TIME MODE: show 12h in UI, keep 24h internally (stable with xdsoft)
+    // =====================================================================================
+    const UI_USE_12H = true;
     const pad2 = (n) => n.toString().padStart(2, '0');
 
-    function toMinutes(hhmm) {
-        if (!hhmm) return NaN;
-        const parts = hhmm.split(':').map(x => parseInt(x, 10) || 0);
-        const h = parts[0] || 0, m = parts[1] || 0;
+    function normalizeHHMM24(v) {
+        if (!v) return '';
+        const s = String(v).trim();
+        const m = /^(\d{1,2}):(\d{2})/.exec(s); // HH:MM or HH:MM:SS
+        if (!m) return '';
+        const h = Number(m[1]), min = Number(m[2]);
+        if (!Number.isFinite(h) || !Number.isFinite(min)) return '';
+        return `${pad2(h)}:${pad2(min)}`;
+    }
+
+    function time24To12(hhmm24) {
+        const t = normalizeHHMM24(hhmm24);
+        if (!t) return '';
+        let [h, m] = t.split(':').map(Number);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        if (h === 0) h = 12;
+        else if (h > 12) h -= 12;
+        return `${pad2(h)}:${pad2(m)} ${ampm}`;
+    }
+
+    function time12To24(v) {
+        if (!v) return '';
+        const s0 = String(v).trim();
+        if (!s0) return '';
+
+        // already 24h
+        if (/^\d{1,2}:\d{2}/.test(s0) && !/[AaPp][Mm]/.test(s0)) {
+            return normalizeHHMM24(s0);
+        }
+
+        const s = s0.replace(/\s+/g, ' ').toUpperCase();
+        const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/.exec(s);
+        if (!m) return '';
+
+        let h = Number(m[1]);
+        const min = Number(m[2]);
+        const ampm = m[3];
+
+        if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) return '';
+
+        if (h === 12) h = 0;
+        if (ampm === 'PM') h += 12;
+
+        return `${pad2(h)}:${pad2(min)}`;
+    }
+
+    function toUITime(hhmm24) {
+        const t24 = normalizeHHMM24(hhmm24);
+        if (!t24) return hhmm24 ? String(hhmm24) : '';
+        return UI_USE_12H ? time24To12(t24) : t24;
+    }
+
+    function toMinutes24(hhmm24) {
+        const t = normalizeHHMM24(hhmm24);
+        if (!t) return NaN;
+        const [h, m] = t.split(':').map(n => parseInt(n, 10));
+        if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
         return h * 60 + m;
     }
 
@@ -280,13 +206,197 @@
         return `${pad2(h)}:${pad2(m)}`;
     }
 
+    // robust duration: accepts "1.5", "1,5", "HH:MM"
     function normalizeDurationToMinutes(rawDuration) {
-        const hours = parseFloat(rawDuration || 0);
-        if (!isFinite(hours) || hours <= 0) return 0;
+        if (rawDuration == null) return 0;
+        const s = String(rawDuration).trim();
+        if (!s) return 0;
 
-        return Math.round(hours * 60);
+        if (s.includes(':')) {
+            const [h, m] = s.split(':').map(x => parseInt(x, 10));
+            if (!Number.isFinite(h) || !Number.isFinite(m)) return 0;
+            const mins = h * 60 + m;
+            return mins > 0 ? mins : 0;
+        }
+
+        const n = parseFloat(s.replace(',', '.'));
+        if (!isFinite(n) || n <= 0) return 0;
+
+        return Math.round(n * 60); // hours -> minutes
     }
 
+    function ensureTimeWithSecondsFrom24(hhmm24) {
+        const t = normalizeHHMM24(hhmm24);
+        if (!t) return '';
+        return `${t}:00`;
+    }
+
+    // === schStart: store true 24h value here (NEVER trust display string for math)
+    function getSchStart24() {
+        const $s = $('#schStart');
+        const stored = $s.data('t24');
+        if (stored) return normalizeHHMM24(stored);
+
+        // fallback: try parse current value (may be 12h)
+        const raw = ($s.val() || '').toString().trim();
+        const t24 = time12To24(raw) || normalizeHHMM24(raw);
+        if (t24) $s.data('t24', t24);
+        return t24 || '';
+    }
+
+    function setSchStart24(t24) {
+        const $s = $('#schStart');
+        const norm = normalizeHHMM24(t24);
+        if (!norm) return;
+
+        $s.data('t24', norm);
+
+        // show user 12h
+        $s.val(toUITime(norm));
+    }
+
+    // =====================================================================================
+    // Base allowed times (store 24h HH:MM)
+    let schStartBaseAllowedTimes = [];
+
+    // ✅ stable implementation:
+    // - picker runs in 24h (format H:i)
+    // - input displays 12h after close (no parser bugs, no -1 hour)
+    function initSchStartTimepicker(allowedTimes = [], defaultTime24 = null) {
+        const $schStart = $('#schStart');
+        if (!$schStart.length) return;
+        if (!($.fn && typeof $.fn.datetimepicker === 'function')) return;
+
+        // normalize base allowed times to 24h
+        schStartBaseAllowedTimes = Array.isArray(allowedTimes)
+            ? allowedTimes.map(t => normalizeHHMM24(t) || time12To24(t)).filter(Boolean)
+            : [];
+
+        try { $schStart.datetimepicker('destroy'); } catch (e) { }
+
+        $schStart.prop('disabled', false);
+
+        const step = 5;
+
+        // helpers
+        function localISODate(d = new Date()) {
+            return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+        }
+
+        function selectedDateISO() {
+            const raw = ($('#schDate').val() || state.date || '').toString().trim();
+            return formatDateISO(raw);
+        }
+
+        function isSelectedDateToday() {
+            const sel = selectedDateISO();
+            return !!sel && sel === localISODate();
+        }
+
+        function roundUpToStepMinutes(totalMinutes, stepMinutes) {
+            return Math.ceil(totalMinutes / stepMinutes) * stepMinutes;
+        }
+
+        function nowRoundedMinutes(stepMinutes) {
+            const d = new Date();
+            const nowMins = d.getHours() * 60 + d.getMinutes();
+            return roundUpToStepMinutes(nowMins, stepMinutes);
+        }
+
+        function buildTimesFromMinutes24(startMinutes, stepMinutes) {
+            const out = [];
+            const last = 24 * 60 - stepMinutes;
+            for (let m = startMinutes; m <= last; m += stepMinutes) out.push(minutesToHHMM(m));
+            return out;
+        }
+
+        function computeAllowedTimesForToday24() {
+            const minMins = nowRoundedMinutes(step);
+
+            if (schStartBaseAllowedTimes.length) {
+                return schStartBaseAllowedTimes.filter(t => toMinutes24(t) >= minMins);
+            }
+
+            return buildTimesFromMinutes24(minMins, step);
+        }
+
+        const isToday = isSelectedDateToday();
+
+        // ✅ Picker must always be 24h for stability
+        const opts = {
+            datepicker: false,
+            format: 'H:i',
+            formatTime: 'H:i',
+            step: step,
+            scrollInput: false,
+            closeOnTimeSelect: true,
+
+            // Before showing picker, switch input temporarily to stored 24h
+            onShow: function () {
+                const t24 = getSchStart24();
+                if (t24) $schStart.val(t24);
+
+                // keep "today" filtering fresh
+                if (isSelectedDateToday()) {
+                    const times24 = computeAllowedTimesForToday24();
+                    try { this.setOptions({ allowTimes: times24 }); } catch { }
+                }
+            },
+
+            // After close, restore 12h display
+            onClose: function () {
+                const val24 = normalizeHHMM24($schStart.val()) || getSchStart24();
+                if (val24) {
+                    $schStart.data('t24', val24);
+                    $schStart.val(toUITime(val24));
+                }
+            },
+
+            onSelectTime: function (_ct, $input) {
+                const picked24 = normalizeHHMM24(($input && $input.val) ? $input.val() : $schStart.val());
+                if (picked24) $schStart.data('t24', picked24);
+
+                recomputeEndTime();
+                $schStart.trigger('change');
+            },
+
+            onChangeDateTime: function (_ct, $input) {
+                const picked24 = normalizeHHMM24(($input && $input.val) ? $input.val() : $schStart.val());
+                if (picked24) $schStart.data('t24', picked24);
+
+                recomputeEndTime();
+            }
+        };
+
+        // apply allowTimes in 24h only (stable)
+        if (isToday) {
+            const times24 = computeAllowedTimesForToday24();
+            if (!times24.length) {
+                $schStart.val('').prop('disabled', true).data('t24', '');
+                recomputeEndTime();
+                return;
+            }
+            opts.allowTimes = times24;
+        } else if (schStartBaseAllowedTimes.length) {
+            opts.allowTimes = schStartBaseAllowedTimes.slice();
+        }
+
+        // init picker
+        $schStart.datetimepicker(opts);
+
+        // pick initial time (24h)
+        const currentStored = getSchStart24();
+        let chosen24 = normalizeHHMM24(defaultTime24) || currentStored || schStartBaseAllowedTimes[0] || '08:00';
+
+        // if today with allowTimes, ensure chosen exists
+        if (isToday && Array.isArray(opts.allowTimes) && opts.allowTimes.length) {
+            if (!opts.allowTimes.includes(chosen24)) chosen24 = opts.allowTimes[0];
+        }
+
+        setSchStart24(chosen24);
+        recomputeEndTime();
+    }
+    // ================================================================================
 
     function formatDateISO(d) {
         if (!d) return '';
@@ -301,14 +411,6 @@
 
         const [day, m, y] = parts;
         return `${y}-${pad2(parseInt(m, 10))}-${pad2(parseInt(day, 10))}`;
-    }
-
-    function ensureTimeWithSeconds(hhmmOrHhmmss) {
-        if (!hhmmOrHhmmss) return '';
-        const p = hhmmOrHhmmss.split(':');
-        if (p.length >= 3) return `${pad2(p[0])}:${pad2(p[1])}:${pad2(p[2])}`;
-        if (p.length === 2) return `${pad2(p[0])}:${pad2(p[1])}:00`;
-        return hhmmOrHhmmss;
     }
 
     const toNumber = (v) => Number.isFinite(Number(v)) ? Number(v) : null;
@@ -379,8 +481,12 @@
         $('#vehicleDropdown').off('change').on('change', handleVehicleChange);
         $('#chassisDropdown').off('change').on('change', handleChassisChange);
         $('#schDate').off('change').on('change', handleDateChange);
+
         $('#schStart').off('change').on('change', recomputeEndTime);
-        $('#schDuration').off('input change').on('input change', recomputeEndTime);
+
+        // ✅ duration must ALWAYS recompute
+        $('#schDuration').off('input change keyup').on('input change keyup', recomputeEndTime);
+
         $('#CustomerId').off('change').on('change', handleCustomerChange);
     }
 
@@ -404,8 +510,6 @@
                         $chassis.append(`<option value="${item.id}">${item.text}</option>`);
                     });
 
-
-                // 🔑 select chassis = vehicleId
                 $chassis
                     .val(String(selectedVehicleId))
                     .trigger('change.select2')
@@ -419,7 +523,7 @@
 
         const vehicleId = $(this).val();
         const vehicleType = $("#vehicleTypeDropdown").val();
-        
+
         if (!vehicleId) return;
 
         const vehicleName = $(this).find('option:selected').text();
@@ -429,7 +533,6 @@
 
         isVehicleChassisSyncing = true;
 
-        // 1️⃣ Vehicle → chassis
         callApi({
             url: `${window.API_BASE.getVehicleDefentionById}?id=${vehicleId}&vehicleType=${vehicleType}&lang=en`,
             onSuccess: (res) => {
@@ -438,13 +541,10 @@
 
                     $('#chassisDropdown')
                         .val(String(chassisId))
-                        .trigger('change.select2'); // ❌ NO trigger('change')
+                        .trigger('change.select2');
                     updateRecallChip($('#chassisDropdown').find('option:selected').text());
                     state.chassisId = Number(chassisId);
                     $('#CompanyId').val(res.data.vehicle.companyId).trigger('change');
-
-
-
                 }
 
                 isVehicleChassisSyncing = false;
@@ -471,8 +571,6 @@
                     return;
                 }
 
-                // VehicleTypeId=2 → companyId
-                // VehicleTypeId=1 → customerId
                 const idToSet = (Number(vehicleType) === 2) ? dataObj.companyId : dataObj.customerId;
 
                 if (!idToSet || Number(idToSet) <= 0) {
@@ -481,14 +579,12 @@
                     return;
                 }
 
-
                 $('#CustomerId').val(String(idToSet)).trigger('change.select2');
-                  
                 lockCustomerDropdown();
             }
         });
-
     }
+
     function updateRecallChip(chassis) {
         if (!chassis) {
             $("#recallChip").text("Recall: -");
@@ -508,6 +604,7 @@
             }
         });
     }
+
     function handleChassisChange() {
         if (isVehicleChassisSyncing) return;
 
@@ -521,12 +618,10 @@
 
         const vehicleType = $("#vehicleTypeDropdown").val();
 
-        
         $('#vehicleDropdown')
             .val(String(chassisId))
             .trigger('change.select2');
 
-        // Get vehicle info first
         callApi({
             url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&vehicleType=${vehicleType}&lang=en`,
             onSuccess: (res) => {
@@ -534,13 +629,11 @@
 
                     const vehicleCustomerId = res.data.customerId;
 
-                    // Now get agreement info
                     callApi({
                         url: `${window.RazorVars.getOpenAgreementInfoUrl}?vehicleId=${chassisId}&VehicleTypeId=${vehicleType}`,
                         onSuccess: (agreementRes) => {
                             if (isCustomerSource) return;
 
-                            // Priority: agreement customer > vehicle customer
                             let finalCustomerId = null;
 
                             if (agreementRes?.isSuccess && Array.isArray(agreementRes.data) && agreementRes.data.length) {
@@ -556,7 +649,7 @@
                                     .val(String(finalCustomerId))
                                     .trigger('change.select2');
 
-                                lockCustomerDropdown();   // 🔒 AUTO source
+                                lockCustomerDropdown();
                             } else {
                                 $('#CustomerId').val(null).trigger('change.select2');
                                 unlockCustomerDropdown();
@@ -564,7 +657,6 @@
 
                         },
                         onError: () => {
-                            // If agreement call fails, use vehicle customer
                             if (!isCustomerSource && vehicleCustomerId) {
                                 $('#CustomerId').val(String(vehicleCustomerId)).trigger('change.select2');
                             }
@@ -579,14 +671,14 @@
             }
         });
     }
-    function handleCustomerChange() {
 
+    function handleCustomerChange() {
         const customerId = $('#CustomerId').val();
         state.customerId = toNumber(customerId);
         const vehicleType = $("#vehicleTypeDropdown").val();
 
         isCustomerSource = true;
-        
+
         const $vehicle = $('#vehicleDropdown');
         const $chassis = $('#chassisDropdown');
 
@@ -595,7 +687,7 @@
 
         if (!customerId) {
             isCustomerSource = false;
-            
+
             allVehicleOptionsCache.forEach(o => {
                 if (o.value) {
                     $vehicle.append(`<option value="${o.value}">${o.text}</option>`);
@@ -634,7 +726,6 @@
 
                 let firstVehicleId = null;
 
-                // Populate vehicle dropdown
                 allVehicleOptionsCache.forEach(o => {
                     if (allowedVehicleIds.has(Number(o.value))) {
                         $vehicle.append(`<option value="${o.value}">${o.text}</option>`);
@@ -644,7 +735,6 @@
 
                 $vehicle.trigger('change.select2');
 
-                // ✅ FIX: Populate chassis dropdown with ALL customer vehicles
                 if (state.vehicleType && allowedVehicleIds.size > 0) {
                     $.ajax({
                         type: 'GET',
@@ -654,7 +744,6 @@
                         success: function (data) {
                             if (!Array.isArray(data)) return;
 
-                            // ✅ Filter to show only chassis matching customer's vehicles
                             data
                                 .filter(item => allowedVehicleIds.has(Number(item.id)))
                                 .forEach(item => {
@@ -663,7 +752,6 @@
 
                             $chassis.trigger('change.select2');
 
-                            // Set first vehicle as selected
                             if (firstVehicleId) {
                                 isVehicleChassisSyncing = true;
                                 $vehicle.val(firstVehicleId).trigger('change.select2');
@@ -681,9 +769,8 @@
         state.date = $(this).val() || null;
         if (!state.dateTo) state.dateTo = state.date;
 
-        // Re-init timepicker so past times are hidden only for "today"
-        // Safe: initSchStartTimepicker() no-ops if the plugin isn't loaded yet.
-        initSchStartTimepicker(schStartBaseAllowedTimes, $('#schStart').val() || null);
+        // re-init timepicker so past times are hidden only for "today"
+        initSchStartTimepicker(schStartBaseAllowedTimes, getSchStart24() || null);
     }
 
     function handleVehicleTypeChange() {
@@ -754,13 +841,13 @@
             }
         });
     }
-    
 
+    // ✅ End time: keep 24h HH:MM (prevents "damaged" issues on type="time")
     function recomputeEndTime() {
-        const startHHMM = $('#schStart').val();
+        const start24 = getSchStart24();
         const rawDuration = $('#schDuration').val();
 
-        state.startTime = startHHMM || null;
+        state.startTime = start24 || null;
         state.duration = normalizeDurationToMinutes(rawDuration);
 
         if (!state.startTime || !state.duration) {
@@ -769,12 +856,14 @@
             return;
         }
 
-        const startMin = toMinutes(state.startTime);
+        const startMin = toMinutes24(state.startTime);
         const endMin = startMin + state.duration;
-        const endHHMM = minutesToHHMM(endMin);
+        const end24 = minutesToHHMM(endMin);
 
-        state.endTime = endHHMM;
-        $('#schEnd').val(endHHMM).trigger('change');
+        state.endTime = end24;
+
+        // keep it 24h in field
+        $('#schEnd').val(end24).trigger('change');
     }
 
     function initValidation() {
@@ -784,7 +873,6 @@
         if ($form.data('validator')) return;
 
         $form.validate({
-            // IMPORTANT for select2: don't ignore hidden select2 originals
             ignore: ":hidden:not(.select2-hidden-accessible)",
 
             rules: {
@@ -796,14 +884,12 @@
                 Start_Time: { required: true },
                 Duration: { required: true, min: 0 },
                 End_Time: { required: true }
-                // Description is OPTIONAL (no rule)
             },
 
             errorClass: 'is-invalid',
             errorPlacement: function (error, element) {
                 error.addClass('invalid-feedback');
 
-                // If select2, place error after its container
                 if (element.hasClass('select2-hidden-accessible')) {
                     error.insertAfter(element.next('.select2'));
                     return;
@@ -840,7 +926,7 @@
         $(document).off('click.save', '#btnSaveSchedule').on('click.save', '#btnSaveSchedule', function () {
             const $form = $('#scheduleForm');
 
-            // recompute end before validation (so End_Time becomes filled)
+            // recompute end before validation
             recomputeEndTime();
 
             if ($form.length && !$form.valid()) return;
@@ -855,7 +941,8 @@
             if (!state.date) state.date = $('#schDate').val() || null;
             if (!state.dateTo) state.dateTo = state.date;
 
-            state.startTime = $('#schStart').val() || state.startTime;
+            // always use stored 24h
+            state.startTime = getSchStart24() || state.startTime;
             state.duration = normalizeDurationToMinutes($('#schDuration').val());
             recomputeEndTime();
 
@@ -879,15 +966,14 @@
 
                 PlateNumber: $('#vehicleDropdown').find(':selected').text()?.trim() || '',
 
-                Start_Time: ensureTimeWithSeconds($('#schStart').val()),
-                End_Time: ensureTimeWithSeconds($('#schEnd').val()),
+                // ✅ send 24h + seconds
+                Start_Time: ensureTimeWithSecondsFrom24(getSchStart24()),
+                End_Time: ensureTimeWithSecondsFrom24($('#schEnd').val()),
                 Duration: toNumber($('#schDuration').val()),
 
                 Description: $('#descriptionInput').val() ?? '',
                 Status: 44
             };
-            debugger;
-
 
             const isEdit = $('#scheduleModal').data('mode') === 'edit';
             const reservationId = $('#scheduleModal').data('reservationId');
@@ -919,7 +1005,6 @@
                         }).then(() => location.reload());
                         return;
                     }
-
                 },
                 complete: function () {
                     state.isSaving = false;
@@ -932,22 +1017,23 @@
     $(document).on('shown.bs.modal', '#scheduleModal', async function () {
         bindEvents();
 
-        // schStart: keep enabled so picker can open, but make it readonly (no manual typing)
+        // ✅ MUST be text because we display "hh:mm AM/PM"
+        $('#schStart').attr('type', 'text');
+        // schEnd can stay as-is; we write 24h so it won't break even if type="time"
+
+        // schStart: readonly (no manual typing)
         $('#schStart')
             .prop('disabled', false)
             .prop('readonly', true)
             .off('keydown.readonly paste.readonly')
             .on('keydown.readonly paste.readonly', (e) => e.preventDefault());
 
-        // Duration stays editable
         $('#schDuration')
             .prop('disabled', false)
             .prop('readonly', false);
 
-        // End time should be calculated only
         $('#schEnd').prop('readonly', true).on('keydown paste', (e) => e.preventDefault());
 
-        // init selects
         initSelect2($('#vehicleDropdown'));
         initSelect2($('#chassisDropdown'));
         initSelect2($('#vehicleTypeDropdown'));
@@ -962,19 +1048,18 @@
             console.error('flatpickr failed to load', e);
         }
 
-        // init schStart timepicker with current time as default
         try {
             await ensureJQDateTimePicker();
             ensureJQDateTimePickerZIndexPatch();
 
-            // Get current time rounded up to next 5-minute interval as default
+            // current time rounded up to next 5 minutes (24h)
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
             const roundedMinutes = Math.ceil(currentMinutes / 5) * 5;
-            const currentTimeDefault = minutesToHHMM(roundedMinutes);
+            const currentTimeDefault24 = minutesToHHMM(roundedMinutes);
 
-            // Initialize with current time as default
-            initSchStartTimepicker([], currentTimeDefault);
+            // init timepicker (internal 24h + UI display 12h)
+            initSchStartTimepicker([], currentTimeDefault24);
         } catch (e) {
             console.warn("jQuery DateTimePicker failed to load", e);
         }
