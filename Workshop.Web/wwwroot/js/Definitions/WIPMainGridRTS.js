@@ -247,7 +247,6 @@ $(function () {
                     const partialInvoicing = $("#optPartialInv").is(":checked");
                     const accountTypeVal = parseInt($("#AccountType").val()) || 0;
 
-
                     if (!partialInvoicing && (!rowData.AccountType || rowData.AccountType === 0)) {
                         rowData.AccountType = accountTypeVal;
                     }
@@ -374,9 +373,6 @@ $(function () {
                 getRateAmount(keyId, rtsId, acc);
             });
         }
-
-
-
     });
 });
 
@@ -463,7 +459,6 @@ function openScheduleModal(e) {
 
     $('#schDate').val(todayStr).trigger('change');
 
-
     $('table tr').removeClass('selected-row');
     $tr.addClass('selected-row');
 
@@ -473,11 +468,11 @@ function openScheduleModal(e) {
     //        if (data.date && !data.date.startsWith("0001-01-01")) {
     //            $('#schDate').val(data.date.split('T')[0]).trigger('change');
     //        }
-
+    //
     //        if (data.technicianId) {
     //            $('#schTech').val(data.technicianId).trigger('change');
     //        }
-
+    //
     //        if (data.startTime) {
     //            // normalize to HH:mm
     //            let timeStr = data.startTime;
@@ -488,13 +483,13 @@ function openScheduleModal(e) {
     //            const hh = (parts[0] || "00").padStart(2, '0');
     //            const mm = (parts[1] || "00").padStart(2, '0');
     //            scheduledStartHHMM = `${hh}:${mm}`;
-    //            $('#schStart').val(scheduledStartHHMM);
+    //            $('#schStart').val(hhmm24To12(scheduledStartHHMM)); // ✅ display 12h
     //        }
-
+    //
     //        if (data.duration && data.duration > 0) {
     //            $('#schDuration').val(data.duration);
     //        }
-
+    //
     //        recompute();
     //    }
     //});
@@ -523,11 +518,9 @@ function openScheduleModal(e) {
         "#schEnd"
     ];
 
-
     for (let i = 1; i < order.length; i++) {
         $(order[i]).prop("disabled", true);
     }
-
 
     order.forEach(x => $(x).off(".seq"));
 
@@ -574,12 +567,67 @@ const $schEnd = $('#schEnd');
 const today = new Date();
 $schDate.val(today.toISOString().slice(0, 10));
 
+function pad2(n) {
+    return n.toString().padStart(2, '0');
+}
+
+/* ===================== 12H StartTime helpers (NEW) ===================== */
+// يقبل: "08:00" / "8:00 AM" / "08:00 PM" / "08:00:00" ... ويرجع دقائق
+function parseTimeToMinutes(val) {
+    if (!val) return null;
+    val = String(val).trim();
+
+    const m = val.match(/^(\d{1,2})\s*:\s*(\d{2})(?:\s*:\s*\d{2})?\s*([AP]M)?$/i);
+    if (!m) return null;
+
+    let hh = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10);
+    const ap = (m[3] || "").toUpperCase();
+
+    if (ap) {
+        // 12-hour -> 24-hour
+        if (hh < 1 || hh > 12) return null;
+        if (hh === 12) hh = 0;
+        if (ap === "PM") hh += 12;
+    } else {
+        // 24-hour
+        if (hh < 0 || hh > 23) return null;
+    }
+
+    if (mm < 0 || mm > 59) return null;
+
+    return hh * 60 + mm;
+}
+
+function minutesTo12H(totalMinutes) {
+    totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+    const hh24 = Math.floor(totalMinutes / 60);
+    const mm = totalMinutes % 60;
+
+    const ap = hh24 >= 12 ? "PM" : "AM";
+    let hh12 = hh24 % 12;
+    if (hh12 === 0) hh12 = 12;
+
+    return `${hh12}:${pad2(mm)} ${ap}`;
+}
+
+function hhmm24To12(hhmm24) {
+    const m = parseTimeToMinutes(hhmm24);
+    if (m == null) return "";
+    return minutesTo12H(m);
+}
+
+// يرجع HH:mm (24h) مهما كانت قيمة #schStart (12h/24h)
+function getSchStart24() {
+    const m = parseTimeToMinutes($schStart.val());
+    if (m == null) return "";
+    return minutesToHHMM(m);
+}
+/* ===================================================================== */
+
 function mins(hm) {
-    if (!hm) return 0;
-    const parts = hm.split(':').map(Number);
-    const h = parts[0] || 0;
-    const m = parts[1] || 0;
-    return h * 60 + m;
+    const m = parseTimeToMinutes(hm);
+    return m == null ? 0 : m;
 }
 function fromM(n) {
     n = ((n % 1440) + 1440) % 1440;
@@ -587,11 +635,19 @@ function fromM(n) {
     const m = String(n % 60).padStart(2, '0');
     return `${h}:${m}`;
 }
+
+// ✅ recompute صار يتعامل مع 12h بدون ما يخرب الـ EndTime
 function recompute() {
-    const s = mins($schStart.val());
-    const hours = parseInt($schDuration.val() || '0', 10);
-    const d = Math.round(hours * 60);
-    $schEnd.val(s && d ? fromM(s + d) : '');
+    const sMin = parseTimeToMinutes($schStart.val());
+    const hours = parseFloat($schDuration.val() || '0');
+    const dMin = Math.round((isFinite(hours) ? hours : 0) * 60);
+
+    if (sMin == null || dMin <= 0) {
+        $schEnd.val('');
+        return;
+    }
+
+    $schEnd.val(fromM(sMin + dMin)); // EndTime يظل 24h
 }
 
 // recompute end time when user changes start or duration
@@ -600,6 +656,7 @@ $schDuration.on('change input', recompute);
 $schStart.off('change.startTime');
 
 // ---- Timepicker init helper (using jQuery DateTimePicker) ----
+// ✅ StartTime صار 12-hour display (AM/PM) + كل اللوجيك يضل 24-hour داخليًا
 function initSchStartTimepicker(allowedTimes, defaultTime) {
     if (!$schStart.length) return;
 
@@ -608,31 +665,30 @@ function initSchStartTimepicker(allowedTimes, defaultTime) {
         $schStart.datetimepicker('destroy');
     } catch (e) { }
 
+    const allowTimes12 = Array.isArray(allowedTimes)
+        ? allowedTimes.map(hhmm24To12).filter(Boolean)
+        : [];
+
     const opts = {
         datepicker: false,
-        format: 'H:i',
+        format: 'h:i A',      // ✅ 12-hour display
         step: 5,
         scrollInput: false,
-        onSelectTime: function () {
-            recompute();
-        },
-        onChangeDateTime: function () {
-            recompute();
-        },
-        allowTimes: allowedTimes,
+        onSelectTime: function () { recompute(); },
+        onChangeDateTime: function () { recompute(); },
         validateOnBlur: true,
         closeOnWithoutClick: true
-
     };
 
-    if (Array.isArray(allowedTimes) && allowedTimes.length > 0) {
-        opts.allowTimes = allowedTimes; // e.g. ["08:00","08:05",...]
+    if (allowTimes12.length > 0) {
+        opts.allowTimes = allowTimes12; // e.g. ["8:00 AM","8:05 AM",...]
     }
 
     $schStart.datetimepicker(opts);
 
-    const val = defaultTime || (allowedTimes && allowedTimes[0]) || "08:00";
-    $schStart.val(val);
+    const val24 = defaultTime || (allowedTimes && allowedTimes[0]) || "08:00";
+    $schStart.val(hhmm24To12(val24));
+
     recompute();
 }
 
@@ -654,13 +710,14 @@ $("#btnSaveSchedule").on("click", function (e) {
         KeyId: parseInt($('#KeyId').val()),
         TechnicianId: parseInt($('#schTech').val()),
         Date: new Date($('#schDate').val()),
-        StartTime: $('#schStart').val() + ":00",
+        StartTime: getSchStart24() + ":00",         // ✅ حفظ 24h للسيرفر
         //Duration: parseFloat($('#schDuration').val()),//For Hours
         Duration: Math.round(parseFloat($('#schDuration').val()) * 60), //For Minutes
         EndTime: $('#schEnd').val() + ":00"
     };
 
-    var startMin = toMinutes($('#schStart').val());
+    // ✅ startMin صار يفهم 12h مباشرة
+    var startMin = parseTimeToMinutes($('#schStart').val()) || 0;
     var endMin = toMinutes($('#schEnd').val());
     var durationMin = normalizeDurationToMinutes($('#schDuration').val());
 
@@ -798,7 +855,6 @@ $("#schTech").on("change", function () {
         return;
     }
 
-
     if (maxMin < durationMin) {
         initSchStartTimepicker([], null);
         $("#schStart").val('');
@@ -813,7 +869,6 @@ $("#schTech").on("change", function () {
         );
         return;
     }
-
 
     var $schEndLocal = $("#schEnd");
 
@@ -846,16 +901,9 @@ $("#schTech").on("change", function () {
     $schEndLocal.val(endHHMM);
 });
 
-function pad2(n) {
-    return n.toString().padStart(2, '0');
-}
-
 function toMinutes(hhmm) {
-    if (!hhmm) return 0;
-    const parts = hhmm.split(':').map(x => parseInt(x, 10) || 0);
-    const h = parts[0] || 0;
-    const m = parts[1] || 0;
-    return h * 60 + m;
+    const m = parseTimeToMinutes(hhmm);
+    return m == null ? 0 : m;
 }
 
 function minutesToHHMM(total) {
@@ -891,7 +939,7 @@ function computeStartOptionsEnumerate(freeIntervals, durationMin, stepMin = 5) {
     const out = [];
     for (const [s, e] of merged) {
         for (let t = s; t + durationMin <= e; t += stepMin) {
-            out.push(minutesToHHMM(t));
+            out.push(minutesToHHMM(t)); // يظل 24h داخليًا
         }
     }
 
@@ -1106,4 +1154,3 @@ function getEffectiveLabourDiscountPct(rowData) {
 
     return isRowExternal(rowData) ? (partial || main) : (main || partial);
 }
-
