@@ -57,7 +57,6 @@ $(function () {
     function generateUniqueKeyId() {
         if (!window.nextKeyId) window.nextKeyId = 1;
         return window.nextKeyId++;
-
     }
 
     ServicesData.forEach(row => {
@@ -133,7 +132,8 @@ $(function () {
             },
             { dataField: "StandardHours", dataType: "number", caption: window.RazorVars.DXStandardHours, width: 120, allowEditing: true, alignment: "left" },
             { dataField: "BaseRate", visible: false, allowEditing: false },
-            { dataField: "Rate",
+            {
+                dataField: "Rate",
                 caption: window.RazorVars.DXRate,
                 dataType: "number",
                 allowEditing: false,
@@ -167,7 +167,7 @@ $(function () {
 
                     var hours = parseFloat(rowData.StandardHours) || 0;
 
-                    var price = ensureDiscountedRate(rowData); 
+                    var price = ensureDiscountedRate(rowData);
                     var taxAmount = hours * price * vatPercent;
 
                     rowData.Tax = +taxAmount.toFixed(2);
@@ -232,7 +232,7 @@ $(function () {
                 dataField: "AccountType",
                 caption: window.RazorVars.DXAccountType,
                 dataType: "number",
-                allowEditing: true, 
+                allowEditing: true,
                 alignment: "left",
                 lookup: {
                     dataSource: AccountTypes.map(x => ({
@@ -246,10 +246,9 @@ $(function () {
                     const partialInvoicing = $("#optPartialInv").is(":checked");
                     const accountTypeVal = parseInt($("#AccountType").val()) || 0;
 
-
                     if (!partialInvoicing && (!rowData.AccountType || rowData.AccountType === 0)) {
                         rowData.AccountType = accountTypeVal;
-                    } 
+                    }
 
                     return rowData.AccountType;
                 }
@@ -263,7 +262,7 @@ $(function () {
                         icon: "fad fa-regular fa-user act-booking",
                         visible: function (e) {
                             return !(wipStatus === Gone || wipStatus === Invoiced) &&
-                                e.row.data.Status != 1 && e.row.data.Status != 20 && //&& e.row.data.Status === 23;
+                                e.row.data.Status != 1 && e.row.data.Status != 20 &&
                                 parseInt(e.row.data.Status) !== 24 &&
                                 parseInt(e.row.data.Status) !== 26;
                         },
@@ -297,8 +296,6 @@ $(function () {
         allowColumnReordering: true,
         allowColumnResizing: true,
         columnAutoWidth: true,
-        //columnMinWidth: 50,if the comment removed, make the columnAutoWidth
-        //wordWrapEnabled: false,
         hoverStateEnabled: false,
         paging: {
             pageSize: 10
@@ -324,7 +321,6 @@ $(function () {
             } else {
                 updateTotalLabourFieldsFromGrid();
             }
-
         },
         onRowInserted: function () {
             updateTotalLabourFieldsFromGrid();
@@ -373,9 +369,6 @@ $(function () {
                 getRateAmount(keyId, rtsId, acc);
             });
         }
-
-
-
     });
 });
 
@@ -404,22 +397,17 @@ async function updateTotalLabourFieldsFromGrid() {
         const lineBase = rate * hours;
         const lineDisc = lineBase * (pct / 100);
         const lineAfterDiscount = lineBase - lineDisc;
-        const lineTotal = lineAfterDiscount + tax;
 
         totalBase += lineBase;
         totalDiscountAmount += lineDisc;
         totalTaxAmount += tax;
-        //totalAfterDiscount += lineTotal;
         totalAfterDiscount += lineAfterDiscount;
     });
-
-    const totalDiscountPct = totalBase > 0 ? (totalDiscountAmount / totalBase) * 100 : 0;
 
     $("#totLabour").text("SAR " + totalAfterDiscount.toFixed(2));
     setAmount("#totLabour", totalAfterDiscount);
 
     $("#TotalDiscountsLabour").text("SAR " + totalDiscountAmount.toFixed(2));
-
     $("#TotalTaxLabour").text("SAR " + totalTaxAmount.toFixed(2));
 
     const currentVAT = getAmount("#totVAT");
@@ -436,19 +424,11 @@ const $schJobChip = $('#schJobChip');
 const $schAllowedChip = $('#schAllowedChip');
 
 // to remember existing scheduled time (if editing)
-let scheduledStartHHMM = null;
+let scheduledStartHHMM = null; // stores 12h display like "8:00 AM"
 
 function openScheduleModal(e) {
-    console.log("//Start ////////////////////");
-    console.log(e);
-    console.log(e.StandardHours);
-    console.log(e.StandardHours * 60);
-    console.log("// End ////////////////////");
     const $tr = $(this).closest('tr');
-    const rtsId = e.Id;
     const KeyId = e.KeyId;
-    const wipId = e.WIPId;
-    const keyId = e.KeyId;
     scheduledStartHHMM = null;
 
     // reset fields
@@ -457,85 +437,43 @@ function openScheduleModal(e) {
 
     // default date = today
     const todayStr = new Date().toISOString().slice(0, 10);
-    // default start = 08:00, no allowed times yet
-    initSchStartTimepicker([], "08:00");
+
+    // init timepicker (12h)
+    initSchStartTimepicker([], "8:00 AM");
 
     $('#schDate').val(todayStr).trigger('change');
 
-
     $('table tr').removeClass('selected-row');
     $tr.addClass('selected-row');
-
-    //$.get(window.RazorVars.scheduleGetByIdUrl, { RTSId: rtsId, WIPId: wipId, KeyId:keyId }, function (data) {
-    //    if (data) {
-    //        // handle date, ignore 0001-01-01T00:00:00
-    //        if (data.date && !data.date.startsWith("0001-01-01")) {
-    //            $('#schDate').val(data.date.split('T')[0]).trigger('change');
-    //        }
-
-    //        if (data.technicianId) {
-    //            $('#schTech').val(data.technicianId).trigger('change');
-    //        }
-
-    //        if (data.startTime) {
-    //            // normalize to HH:mm
-    //            let timeStr = data.startTime;
-    //            if (timeStr.indexOf('T') >= 0) {
-    //                timeStr = timeStr.split('T')[1];
-    //            }
-    //            const parts = timeStr.split(':');
-    //            const hh = (parts[0] || "00").padStart(2, '0');
-    //            const mm = (parts[1] || "00").padStart(2, '0');
-    //            scheduledStartHHMM = `${hh}:${mm}`;
-    //            $('#schStart').val(scheduledStartHHMM);
-    //        }
-
-    //        if (data.duration && data.duration > 0) {
-    //            $('#schDuration').val(data.duration);
-    //        }
-
-    //        recompute();
-    //    }
-    //});
 
     if (e.StandardHours != null && e.StandardHours !== undefined && e.StandardHours > 0) {
         $('#schDuration').val(parseFloat(e.StandardHours));
     } else {
         $('#schDuration').val('1');
     }
+
+    // Force end recalculation now
     recompute();
 
-    const rts = e.Id;/*($tr.children().eq(0).text() || '').trim();*/
-    const desc = e.Description;/* ($tr.children().eq(1).text() || '').trim();*/
-    const allowTxt = ($tr.children().eq(2).text() || '').trim();
-    const allowed = e.StandardHours;//parseInt((allowTxt.match(/(\d+)\s*m/i) || [])[1] || '0', 10);
+    const rts = e.Id;
+    const desc = e.Description;
+    const allowed = e.StandardHours;
 
     $schJobChip.text((resources.job || 'Job') + ': ' + rts + ' — ' + desc);
     $schAllowedChip.text((resources.allowed || 'Allowed') + ': ' + (allowed || 0) + 'h');
 
     const modal = new bootstrap.Modal('#scheduleModal');
-    const order = [
-        "#schDate",
-        "#schTech",
-        "#schStart",
-        "#schDuration",
-        "#schEnd"
-    ];
-
+    const order = ["#schDate", "#schTech", "#schStart", "#schDuration", "#schEnd"];
 
     for (let i = 1; i < order.length; i++) {
         $(order[i]).prop("disabled", true);
     }
 
-
     order.forEach(x => $(x).off(".seq"));
-
     order.forEach((selector, i) => {
         $(selector).on("change.seq input.seq", function () {
             const filled = $(this).val()?.trim().length > 0;
-            if (filled && order[i + 1]) {
-                $(order[i + 1]).prop("disabled", false);
-            }
+            if (filled && order[i + 1]) $(order[i + 1]).prop("disabled", false);
         });
     });
 
@@ -543,7 +481,6 @@ function openScheduleModal(e) {
 }
 
 function DeleteService(e) {
-
     var data = {
         Id: parseInt(e.Id),
         WIPId: parseInt(e.WIPId),
@@ -573,71 +510,214 @@ const $schEnd = $('#schEnd');
 const today = new Date();
 $schDate.val(today.toISOString().slice(0, 10));
 
-function mins(hm) {
-    if (!hm) return 0;
-    const parts = hm.split(':').map(Number);
-    const h = parts[0] || 0;
-    const m = parts[1] || 0;
+/* ========= 12-hour time helpers (Option B) ========= */
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+/**
+ * IMPORTANT FIX:
+ * If #schEnd is <input type="time">, setting "3:15 PM" will be rejected silently.
+ * So we force #schStart/#schEnd to be text inputs (and #schEnd readonly).
+ */
+function ensureScheduleInputsAreText() {
+    const tStart = ($schStart.attr('type') || '').toLowerCase();
+    const tEnd = ($schEnd.attr('type') || '').toLowerCase();
+
+    if (tStart === 'time') $schStart.attr('type', 'text');
+    if (tEnd === 'time') $schEnd.attr('type', 'text');
+
+    // Make end read-only (it's calculated)
+    $schEnd.prop('readonly', true);
+}
+ensureScheduleInputsAreText();
+$(document).on('shown.bs.modal', '#scheduleModal', function () {
+    ensureScheduleInputsAreText();
+    // Recompute on show to keep UI consistent
+    recompute();
+});
+
+// parses BOTH "HH:mm" and "h:mm AM/PM" (also tolerant of "HH:mm:ss" and "....T....")
+function toMinutes(timeStr) {
+    if (!timeStr) return NaN;
+
+    let s = String(timeStr).trim();
+
+    // strip date part if any: "2026-01-01T08:00:00"
+    if (s.indexOf('T') >= 0) s = s.split('T')[1].trim();
+
+    // detect AM/PM
+    let ampm = null;
+    const ampmMatch = s.match(/\b(AM|PM)\b/i);
+    if (ampmMatch) {
+        ampm = ampmMatch[1].toUpperCase();
+        s = s.replace(/\b(AM|PM)\b/i, '').trim();
+    }
+
+    // take HH:mm (ignore seconds if present)
+    const parts = s.split(':');
+    if (parts.length < 2) return NaN;
+
+    let h = parseInt(parts[0], 10);
+    let m = parseInt(parts[1], 10);
+
+    if (!isFinite(h) || !isFinite(m)) return NaN;
+
+    if (ampm) {
+        h = h % 12;              // 12 -> 0
+        if (ampm === "PM") h += 12;
+    }
+
     return h * 60 + m;
 }
-function fromM(n) {
-    n = ((n % 1440) + 1440) % 1440;
-    const h = String(Math.floor(n / 60)).padStart(2, '0');
-    const m = String(n % 60).padStart(2, '0');
-    return `${h}:${m}`;
-}
-function recompute() {
-    const s = mins($schStart.val());
-    const hours = parseInt($schDuration.val() || '0', 10);
-    const d = Math.round(hours * 60);
-    $schEnd.val(s && d ? fromM(s + d) : '');
+
+function minutesTo12(total) {
+    total = ((total % 1440) + 1440) % 1440;
+    const h24 = Math.floor(total / 60);
+    const m = total % 60;
+
+    const ampm = h24 >= 12 ? "PM" : "AM";
+    let h12 = h24 % 12;
+    if (h12 === 0) h12 = 12;
+
+    return `${h12}:${pad2(m)} ${ampm}`;
 }
 
-// recompute end time when user changes start or duration
-$schStart.on('change input', recompute);
-$schDuration.on('change input', recompute);
-$schStart.off('change.startTime');
+function minutesTo24HHMM(total) {
+    total = ((total % 1440) + 1440) % 1440;
+    const h = Math.floor(total / 60);
+    const m = total % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+}
+
+function parseDurationHours(raw) {
+    const s = (raw ?? '').toString().trim().replace(',', '.');
+    const num = parseFloat(s);
+    return isFinite(num) ? num : NaN;
+}
+
+function normalizeDurationToMinutes(rawDuration) {
+    const h = parseDurationHours(rawDuration);
+    if (!isFinite(h) || h <= 0) return 0;
+    return Math.round(h * 60);
+}
+
+// Accepts "08:00", "08:00:00", "8:00 AM", "2026-..T08:00:00" -> returns "8:00 AM"
+function normalizeTo12Display(timeStr) {
+    if (!timeStr) return "";
+    const s = String(timeStr).trim();
+    if (/\b(AM|PM)\b/i.test(s)) {
+        return s.replace(/\s+/g, ' ').trim().toUpperCase();
+    }
+    return minutesTo12(toMinutes(s));
+}
+
+/**
+ * FIXED recompute:
+ * - Always updates #schEnd on duration change.
+ * - Works even if inputs are replaced / type="time" existed (we force type text).
+ */
+function recompute() {
+    ensureScheduleInputsAreText();
+
+    const startVal = ($schStart.val() || '').trim();
+    const startMin = toMinutes(startVal);
+
+    const durHours = parseDurationHours($schDuration.val());
+    if (!startVal || !isFinite(startMin) || !isFinite(durHours) || durHours <= 0) {
+        $schEnd.val('');
+        return;
+    }
+
+    const durationMin = Math.round(durHours * 60);
+    const endMin = startMin + durationMin;
+
+    // Display end in 12-hour format
+    $schEnd.val(minutesTo12(endMin));
+
+    // Also keep a 24-hour value around (handy for debugging / if you want to use it later)
+    $schEnd.attr('data-end-24', minutesTo24HHMM(endMin));
+}
+
+/**
+ * Bind schedule handlers robustly:
+ * - Delegated DOM events (works even if modal content gets rerendered)
+ * - DevExtreme widget hooks (dxNumberBox/dxTextBox) if schDuration is a widget
+ */
+function bindScheduleHandlers() {
+    // Delegated DOM events
+    $(document).off('.schedRecompute');
+    $(document).on('input.schedRecompute change.schedRecompute keyup.schedRecompute', '#schStart', recompute);
+    $(document).on('input.schedRecompute change.schedRecompute keyup.schedRecompute', '#schDuration', recompute);
+
+    // If schDuration is a DevExtreme editor, hook onValueChanged too (doesn't hurt if it's not)
+    try {
+        const nb = $('#schDuration').dxNumberBox('instance');
+        if (nb) {
+            const prev = nb.option('onValueChanged');
+            nb.option('onValueChanged', function (e) {
+                if (typeof prev === 'function') prev.call(this, e);
+                recompute();
+            });
+        }
+    } catch (e) { }
+
+    try {
+        const tb = $('#schDuration').dxTextBox('instance');
+        if (tb) {
+            const prev = tb.option('onValueChanged');
+            tb.option('onValueChanged', function (e) {
+                if (typeof prev === 'function') prev.call(this, e);
+                recompute();
+            });
+        }
+    } catch (e) { }
+}
+bindScheduleHandlers();
 
 // ---- Timepicker init helper (using jQuery DateTimePicker) ----
 function initSchStartTimepicker(allowedTimes, defaultTime) {
     if (!$schStart.length) return;
 
+    ensureScheduleInputsAreText();
+
     // destroy previous instance if any
-    try {
-        $schStart.datetimepicker('destroy');
-    } catch (e) { }
+    try { $schStart.datetimepicker('destroy'); } catch (e) { }
 
     const opts = {
         datepicker: false,
-        format: 'H:i',
+        format: 'g:i A',       // 12-hour in input
+        formatTime: 'g:i A',   // 12-hour in dropdown
+        hours12: true,         // safe if ignored by plugin build
         step: 5,
         scrollInput: false,
-        onSelectTime: function () {
-            recompute();
-        },
-        onChangeDateTime: function () {
-            recompute();
-        },
+        onSelectTime: recompute,
+        onChangeDateTime: recompute,
+        onClose: recompute,
         allowTimes: allowedTimes,
         validateOnBlur: true,
         closeOnWithoutClick: true
-
     };
 
     if (Array.isArray(allowedTimes) && allowedTimes.length > 0) {
-        opts.allowTimes = allowedTimes; // e.g. ["08:00","08:05",...]
+        opts.allowTimes = allowedTimes; // e.g. ["8:00 AM","8:05 AM",...]
     }
 
     $schStart.datetimepicker(opts);
 
-    const val = defaultTime || (allowedTimes && allowedTimes[0]) || "08:00";
+    let val = "";
+    if (defaultTime != null && String(defaultTime).trim() !== "") {
+        val = normalizeTo12Display(defaultTime);
+    } else if (allowedTimes && allowedTimes.length) {
+        val = allowedTimes[0];
+    }
+
     $schStart.val(val);
     recompute();
 }
 
 // initial timepicker (no restrictions yet)
-initSchStartTimepicker([], "08:00");
+initSchStartTimepicker([], "8:00 AM");
 
+// Keep your existing basic validate/hide handler
 $('#btnSaveSchedule').on('click', function () {
     if (!$('#schDate').val() || !$('#schTech').val() || !$('#schStart').val() || !$('#schDuration').val()) {
         Swal.fire(theMainLang == "en" ? resources.fill_required || 'Please fill required fields' : "الرجاء ملئ الحقول", "", "warining");
@@ -647,21 +727,27 @@ $('#btnSaveSchedule').on('click', function () {
 });
 
 $("#btnSaveSchedule").on("click", function (e) {
+    // BULLETPROOF: compute end from start + duration (don’t rely on whatever is inside #schEnd)
+    const startMin = toMinutes($('#schStart').val());
+    const durationMin = normalizeDurationToMinutes($('#schDuration').val());
+    const endMin = startMin + durationMin;
+
+    const start24 = minutesTo24HHMM(startMin);
+    const end24 = minutesTo24HHMM(endMin);
+
+    // Keep UI end time aligned too
+    $('#schEnd').val(minutesTo12(endMin)).attr('data-end-24', end24);
+
     var WIPSChedule = {
         WIPId: parseInt($('#Id').val()),
         RTSId: parseInt($('#RTSId').val()),
         KeyId: parseInt($('#KeyId').val()),
         TechnicianId: parseInt($('#schTech').val()),
         Date: new Date($('#schDate').val()),
-        StartTime: $('#schStart').val() + ":00",
-        //Duration: parseFloat($('#schDuration').val()),//For Hours
-        Duration: Math.round(parseFloat($('#schDuration').val()) * 60), //For Minutes
-        EndTime: $('#schEnd').val() + ":00"
+        StartTime: start24 + ":00",
+        Duration: durationMin,              // minutes
+        EndTime: end24 + ":00"
     };
-
-    var startMin = toMinutes($('#schStart').val());
-    var endMin = toMinutes($('#schEnd').val());
-    var durationMin = normalizeDurationToMinutes($('#schDuration').val());
 
     var $selected = $("#schTech").find('option:selected');
     var freeIntervals = [];
@@ -673,7 +759,7 @@ $("#btnSaveSchedule").on("click", function (e) {
     let valid = false;
 
     for (const interval of freeIntervals) {
-        const s = toMinutes(interval.startFree);
+        const s = toMinutes(interval.startFree); // likely "HH:mm" (24h) from backend
         const e = toMinutes(interval.endFree);
 
         if (startMin >= s && (startMin + durationMin) <= e) {
@@ -709,7 +795,7 @@ $("#btnSaveSchedule").on("click", function (e) {
                 StatusText: "B-Booked",
                 TechnicianId: parseInt($('#schTech').val())
             }).then(() => {
-                grid.cancelEditData(); 
+                grid.cancelEditData();
                 return grid.getDataSource().reload();
             }).then(() => {
                 grid.refresh(true);
@@ -728,7 +814,7 @@ $("#btnSaveSchedule").on("click", function (e) {
 $("#schDate").on("change", function () {
     var date = $("#schDate").val();
     var duration = parseFloat($('#schDuration').val()) || 0;
-    var parsedDuration = duration;// / 60;
+    var parsedDuration = duration;
 
     $.ajax({
         type: 'GET',
@@ -795,8 +881,7 @@ $("#schTech").on("change", function () {
     if (durationMin <= 0) {
         initSchStartTimepicker([], null);
         return;
-    } 
-
+    }
 
     if (maxMin < durationMin) {
         initSchStartTimepicker([], null);
@@ -813,12 +898,9 @@ $("#schTech").on("change", function () {
         return;
     }
 
-
-    var $schEndLocal = $("#schEnd");
-
     if (!freeIntervals.length || durationMin <= 0) {
         $("#schStart").val('');
-        $schEndLocal.val('');
+        $("#schEnd").val('');
         initSchStartTimepicker([], null);
         return;
     }
@@ -827,7 +909,7 @@ $("#schTech").on("change", function () {
 
     if (!options.length) {
         $("#schStart").val('');
-        $schEndLocal.val('');
+        $("#schEnd").val('');
         initSchStartTimepicker([], null);
         return;
     }
@@ -840,41 +922,15 @@ $("#schTech").on("change", function () {
 
     initSchStartTimepicker(options, defaultStart);
 
-    var startMinutes = toMinutes(defaultStart);
-    var endHHMM = minutesToHHMM(startMinutes + durationMin);
-    $schEndLocal.val(endHHMM);
+    // IMPORTANT: no manual end-time set here; let recompute() do it consistently
+    recompute();
 });
-
-function pad2(n) {
-    return n.toString().padStart(2, '0');
-}
-
-function toMinutes(hhmm) {
-    if (!hhmm) return 0;
-    const parts = hhmm.split(':').map(x => parseInt(x, 10) || 0);
-    const h = parts[0] || 0;
-    const m = parts[1] || 0;
-    return h * 60 + m;
-}
-
-function minutesToHHMM(total) {
-    total = Math.max(0, total);
-    const h = Math.floor(total / 60) % 24;
-    const m = total % 60;
-    return pad2(h) + ':' + pad2(m);
-}
-
-function normalizeDurationToMinutes(rawDuration) {
-    const num = parseFloat(rawDuration || 0);
-    if (!isFinite(num) || num <= 0) return 0;
-    return Math.round(num * 60);
-}
 
 function computeStartOptionsEnumerate(freeIntervals, durationMin, stepMin = 5) {
     if (!Array.isArray(freeIntervals) || durationMin <= 0) return [];
 
     const ranges = freeIntervals
-        .map(i => [toMinutes(i.startFree), toMinutes(i.endFree)])
+        .map(i => [toMinutes(i.startFree), toMinutes(i.endFree)]) // backend likely 24h
         .filter(([s, e]) => Number.isFinite(s) && Number.isFinite(e) && e > s)
         .sort((a, b) => a[0] - b[0]);
 
@@ -890,7 +946,7 @@ function computeStartOptionsEnumerate(freeIntervals, durationMin, stepMin = 5) {
     const out = [];
     for (const [s, e] of merged) {
         for (let t = s; t + durationMin <= e; t += stepMin) {
-            out.push(minutesToHHMM(t));
+            out.push(minutesTo12(t)); // 12-hour display in dropdown
         }
     }
 
@@ -937,6 +993,7 @@ function updateStatusInGrid(KeyId, newStatus, statusText) {
         }
     });
 }
+
 function GetVatValueById(vatId) {
     var vatValue = 0;
     $.ajax({
@@ -954,8 +1011,8 @@ function GetVatValueById(vatId) {
     });
     return vatValue;
 }
+
 function ensureDiscountedRate(rowData) {
-    //const discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
     const discount = getEffectiveLabourDiscountPct(rowData);
 
     let rate = parseFloat(rowData.Rate) || 0;
@@ -972,8 +1029,6 @@ function ensureDiscountedRate(rowData) {
     }
 
     const discounted = base - (base * (discount / 100));
-    //rowData.Rate = discounted.toFixed(2);
-    //return rowData.Rate;
     return discounted;
 }
 
@@ -1082,7 +1137,6 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
 }
 
 function isRowExternal(rowData) {
-
     return !!(rowData && (rowData.IsExternal === true || rowData.IsExternal === 1 || rowData.External === true));
 }
 
@@ -1099,10 +1153,10 @@ function getEffectiveVatId(rowData) {
 
     return isRowExternal(rowData) ? (partialVat || mainVat) : (mainVat || partialVat);
 }
+
 function getEffectiveLabourDiscountPct(rowData) {
     const main = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
     const partial = parseFloat($("#_DiscountPercentageLaborPartial").val()) || 0;
 
     return isRowExternal(rowData) ? (partial || main) : (main || partial);
 }
-
