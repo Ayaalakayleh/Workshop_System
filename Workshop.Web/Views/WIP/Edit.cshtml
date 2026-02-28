@@ -441,8 +441,11 @@
 								<i class="fa fa-save"></i>&nbsp;@Common["Label_Save"]
 							</button>
 						}
-						<a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]</a>
-
+						<a href="@Url.Action("Index")"
+						   class="btn btn-secondary"
+						   id="btnBackToList">
+							<i class="fa fa-arrow-left"></i>&nbsp;@Common["Label_BackToList"]
+						</a>
 					</div>
 				</div>
 			</div>
@@ -674,7 +677,6 @@
 		confirmOpen: false,
 		guardReady: false,
 		observerActive: false,
-		// optional fallback if user opened page directly and there is no back page
 		fallbackUrl: null,
 	  };
 
@@ -688,25 +690,26 @@
 		resetDirty() { state.dirty = false; },
 		isDirty() { return state.dirty; },
 
-		// Use this when YOU intentionally navigate (save button, etc.)
+		// Use this when YOU intentionally navigate (after save, etc.)
 		bypassOnce() {
 		  state.bypass = true;
 		  setTimeout(() => (state.bypass = false), 0);
 		},
 
-		// Navigate with guard
 		navigate(url) {
+		  if (!url) return;
+
 		  if (!state.dirty || state.bypass) {
 			window.location.href = url;
 			return;
 		  }
+
 		  confirmLeave(() => {
 			state.bypass = true;
 			window.location.href = url;
 		  });
 		},
 
-		// Back with guard (for your custom back button)
 		back() {
 		  attemptLeaveByBack();
 		},
@@ -715,6 +718,11 @@
 		  state.fallbackUrl = url;
 		}
 	  };
+
+	  // Default fallback (your list page) if available
+	  if (window.URLs && window.URLs.indexUrl) {
+		state.fallbackUrl = window.URLs.indexUrl;
+	  }
 
 	  // -----------------------------
 	  // Confirm UI (Bootstrap modal if exists, else window.confirm)
@@ -769,8 +777,6 @@
 	  // -----------------------------
 	  // Dirty detection
 	  // -----------------------------
-
-	  // 1) Standard input/select changes
 	  document.addEventListener("input", (e) => {
 		if (e.target && e.target.matches("input, textarea")) state.dirty = true;
 	  }, true);
@@ -782,10 +788,8 @@
 		}
 	  }, true);
 
-	  // 2) Catch DOM changes like: add row to table, modal DOM/class changes, etc.
-	  // Start observing only AFTER a user gesture to avoid marking dirty during initial render.
+	  // MutationObserver (activates after first user gesture)
 	  const observer = new MutationObserver(() => {
-		// Mark dirty on first meaningful mutation after user gesture
 		state.dirty = true;
 	  });
 
@@ -801,10 +805,15 @@
 		});
 	  }
 
-	  // First user gesture activates observer
 	  ["click", "keydown", "touchstart"].forEach((evt) => {
 		window.addEventListener(evt, activateObserverOnce, { once: true, capture: true });
 	  });
+
+	  // -----------------------------
+	  // IMPORTANT CHANGE:
+	  // We REMOVED beforeunload guard so page reload works with NO alert.
+	  // (This also means closing the tab won't show the unsaved warning.)
+	  // -----------------------------
 
 	  // -----------------------------
 	  // History guard (Back button fix)
@@ -813,7 +822,6 @@
 		if (state.guardReady) return;
 		state.guardReady = true;
 
-		// Mark current entry as BASE, then add a GUARD entry on top.
 		const baseState = Object.assign({}, history.state || {}, { __LG_BASE: true });
 		history.replaceState(baseState, "", window.location.href);
 
@@ -824,32 +832,24 @@
 	  initHistoryGuard();
 
 	  function attemptLeaveByBack() {
-		// If clean, leave immediately in a "single back" feel
 		if (!state.dirty || state.bypass) {
 		  state.bypass = true;
-		  // We are usually on GUARD. Go back to BASE, then immediately back again to real previous page.
 		  history.back();
-		  // When popstate hits BASE, it will auto-skip to previous page (see popstate handler).
 		  setTimeout(() => (state.bypass = false), 0);
 		  return;
 		}
 
-		// Dirty: show confirm, then leave
 		confirmLeave(() => {
 		  state.bypass = true;
-		  // From GUARD, going -2 skips BASE and leaves to the real previous page
 		  history.go(-2);
 
-		  // Fallback: if user opened in a fresh tab and go(-2) does nothing
+		  // Fallback if there is no real history (opened in new tab)
+		  const currentUrl = window.location.href;
 		  setTimeout(() => {
-			state.bypass = false;
-			// If still here and a fallback is defined, use it
-			// (No perfect detection exists without beforeunload; this is a pragmatic fallback.)
-			if (state.fallbackUrl && window.location.href === window.location.href) {
-			  // (The equality is always true; we keep fallback only as opt-in via setFallbackUrl)
-			  // If you want this fallback to be strict, call navigate(fallbackUrl) manually instead.
+			if (window.location.href === currentUrl && state.fallbackUrl) {
+			  window.location.href = state.fallbackUrl;
 			}
-		  }, 0);
+		  }, 600);
 		});
 	  }
 
@@ -858,17 +858,20 @@
 
 		const st = e.state || {};
 
-		// User pressed Back from GUARD -> landed on BASE (same page).
 		if (st.__LG_BASE) {
 		  if (state.dirty) {
-			// Dirty: prevent the second back from leaving silently
 			history.pushState({ __LG_GUARD: true }, "", window.location.href);
 
 			confirmLeave(() => {
 			  state.bypass = true;
-			  // Skip BASE and leave to previous page
 			  history.go(-2);
-			  setTimeout(() => (state.bypass = false), 0);
+
+			  const currentUrl = window.location.href;
+			  setTimeout(() => {
+				if (window.location.href === currentUrl && state.fallbackUrl) {
+				  window.location.href = state.fallbackUrl;
+				}
+			  }, 600);
 			});
 		  } else {
 			state.bypass = true;
@@ -878,8 +881,30 @@
 		}
 	  });
 
+	  // -----------------------------
+	  // CLICK HANDLING
+	  // - Back to list
+	  // - Optional custom back
+	  // - Other same-tab links
+	  // -----------------------------
 	  document.addEventListener("click", (e) => {
+		// 1) Back to list explicit
+		const backToListBtn = e.target.closest("#btnBackToList");
+		if (backToListBtn) {
+		  // allow ctrl/cmd/middle click to open in new tab normally
+		  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
 
+		  e.preventDefault();
+		  const url =
+			backToListBtn.getAttribute("href") ||
+			(window.URLs && window.URLs.indexUrl) ||
+			state.fallbackUrl;
+
+		  window.LeaveGuard.navigate(url);
+		  return;
+		}
+
+		// 2) Optional: custom back button support
 		const backBtn = e.target.closest("[data-leave-guard-back]");
 		if (backBtn) {
 		  e.preventDefault();
@@ -887,10 +912,13 @@
 		  return;
 		}
 
+		// 3) General link guard (same-tab navigations)
 		const a = e.target.closest("a[href]");
 		if (!a) return;
+
 		if (a.target && a.target !== "_self") return;
 		if (a.hasAttribute("download")) return;
+		if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
 
 		const href = a.getAttribute("href");
 		if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
@@ -907,6 +935,7 @@
 		});
 	  }, true);
 
+	  // Let form submits proceed
 	  document.addEventListener("submit", () => {
 		state.bypass = true;
 		setTimeout(() => (state.bypass = false), 0);
