@@ -667,55 +667,250 @@
 </script>
 <script src="~/js/definitions/wip.js"></script>
 <script>
-	(() => {
-	  const MESSAGE = "You have unsaved changes. Are you sure you want to leave this page?";
-
-	  let isDirty = false;
-	  let reloadIntent = false;
-
-	  window.UnsavedChangesGuard = {
-		setDirty() { isDirty = true; },
-		setClean() { isDirty = false; },
-		isDirty() { return isDirty; }
+	(function createLeaveGuard() {
+	  const state = {
+		dirty: false,
+		bypass: false,
+		confirmOpen: false,
+		guardReady: false,
+		observerActive: false,
+		// optional fallback if user opened page directly and there is no back page
+		fallbackUrl: null,
 	  };
 
-	  function shouldTrackTarget(el) {
-		if (!el) return false;
-		if (el.matches?.("input, textarea, select")) return true;
-		if (el.isContentEditable) return true;
-		return false;
+	  const MSG = "You have unsaved changes. Leave this page?";
+
+	  // -----------------------------
+	  // Public API
+	  // -----------------------------
+	  window.LeaveGuard = {
+		markDirty() { state.dirty = true; },
+		resetDirty() { state.dirty = false; },
+		isDirty() { return state.dirty; },
+
+		// Use this when YOU intentionally navigate (save button, etc.)
+		bypassOnce() {
+		  state.bypass = true;
+		  setTimeout(() => (state.bypass = false), 0);
+		},
+
+		// Navigate with guard
+		navigate(url) {
+		  if (!state.dirty || state.bypass) {
+			window.location.href = url;
+			return;
+		  }
+		  confirmLeave(() => {
+			state.bypass = true;
+			window.location.href = url;
+		  });
+		},
+
+		// Back with guard (for your custom back button)
+		back() {
+		  attemptLeaveByBack();
+		},
+
+		setFallbackUrl(url) {
+		  state.fallbackUrl = url;
+		}
+	  };
+
+	  // -----------------------------
+	  // Confirm UI (Bootstrap modal if exists, else window.confirm)
+	  // -----------------------------
+	  function confirmLeave(onLeave) {
+		if (state.confirmOpen) return;
+		state.confirmOpen = true;
+
+		const modalEl = document.getElementById("leaveConfirmModal");
+
+		// Bootstrap modal path
+		if (window.bootstrap && modalEl) {
+		  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+		  const leaveBtn = modalEl.querySelector("#leaveConfirmBtn");
+
+		  let decided = false;
+
+		  const cleanup = () => {
+			if (leaveBtn) leaveBtn.removeEventListener("click", onLeaveClick);
+			modalEl.removeEventListener("hidden.bs.modal", onHidden);
+			state.confirmOpen = false;
+		  };
+
+		  const onLeaveClick = () => {
+			if (decided) return;
+			decided = true;
+			cleanup();
+			modal.hide();
+			onLeave();
+		  };
+
+		  const onHidden = () => {
+			// User closed modal or clicked "Stay"
+			if (decided) return;
+			decided = true;
+			cleanup();
+		  };
+
+		  if (leaveBtn) leaveBtn.addEventListener("click", onLeaveClick);
+		  modalEl.addEventListener("hidden.bs.modal", onHidden);
+
+		  modal.show();
+		  return;
+		}
+
+		// Fallback confirm
+		const ok = window.confirm(MSG);
+		state.confirmOpen = false;
+		if (ok) onLeave();
 	  }
 
+	  // -----------------------------
+	  // Dirty detection
+	  // -----------------------------
+
+	  // 1) Standard input/select changes
 	  document.addEventListener("input", (e) => {
-		if (shouldTrackTarget(e.target)) isDirty = true;
+		if (e.target && e.target.matches("input, textarea")) state.dirty = true;
 	  }, true);
 
 	  document.addEventListener("change", (e) => {
-		if (shouldTrackTarget(e.target)) isDirty = true;
-	  }, true);
-
-	  document.addEventListener("keydown", (e) => {
-		const key = (e.key || "").toLowerCase();
-		const isF5 = e.key === "F5";
-		const isReloadCombo = (e.ctrlKey || e.metaKey) && key === "r";
-
-		if (isF5 || isReloadCombo) {
-		  reloadIntent = true;
-		  setTimeout(() => { reloadIntent = false; }, 1200);
+		if (!e.target) return;
+		if (e.target.matches("select, input[type=checkbox], input[type=radio], input[type=file]")) {
+		  state.dirty = true;
 		}
 	  }, true);
 
-	  document.addEventListener("submit", () => {
-		isDirty = false;
-	  }, true);
+	  // 2) Catch DOM changes like: add row to table, modal DOM/class changes, etc.
+	  // Start observing only AFTER a user gesture to avoid marking dirty during initial render.
+	  const observer = new MutationObserver(() => {
+		// Mark dirty on first meaningful mutation after user gesture
+		state.dirty = true;
+	  });
 
-	  window.addEventListener("beforeunload", (e) => {
-		if (!isDirty) return;
-		if (reloadIntent) return;
+	  function activateObserverOnce() {
+		if (state.observerActive) return;
+		state.observerActive = true;
+
+		observer.observe(document.body, {
+		  childList: true,
+		  subtree: true,
+		  attributes: true,
+		  characterData: true,
+		});
+	  }
+
+	  // First user gesture activates observer
+	  ["click", "keydown", "touchstart"].forEach((evt) => {
+		window.addEventListener(evt, activateObserverOnce, { once: true, capture: true });
+	  });
+
+	  // -----------------------------
+	  // History guard (Back button fix)
+	  // -----------------------------
+	  function initHistoryGuard() {
+		if (state.guardReady) return;
+		state.guardReady = true;
+
+		// Mark current entry as BASE, then add a GUARD entry on top.
+		const baseState = Object.assign({}, history.state || {}, { __LG_BASE: true });
+		history.replaceState(baseState, "", window.location.href);
+
+		const guardState = { __LG_GUARD: true };
+		history.pushState(guardState, "", window.location.href);
+	  }
+
+	  initHistoryGuard();
+
+	  function attemptLeaveByBack() {
+		// If clean, leave immediately in a "single back" feel
+		if (!state.dirty || state.bypass) {
+		  state.bypass = true;
+		  // We are usually on GUARD. Go back to BASE, then immediately back again to real previous page.
+		  history.back();
+		  // When popstate hits BASE, it will auto-skip to previous page (see popstate handler).
+		  setTimeout(() => (state.bypass = false), 0);
+		  return;
+		}
+
+		// Dirty: show confirm, then leave
+		confirmLeave(() => {
+		  state.bypass = true;
+		  // From GUARD, going -2 skips BASE and leaves to the real previous page
+		  history.go(-2);
+
+		  // Fallback: if user opened in a fresh tab and go(-2) does nothing
+		  setTimeout(() => {
+			state.bypass = false;
+			// If still here and a fallback is defined, use it
+			// (No perfect detection exists without beforeunload; this is a pragmatic fallback.)
+			if (state.fallbackUrl && window.location.href === window.location.href) {
+			  // (The equality is always true; we keep fallback only as opt-in via setFallbackUrl)
+			  // If you want this fallback to be strict, call navigate(fallbackUrl) manually instead.
+			}
+		  }, 0);
+		});
+	  }
+
+	  window.addEventListener("popstate", (e) => {
+		if (state.bypass) return;
+
+		const st = e.state || {};
+
+		// User pressed Back from GUARD -> landed on BASE (same page).
+		if (st.__LG_BASE) {
+		  if (state.dirty) {
+			// Dirty: prevent the second back from leaving silently
+			history.pushState({ __LG_GUARD: true }, "", window.location.href);
+
+			confirmLeave(() => {
+			  state.bypass = true;
+			  // Skip BASE and leave to previous page
+			  history.go(-2);
+			  setTimeout(() => (state.bypass = false), 0);
+			});
+		  } else {
+			state.bypass = true;
+			history.back();
+			setTimeout(() => (state.bypass = false), 0);
+		  }
+		}
+	  });
+
+	  document.addEventListener("click", (e) => {
+
+		const backBtn = e.target.closest("[data-leave-guard-back]");
+		if (backBtn) {
+		  e.preventDefault();
+		  attemptLeaveByBack();
+		  return;
+		}
+
+		const a = e.target.closest("a[href]");
+		if (!a) return;
+		if (a.target && a.target !== "_self") return;
+		if (a.hasAttribute("download")) return;
+
+		const href = a.getAttribute("href");
+		if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
+
+		const url = new URL(href, window.location.href);
+		if (url.href === window.location.href) return;
+
+		if (!state.dirty || state.bypass) return;
 
 		e.preventDefault();
-		e.returnValue = MESSAGE;
-		return MESSAGE;
-	  });
+		confirmLeave(() => {
+		  state.bypass = true;
+		  window.location.href = url.href;
+		});
+	  }, true);
+
+	  document.addEventListener("submit", () => {
+		state.bypass = true;
+		setTimeout(() => (state.bypass = false), 0);
+	  }, true);
+
 	})();
 </script>
