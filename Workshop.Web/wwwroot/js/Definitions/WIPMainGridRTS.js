@@ -660,33 +660,24 @@ $schStart.off('change.startTime');
 function initSchStartTimepicker(allowedTimes, defaultTime) {
     if (!$schStart.length) return;
 
-    // destroy previous instance if any
-    try {
-        $schStart.datetimepicker('destroy');
-    } catch (e) { }
+    try { $schStart.datetimepicker('destroy'); } catch (e) { }
 
-    const allowTimes12 = Array.isArray(allowedTimes)
-        ? allowedTimes.map(hhmm24To12).filter(Boolean)
-        : [];
+    const allowed24 = Array.isArray(allowedTimes) ? allowedTimes : []; // ["07:00","07:05",...]
 
-    const opts = {
+    $schStart.datetimepicker({
         datepicker: false,
-        format: 'h:i A',      // ✅ 12-hour display
+        format: 'h:i A',       
+        formatTime: 'h:i A',   
         step: 5,
         scrollInput: false,
-        onSelectTime: function () { recompute(); },
-        onChangeDateTime: function () { recompute(); },
-        validateOnBlur: true,
-        closeOnWithoutClick: true
-    };
+        scrollTime: false,     
+        validateOnBlur: false,
+        closeOnWithoutClick: true,
+        allowTimes: allowed24, 
+        onClose: function () { recompute(); }
+    });
 
-    if (allowTimes12.length > 0) {
-        opts.allowTimes = allowTimes12; // e.g. ["8:00 AM","8:05 AM",...]
-    }
-
-    $schStart.datetimepicker(opts);
-
-    const val24 = defaultTime || (allowedTimes && allowedTimes[0]) || "08:00";
+    const val24 = defaultTime || allowed24[0] || "08:00";
     $schStart.val(hhmm24To12(val24));
 
     recompute();
@@ -863,8 +854,8 @@ $("#schTech").on("change", function () {
         Swal.fire(
             theMainLang == "en" ? "No slot fits duration" : "لا توجد فترة زمنية تكفي للمدة المطلوبة",
             theMainLang == "en"
-                ? `Max available: ${maxMin} min, required: ${durationMin} min`
-                : `أقصى مدة متاحة: ${maxMin} دقيقة، المطلوبة: ${durationMin} دقيقة`,
+                ? `Max available: ${maxMin / 60} min, required: ${durationMin / 60} min`
+                : `أقصى مدة متاحة: ${maxMin / 60} دقيقة، المطلوبة: ${durationMin / 60} دقيقة`,
             "warning"
         );
         return;

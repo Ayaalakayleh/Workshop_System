@@ -2071,7 +2071,9 @@ namespace Workshop.Web.Controllers
         {
             var technicians = await _apiClient.GetAvailableTechniciansAsync(date, duration, BranchId, true);
 
-            var data = technicians.Select(t => new
+            var data = technicians
+                .Where(t => t.FreeIntervalsList != null && t.FreeIntervalsList.Any())
+                .Select(t => new
             {
                 value = t.TechnicianId,
                 text = lang == "en" ? t.PrimaryName : t.SecondaryName,
