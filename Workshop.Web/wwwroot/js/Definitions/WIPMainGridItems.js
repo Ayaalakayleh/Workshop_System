@@ -190,6 +190,7 @@ $(function () {
             },
             { dataField: "Code", caption: window.RazorVars.DXCode, allowEditing: false, alignment: "left" },
             { dataField: "Name", caption: window.RazorVars.DXName, allowEditing: false, alignment: "left" },
+            { dataField: "FK_SubCategoryId", caption: "SubCategoryId", allowEditing: false, visible: false },
             {
                 dataField: "RequiresApproval",
                 caption: theMainLang == "en" ? "Price Approval" : "اعتماد السعر",

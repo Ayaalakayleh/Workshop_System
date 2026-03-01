@@ -13,7 +13,7 @@
 
             var model = {
                 WIP: WIP ? parseInt(WIP) : null,
-                TypeId: $("#TypeId").val() ? parseInt($("#TypeId").val()) : null,
+                TypeIds: $("#TypeIds").val() ,
                 StatusId: $("#StatusId").val() ? parseInt($("#StatusId").val()) : null,
                 InvoiceDateStart: InvoiceDateStart || null,
                 InvoiceDateEnd: InvoiceDateEnd || null,

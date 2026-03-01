@@ -67,7 +67,7 @@ namespace Workshop.Infrastructure.Repositories
             using var connection = _context.CreateConnection();
 
             var parameters = new DynamicParameters();
-            parameters.Add("@TypeId", filterDTO.TypeId);
+            parameters.Add("@SubCategories", filterDTO.SubCategories);
             parameters.Add("@WIPId", filterDTO.WIP);
             parameters.Add("@InvoiceDateStart", filterDTO.InvoiceDateStart);
             parameters.Add("@InvoiceDateEND", filterDTO.InvoiceDateEnd);

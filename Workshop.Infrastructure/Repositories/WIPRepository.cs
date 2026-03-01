@@ -185,6 +185,7 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("fk_UnitId", typeof(int));
             table.Columns.Add("WarehouseId", typeof(int));
             table.Columns.Add("LocatorId", typeof(int));
+            table.Columns.Add("FK_SubCategoryId", typeof(int));
             table.Columns.Add("RequestQuantity", typeof(decimal));
             table.Columns.Add("Quantity", typeof(decimal));
             table.Columns.Add("UsedQuantity", typeof(decimal));
@@ -200,7 +201,7 @@ namespace Workshop.Infrastructure.Repositories
 
             foreach (var item in Items)
             {
-                table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.RequestId, item.ItemId, item.fk_UnitId, item.WarehouseId, item.LocatorId, item.RequestQuantity, item.Quantity, item.UsedQuantity,
+                table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.RequestId, item.ItemId, item.fk_UnitId, item.WarehouseId, item.LocatorId, item.FK_SubCategoryId, item.RequestQuantity, item.Quantity, item.UsedQuantity,
                    item.Price, item.CostPrice, item.SalePrice, item.Discount, item.Total, item.ModifyBy, item.AccountType, item.RequiresPriceApproval, item.PriceWorkflowEnumId);
             }
 

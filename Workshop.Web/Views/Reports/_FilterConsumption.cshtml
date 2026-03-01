@@ -37,10 +37,10 @@
         <div class="form-group">
             <label>@Common["Type"]</label>
              @Html.DropDownList(
-                "TypeId",
-                (IEnumerable<SelectListItem>)ViewBag.AccountTypes,
+                "TypeIds",
+                        (IEnumerable<SelectListItem>)ViewBag.SubCategories,
                 "Select Type",
-                new { @class = "form-control" }
+                        new { @class = "form-control", multiple = "multiple" }
             )
         </div>
     </div>

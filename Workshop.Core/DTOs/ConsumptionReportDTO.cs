@@ -41,6 +41,8 @@ namespace Workshop.Core.DTOs
     {
         public int? WIP { get; set; }
         public int? TypeId { get; set; }
+        public List<int>? TypeIds { get; set; }
+        public string? SubCategories { get; set; }
         public DateTime? InvoiceDateStart { get; set; }
         public DateTime? InvoiceDateEnd { get; set; }
         public int? CustomerId { get; set; }

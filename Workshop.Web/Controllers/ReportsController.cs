@@ -619,17 +619,18 @@ namespace Workshop.Web.Controllers
         {
             var isCompanyCenterialized = 1;
             var allCustomers = await _accountingApiClient.Customer_GetAll(CompanyId, BranchId, isCompanyCenterialized, lang);
-            var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(16, CompanyId);
+            //var VehcileServices = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(16, CompanyId);
+            var Types = await _inventoryApiClient.GetAllSubCategoriesAsync();
             ViewBag.Customers = allCustomers?.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CustomerName
             }).ToList() ?? new List<SelectListItem>();
 
-            ViewBag.AccountTypes = VehcileServices?.Select(c => new SelectListItem
+            ViewBag.SubCategories = Types?.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
-                Text = lang == "en" ? c.PrimaryName : c.SecondaryName
+                Text = lang == "en" ? c.primaryName : c.secondaryName
 
             }).ToList() ?? new List<SelectListItem>();
 
@@ -647,7 +648,8 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                filter.TypeId ??= 0;
+                //filter.TypeId ??= 0;
+                filter.SubCategories = (filter.TypeIds == null || filter.TypeIds.Count == 0) ? null : string.Join(",", filter.TypeIds);
                 var data = await _apiClient.GetConsumptionReportAsync(filter);
                 
                 var isCompanyCenterialized = 1;

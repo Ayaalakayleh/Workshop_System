@@ -291,6 +291,7 @@ function updateSelectionCount(count) {
                     MaxQty: item.availableQty,
                     WarehouseId: item.warehouseId,
                     isDecimalUnit: item.isDecimalUnit,
+                    FK_SubCategoryId: item.fK_SubCategoryId,
 
                     RequiresPriceApproval: !!item.requiresPriceApproval,
                     PriceWorkflowEnumId: item.priceWorkflowEnumId ?? null,

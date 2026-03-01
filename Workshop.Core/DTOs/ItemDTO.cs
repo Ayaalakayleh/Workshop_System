@@ -148,6 +148,7 @@ namespace Workshop.Core.DTOs
         public int fk_UnitId { get; set; } 
         public int? WarehouseId { get; set; } 
         public int? LocatorId { get; set; } 
+        public int? FK_SubCategoryId { get; set; } 
         public decimal RequestQuantity { get; set; }
         public decimal Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
