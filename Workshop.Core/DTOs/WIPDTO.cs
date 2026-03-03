@@ -23,7 +23,7 @@ namespace Workshop.Core.DTOs
         public decimal? Total { get; set; }
         public int? WorkshopId { get; set; } = 0;
 
-        public bool IsExternal { get; set; } = false;
+        public bool IsExternal { get; set; } = false; 
         public IEnumerable<WIPDTO>? List { get; set; }
         public IEnumerable<M_WIPServiceHistoryDTO>? History { get; set; }
         public IEnumerable<VehicleDefinitions>? VehicleDetails { get; set; }
@@ -51,6 +51,8 @@ namespace Workshop.Core.DTOs
         public int? CreatedBy { get; set; }
         public int? ModifyBy { get; set; }
         public int? TotalPages { get; set; }
+        public int? AccountType { get; set; }
+        public int? PartialAccountType { get; set; }
         public string? LookupCode { get; set; }
         public string? LookupPrimaryName { get; set; }
         public string? LookupSecondaryName { get; set; }

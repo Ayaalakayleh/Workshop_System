@@ -115,7 +115,10 @@ function resetRowToEstimateIfApproved(row, grid, rowIndex) {
     }
     return false;
 }
-
+function isRowRejected(row) {
+    return Number(row?.PriceWorkflowStatus) === PriceWorkflowStatusEnum.Rejected ||
+        Number(row?.Status) === 37;
+}
 //===========================================================
 $(function () {
     let locatorsLoadedOnInit = false;
@@ -126,7 +129,7 @@ $(function () {
         noDataText: resources.NoDataInTable,
         showBorders: true,
         remoteOperations: {
-            filtering: true,
+            filtering: false,
             sorting: true,
             paging: true
         },
@@ -560,14 +563,14 @@ $(function () {
                             //const v = e.value;
                             let v = normalizeQtyValue(e.value, opt.allowDecimal, 2);
                             const maxV = Number(row.Quantity) || 0;
-
+                            debugger
                             // clamp
                             if (v > maxV) v = maxV;
                             if (v < 0) v = 0;
 
-                            if (!v) {
-                                v = null;
+                            const isEmpty = v === null || v === undefined || Number.isNaN(v);
 
+                            if (isEmpty) {
                                 e.component.option("value", null);
                                 cellInfo.setValue(null);
                                 row.UsedQuantity = null;
@@ -601,6 +604,11 @@ $(function () {
                 allowEditing: true,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
+
+                    if (isRowRejected(rowData)) {
+                        rowData.Price = 0;
+                        return 0;
+                    }
 
                     const type = (rowData.AccountType != null && rowData.AccountType !== 0 && rowData.AccountType !== "")
                         ? String(rowData.AccountType)
@@ -641,6 +649,12 @@ $(function () {
                     showSpinButtons: true
                 },
                 calculateCellValue: function (rowData) {
+                    if (isRowRejected(rowData)) {
+                        rowData.Discount = 0;
+                        rowData.DiscountPct = 0;
+                        return 0;
+                    } 
+
                     //const qty = +rowData.Quantity || +rowData.RequestQuantity || 0;
                     const qty = getEffectiveQty(rowData);
                     const price = +rowData.Price || 0;
@@ -689,7 +703,12 @@ $(function () {
                 allowEditing: false, 
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-                    debugger
+
+                    if (isRowRejected(rowData)) {
+                        rowData.Tax = 0;
+                        return 0;
+                    } 
+
                     if (Number(rowData.AccountType) === 1) {
                         rowData.Tax = 0;
                         return 0;
@@ -727,7 +746,12 @@ $(function () {
                 allowEditing: false,
                 alignment: "left",
                 calculateCellValue: function (rowData) {
-                     
+
+                    if (isRowRejected(rowData)) {
+                        rowData.Total = 0;
+                        return 0;
+                    }
+
                     var requestQuantity = parseFloat(rowData.RequestQuantity) || 0;
                     var quantity = parseFloat(rowData.Quantity) || 0;
                     var price = parseFloat(rowData.Price) || 0;
@@ -837,8 +861,8 @@ $(function () {
                             return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
                                 (Permission_Issue && (
                                     AllowActions &&
-                                    parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
-                                    OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                                parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
+                                parseInt(e.row.data.Status) !== 37 && OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                                 ));
                         },
                         disabled: function (e) {
@@ -869,6 +893,7 @@ $(function () {
                                 (Permission_Issue && (
                                     AllowActions &&
                                     parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
+                                    parseInt(e.row.data.Status) !== 37 &&
                                     OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                                 ));
                         },

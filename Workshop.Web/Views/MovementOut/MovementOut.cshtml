@@ -1001,6 +1001,22 @@
                 $("#VehicleClass").text(Data.RefVehicleClasses.VehicleClassPrimaryName);
                 $("#VehiclePlateNo").text(Data.PlateNumber);
                 $("#VehicleModel").text(Data.RefVehicleModels.VehicleModelPrimaryName);
+
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("GetAgreementbyVehicleId", "MovementIn")" + "?id=" + $("#VehicleID").val(),
+                    dataType: "json"
+                }).done(function (res) {
+                    if (res && res.isSuccess && res.data && res.data.length > 0) {
+                        var agr = res.data[0];
+                        $("#customerName").html(agr.customerName ?? "");
+                        $("#ExitDriverName").val(agr.customerPrimaryName ?? "");
+                        $("#CustomerPhone").html(agr.customerPhoneNumber ?? "");
+                    } else {
+                        $("#customerName").html("");
+                        $("#CustomerPhone").html("");
+                    }
+                });
             }
         });
     }

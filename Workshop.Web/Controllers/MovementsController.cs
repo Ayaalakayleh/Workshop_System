@@ -211,6 +211,8 @@ namespace Workshop.Web.Controllers
             }
 
             movement.LastMovementDetails = await _workshopapiClient.GetLastVehicleMovementByVehicleIdAsync(movement.VehicleID.Value);
+            //if(movement.ReceivedTime == null) 
+            //    movement.LastMovementDetails.ReceivedTime;
 
             var vChecklists = await _workshopapiClient.GetVehicleChecklistByMovementId(movementId);
             var vLookupChecklist = await _workshopapiClient.GetVehicleChecklistLookup();
