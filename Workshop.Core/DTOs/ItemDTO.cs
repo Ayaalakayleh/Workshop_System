@@ -9,31 +9,31 @@ namespace Workshop.Core.DTOs
     public class ItemDTO
     {
         public int Id { get; set; }
-        public string Code { get; set; }
-        public string ItemNumber { get; set; }
+        public string? Code { get; set; } = string.Empty;
+        public string? ItemNumber { get; set; } = string.Empty;
         public string Name { get; set; }
-        public string PrimaryName { get; set; }
-        public string SecondaryName { get; set; }
-        public string ManufacturerNumber { get; set; }
+        public string? PrimaryName { get; set; } = string.Empty;
+        public string? SecondaryName { get; set; } = string.Empty;
+        public string? ManufacturerNumber { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public decimal SalePrice { get; set; }
         public decimal PurchasePrice { get; set; }
-        public string SubCategoryPrimaryName { get; set; }
-        public string SubCategorySecondaryName { get; set; }
-        public string CategoryPrimaryName { get; set; }
-        public string CategorySecondaryName { get; set; }
-        public string GroupPrimaryName { get; set; }
-        public string GroupSecondaryName { get; set; }
-        public string ImagePath { get; set; }
+        public string? ImagePath { get; set; }
+        public string? GroupPrimaryName { get; set; } = string.Empty;
+        public string? GroupSecondaryName { get; set; } = string.Empty;
+        public string? CategoryPrimaryName { get; set; } = string.Empty;
+        public string? CategorySecondaryName { get; set; } = string.Empty;
+        public string? SubCategoryPrimaryName { get; set; } = string.Empty;
+        public string? SubCategorySecondaryName { get; set; } = string.Empty;
         public int FK_GroupId { get; set; }
         public int FK_CategoryId { get; set; }
         public int FK_SubCategoryId { get; set; }
         public int FK_UnitId { get; set; }
-        public string UnitName { get; set; }
-        public string UnitPrimaryName { get; set; }
-        public string UnitSecondaryName { get; set; }
-        public string CategoryName { get; set; }
-        public int FK_TaxClassificationId { get; set; }
+        public string? UnitName { get; set; } = string.Empty;
+        public string? UnitPrimaryName { get; set; } = string.Empty;
+        public string? UnitSecondaryName { get; set; } = string.Empty;
+        public string? CategoryName { get; set; } = string.Empty;
+        public int? FK_TaxClassificationId { get; set; }
         public bool? IsSerialized { get; set; }
         public bool? IsUniqueSerial { get; set; }
         public bool? IsBatchControl { get; set; }
@@ -41,17 +41,20 @@ namespace Workshop.Core.DTOs
         public bool? IsWarrantlyEligible { get; set; }
         public bool? IsInspectionReq { get; set; }
         public bool? IsActive { get; set; }
-        public string BaseUnitPrimaryName { get; set; }
-        public string BaseUnitSecondaryName { get; set; }
+        public string? BaseUnitPrimaryName { get; set; } = string.Empty;
+        public string? BaseUnitSecondaryName { get; set; } = string.Empty;
         public int WarehouseId { get; set; }
-        public string WarehousePrimaryName { get; set; }
-        public string WarehouseSecondaryName { get; set; }
+        public string? WarehousePrimaryName { get; set; } = string.Empty;
+        public string? WarehouseSecondaryName { get; set; } = string.Empty;
         public int? LocatorId { get; set; }
-        public string LocatorCode { get; set; }
+        public string? LocatorCode { get; set; } = string.Empty;
         public decimal AvailableQty { get; set; }
         public decimal AvgCost { get; set; }
         public int TotalRows { get; set; }
-        public string SubCategoryName { get; set; }
+        public string? SubCategoryName { get; set; } = string.Empty;
+        public List<int> WarehousesIds { get; set; } = [];
+        public List<AlternateUnitDTO> AlternateUnits { get; set; } = [];
+        public List<long> AlternativeItems { get; set; } = [];
 
     }
 
@@ -227,4 +230,11 @@ namespace Workshop.Core.DTOs
         public decimal? FactorUsed { get; set; }
     }
 
+    public class AlternateUnitDTO
+    {
+        public int UnitId { get; set; }
+        public string? UnitPrimaryName { get; set; }
+        public string? UnitSecondaryName { get; set; }
+        public decimal ConversionFactor { get; set; }
+    }
 }
