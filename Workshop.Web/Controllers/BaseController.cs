@@ -35,10 +35,58 @@ namespace Workshop.Web.Controllers
             BranchId = HttpContext.Session.GetInt32("BranchId") ?? 0;
             UserId = HttpContext.Session.GetInt32("UserId") ?? 0;
             GroupId = HttpContext.Session.GetString("UserGroupId") ?? "";
-            var branchInfoStr = HttpContext.Session.GetString("BranchInfo");
-            CurrencyId = !string.IsNullOrEmpty(branchInfoStr)
-                ? System.Text.Json.JsonSerializer.Deserialize<CompanyBranch>(branchInfoStr)?.CurrencyIDH ?? 0
-                : 0;
+            var cur = HttpContext.Session.GetInt32("CurrencyId");
+            if (cur.HasValue && cur.Value > 0)
+            {
+                CurrencyId = cur.Value;
+            }
+            else
+            {
+                var branchInfoStr = HttpContext.Session.GetString("BranchInfo");
+                CurrencyId = !string.IsNullOrEmpty(branchInfoStr)
+                    ? System.Text.Json.JsonSerializer.Deserialize<CompanyBranch>(branchInfoStr)?.CurrencyIDH ?? 0
+                    : 0;
+            }
+
+           
+            bool isEmbed = false;
+
+            var qs = HttpContext.Request.Query["isEmbed"].ToString();
+            if (!string.IsNullOrWhiteSpace(qs) && bool.TryParse(qs, out var parsed))
+            {
+                isEmbed = parsed;
+                HttpContext.Session.SetString("IsEmbed", isEmbed ? "true" : "false");
+            }
+            else
+            {
+                var fetchDest = HttpContext.Request.Headers["Sec-Fetch-Dest"].ToString();
+                bool inIFrame = string.Equals(fetchDest, "iframe", StringComparison.OrdinalIgnoreCase);
+
+               
+                if (!inIFrame)
+                {
+                    var referer = HttpContext.Request.Headers["Referer"].ToString();
+                    if (!string.IsNullOrWhiteSpace(referer))
+                    {
+                      
+                        inIFrame = referer.Contains(HttpContext.Request.Host.Value, StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+
+                if (inIFrame)
+                {
+                    //  iframe: from session
+                    var s = HttpContext.Session.GetString("IsEmbed");
+                    isEmbed = string.Equals(s, "true", StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    // top-level: isEmbed false
+                    isEmbed = false;
+                    HttpContext.Session.Remove("IsEmbed");
+                }
+            }
+            ViewBag.isEmbed = isEmbed;
             base.OnActionExecuting(context);
         }
         public BaseController(IMemoryCache memoryCache, IConfiguration configuration, IWebHostEnvironment environment)

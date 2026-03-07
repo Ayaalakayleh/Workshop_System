@@ -8,8 +8,9 @@
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
 @{
+    Layout = (ViewBag.isEmbed == true) ? "_IFrameLayout" : "_Layout";
+
 	var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
-	// var lang = "en";
 	var WIPstatus = Model.Status;
 	ViewData["WIPstatus"] = WIPstatus;
 	ViewData["WIPId"] = Model.Id;

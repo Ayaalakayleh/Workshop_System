@@ -942,6 +942,27 @@ $(function () {
                         }
                     },
                     {
+                        hint: theMainLang === "en" ? "Item Details" : "تفاصيل الصنف",
+                        icon: "menu",            
+                        type: "default",
+                        stylingMode: "contained",
+                        visible: function (e) {
+                            return true;
+                        },
+                        onClick: function (e) {
+                            const itemId = e?.row?.data?.ItemId || e?.row?.data?.Id;
+                            if (!itemId) {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: theMainLang == "en" ? "Missing Item ID" : "رقم الصنف غير موجود",
+                                });
+                                return;
+                            }
+
+                            openInventoryItemTabsModal(itemId);
+                        }
+                    },
+                    {
                         hint: "Delete",
                         icon: "fad fa-trash",
                         visible: function (e) {
@@ -2343,3 +2364,47 @@ function stackCaption(caption) {
         .split(/\s+/)           // split by spaces
         .join("<br/>");         // put each word on new line
 }
+
+async function openInventoryItemTabsModal(itemId) {
+    const returnUrl = `/ItemMaster/TabsEmbed/${encodeURIComponent(itemId)}`;
+
+    const res = await fetch(`/InventoryEmbed/GetEmbedUrl?returnUrl=${encodeURIComponent(returnUrl)}`, {
+        method: "GET",
+        credentials: "same-origin"
+    });
+
+    if (!res.ok) {
+        const txt = await res.text();
+        Swal.fire({ icon: "error", title: "Embed Error", text: txt });
+        return;
+    }
+
+    const data = await res.json();
+
+    showInvFrame(data.iframeSrc);
+}
+
+
+function showInvFrame(url) {
+    const frame = document.getElementById("invItemTabsFrame");
+    const host = document.getElementById("invFrameHost");
+
+    frame.src = url;
+    host.classList.add("show");
+}
+
+function closeInvFrameHost() {
+    const host = document.getElementById("invFrameHost");
+    const frame = document.getElementById("invItemTabsFrame");
+
+    host.classList.remove("show");
+    frame.src = "about:blank";
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeInvFrameHost();
+});
+
+document.getElementById("invFrameHost")?.addEventListener("click", (e) => {
+    if (e.target.id === "invFrameHost") closeInvFrameHost();
+});

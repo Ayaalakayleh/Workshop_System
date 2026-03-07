@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Content Remove="Views\PriceMatrix\Edit.cshtml" />
-    <Content Remove="Views\Shared\_IFrameLayout.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

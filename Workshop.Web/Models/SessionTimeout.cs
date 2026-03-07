@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -10,6 +11,12 @@ namespace Workshop.Web.Models
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var httpContext = context.HttpContext;
+
+            if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any())
+            {
+                base.OnActionExecuting(context);
+                return;
+            }
 
             string controllerName = context.RouteData.Values["controller"].ToString().ToLower();
             string actionName = context.RouteData.Values["action"].ToString().ToLower();

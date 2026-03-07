@@ -3,6 +3,11 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
+@{
+    var isEmbed = (ViewBag.isEmbed as bool?) ?? false;
+
+    Layout = (ViewBag.isEmbed == true) ? "_IFrameLayout" : "_Layout";
+}
 
 <div class="row">
     <div class="col-12">
@@ -27,7 +32,11 @@
                     <hr />
                     <div id="WIPListContainer">
                         @* Initial render of first page *@
-                        @await Html.PartialAsync("_WIPList", Model.List)
+                        @await Html.PartialAsync("_WIPList", Model.List, new ViewDataDictionary(ViewData)
+                        {
+                            ["IsEmbed"] = isEmbed
+                                                
+                        })
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end">
@@ -44,6 +53,7 @@
 
 <script src="~/js/Definitions/wip.js"></script>
 <script>
+    const isEmbed = @(ViewBag.isEmbed == true ? "true" : "false");
     // Expose server-generated URLs to wip.js — use window.URLs consistently
     window.URLs = {
         indexUrl: '@Url.Action("Index", "WIP")',
@@ -51,7 +61,7 @@
         branchesUrl: '@Url.Action("Branches", "ERPAPI")',
         createIssueVoucher: '@Url.Action("CreateIssueVoucher", "WIP")',
         editPostUrl: '@Url.Action("Edit_Post", "WIP")',
-        editGetUrl: '@Url.Action("Edit", "WIP")',
+        editGetUrl: '@Url.Action("Edit", "WIP")' + '?isEmbed=' + isEmbed,
         closeWipUrl: '@Url.Action("CloseWIP", "WIP")',
         getVehicleDetailsByIdUrl: '@Url.Action("GetVehicleDetailsById", "WIP")',
         getWIPOptionsByIdUrl: '@Url.Action("GetWIPOptionsById", "WIP")',

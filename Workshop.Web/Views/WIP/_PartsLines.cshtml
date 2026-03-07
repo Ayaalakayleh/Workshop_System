@@ -15,6 +15,42 @@
     #WarehouseDiv{
         width: 200px !important;
     }
+
+    #invFrameHost {
+        position: fixed;
+        inset: 0;
+        display: none;
+        z-index: 2000;
+    }
+
+        #invFrameHost.show {
+            display: block;
+        }
+
+        #invFrameHost .frameBox {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(1200px, calc(100vw - 48px));
+            height: min(760px, calc(100vh - 80px));
+            border-radius: 12px;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        #invFrameHost .closeBtn {
+            position: absolute;
+            right: 14px;
+            top: 14px;
+            z-index: 3;
+            border: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.85);
+            cursor: pointer;
+        }
 </style>
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -127,6 +163,12 @@
             </div>
 
         </div>
+    </div>
+</div>
+
+<div id="invFrameHost">
+    <div class="frameBox">
+        <iframe id="invItemTabsFrame" style="width:100%;height:100%;border:0;background:transparent;"></iframe>
     </div>
 </div>
 

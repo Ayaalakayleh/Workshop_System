@@ -5,10 +5,11 @@
 @inject IStringLocalizer<Messages> Message
 
 @{
+    var isEmbed = ViewBag.isEmbed;
     // Key used to store the last opened WIP id in the browser
     const string LastWipStorageKey = "last_wip_opened_id";
     // URL template (we'll replace __ID__ in JS)
-    var editUrlTemplate = Url.Action("Edit", "WIP", new { id = "__ID__" });
+    var editUrlTemplate = Url.Action("Edit", "WIP", new { id = "__ID__", isEmbed = (bool)(ViewBag.isEmbed ?? false) });
 }
 
 <div class="d-flex justify-content-end mb-2">
@@ -57,7 +58,7 @@
 
                     </td>
                     <td>
-                        <a href="@Url.Action("Edit", "WIP", new { id = item.Id })"
+                        <a href="@Url.Action("Edit", "WIP", new { id = item.Id, isEmbed = isEmbed })"
                            class="btn btn-success btn-sm btn-open-wip"
                            data-wip-id="@item.Id">
                             <i class="fad fa-folder-open"></i>&nbsp;@Common["Button_Open"]

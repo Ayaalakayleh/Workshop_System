@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using Workshop.Core.DTOs;
+using Workshop.Core.DTOs.General;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
-using Workshop.Core.DTOs.General;
 
 namespace Workshop.Web.Controllers
 {
@@ -159,8 +161,8 @@ namespace Workshop.Web.Controllers
                 HttpContext.Session.SetString("Permission", permissionData?.Permissions ?? "");
                 HttpContext.Session.SetString("UserGroupId", permissionData?.Groups ?? "");
 
-                var primaryMenu =await _erpapicient.GetUserMenu("en", user.UserID, "11", companyId, branch);
-                
+                var primaryMenu = await _erpapicient.GetUserMenu("en", user.UserID, "11", companyId, branch);
+
                 // Inject Consumption Report if not exists
                 //if (primaryMenu != null && !primaryMenu.Any(m => m.MethodName == "ConsumptionReport"))
                 //{
@@ -248,5 +250,64 @@ namespace Workshop.Web.Controllers
         {
             return View();
         }
+
+        [AllowAnonymous]
+        [HttpGet("/Authentication/EmbedVerify")]
+        public async Task<IActionResult> EmbedVerify(int userId, string contactHash, string returnUrl)
+        {
+            // 1) Validate returnUrl 
+            if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl))
+                return BadRequest("Invalid returnUrl");
+
+            // 2) Validate inputs
+            if (userId <= 0 || string.IsNullOrWhiteSpace(contactHash))
+                return BadRequest("Missing parameters");
+
+            // 3) Get user info from DB/API by userId (NOT from cookies / NOT from JWT)
+            var user = await _erpapicient.GetUserInfoById(userId);
+            if (user == null)
+                return Unauthorized();
+
+            // 4) Regenerate expected hash using same secrets + same logic
+            string prefix = _config["EmbedAuth:PrefixPassword"] ?? "";
+            string suffix = _config["EmbedAuth:SuffixPassword"] ?? "";
+
+            string expectedHash = EmbedHashService.Generate(user.Email, user.PhoneNo, user.UserID, prefix, suffix);
+
+            // 5) Timing-safe compare
+            if (!EmbedHashService.FixedTimeEqualsHex(expectedHash, contactHash))
+                return Unauthorized();
+
+            // 6) Session registration (must satisfy SessionTimeout)
+            HttpContext.Session.SetInt32("UserId", user.UserID);
+            HttpContext.Session.SetString("UserInfo", JsonSerializer.Serialize(user));
+            HttpContext.Session.SetString("Role", user.Role_Id.ToString());
+            HttpContext.Session.SetInt32("UserGroupId", user.UserGroupId);
+
+            // 1. Get a company for this user (choose default/first)
+            var companies = await _erpapicient.GetUserCompanies(user.UserID);
+            var company = companies?.FirstOrDefault();
+            if (company == null) return Unauthorized("No company for user");
+
+            HttpContext.Session.SetInt32("CompanyId", company.Id);
+            HttpContext.Session.SetString("CompanyInfo", JsonSerializer.Serialize(company));
+
+            // 2. Get a branch for this user/company (choose default/first)
+            var branches = await _erpapicient.GetBranchesByCompanyIdUserId(company.Id, user.UserID);
+            var branch = branches?.FirstOrDefault();
+            if (branch == null) return Unauthorized("No branch for user");
+
+            HttpContext.Session.SetInt32("BranchId", branch.BranchID);
+            HttpContext.Session.SetString("BranchInfo", JsonSerializer.Serialize(branch));
+            var primaryMenu = await _erpapicient.GetUserMenu("en", user.UserID, "11", company.Id, branch.BranchID);
+            HttpContext.Session.SetString("PrimaryMenuList", System.Text.Json.JsonSerializer.Serialize(primaryMenu));
+
+            HttpContext.Session.GetString("UserGroupId");
+            HttpContext.Session.SetInt32("CurrencyId", branch.CurrencyIDH);
+
+            // 7) Redirect to internal page
+            return Redirect(returnUrl);
+        }
+
     }
 }

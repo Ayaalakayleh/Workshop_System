@@ -85,6 +85,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(100);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+
+    options.Cookie.Name = ".Workshop.Session";
 });
 
 builder.Services.AddControllersWithViews(options =>

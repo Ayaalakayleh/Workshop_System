@@ -89,9 +89,10 @@ namespace Workshop.Web.Controllers
         }
 
         [CustomAuthorize(Permissions.WIP.View)]
-        public async Task<IActionResult> Index([FromForm] FilterWIPDTO? oFilterWIPDTO)
+        public async Task<IActionResult> Index([FromForm] FilterWIPDTO? oFilterWIPDTO, bool isEmbed=false)
         {
 
+            //ViewBag.isEmbed = isEmbed;
             var isCompanyCenterialized = 1;
             oFilterWIPDTO ??= new FilterWIPDTO();
             oFilterWIPDTO.PageNumber = oFilterWIPDTO.PageNumber ?? 1;
@@ -140,11 +141,13 @@ namespace Workshop.Web.Controllers
         }
 
 
-        public async Task<IActionResult> Edit(int? id, int? movementId = 0)
+        public async Task<IActionResult> Edit(int? id, int? movementId = 0, bool isEmbed = false)
         {
             try
             {
 
+                
+                //ViewBag.isEmbed = fromSession;
                 var isCompanyCenterialized = 1;
                 WIPDTO dto = new WIPDTO();
                 VehicleMovement movement = new VehicleMovement();

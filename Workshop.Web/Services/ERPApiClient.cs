@@ -267,6 +267,7 @@ namespace Workshop.Web.Services
 
         }
 
+        #region Workflow
         public async Task<StateResponse> GetWorkflowStateByMasterIdAndCompanyId(Guid? MasterId, int CompanyId)
         {
             string url = $"/WorkflowInstance/GetStates?MasterId={MasterId}&CompanyId={CompanyId}";
@@ -292,5 +293,8 @@ namespace Workshop.Web.Services
             string url = $"/WorkflowInstance/Insert?DocId={WorkflowEnum}&MasterId={MasterId}&CompanyId={CompanyId}&CreatedBy={CreatedBy}&GroupId={groupId}";
             return await SendRequest<bool>(url, HttpMethod.Get);
         }
+
+        #endregion
+
     }
 }
