@@ -1823,8 +1823,7 @@ namespace Workshop.Web.Controllers
                 return Json(new
                 {
                     success = false,
-                    error = ex.Message,
-                    inner = ex.InnerException?.Message
+                    message = ex.InnerException?.Message ?? ex.Message
                 });
             }
         }
@@ -1906,6 +1905,12 @@ namespace Workshop.Web.Controllers
                     if (item.Total > 0)
                     {
                         accountId = items.Where(a => a.ItemNumber == -6).FirstOrDefault()?.ItemSalesAccountId;
+                        if (accountId == null)
+                        {
+                            throw new InvalidOperationException(lang == "en"
+                                ? "Labour account is incomplete in accounting"
+                                : "حساب العمالة غير مكتمل في المحاسبة");
+                        }
                         //accountId = accountId == null ? InvoiceType.AccountId : accountId;
                         accountTable = new AccountTable();
                         accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
@@ -1950,6 +1955,12 @@ namespace Workshop.Web.Controllers
                     var mapping = await _inventoryApiClient.GetItemByIdAsync(item.ItemId);
 
                     accountId = items.Where(a => a.ItemNumber == -5).FirstOrDefault()?.ItemSalesAccountId;
+                    if (accountId == null)
+                    {
+                        throw new InvalidOperationException(lang == "en"
+                            ? "Item account is incomplete in accounting"
+                            : "حساب القطع غير مكتمل في المحاسبة");
+                    }
                     //accountId = accountId == null ? InvoiceType.AccountId : accountId;
                     accountTable = new AccountTable();
                     accountTable = AccountList.Where(x => x.ID == accountId).FirstOrDefault();
@@ -2032,6 +2043,10 @@ namespace Workshop.Web.Controllers
                 var oAccountSalesMaster = await _accountingApiClient.AccountSalesMaster_Insert(oAccountSales);
 
                 return oAccountSalesMaster;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
