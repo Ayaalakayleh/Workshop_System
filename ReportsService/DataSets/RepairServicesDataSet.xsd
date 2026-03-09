@@ -9,14 +9,17 @@
       </DataSource>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="RepairServicesDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_UserDSName="RepairServicesDataSet" msprop:Generator_DataSetName="RepairServicesDataSet">
+  <xs:element name="RepairServicesDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="RepairServicesDataSet" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="RepairServicesDataSet">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="Services" msprop:Generator_RowEvHandlerName="ServicesRowChangeEventHandler" msprop:Generator_RowDeletedName="ServicesRowDeleted" msprop:Generator_RowDeletingName="ServicesRowDeleting" msprop:Generator_RowEvArgName="ServicesRowChangeEvent" msprop:Generator_TablePropName="Services" msprop:Generator_RowChangedName="ServicesRowChanged" msprop:Generator_RowChangingName="ServicesRowChanging" msprop:Generator_TableClassName="ServicesDataTable" msprop:Generator_RowClassName="ServicesRow" msprop:Generator_TableVarName="tableServices" msprop:Generator_UserTableName="Services">
+        <xs:element name="Services" msprop:Generator_RowClassName="ServicesRow" msprop:Generator_RowEvHandlerName="ServicesRowChangeEventHandler" msprop:Generator_RowDeletedName="ServicesRowDeleted" msprop:Generator_RowDeletingName="ServicesRowDeleting" msprop:Generator_RowEvArgName="ServicesRowChangeEvent" msprop:Generator_TablePropName="Services" msprop:Generator_RowChangedName="ServicesRowChanged" msprop:Generator_UserTableName="Services" msprop:Generator_RowChangingName="ServicesRowChanging" msprop:Generator_TableClassName="ServicesDataTable" msprop:Generator_TableVarName="tableServices">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Description" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_UserColumnName="Description" type="xs:string" minOccurs="0" />
-              <xs:element name="StandardHours" msprop:Generator_ColumnPropNameInRow="StandardHours" msprop:Generator_ColumnPropNameInTable="StandardHoursColumn" msprop:Generator_ColumnVarNameInTable="columnStandardHours" msprop:Generator_UserColumnName="StandardHours" type="xs:string" minOccurs="0" />
+              <xs:element name="Description" msprop:Generator_UserColumnName="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" type="xs:string" minOccurs="0" />
+              <xs:element name="StandardHours" msprop:Generator_UserColumnName="StandardHours" msprop:Generator_ColumnPropNameInTable="StandardHoursColumn" msprop:Generator_ColumnPropNameInRow="StandardHours" msprop:Generator_ColumnVarNameInTable="columnStandardHours" type="xs:string" minOccurs="0" />
+              <xs:element name="LongDescription" msprop:Generator_ColumnPropNameInRow="LongDescription" msprop:Generator_ColumnPropNameInTable="LongDescriptionColumn" msprop:Generator_ColumnVarNameInTable="columnLongDescription" msprop:Generator_UserColumnName="LongDescription" type="xs:string" minOccurs="0" />
+              <xs:element name="Code" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_UserColumnName="Code" type="xs:string" minOccurs="0" />
+              <xs:element name="KeyId" msprop:Generator_ColumnPropNameInRow="KeyId" msprop:Generator_ColumnPropNameInTable="KeyIdColumn" msprop:Generator_ColumnVarNameInTable="columnKeyId" msprop:Generator_UserColumnName="KeyId" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

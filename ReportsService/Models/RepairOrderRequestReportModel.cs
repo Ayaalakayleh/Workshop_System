@@ -27,6 +27,7 @@ namespace ReportsService.Models
         public string CustomerMobileNumber { get; set; } = null;
         public string MVPIExpDate { get; set; } = null;
         public string RegistrationExpDate { get; set; } = null;
+        public string RegistrationNo { get; set; } = null;
         public string Complaint { get; set; } = null;
         public string DateIn { get; set; } = null;
         public string TimeIn { get; set; } = null;
@@ -41,6 +42,7 @@ namespace ReportsService.Models
         public List<CreateWIPServiceModel> Services { get; set; } = new List<CreateWIPServiceModel>();
         public List<ItemModel> Items { get; set; } = new List<ItemModel>();
         public byte[] DamageImageBytes { get; set; }
+        public byte[] DamageImageBytes_Vertical { get; set; }
         public string RecallListText { get; set; } = null;
         public string Branch { get; set; } = null;
         public string Note { get; set; } = null;

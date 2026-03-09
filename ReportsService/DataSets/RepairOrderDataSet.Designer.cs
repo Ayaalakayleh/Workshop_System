@@ -345,6 +345,10 @@ namespace ReportsService.DataSets {
             
             private global::System.Data.DataColumn columnNote;
             
+            private global::System.Data.DataColumn columnDamageImage_Vertical;
+            
+            private global::System.Data.DataColumn columnRegistrationNo;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public DataTable1DataTable() {
@@ -644,6 +648,22 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public global::System.Data.DataColumn DamageImage_VerticalColumn {
+                get {
+                    return this.columnDamageImage_Vertical;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public global::System.Data.DataColumn RegistrationNoColumn {
+                get {
+                    return this.columnRegistrationNo;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -712,7 +732,9 @@ namespace ReportsService.DataSets {
                         string ColorName, 
                         byte[] DamageImage, 
                         string RecallListText, 
-                        string Note) {
+                        string Note, 
+                        byte[] DamageImage_Vertical, 
+                        string RegistrationNo) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         AccountNo,
@@ -747,7 +769,9 @@ namespace ReportsService.DataSets {
                         ColorName,
                         DamageImage,
                         RecallListText,
-                        Note};
+                        Note,
+                        DamageImage_Vertical,
+                        RegistrationNo};
                 rowDataTable1Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowDataTable1Row);
                 return rowDataTable1Row;
@@ -803,6 +827,8 @@ namespace ReportsService.DataSets {
                 this.columnDamageImage = base.Columns["DamageImage"];
                 this.columnRecallListText = base.Columns["RecallListText"];
                 this.columnNote = base.Columns["Note"];
+                this.columnDamageImage_Vertical = base.Columns["DamageImage_Vertical"];
+                this.columnRegistrationNo = base.Columns["RegistrationNo"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -874,6 +900,10 @@ namespace ReportsService.DataSets {
                 base.Columns.Add(this.columnRecallListText);
                 this.columnNote = new global::System.Data.DataColumn("Note", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnNote);
+                this.columnDamageImage_Vertical = new global::System.Data.DataColumn("DamageImage_Vertical", typeof(byte[]), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDamageImage_Vertical);
+                this.columnRegistrationNo = new global::System.Data.DataColumn("RegistrationNo", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnRegistrationNo);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1544,6 +1574,38 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public byte[] DamageImage_Vertical {
+                get {
+                    try {
+                        return ((byte[])(this[this.tableDataTable1.DamageImage_VerticalColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'DamageImage_Vertical\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.DamageImage_VerticalColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public string RegistrationNo {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.RegistrationNoColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'RegistrationNo\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.RegistrationNoColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public bool IsAccountNoNull() {
                 return this.IsNull(this.tableDataTable1.AccountNoColumn);
             }
@@ -1936,6 +1998,30 @@ namespace ReportsService.DataSets {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public void SetNoteNull() {
                 this[this.tableDataTable1.NoteColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public bool IsDamageImage_VerticalNull() {
+                return this.IsNull(this.tableDataTable1.DamageImage_VerticalColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public void SetDamageImage_VerticalNull() {
+                this[this.tableDataTable1.DamageImage_VerticalColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public bool IsRegistrationNoNull() {
+                return this.IsNull(this.tableDataTable1.RegistrationNoColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public void SetRegistrationNoNull() {
+                this[this.tableDataTable1.RegistrationNoColumn] = global::System.Convert.DBNull;
             }
         }
         

@@ -48,6 +48,8 @@
               <xs:element name="DamageImage" msprop:Generator_ColumnPropNameInTable="DamageImageColumn" msprop:Generator_ColumnPropNameInRow="DamageImage" msprop:Generator_UserColumnName="DamageImage" msprop:Generator_ColumnVarNameInTable="columnDamageImage" type="xs:base64Binary" minOccurs="0" />
               <xs:element name="RecallListText" msprop:Generator_ColumnPropNameInTable="RecallListTextColumn" msprop:Generator_ColumnPropNameInRow="RecallListText" msprop:Generator_UserColumnName="RecallListText" msprop:Generator_ColumnVarNameInTable="columnRecallListText" type="xs:string" minOccurs="0" />
               <xs:element name="Note" msprop:Generator_ColumnPropNameInTable="NoteColumn" msprop:Generator_ColumnPropNameInRow="Note" msprop:Generator_UserColumnName="Note" msprop:Generator_ColumnVarNameInTable="columnNote" type="xs:string" minOccurs="0" />
+              <xs:element name="DamageImage_Vertical" msprop:Generator_ColumnPropNameInTable="DamageImage_VerticalColumn" msprop:Generator_ColumnPropNameInRow="DamageImage_Vertical" msprop:Generator_UserColumnName="DamageImage_Vertical" msprop:Generator_ColumnVarNameInTable="columnDamageImage_Vertical" type="xs:base64Binary" minOccurs="0" />
+              <xs:element name="RegistrationNo" msprop:Generator_UserColumnName="RegistrationNo" msprop:Generator_ColumnPropNameInTable="RegistrationNoColumn" msprop:Generator_ColumnPropNameInRow="RegistrationNo" msprop:Generator_ColumnVarNameInTable="columnRegistrationNo" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

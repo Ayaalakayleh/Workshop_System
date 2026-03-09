@@ -26,6 +26,7 @@ namespace Workshop.Web.Models
         public string? CustomerMobileNumber { get; set; }
         public string? MVPIExpDate { get; set; }
         public string? RegistrationExpDate { get; set; }
+        public string? RegistrationNo { get; set; }
         public string? Complaint { get; set; }
         public string? DateIn { get; set; }
         public string? TimeIn { get; set; }
@@ -41,6 +42,7 @@ namespace Workshop.Web.Models
         public List<CreateWIPServiceDTO>? Services { get; set; }
         public List<ItemModel>? Items { get; set; }
         public byte[] DamageImageBytes { get; set; }
+        public byte[] DamageImageBytes_Vertical { get; set; }
         public List<ActiveRecallDto> Recalls { get; set; } = new List<ActiveRecallDto>();
         public string RecallListText { get; set; } = null;
         public string Branch { get; set; } = null;

@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -34,6 +35,8 @@ using Workshop.Web.Interfaces.Services;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Workshop.Web.Controllers
 {
@@ -2624,7 +2627,22 @@ namespace Workshop.Web.Controllers
                         movement.DamageImageName);
 
                     if (System.IO.File.Exists(physicalPath))
-                        model.DamageImageBytes = await System.IO.File.ReadAllBytesAsync(physicalPath);
+                    {
+                        var imageBytes = await System.IO.File.ReadAllBytesAsync(physicalPath);
+                        model.DamageImageBytes = imageBytes;
+
+                        using (var inputStream = new MemoryStream(imageBytes))
+                        using (var image = Image.FromStream(inputStream))
+                        {
+                            image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+                            using (var outputStream = new MemoryStream())
+                            {
+                                image.Save(outputStream, ImageFormat.Jpeg);
+                                model.DamageImageBytes_Vertical = outputStream.ToArray();
+                            }
+                        }
+                    }
                 }
 
 
@@ -2671,7 +2689,8 @@ namespace Workshop.Web.Controllers
                 model.CreatedDate = Details.CreatedAt?.ToString("dd-MM-yyyy");
                 var options = await _apiClient.WIP_GetOptionsById(Id);
                 model.RepeatRepair = options.RepeatRepair == true ? "Yes" : "No";
-
+                var RegDoc = await _vehicleApiClient.Documants_GetByVehicleIdAndSystemTypeId(vehicleId, 8);
+                model.RegistrationNo = RegDoc?.Number;
                 if (vehicleInfo.VIN != null)
                 {
 

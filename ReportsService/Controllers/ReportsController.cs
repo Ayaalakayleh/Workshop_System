@@ -66,6 +66,7 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("WIPId", typeof(int));
                 dt.Columns.Add("FuelLevel", typeof(string));
                 dt.Columns.Add("RegistrationExpDate", typeof(string));
+                dt.Columns.Add("RegistrationNo", typeof(string));
                 dt.Columns.Add("CreatedBy", typeof(string));
                 dt.Columns.Add("UserPhoeNo", typeof(string));
                 dt.Columns.Add("CreatedDate", typeof(string));
@@ -76,6 +77,7 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("TimeOut", typeof(string));
                 dt.Columns.Add("MovementId", typeof(int));
                 dt.Columns.Add("DamageImage", typeof(byte[]));
+                dt.Columns.Add("DamageImage_Vertical", typeof(byte[]));
                 dt.Columns.Add("RecallListText", typeof(string));
                 dt.Columns.Add("PlateNumber", typeof(string));
                 dt.Columns.Add("VIN", typeof(string));
@@ -103,6 +105,7 @@ namespace ReportsService.Controllers
                 r["WIPId"] = model.WIPId ?? 0;
                 r["FuelLevel"] = model.FuelLevel ?? "";
                 r["RegistrationExpDate"] = model.RegistrationExpDate ?? "";
+                r["RegistrationNo"] = model.RegistrationNo ?? "";
                 r["CreatedBy"] = model.CreatedBy ?? "";
                 r["UserPhoeNo"] = model.UserPhoeNo ?? "";
                 r["CreatedDate"] = model.CreatedDate ?? "";
@@ -113,6 +116,7 @@ namespace ReportsService.Controllers
                 r["TimeOut"] = model.TimeOut ?? "";
                 r["MovementId"] = model.MovementId ?? 0;
                 r["DamageImage"] = (object)model.DamageImageBytes ?? DBNull.Value;
+                r["DamageImage_Vertical"] = (object)model.DamageImageBytes_Vertical ?? DBNull.Value;
                 r["RecallListText"] = model.RecallListText ?? "";
                 r["PlateNumber"] = model.VehicleInfo.PlateNumber ?? "";
                 r["VIN"] = model.VehicleInfo.VIN ?? "";
@@ -148,13 +152,19 @@ namespace ReportsService.Controllers
 
                 // Vehicle Service Table ==============================
                 var dtService = new DataTable("Services");
+                dtService.Columns.Add("Code", typeof(string));
                 dtService.Columns.Add("Description", typeof(string));
+                dtService.Columns.Add("LongDescription", typeof(string));
+                dtService.Columns.Add("KeyId", typeof(int));
                 dtService.Columns.Add("StandardHours", typeof(decimal));
 
                 foreach (var v in model.Services ?? new List<CreateWIPServiceModel>())
                 {
                     dtService.Rows.Add(
+                        v.Code ?? "",
                         v.Description ?? "",
+                        v.LongDescription ?? "",
+                        v.KeyId,
                         v.StandardHours 
                     );
                 }
@@ -234,8 +244,8 @@ namespace ReportsService.Controllers
                 sub_Service.Database.Tables["Services"].SetDataSource(ds.Tables["Services"]);
 
                 //Items Subreport
-                var sub_Items = rpt.OpenSubreport("SubRepairItemsReport.rpt");
-                sub_Items.Database.Tables["Items"].SetDataSource(ds.Tables["Items"]);
+                //var sub_Items = rpt.OpenSubreport("SubRepairItemsReport.rpt");
+                //sub_Items.Database.Tables["Items"].SetDataSource(ds.Tables["Items"]);
 
                 //Tires Subreport
                 var sub_Tires = rpt.OpenSubreport("SubTiresChecklistReport.rpt");
@@ -287,14 +297,23 @@ namespace ReportsService.Controllers
             }
             catch (Exception ex)
             {
-                string LogDirectory = "C:\\LogFiles";
-                
-                LogDirectory = (LogDirectory + "Log_" + DateTime.Now.ToString("dd_MM_yyyy", new CultureInfo("en-us")) + ".txt");
-                var sLogFormat = DateTime.Now.ToString("dd/MM/yyyy", new CultureInfo("en-us")) + " " + DateTime.Now.ToString("HH:mm:ss", new CultureInfo("en-us")) + " ==> ";
-                StreamWriter sw = new StreamWriter(LogDirectory, true);
-                sw.WriteLine(sLogFormat + ex.Message + "" + ex.StackTrace);
-                sw.Flush();
-                sw.Close();
+                string logDirectory = @"C:\LogFiles";
+                Directory.CreateDirectory(logDirectory);
+
+                string logFile = Path.Combine(
+                    logDirectory,
+                    "Log_" + DateTime.Now.ToString("dd_MM_yyyy", new CultureInfo("en-us")) + ".txt"
+                );
+
+                var sLogFormat =
+                    DateTime.Now.ToString("dd/MM/yyyy", new CultureInfo("en-us")) + " " +
+                    DateTime.Now.ToString("HH:mm:ss", new CultureInfo("en-us")) + " ==> ";
+
+                using (StreamWriter sw = new StreamWriter(logFile, true))
+                {
+                    sw.WriteLine(sLogFormat + ex.Message + " " + ex.StackTrace);
+                }
+
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
                     Content = new StringContent(ex.ToString())
