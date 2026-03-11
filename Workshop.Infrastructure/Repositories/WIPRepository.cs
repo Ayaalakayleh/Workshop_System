@@ -296,6 +296,15 @@ namespace Workshop.Infrastructure.Repositories
             var parameters = new { Id = id };
             return await _database.ExecuteGetAllStoredProcedure<CreateItemDTO>("WIP_GetItemsById", parameters);
         }
+        public async Task<CreateItemDTO> WIP_GetItemByItemId(int WIPId, int ItemId, int KeyId)
+        {
+            var parameters = new {
+                WIPId = WIPId,
+                ItemId = ItemId,
+                KeyId = KeyId
+            };
+            return await _database.ExecuteGetByIdProcedure<CreateItemDTO>("WIP_GetItemByItemId", parameters);
+        }
 
         public async Task<AccountDTO?> WIP_GetAccountById(int id)
         {

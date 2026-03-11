@@ -49,7 +49,7 @@ namespace Workshop.Infrastructure
 
             services.AddScoped<IInsuranceClaimsDataRepository, InsuranceClaimsDataRepository>();
             services.AddScoped<IWipPriceWorkflowRepository, WipPriceWorkflowRepository>();
-
+            
 
             return services;
         }

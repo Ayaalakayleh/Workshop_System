@@ -49,6 +49,7 @@ namespace Workshop.Web.Controllers
         private readonly InventoryApiClient _inventoryApiClient;
         private readonly ERPApiClient _erpApiClient;
         private readonly ReportsServiceApiClient _reportsServiceApiClient;
+        private readonly WorkflowEmailService _workflowEmailService;
         private readonly IFileService _fileService;
         private readonly IFileValidationService _fileValidationService;
         private readonly ILogger<WIPController> _logger;
@@ -63,6 +64,7 @@ namespace Workshop.Web.Controllers
             InventoryApiClient inventoryApiClient,
             ERPApiClient erpApiClient,
             ReportsServiceApiClient repo,
+            WorkflowEmailService workflowEmailService,
             IConfiguration configuration,
             IWebHostEnvironment env,
             IFileService fileService,
@@ -77,6 +79,7 @@ namespace Workshop.Web.Controllers
             _inventoryApiClient = inventoryApiClient;
             _reportsServiceApiClient = repo;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+            _workflowEmailService = workflowEmailService;
             _fileService = fileService;
             _fileValidationService = fileValidationService;
             _erpApiClient = erpApiClient;
@@ -149,8 +152,6 @@ namespace Workshop.Web.Controllers
             try
             {
 
-                
-                //ViewBag.isEmbed = fromSession;
                 var isCompanyCenterialized = 1;
                 WIPDTO dto = new WIPDTO();
                 VehicleMovement movement = new VehicleMovement();
@@ -678,7 +679,7 @@ namespace Workshop.Web.Controllers
                                 });
 
                                 // 4) notifications (optional)
-                                await SendWorkflowEmailAndNotification(masterId, Action: 0, CreatedBy: UserId, wipItemId: line.Id);
+                                //await SendWorkflowEmailAndNotification(masterId, Action: 0, CreatedBy: UserId, wipItemId: line.Id);
                             }
                         }
                     }
@@ -3777,27 +3778,57 @@ namespace Workshop.Web.Controllers
                     return Json(new { success = false, message = "Approve failed" });
 
                 state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
+                if (state == null)
+                    return Json(new { success = false, message = "State not found after approve" });
 
-                var isFinished = state?.IsFinished ?? false;
+                var isFinished = state.IsFinished;
 
                 if (isFinished)
                 {
                     await _apiClient.WipPriceWorkflow_Finish(new FinishWipPriceWorkflowRequest
                     {
-                        WipItemId = dto.WipItemId,  
+                        WipItemId = dto.Id,
                         MasterId = dto.MasterId,
-                        Status = 2,               
+                        Status = 2,
                         Reason = dto.Reason,
                         UserId = UserId
                     });
+                }
+                else
+                {
+                    if ((state.UsersContactInformation == null || state.UsersContactInformation.Count == 0) && state.NextGroupId > 0)
+                    {
+                        var nextUsers = await _erpApiClient.GetUsersByGroupId(state.NextGroupId);
+
+                        state.UsersContactInformation = nextUsers?
+                            .Where(u => u.IsActive)
+                            .Select(u => new UserContactInformation
+                            {
+                                Id = u.UserID,
+                                Email = u.Email,
+                                PhoneNo = u.PhoneNo
+                            })
+                            .ToList() ?? new List<UserContactInformation>();
+                    }
+
+                    await _workflowEmailService.SendAsync(new WorkflowEmailRequest
+                    {
+                        MasterId = dto.MasterId,
+                        CompanyId = CompanyId,
+                        WipId = dto.WIPId,
+                        WipItemId = dto.WipItemId,
+                        KeyId = dto.KeyId,
+                        Action = 1,
+                        Lang = lang,
+                        CreatedBy = UserId
+                    }, state);
                 }
 
                 return Json(new
                 {
                     success = true,
                     isFinished = isFinished,
-
-                    priceWorkflowStatus = isFinished ? 2 : 1, // 2 Approved, 1 Pending
+                    priceWorkflowStatus = isFinished ? 2 : 1,
                     priceWorkflowStatusText = isFinished
                         ? (lang == "en" ? "Approved" : "تم الاعتماد")
                         : (lang == "en" ? "Pending" : "قيد الانتظار")
@@ -3820,18 +3851,24 @@ namespace Workshop.Web.Controllers
 
                 var groupIds = (GroupId?.ToString() ?? "")
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse).ToList();
+                    .Select(int.Parse)
+                    .ToList();
 
                 if (!groupIds.Contains(state.NextGroupId))
                     return Json(new { success = false, message = "No permission" });
 
-                var responseReject = await _erpApiClient.RejectWorkflowInstance(dto.MasterId, CompanyId, UserId, dto.Reason);
+                var responseReject = await _erpApiClient.RejectWorkflowInstance(
+                    dto.MasterId, CompanyId, UserId, dto.Reason
+                );
 
                 if (!responseReject.IsScusses)
                     return Json(new { success = false, message = "Reject failed" });
 
                 state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
-                var isRejected = state?.IsRejected ?? false;
+                if (state == null)
+                    return Json(new { success = false, message = "State not found after reject" });
+
+                var isRejected = state.IsRejected;
 
                 if (isRejected)
                 {
@@ -3844,13 +3881,47 @@ namespace Workshop.Web.Controllers
                         UserId = UserId
                     });
                 }
+                else
+                {
+                    if ((state.UsersContactInformation == null || state.UsersContactInformation.Count == 0) && state.NextGroupId > 0)
+                    {
+                        var nextUsers = await _erpApiClient.GetUsersByGroupId(state.NextGroupId);
+
+                        state.UsersContactInformation = nextUsers?
+                            .Where(u => u.IsActive)
+                            .Select(u => new UserContactInformation
+                            {
+                                Id = u.UserID,
+                                Email = u.Email,
+                                PhoneNo = u.PhoneNo
+                            })
+                            .ToList() ?? new List<UserContactInformation>();
+                    }
+
+                    await _workflowEmailService.SendAsync(
+                        new WorkflowEmailRequest
+                        {
+                            MasterId = dto.MasterId,
+                            CompanyId = CompanyId,
+                            WipId = dto.WIPId,
+                            WipItemId = dto.WipItemId,
+                            KeyId = dto.KeyId,
+                            Action = 2,
+                            Lang = lang,
+                            CreatedBy = UserId
+                        },
+                        state
+                    );
+                }
 
                 return Json(new
                 {
                     success = true,
                     isRejected = isRejected,
-                    priceWorkflowStatus = 3,
-                    priceWorkflowStatusText = (lang == "en" ? "Rejected" : "مرفوض")
+                    priceWorkflowStatus = isRejected ? 3 : 1,
+                    priceWorkflowStatusText = isRejected
+                        ? (lang == "en" ? "Rejected" : "مرفوض")
+                        : (lang == "en" ? "Pending" : "قيد الانتظار")
                 });
             }
             catch (Exception ex)
@@ -3873,202 +3944,6 @@ namespace Workshop.Web.Controllers
             {
                 return Json(data);
 
-            }
-        }
-        public async Task<TempData> SendWorkflowEmailAndNotification(Guid? MasterId,int Action = 0, int CreatedBy = 0, int wipItemId = 0)
-        {
-            var resultJson = new TempData
-            {
-                Notification = new List<Notification>()
-            };
-
-            try
-            {
-                if (MasterId is null || MasterId == Guid.Empty)
-                    return resultJson;
-
-                var state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(MasterId.Value, CompanyId);
-                if (state == null)
-                    return resultJson;
-
-
-                WipPriceWorkflowItem ctx = new WipPriceWorkflowItem();
-                //WipPriceWorkflowItem ctx = await _apiClient.WIP_GetItemsById(wipItemId);
-
-                ctx ??= new WipPriceWorkflowItem
-                {
-                    WipItemId = wipItemId,
-                    MasterId = MasterId
-                };
-
-                // ItemName/Code،   Inventory ItemId
-                if (ctx.ItemId.HasValue && (string.IsNullOrWhiteSpace(ctx.ItemName) || string.IsNullOrWhiteSpace(ctx.ItemCode)))
-                {
-                    try
-                    {
-                        var item = await _inventoryApiClient.GetItemByIdAsync(ctx.ItemId.Value);
-                        if (item != null)
-                        {
-                            ctx.ItemCode ??= item.Code;
-                            ctx.ItemName ??= (lang == "en" ? item.PrimaryName : item.SecondaryName);
-                        }
-                    }
-                    catch
-                    {
-                       
-                    }
-                }
-
-                // 3)  Action text
-                string subject;
-                string primaryTitle;
-                string secondaryTitle;
-
-                //  Action  (1 approve / 2 reject / 3 review / default new)
-                switch (Action)
-                {
-                    case 1:
-                        primaryTitle = "Price approval step completed — next action required.";
-                        secondaryTitle = "تمت خطوة اعتماد السعر — يوجد إجراء مطلوب للمرحلة التالية.";
-                        break;
-
-                    case 2:
-                        primaryTitle = "Price approval rejected — action required.";
-                        secondaryTitle = "تم رفض اعتماد السعر — يرجى اتخاذ إجراء.";
-                        break;
-
-                    case 3:
-                        primaryTitle = "Price approval reviewed — action required.";
-                        secondaryTitle = "تمت مراجعة اعتماد السعر — يرجى اتخاذ إجراء.";
-                        break;
-
-                    default:
-                        primaryTitle = "New price approval request — action required.";
-                        secondaryTitle = "طلب اعتماد سعر جديد — يرجى اتخاذ إجراء.";
-                        break;
-                }
-
-                // Title
-                var partLabelEn = $"{ctx.ItemCode ?? ("Item#" + (ctx.ItemId?.ToString() ?? ""))} {ctx.ItemName}".Trim();
-                var partLabelAr = $"{ctx.ItemCode ?? ("قطعة#" + (ctx.ItemId?.ToString() ?? ""))} {ctx.ItemName}".Trim();
-
-                // Subject
-                subject = $"Price Approval - WIP {(ctx.WipId > 0 ? ctx.WipId.ToString() : "-")} - Line #{ctx.WipItemId}";
-
-                // 4) Link  WIP 
-                string? baseLink = null;
-                if (ctx.WipId > 0)
-                {
-                    baseLink = Url.Action("Edit", "WIP", new { id = ctx.WipId }, Request.Scheme);
-                }
-                var link = string.IsNullOrWhiteSpace(baseLink)
-                    ? ""
-                    : $"{baseLink}#item-{ctx.WipItemId}";
-
-                // 5)  (HTML) + SMS (Plain text)
-                var qtyText = ctx.Quantity.HasValue ? ctx.Quantity.Value.ToString("0.##") : "-";
-                var priceText = ctx.SalePrice.HasValue ? ctx.SalePrice.Value.ToString("0.##") : "-";
-
-                var bodyHtml = $@"
-                        <div style='font-family:Arial; font-size:14px'>
-                          <h3>{primaryTitle}</h3>
-                          <h3 style='text-align:right'>{secondaryTitle}</h3>
-
-                          <hr />
-
-                          <p><b>WIP:</b> {(ctx.WipId > 0 ? ctx.WipId.ToString() : "-")}</p>
-                          <p><b>WIP Item Line:</b> {ctx.WipItemId}</p>
-                          <p><b>Part:</b> {System.Net.WebUtility.HtmlEncode(partLabelEn)}</p>
-                          <p style='text-align:right'><b>القطعة:</b> {System.Net.WebUtility.HtmlEncode(partLabelAr)}</p>
-
-                          <p><b>Qty:</b> {qtyText} &nbsp; | &nbsp; <b>Price:</b> {priceText}</p>
-                          <p style='text-align:right'><b>الكمية:</b> {qtyText} &nbsp; | &nbsp; <b>السعر:</b> {priceText}</p>
-
-                          <p><b>Workflow MasterId:</b> {MasterId}</p>
-
-                          {(string.IsNullOrWhiteSpace(link) ? "" : $"<p><a href='{link}'>Open WIP / فتح أمر العمل</a></p>")}
-                        </div>";
-
-                // SMS
-                var smsText = $"Price approval: WIP {(ctx.WipId > 0 ? ctx.WipId.ToString() : "-")}, Line {ctx.WipItemId}, Part: {partLabelEn}, Qty: {qtyText}, Price: {priceText}";
-
-                // NotificationType (1 SMS, 2 Email, 3 Both)
-                //foreach (var u in state.UsersContactInformation ?? new List<dynamic>())
-                //{
-                    // SMS
-                    //if ((state.NotificationType == 1 || state.NotificationType == 3) && !string.IsNullOrWhiteSpace(u.PhoneNo))
-                    //{
-                    //    try
-                    //    {
-                    //        var phone = NormalizeKsaPhone(u.PhoneNo);
-                    //        if (!string.IsNullOrWhiteSpace(phone))
-                    //            await _msegat.SendSmsAsync(phone, smsText);
-                    //    }
-                    //    catch
-                    //    {
-                           
-                    //    }
-                    //}
-
-                    // Email
-                    //if ((state.NotificationType == 2 || state.NotificationType == 3) && !string.IsNullOrWhiteSpace(u.Email))
-                    //{
-                    //    try
-                    //    {
-                    //        var mail = new Mail
-                    //        {
-                    //            To = u.Email,
-                    //            Subject = subject,
-                    //            Body = bodyHtml
-                    //        };
-                    //        // SendEmail(mail, lang);
-                    //    }
-                    //    catch
-                    //    {
-                           
-                    //    }
-                    //}
-
-                    // Notification 
-                    /*
-                    try
-                    {
-                        var notif = new Notification
-                        {
-                            Type = 4,
-                            RelatedItemId = ctx.WipId > 0 ? ctx.WipId : ctx.WipItemId, // حسب ما بدك تربطها
-                            CreatedBy = CreatedBy,
-                            PrimaryMessage = primaryTitle + $" (WIP {ctx.WipId}, Line {ctx.WipItemId})",
-                            SecondaryMessage = secondaryTitle + $" (أمر عمل {ctx.WipId}، بند {ctx.WipItemId})",
-                            UserId = u.Id,
-                            ModuleId = 1,
-                            Link = link,
-                            PrimaryType = "Price Approval",
-                            SecondaryType = "اعتماد سعر"
-                        };
-
-                        var inserted = await _erpApiClient.Notification_Insert(notif);
-                        // CurrentModuleHubConnection(inserted);
-                    }
-                    catch { }
-                    */
-                //}
-
-                return resultJson;
-            }
-            catch
-            {
-                return resultJson;
-            }
-
-            static string NormalizeKsaPhone(string raw)
-            {
-                if (string.IsNullOrWhiteSpace(raw)) return "";
-                var phone = raw.Trim().Replace(" ", "").Replace("-", "");
-                if (phone.StartsWith("+")) phone = phone.Substring(1);
-                if (phone.StartsWith("0")) phone = phone.Substring(1);
-                if (!phone.StartsWith("966")) phone = "966" + phone;
-                return phone;
             }
         }
       

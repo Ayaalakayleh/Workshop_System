@@ -602,5 +602,13 @@ namespace Workshop.API.Controllers
             if(result == null) return Ok(new { IsSuccess = false });
             return Ok(result);
         }
+
+        [HttpGet("WIP_GetItemRow")]
+        public async Task<IActionResult> WIP_GetItemByItemId([FromQuery] int WIPId, int ItemId, int KeyId)
+        {
+            var result = await _service.WIP_GetItemByItemId(WIPId, ItemId, KeyId);
+            if(result == null) return Ok(new { IsSuccess = false });
+            return Ok(result);
+        }
     }
 }

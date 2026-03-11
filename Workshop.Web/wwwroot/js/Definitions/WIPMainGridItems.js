@@ -2267,9 +2267,12 @@ function priceWfApprove(row) {
         dataType: "json",
         data: JSON.stringify({
             MasterId: row.PriceWorkflowMasterId,
-            WipItemId: row.Id,
+            WipItemId: row.ItemId,
+            Id: row.Id,
             ActionId: 1,
-            Reason: ""
+            Reason: "",
+            WIPId: row.WIPId,
+            KeyId: row.KeyId
         })
     }).done(function (res) {
 
@@ -2322,9 +2325,12 @@ function priceWfReject(row) {
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 data: JSON.stringify({
-                    MasterId: row.PriceWorkflowMasterId, 
-                    WipItemId: row.Id,
-                    Reason: reason
+                    MasterId: row.PriceWorkflowMasterId,
+                    WipItemId: row.ItemId,
+                    Id: row.Id,
+                    Reason: reason,
+                    WIPId: row.WIPId,
+                    KeyId: row.KeyId
                 })
             }).done(function (res) {
 

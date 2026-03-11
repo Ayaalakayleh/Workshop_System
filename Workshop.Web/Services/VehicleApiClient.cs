@@ -306,6 +306,11 @@ namespace Workshop.Web.Services
             string url = $"/Reservation/GetRentalDetails?ReservationId={ReservationId}&language={language}";
             return await SendRequest<Reservation>(url, HttpMethod.Get);
         }
+        public async Task<EmailTemplate> GetEmailTemplate(int id)
+        {
+            string url = $"/EmailTemplate/GetEmailTemplate?id={id}";
+            return await SendRequest<EmailTemplate>(url, HttpMethod.Get);
+        }
 
 
     }

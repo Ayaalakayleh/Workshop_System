@@ -2073,6 +2073,11 @@ namespace Workshop.Web.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<CreateItemDTO>>($"api/WIP/GetWIPItems?Id={id}&lang={lang}");
 
         }
+        public async Task<CreateItemDTO> WIP_GetItemsById(int WIPId, int ItemId, int KeyId)
+        {
+            return await _httpClient.GetFromJsonAsync<CreateItemDTO>($"api/WIP/WIP_GetItemRow?WIPId={WIPId}&ItemId={ItemId}&KeyId={KeyId}");
+
+        }
 
         public async Task<IEnumerable<CreateWIPServiceDTO?>> WIP_GetServicesById(int id, string lang="en")
         {

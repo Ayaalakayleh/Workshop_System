@@ -71,5 +71,6 @@ namespace Workshop.Core.Interfaces.IServices
         Task<bool> WIP_IsClosed(int WIPId);
         Task<bool> WIP_ToggleReturnParts(int WIPId, bool Toggle);
         Task<bool> WIP_CheckRowExists(int KeyId, int WIPId);
+        Task<CreateItemDTO> WIP_GetItemByItemId(int WIPId, int ItemId, int KeyId);
     }
 }

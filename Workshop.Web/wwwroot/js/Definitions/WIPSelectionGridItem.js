@@ -46,11 +46,7 @@ function initializeItemSelectionGrid() {
                 data: []
             }
         },
-        remoteOperations: {
-            filtering: true,
-            sorting: true,
-            paging: true
-        },
+        remoteOperations: false,
         columns: [
             { dataField: "id", caption: theMainLang == "en" ? "ID" : "الرقم", visible: false },
             { dataField: "code", caption: theMainLang == "en" ? "Code" : "الرمز", allowEditing: false },
@@ -58,14 +54,14 @@ function initializeItemSelectionGrid() {
                 dataField: "Name",
                 caption: theMainLang == "en" ? "Name" : "الاسم",
                 allowEditing: false,
-                calculateDisplayValue: function (rowData) {
+                calculateCellValue: function (rowData) {
                     return lang === "en" ? rowData?.primaryName : rowData?.secondaryName;
                 }
             },
             { dataField: "primaryName", caption: theMainLang == "en" ? "Primary Name" : "الاسم الأساسي", visible: false },
             { dataField: "secondaryName", caption: theMainLang == "en" ? "Secondary Name" : "الاسم الثانوي", visible: false },
 
-            { dataField: "availableQty", caption: theMainLang == "en" ? "Available Qty" : "الكمية المتاحة", allowEditing: false, visible: true },
+            { dataField: "availableQty", caption: theMainLang == "en" ? "Available Qty" : "الكمية المتاحة", allowEditing: false, visible: true, width: 90 },
 
             { dataField: "warehouseId", caption: theMainLang == "en" ? "Warehouse ID" : "رقم المستودع", allowEditing: false, visible: false },
             { dataField: "warehouse", caption: theMainLang == "en" ? "Warehouse" : "المستودع", allowEditing: false, visible: true },
@@ -78,7 +74,7 @@ function initializeItemSelectionGrid() {
                 dataField: "CategoryName",
                 caption: theMainLang == "en" ? "Category Name" : "اسم الفئة",
                 allowEditing: false,
-                calculateDisplayValue: function (rowData) {
+                calculateCellValue: function (rowData) {
                     return lang === "en" ? rowData?.categoryPrimaryName : rowData?.categorySecondaryName;
                 }
             },
@@ -89,7 +85,7 @@ function initializeItemSelectionGrid() {
                 dataField: "SubCategoryName",
                 caption: theMainLang == "en" ? "Sub Category" : "الفئة الفرعية",
                 allowEditing: false,
-                calculateDisplayValue: function (rowData) {
+                calculateCellValue: function (rowData) {
                     return lang === "en" ? rowData?.subCategoryPrimaryName : rowData?.subCategorySecondaryName;
                 }
             },
@@ -101,14 +97,14 @@ function initializeItemSelectionGrid() {
                 dataField: "UnitName",
                 caption: theMainLang == "en" ? "Unit" : "الوحدة",
                 allowEditing: false,
-                calculateDisplayValue: function (rowData) {
+                calculateCellValue: function (rowData) {
                     return lang === "en" ? rowData?.unitPrimaryName : rowData?.unitSecondaryName;
                 }
             },
             { dataField: "unitPrimaryName", caption: theMainLang == "en" ? "Unit Primary Name" : "الاسم الأساسي للوحدة", visible: false },
             { dataField: "unitSecondaryName", caption: theMainLang == "en" ? "Unit Secondary Name" : "الاسم الثانوي للوحدة", visible: false },
 
-            { dataField: "avgCost", caption: theMainLang == "en" ? "Avg Cost" : "معدل السعر", dataType: "number", allowEditing: false, visible: true },
+            { dataField: "avgCost", caption: theMainLang == "en" ? "Avg Cost" : "معدل السعر", dataType: "number", allowEditing: false, visible: true, width: 70, },
             { dataField: "price", caption: theMainLang == "en" ? "Price" : "السعر", dataType: "number", allowEditing: false, visible: false },
             { dataField: "costPrice", caption: theMainLang == "en" ? "Cost" : "التكلفة", dataType: "number", allowEditing: false, visible: false },
             { dataField: "salePrice", caption: theMainLang == "en" ? "Sale Price" : "سعر البيع", dataType: "number", allowEditing: false, visible: false },
@@ -189,6 +185,30 @@ function initializeItemSelectionGrid() {
                         }
 
                     },
+                    {
+                        hint: theMainLang == "en" ? "Create Material Request" : "إنشاء طلب شراء داخلي",
+                        icon: "cart",
+                        type: "default",
+                        stylingMode: "contained",
+                        visible: function (e) {
+                            return Number(e.row?.data?.availableQty || 0) === 0;
+                        },
+                        onClick: function (e) {
+                            const row = e.row.data;
+
+                            const itemId = row.id;
+                            const wipId = parseInt($("#Id").val() || "0");
+                            const qty = 1;
+
+                            const url = window.RazorVars.internalPurchaseRequestEditUrl
+                                + "?FromWhere=1"
+                                + "&itemId=" + encodeURIComponent(itemId)
+                                + "&wipId=" + encodeURIComponent(wipId)
+                                + "&qty=" + encodeURIComponent(qty);
+
+                            window.location.href = url;
+                        }
+                    }
                 ]
             }
         ],

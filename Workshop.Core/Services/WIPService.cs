@@ -325,6 +325,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.WIP_CheckRowExists(KeyId, WIPId);
         }
+        public async Task<CreateItemDTO> WIP_GetItemByItemId(int WIPId, int ItemId, int KeyId)
+        {
+            return await _repository.WIP_GetItemByItemId(WIPId, ItemId, KeyId);
+        }
 
     }
 }

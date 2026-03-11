@@ -42,6 +42,9 @@ builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IFileValidationService, FileValidationService>();
 
+builder.Services.AddScoped<WorkflowEmailService>();
+builder.Services.AddScoped<EmailSender>();
+
 // Add Resource Services
 builder.Services.AddResourceServices();
 builder.Services.AddMemoryCache();

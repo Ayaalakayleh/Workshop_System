@@ -14,16 +14,22 @@
 
     public class ApproveDto
     {
+        public int Id { get; set; }
         public Guid MasterId { get; set; }
         public int WipItemId { get; set; }
+        public int WIPId { get; set; }
+        public int KeyId { get; set; }
         public int ActionId { get; set; }
         public string Reason { get; set; }
     }
 
     public class RejectDto
     {
+        public int Id { get; set; }
         public Guid MasterId { get; set; }
         public int WipItemId { get; set; }
         public string Reason { get; set; }
+        public int WIPId { get; set; }
+        public int KeyId { get; set; }
     }
 }

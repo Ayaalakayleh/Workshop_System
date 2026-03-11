@@ -267,6 +267,12 @@ namespace Workshop.Web.Services
 
         }
 
+        public async Task<List<User>> GetUsersByGroupId(int GroupId)
+        {
+            string url = $"/Users/GetUsersByGroupId?GroupId={GroupId}";
+            return await SendRequest<List<User>>(url, HttpMethod.Get);
+        }
+
         #region Workflow
         public async Task<StateResponse> GetWorkflowStateByMasterIdAndCompanyId(Guid? MasterId, int CompanyId)
         {
