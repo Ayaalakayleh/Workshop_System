@@ -33,10 +33,10 @@ function updateRowInGrid(row) {
     const store = grid.getDataSource().store();
 
     return store.update(row.KeyId, row).then(() => {
-        const idx = grid.getRowIndexByKey(row.KeyId);
-        if (idx >= 0) grid.repaintRows([idx]);
-        safeUpdateFieldsFromGrid();
-    });
+            const idx = grid.getRowIndexByKey(row.KeyId);
+            if (idx >= 0) grid.repaintRows([idx]);
+            safeUpdateFieldsFromGrid();
+        });
 }
 
 function getEffectiveQty(d) {
@@ -892,8 +892,7 @@ $(function () {
                             return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
                                 (Permission_Issue && (
                                     AllowActions &&
-                                    parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
-                                    parseInt(e.row.data.Status) !== 37 &&
+                                    parseInt(e.row.data.Status) === 42 &&
                                     OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                                 ));
                         },
@@ -1563,26 +1562,24 @@ function TransferParts() {
     });
 }
 function saveData() {
-    // RTS - Services
     var Services_grid = $('#mainRTSGrid').dxDataGrid('instance');
     var Services_Items = Services_grid.getDataSource().items();
 
     var ServicesJson = JSON.stringify(Services_Items);
     $("#Services").val(ServicesJson);
 
-    // Items
     var grid = $('#mainItemsGrid').dxDataGrid('instance');
-    //var gridItems = grid.getDataSource().items();
     var gridItems = grid.getDataSource().items().map(x => ({
         ...x,
         requiresPriceApproval: !!x.requiresPriceApproval,
         RequiresPriceApproval: !!x.requiresPriceApproval
     }));
+
     var itemsJson = JSON.stringify(gridItems);
     $("#Items").val(itemsJson);
 
     var WIPId = $('#Id').val();
-    var WsId = 10;//$("#FK_WarehouseId").val();
+    var WsId = 10;
     var VehId = $('#_vehicleId').val();
     var MovId = $('#_movementId').val();
     var accountType = $("#AccountType").val();
@@ -1612,12 +1609,6 @@ function saveData() {
     var optReturnParts = $("#optReturnParts").is(":checked");
     var optRepeatRepair = $("#optRepeatRepair").is(":checked");
     var optUpdateDemand = $("#optUpdateDemand").is(":checked");
-    var inv_AccountType = $("#invAccountType").val();
-    var inv_InvoiceNo = $("#InvoiceNo").val();
-    var inv_Date = $("#invDate").val();
-    var inv_Total = $("#invTotal").val();
-    var inv_Tax = $("#invTax").val();
-    var inv_Net = $("#invNet").val();
 
     var accountDetails = {
         WIPId: WIPId ?? 0,
@@ -1634,16 +1625,6 @@ function saveData() {
         PartialTermsId: partialTerms,
         PartialVat: partialVat
     };
-
-    //var invoiceDetails = {
-    //    WIPId: WIPId ?? 0,
-    //    AccountType: inv_AccountType,
-    //    InvoiceNo: inv_InvoiceNo,
-    //    InvoiceDate: inv_Date,
-    //    Total: inv_Total,
-    //    Tax: inv_Tax,
-    //    Net: inv_Net
-    //};
 
     var vehicleTab = {
         WIPId: WIPId,
@@ -1688,29 +1669,12 @@ function saveData() {
         Options: optionsTab
     };
 
- 
-    $.ajax({
+    return $.ajax({
         type: 'POST',
         url: window.URLs.editPostUrl,
         dataType: 'json',
         data: model
-    }).done(function (result) {
-        //console.log("Edit_Post result:", result);
-
-        //if (result && result.success && result.wipId) {
-        //    Swal.fire("Success", "WIP " + WIPId + " Saved Successfully!").then(() => {
-        //        window.location.href = window.URLs.editGetUrl + '?id=' + result.wipId + '&movementId=' + MovId;
-        //    });
-        //} else {
-        //    Swal.fire({
-        //        icon: "error",
-        //        title: "Save Failed",
-        //        text: result && result.errorMessage ? result.errorMessage : "Unknown error occurred"
-        //    });
-        //}
-
     });
-
 }
 function CreateIssueVoucher(row) {
     var valselect = "";
@@ -1912,27 +1876,62 @@ function handleFailure(data, isConflict) {
     });
 }
 function UndoIssueVoucher(row) {
-    $.ajax({
-        type: 'GET',
+    const grid = $("#mainItemsGrid").dxDataGrid("instance");
+    const wipId = Number($("#Id").val() || 0);
+
+    if (!(Number(row?.PartsIssueId || 0) > 0)) {
+        Swal.fire({
+            icon: "warning",
+            title: theMainLang == "en" ? "Issue required first" : "يجب تنفيذ الصرف أولاً",
+            text: theMainLang == "en"
+                ? "You cannot undo before creating the issue voucher."
+                : "لا يمكنك تنفيذ التراجع قبل إنشاء سند الصرف."
+        });
+        return $.Deferred().reject("missing PartsIssueId").promise();
+    }
+
+    return $.ajax({
+        type: 'POST',
         url: window.RazorVars.undoIssueVoucherUrl,
         dataType: 'json',
         data: {
             PartsIssueId: row.PartsIssueId,
-            WIPId: row.WIPId
-        },
-        success: function (res) {
-            if (res.success) {
-                Swal.fire({
-                    icon: "success",
-                    title: theMainLang == "en" ? 'Success' : "تمت العملية بنجاح"
-                }).then(() => $("#mainItemsGrid").dxDataGrid("instance")?.repaint());
-            } else {
-                Swal.fire(theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما", "", "error");
-            }
-        },
-        error: function (err) {
-            console.error("Error:", err);
+            WIPId: wipId,
+            Id: row.Id
         }
+    }).done(function (res) {
+        if (!res || !res.success) {
+            Swal.fire({
+                icon: "error",
+                title: (res && (res.message || res.errorMessage))
+                    ? (res.message || res.errorMessage)
+                    : (theMainLang == "en" ? "Error Happened" : "حصل خطأ ما")
+            });
+            return;
+        }
+
+        row.PartsIssueId = null;
+        row.Status = 36;
+        row.StatusText = statusTextById(36, true);
+
+        updateRowInGrid(row).then(function () {
+            grid.refresh();
+
+            Swal.fire({
+                icon: "success",
+                title: theMainLang == "en" ? "Undo completed" : "تم إلغاء الصرف بنجاح"
+            }).then(() => {
+                location.reload();
+            });
+        });
+    }).fail(function (xhr, status, error) {
+        console.error("Undo failed:", status, error, xhr?.responseText);
+
+        Swal.fire({
+            icon: "error",
+            title: theMainLang == "en" ? "Error Happened" : "حصل خطأ ما",
+            text: xhr?.responseJSON?.message || xhr?.responseText || error || status || ""
+        });
     });
 }
 

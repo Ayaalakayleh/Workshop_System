@@ -2298,34 +2298,110 @@ namespace Workshop.Web.Controllers
         }
 
 
-        public async Task<JsonResult> UndoIssueVoucher(int PartsIssueId, int WIPId)
+        [HttpPost]
+        public async Task<JsonResult> UndoIssueVoucher(int PartsIssueId, int WIPId, int Id)
         {
-            var responseString = await _inventoryApiClient.GetAllGRNByIdHead(PartsIssueId);
-            var response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
-              responseString,
-              new JsonSerializerOptions
-              {
-                  PropertyNameCaseInsensitive = true
-              });
-
-            var TransTypeNo = Convert.ToInt32(response.FinancialTransactionTypeNo);
-            var MasterId = (int)response.Fk_FinancialTransactionMasterId;
-
-            var rev = await _accountingApiClient.ReverseTransactionAsync(MasterId, TransTypeNo, CompanyId, BranchId, UserId);
-            var deleteDTO = new DeleteInventoryTransactionDTO
+            try
             {
-                ID = PartsIssueId,
-                ModifiedBy = 1,
-                FK_FinancialTransactionReverseId = rev.ID
-            };
+                if (PartsIssueId <= 0)
+                {
+                    return Json(new { success = false, message = lang == "en" ? "You must issue the item first.": "يجب تنفيذ الصرف أولاً."});
+                }
 
-            var deleteResult = await _inventoryApiClient.InventoryTransactionDelete(deleteDTO);
+                var responseString = await _inventoryApiClient.GetAllGRNByIdHead(PartsIssueId);
 
-            if (deleteResult == 0)
-            {
-                var isDelete = await _apiClient.WIP_DeleteItems(WIPId, PartsIssueId);
+                if (string.IsNullOrWhiteSpace(responseString))
+                {
+                    return Json(new{  success = false,message = lang == "en"? "Issue voucher not found or already undone.": "سند الصرف غير موجود أو تم التراجع عنه مسبقًا."});    
+                }
+
+                InventoryTransactionByIdDTO? response;
+                try
+                {
+                    response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
+                        responseString,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                }
+                catch
+                {
+                    return Json(new
+                    {
+                        success = false, message = lang == "en" ? "Invalid issue voucher data." : "بيانات سند الصرف غير صالحة."
+                    });
+                }
+
+                if (response == null)
+                {
+                    return Json(new
+                    {
+                        success = false, message = lang == "en"  ? "Issue voucher not found." : "سند الصرف غير موجود."
+                           
+                    });
+                }
+
+                if (response.Fk_FinancialTransactionMasterId == null || response.FinancialTransactionTypeNo == null)
+                {
+                    return Json(new {success = false,message = lang == "en"? "Issue voucher financial data is missing." : "البيانات المالية لسند الصرف غير مكتملة."});
+                }
+
+                var transTypeNo = Convert.ToInt32(response.FinancialTransactionTypeNo);
+                var masterId = (int)response.Fk_FinancialTransactionMasterId;
+
+                var rev = await _accountingApiClient.ReverseTransactionAsync(masterId, transTypeNo, CompanyId, BranchId, UserId);
+
+                if (rev == null || rev.ID <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false, message = lang == "en" ? "Failed to reverse accounting transaction." : "فشل عكس القيد المحاسبي."
+                    });
+                }
+
+                var deleteDTO = new DeleteInventoryTransactionDTO
+                {
+                    ID = PartsIssueId,
+                    ModifiedBy = UserId,
+                    FK_FinancialTransactionReverseId = rev.ID
+                };
+
+                var deleteResult = await _inventoryApiClient.InventoryTransactionDelete(deleteDTO);
+                if (deleteResult == 0)
+                {
+                    await _apiClient.UpdateIssueIdToWIP(new UpdateIssueIdDTO
+                    {
+                        IssueId = 0,
+                        WIPId = WIPId,
+                        Id = Id
+                    });
+
+                    await _apiClient.UpdatePartStatusForSingleItem(new UpdateSinglePartStatusDTO
+                    {
+                        WIPId = WIPId,
+                        Id = Id,
+                        StatusId = 36
+                    });
+                }
+                if (deleteResult != 0)
+                {
+                    return Json(new
+                    {
+                        success = false, message = lang == "en" ? "Failed to undo issue voucher." : "فشل التراجع عن سند الصرف."
+                    });
+                }
+
+                return Json(new { success = true });
             }
-            return Json(new { success = true, data = deleteResult });
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.InnerException?.Message ?? ex.Message
+                });
+            }
         }
         public async Task<JsonResult> UpdatePartStatusForSingleItem([FromBody] UpdateSinglePartStatusDTO dto)
         {
