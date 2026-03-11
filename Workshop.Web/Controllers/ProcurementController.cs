@@ -25,6 +25,35 @@ namespace Workshop.Web.Controllers
             return View();
         }
 
+        [CustomAuthorize(Permissions.Procurement.InternalPurchaseRequest)]
+        public ActionResult InternalPurchaseRequestEdit(int? Id = null, int? FromWhere = null, int? itemId = null, int? wipId = null, decimal? qty = null)
+        {
+            ViewBag.HostName = _configuration["ApiSettings:SalesAndProcurementUrl"];
+
+            var query = new List<string>();
+
+            if (Id.HasValue)
+                query.Add($"Id={Id.Value}");
+
+            if (FromWhere.HasValue)
+                query.Add($"FromWhere={FromWhere.Value}");
+
+            if (itemId.HasValue)
+                query.Add($"itemId={itemId.Value}");
+
+            if (wipId.HasValue)
+                query.Add($"wipId={wipId.Value}");
+
+            if (qty.HasValue)
+                query.Add($"qty={qty.Value}");
+
+            var queryString = query.Any() ? "?" + string.Join("&", query) : "";
+
+            ViewBag.TargetUrl = $"{ViewBag.HostName}/InternalPurchaseRequest/Edit{queryString}";
+
+            return View();
+        }
+
         [CustomAuthorize(Permissions.Procurement.PurchaseOrder)]
         public ActionResult PurchaseOrder()
         {
