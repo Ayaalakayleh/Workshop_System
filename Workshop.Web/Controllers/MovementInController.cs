@@ -190,13 +190,13 @@ namespace Workshop.Web.Controllers
                 if (!string.IsNullOrEmpty(driverSignatureBase64))
                 {
                     var (filePath, fileName) = await _fileService.SaveBase64FileAsync(driverSignatureBase64, "MovementSignatures");
-                    movement.DriverSignature = fileName;
+                    movement.DriverSignature = Path.Combine(filePath, fileName).Replace("\\", "/");
                 }
 
                 if (!string.IsNullOrEmpty(employeeSignatureBase64))
                 {
                     var (filePath, fileName) = await _fileService.SaveBase64FileAsync(employeeSignatureBase64, "MovementSignatures");
-                    movement.EmployeeSignature = fileName;
+                    movement.EmployeeSignature = Path.Combine(filePath, fileName).Replace("\\", "/");
                 }
 
                 movement.CreatedBy = UserId;
@@ -613,56 +613,6 @@ namespace Workshop.Web.Controllers
             return subStatuses;
         }
         #endregion
-
-        [HttpPost]
-        public async Task<IActionResult> UploadWipDamageImage([FromForm] string img, [FromForm] int wipId)
-        {
-            if (wipId <= 0 || string.IsNullOrWhiteSpace(img))
-                return Json(new { isSuccess = false, message = "Invalid data" });
-
-            var base64 = img
-                .Replace("data:image/png;base64,", "")
-                .Replace("data:image/jpeg;base64,", "")
-                .Replace("data:image/jpg;base64,", "");
-
-            byte[] bytes;
-            try
-            {
-                bytes = Convert.FromBase64String(base64);
-            }
-            catch
-            {
-                return Json(new { isSuccess = false, message = "Invalid base64" });
-            }
-
-            var relativeRoot = base._configuration["FileUpload:DirectoryPath"] ?? "Uploads";
-
-            var folderPath = Path.Combine(base._env.WebRootPath, relativeRoot, "WipDamageImages", wipId.ToString());
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            var fileName = "VehicleDamages.png";
-
-            // var fileName = $"VehicleDamages_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-
-            var fullPath = Path.Combine(folderPath, fileName);
-
-            _logger.LogInformation("WebRootPath: {wr}", base._env.WebRootPath);
-            _logger.LogInformation("FolderPath: {fp}", folderPath);
-            _logger.LogInformation("FullPath: {p}", fullPath);
-
-            await System.IO.File.WriteAllBytesAsync(fullPath, bytes);
-
-            var filePath = Path.Combine("WipDamageImages", wipId.ToString()).Replace("\\", "/");
-
-            return Json(new
-            {
-                isSuccess = true,
-                filePath = filePath,  
-                fileName = fileName,  
-                publicUrl = "/" + Path.Combine(relativeRoot, filePath, fileName).Replace("\\", "/")
-            });
-        }
 
 
     }

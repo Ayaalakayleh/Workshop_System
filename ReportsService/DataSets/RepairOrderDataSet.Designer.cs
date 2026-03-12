@@ -349,6 +349,12 @@ namespace ReportsService.DataSets {
             
             private global::System.Data.DataColumn columnRegistrationNo;
             
+            private global::System.Data.DataColumn columnDriverSignatureBytes;
+            
+            private global::System.Data.DataColumn columnEmployeeSignatureBytes;
+            
+            private global::System.Data.DataColumn columnDriverName;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public DataTable1DataTable() {
@@ -664,6 +670,30 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public global::System.Data.DataColumn DriverSignatureBytesColumn {
+                get {
+                    return this.columnDriverSignatureBytes;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public global::System.Data.DataColumn EmployeeSignatureBytesColumn {
+                get {
+                    return this.columnEmployeeSignatureBytes;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public global::System.Data.DataColumn DriverNameColumn {
+                get {
+                    return this.columnDriverName;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -734,7 +764,10 @@ namespace ReportsService.DataSets {
                         string RecallListText, 
                         string Note, 
                         byte[] DamageImage_Vertical, 
-                        string RegistrationNo) {
+                        string RegistrationNo, 
+                        byte[] DriverSignatureBytes, 
+                        byte[] EmployeeSignatureBytes, 
+                        string DriverName) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         AccountNo,
@@ -771,7 +804,10 @@ namespace ReportsService.DataSets {
                         RecallListText,
                         Note,
                         DamageImage_Vertical,
-                        RegistrationNo};
+                        RegistrationNo,
+                        DriverSignatureBytes,
+                        EmployeeSignatureBytes,
+                        DriverName};
                 rowDataTable1Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowDataTable1Row);
                 return rowDataTable1Row;
@@ -829,6 +865,9 @@ namespace ReportsService.DataSets {
                 this.columnNote = base.Columns["Note"];
                 this.columnDamageImage_Vertical = base.Columns["DamageImage_Vertical"];
                 this.columnRegistrationNo = base.Columns["RegistrationNo"];
+                this.columnDriverSignatureBytes = base.Columns["DriverSignatureBytes"];
+                this.columnEmployeeSignatureBytes = base.Columns["EmployeeSignatureBytes"];
+                this.columnDriverName = base.Columns["DriverName"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -904,6 +943,12 @@ namespace ReportsService.DataSets {
                 base.Columns.Add(this.columnDamageImage_Vertical);
                 this.columnRegistrationNo = new global::System.Data.DataColumn("RegistrationNo", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnRegistrationNo);
+                this.columnDriverSignatureBytes = new global::System.Data.DataColumn("DriverSignatureBytes", typeof(byte[]), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDriverSignatureBytes);
+                this.columnEmployeeSignatureBytes = new global::System.Data.DataColumn("EmployeeSignatureBytes", typeof(byte[]), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnEmployeeSignatureBytes);
+                this.columnDriverName = new global::System.Data.DataColumn("DriverName", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDriverName);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1606,6 +1651,54 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public byte[] DriverSignatureBytes {
+                get {
+                    try {
+                        return ((byte[])(this[this.tableDataTable1.DriverSignatureBytesColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'DriverSignatureBytes\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.DriverSignatureBytesColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public byte[] EmployeeSignatureBytes {
+                get {
+                    try {
+                        return ((byte[])(this[this.tableDataTable1.EmployeeSignatureBytesColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'EmployeeSignatureBytes\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.EmployeeSignatureBytesColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public string DriverName {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.DriverNameColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'DriverName\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.DriverNameColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public bool IsAccountNoNull() {
                 return this.IsNull(this.tableDataTable1.AccountNoColumn);
             }
@@ -2022,6 +2115,42 @@ namespace ReportsService.DataSets {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public void SetRegistrationNoNull() {
                 this[this.tableDataTable1.RegistrationNoColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public bool IsDriverSignatureBytesNull() {
+                return this.IsNull(this.tableDataTable1.DriverSignatureBytesColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public void SetDriverSignatureBytesNull() {
+                this[this.tableDataTable1.DriverSignatureBytesColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public bool IsEmployeeSignatureBytesNull() {
+                return this.IsNull(this.tableDataTable1.EmployeeSignatureBytesColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public void SetEmployeeSignatureBytesNull() {
+                this[this.tableDataTable1.EmployeeSignatureBytesColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public bool IsDriverNameNull() {
+                return this.IsNull(this.tableDataTable1.DriverNameColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public void SetDriverNameNull() {
+                this[this.tableDataTable1.DriverNameColumn] = global::System.Convert.DBNull;
             }
         }
         

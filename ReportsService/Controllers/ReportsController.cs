@@ -68,6 +68,7 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("RegistrationExpDate", typeof(string));
                 dt.Columns.Add("RegistrationNo", typeof(string));
                 dt.Columns.Add("CreatedBy", typeof(string));
+                dt.Columns.Add("DriverName", typeof(string));
                 dt.Columns.Add("UserPhoeNo", typeof(string));
                 dt.Columns.Add("CreatedDate", typeof(string));
                 dt.Columns.Add("RepeatRepair", typeof(string));
@@ -78,6 +79,8 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("MovementId", typeof(int));
                 dt.Columns.Add("DamageImage", typeof(byte[]));
                 dt.Columns.Add("DamageImage_Vertical", typeof(byte[]));
+                dt.Columns.Add("DriverSignatureBytes", typeof(byte[]));
+                dt.Columns.Add("EmployeeSignatureBytes", typeof(byte[]));
                 dt.Columns.Add("RecallListText", typeof(string));
                 dt.Columns.Add("PlateNumber", typeof(string));
                 dt.Columns.Add("VIN", typeof(string));
@@ -107,6 +110,7 @@ namespace ReportsService.Controllers
                 r["RegistrationExpDate"] = model.RegistrationExpDate ?? "";
                 r["RegistrationNo"] = model.RegistrationNo ?? "";
                 r["CreatedBy"] = model.CreatedBy ?? "";
+                r["DriverName"] = model.DriverName ?? "";
                 r["UserPhoeNo"] = model.UserPhoeNo ?? "";
                 r["CreatedDate"] = model.CreatedDate ?? "";
                 r["RepeatRepair"] = model.RepeatRepair ?? "";
@@ -117,6 +121,8 @@ namespace ReportsService.Controllers
                 r["MovementId"] = model.MovementId ?? 0;
                 r["DamageImage"] = (object)model.DamageImageBytes ?? DBNull.Value;
                 r["DamageImage_Vertical"] = (object)model.DamageImageBytes_Vertical ?? DBNull.Value;
+                r["DriverSignatureBytes"] = (object)model.DriverSignatureBytes ?? DBNull.Value;
+                r["EmployeeSignatureBytes"] = (object)model.EmployeeSignatureBytes ?? DBNull.Value;
                 r["RecallListText"] = model.RecallListText ?? "";
                 r["PlateNumber"] = model.VehicleInfo.PlateNumber ?? "";
                 r["VIN"] = model.VehicleInfo.VIN ?? "";

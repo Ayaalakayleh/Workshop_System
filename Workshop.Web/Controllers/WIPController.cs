@@ -2673,6 +2673,7 @@ namespace Workshop.Web.Controllers
                 model.CompanyData.Branch = Branche != null ? (lang == "en" ? Branche.BranchPrimaryName : Branche.BranchSecondaryName) : string.Empty;
                 model.Note = Details.Note;
                 model.CompanyData.CompanyPrimaryName = companyInfo != null ? companyInfo.CompanyPrimaryName : string.Empty;
+                model.DriverName = movement.ResivedDriverId;
 
                 // Logo
                 model.CompanyData.Img = companyInfo.Img;
@@ -2695,10 +2696,10 @@ namespace Workshop.Web.Controllers
                     model.CustomerMobileNumber = agreement.CustomerPhoneNumber;
                 }
 
-                if (!string.IsNullOrWhiteSpace(movement.DamageImagePath) && !string.IsNullOrWhiteSpace(movement.DamageImageName))
-    
-                {
                     var root = _configuration["FileUpload:DirectoryPath"]; 
+                //Images
+                if (!string.IsNullOrWhiteSpace(movement.DamageImagePath) && !string.IsNullOrWhiteSpace(movement.DamageImageName))
+                {
                     var physicalPath = Path.Combine(_env.WebRootPath, root,
                         movement.DamageImagePath.Replace("/", Path.DirectorySeparatorChar.ToString()),
                         movement.DamageImageName);
@@ -2722,6 +2723,49 @@ namespace Workshop.Web.Controllers
                     }
                 }
 
+                if (!string.IsNullOrWhiteSpace(movement.DriverSignature))
+                {
+                    var driverSignaturePath = Path.Combine(
+                        _env.WebRootPath, root, movement.DriverSignature.Replace("/", Path.DirectorySeparatorChar.ToString())
+                    );
+
+                    if (System.IO.File.Exists(driverSignaturePath))
+                    {
+                        using var stream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(driverSignaturePath));
+                        using var image = Image.FromStream(stream);
+                        using var bitmap = new Bitmap(image.Width, image.Height);
+                        using var graphics = Graphics.FromImage(bitmap);
+
+                        graphics.Clear(System.Drawing.Color.White);
+                        graphics.DrawImage(image, 0, 0);
+
+                        using var output = new MemoryStream();
+                        bitmap.Save(output, ImageFormat.Png);
+                        model.DriverSignatureBytes = output.ToArray();
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(movement.EmployeeSignature))
+                {
+                    var employeeSignaturePath = Path.Combine(
+                        _env.WebRootPath, root, movement.EmployeeSignature.Replace("/", Path.DirectorySeparatorChar.ToString())
+                    );
+
+                    if (System.IO.File.Exists(employeeSignaturePath))
+                    {
+                        using var stream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(employeeSignaturePath));
+                        using var image = Image.FromStream(stream);
+                        using var bitmap = new Bitmap(image.Width, image.Height);
+                        using var graphics = Graphics.FromImage(bitmap);
+
+                        graphics.Clear(System.Drawing.Color.White);
+                        graphics.DrawImage(image, 0, 0);
+
+                        using var output = new MemoryStream();
+                        bitmap.Save(output, ImageFormat.Png);
+                        model.EmployeeSignatureBytes = output.ToArray();
+                    }
+                }
 
                 //============================================================================================================
                 var vehicleInfo = await GetVehicleInfoAsync(Details.VehicleId, (int)workOrderDetials?.VehicleType);

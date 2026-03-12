@@ -43,6 +43,9 @@ namespace Workshop.Web.Models
         public List<ItemModel>? Items { get; set; }
         public byte[] DamageImageBytes { get; set; }
         public byte[] DamageImageBytes_Vertical { get; set; }
+        public byte[] DriverSignatureBytes { get; set; }
+        public byte[] EmployeeSignatureBytes { get; set; }
+        public string DriverName { get; set; } = null;
         public List<ActiveRecallDto> Recalls { get; set; } = new List<ActiveRecallDto>();
         public string RecallListText { get; set; } = null;
         public string Branch { get; set; } = null;

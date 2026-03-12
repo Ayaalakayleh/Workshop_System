@@ -43,6 +43,9 @@ namespace ReportsService.Models
         public List<ItemModel> Items { get; set; } = new List<ItemModel>();
         public byte[] DamageImageBytes { get; set; }
         public byte[] DamageImageBytes_Vertical { get; set; }
+        public byte[] DriverSignatureBytes { get; set; }
+        public byte[] EmployeeSignatureBytes { get; set; }
+        public string DriverName { get; set; } = null;
         public string RecallListText { get; set; } = null;
         public string Branch { get; set; } = null;
         public string Note { get; set; } = null;
