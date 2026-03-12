@@ -2092,29 +2092,6 @@ function safeUpdateFieldsFromGrid() {
 }
 
 //============================================================================================
-//function priceWfHistory(row) {
-//    return $.ajax({
-//        url: window.RazorVars.priceWfHistoryUrl,
-//        type: "POST",
-//        dataType: "json",
-//        data: { MasterId: row.PriceWorkflowMasterId }
-//    }).done(hist => {
-//        const html = (hist || []).map(h => `
-//      <div style="text-align:${theMainLang === "en" ? "left" : "right"}">
-//        <b>${h.actionName || ""}</b> - ${h.createdAt || ""}<br/>
-//        ${h.reason || ""}
-//      </div>
-//    `).join("<hr/>");
-
-//        Swal.fire({
-//            title: theMainLang === "en" ? "Workflow History" : "سجل الاعتماد",
-//            html: html || (theMainLang === "en" ? "No history" : "لا يوجد سجل"),
-//            width: 700
-//        });
-//    });
-//}
-
-
 function priceWfHistory(row) {
     return $.ajax({
         url: window.RazorVars.priceWfHistoryUrl,

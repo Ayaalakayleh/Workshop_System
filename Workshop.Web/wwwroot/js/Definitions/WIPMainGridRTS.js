@@ -841,6 +841,13 @@ $("#schTech").on("change", function () {
     var durationMin = normalizeDurationToMinutes($('#schDuration').val());
     const maxMin = maxFreeMinutes(freeIntervals);
 
+    const formatHours = (minutes) => {
+        const hours = minutes / 60;
+        return Number.isInteger(hours)
+            ? hours.toString()
+            : hours.toFixed(1).replace(/\.0$/, '');
+    };
+
     if (durationMin <= 0) {
         initSchStartTimepicker([], null);
         return;
@@ -852,10 +859,10 @@ $("#schTech").on("change", function () {
         $("#schEnd").val('');
 
         Swal.fire(
-            theMainLang == "en" ? "No slot fits duration" : "لا توجد فترة زمنية تكفي للمدة المطلوبة",
+            theMainLang == "en" ? "No suitable time slot" : "لا توجد فترة مناسبة",
             theMainLang == "en"
-                ? `Max available: ${maxMin / 60} min, required: ${durationMin / 60} min`
-                : `أقصى مدة متاحة: ${maxMin / 60} دقيقة، المطلوبة: ${durationMin / 60} دقيقة`,
+                ? `Available: ${formatHours(maxMin)} hours, required: ${formatHours(durationMin)} hours`
+                : `المتاح: ${formatHours(maxMin)} ساعة، المطلوب: ${formatHours(durationMin)} ساعة`,
             "warning"
         );
         return;

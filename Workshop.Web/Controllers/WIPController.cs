@@ -3940,64 +3940,21 @@ namespace Workshop.Web.Controllers
                 if (!responseReject.IsScusses)
                     return Json(new { success = false, message = "Reject failed" });
 
-                state = await _erpApiClient.GetWorkflowStateByMasterIdAndCompanyId(dto.MasterId, CompanyId);
-                if (state == null)
-                    return Json(new { success = false, message = "State not found after reject" });
-
-                var isRejected = state.IsRejected;
-
-                if (isRejected)
+                await _apiClient.WipPriceWorkflow_Finish(new FinishWipPriceWorkflowRequest
                 {
-                    await _apiClient.WipPriceWorkflow_Finish(new FinishWipPriceWorkflowRequest
-                    {
-                        WipItemId = dto.WipItemId,
-                        MasterId = dto.MasterId,
-                        Status = 3,
-                        Reason = dto.Reason,
-                        UserId = UserId
-                    });
-                }
-                else
-                {
-                    if ((state.UsersContactInformation == null || state.UsersContactInformation.Count == 0) && state.NextGroupId > 0)
-                    {
-                        var nextUsers = await _erpApiClient.GetUsersByGroupId(state.NextGroupId);
-
-                        state.UsersContactInformation = nextUsers?
-                            .Where(u => u.IsActive)
-                            .Select(u => new UserContactInformation
-                            {
-                                Id = u.UserID,
-                                Email = u.Email,
-                                PhoneNo = u.PhoneNo
-                            })
-                            .ToList() ?? new List<UserContactInformation>();
-                    }
-
-                    await _workflowEmailService.SendAsync(
-                        new WorkflowEmailRequest
-                        {
-                            MasterId = dto.MasterId,
-                            CompanyId = CompanyId,
-                            WipId = dto.WIPId,
-                            WipItemId = dto.WipItemId,
-                            KeyId = dto.KeyId,
-                            Action = 2,
-                            Lang = lang,
-                            CreatedBy = UserId
-                        },
-                        state
-                    );
-                }
+                    WipItemId = dto.Id,
+                    MasterId = dto.MasterId,
+                    Status = 3,
+                    Reason = dto.Reason,
+                    UserId = UserId
+                });
 
                 return Json(new
                 {
                     success = true,
-                    isRejected = isRejected,
-                    priceWorkflowStatus = isRejected ? 3 : 1,
-                    priceWorkflowStatusText = isRejected
-                        ? (lang == "en" ? "Rejected" : "مرفوض")
-                        : (lang == "en" ? "Pending" : "قيد الانتظار")
+                    isRejected = true,
+                    priceWorkflowStatus = 3,
+                    priceWorkflowStatusText = lang == "en" ? "Rejected" : "مرفوض"
                 });
             }
             catch (Exception ex)
