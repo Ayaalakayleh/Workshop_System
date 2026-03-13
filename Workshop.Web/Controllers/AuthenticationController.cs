@@ -306,7 +306,12 @@ namespace Workshop.Web.Controllers
             HttpContext.Session.SetInt32("CurrencyId", branch.CurrencyIDH);
 
             // 7) Redirect to internal page
-            return Redirect(returnUrl);
+            if (!returnUrl.StartsWith("/"))
+                returnUrl = "/" + returnUrl;
+
+            var finalUrl = Url.Content("~" + returnUrl);
+
+            return LocalRedirect(finalUrl);
         }
 
     }
