@@ -2360,7 +2360,7 @@ function stackCaption(caption) {
 }
 
 async function openInventoryItemTabsModal(itemId) {
-    const returnUrl = `${window.RazorVars.itemTabsBase}${encodeURIComponent(itemId)}`;
+    const returnUrl = `/ItemMaster/TabsEmbed/${encodeURIComponent(itemId)}`;
 
     const res = await fetch(`${window.RazorVars.getEmbedUrl}?returnUrl=${encodeURIComponent(returnUrl)}`,
         {
