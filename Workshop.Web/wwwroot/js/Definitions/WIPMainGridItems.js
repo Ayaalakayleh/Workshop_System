@@ -375,8 +375,19 @@ $(function () {
                     }
                 },
                 editCellTemplate: function (cellElement, cellInfo) {
+                    const row = cellInfo.data || {};
+                    const status = Number(row.Status ?? row.status ?? 0);
 
-                    const row = cellInfo.data;
+                    if (status === 42) {
+                        const selectedUnit = (row.ItemUnits || []).find(x => x.unitId == row.fk_UnitId);
+
+                        const text = selectedUnit
+                            ? ((lang === "en") ? selectedUnit.unitPrimaryName : selectedUnit.unitSecondaryName)
+                            : "";
+
+                        $("<div>").text(text).appendTo(cellElement);
+                        return;
+                    }
 
                     $("<div>").dxSelectBox({
                         dataSource: row.ItemUnits || [],
@@ -386,7 +397,6 @@ $(function () {
                             return (lang === "en") ? u.unitPrimaryName : u.unitSecondaryName;
                         },
                         value: row.fk_UnitId,
-
                         onValueChanged: function (e) {
 
                             const grid = cellInfo.component;
@@ -408,14 +418,16 @@ $(function () {
 
                                 row.isDecimalUnit = !!(selectedUnit?.isDecimalUnit ?? selectedUnit?.isDecimalUnit);
 
-                                // Factor
                                 const oldFactor = Number(row.UnitFactor) || 1;
                                 row.UnitFactor = Number(selectedUnit?.conversionFactor) || 1;
 
                                 if (!row.isDecimalUnit) {
                                     row.RequestQuantity = Math.floor(Number(row.RequestQuantity) || 0);
                                     row.Quantity = Math.floor(Number(row.Quantity) || 0);
-                                    //row.UsedQuantity = Math.floor(Number(row.UsedQuantity));
+
+                                    if (row.UsedQuantity !== null && row.UsedQuantity !== undefined && row.UsedQuantity !== "") {
+                                        row.UsedQuantity = Math.floor(Number(row.UsedQuantity));
+                                    }
                                 }
 
                                 if (!row.BaseCostPrice || Number(row.BaseCostPrice) === 0) {
@@ -441,7 +453,7 @@ $(function () {
 
                                     grid.cellValue(rowIndex, "RequestQuantity", row.RequestQuantity);
                                     grid.cellValue(rowIndex, "Quantity", row.Quantity);
-                                    //grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
+                                    grid.cellValue(rowIndex, "UsedQuantity", row.UsedQuantity);
 
                                     grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
                                     grid.cellValue(rowIndex, "Price", row.Price);
@@ -2348,12 +2360,14 @@ function stackCaption(caption) {
 }
 
 async function openInventoryItemTabsModal(itemId) {
-    const returnUrl = `/ItemMaster/TabsEmbed/${encodeURIComponent(itemId)}`;
+    const returnUrl = `${window.RazorVars.itemTabsBase}${encodeURIComponent(itemId)}`;
 
-    const res = await fetch(`/InventoryEmbed/GetEmbedUrl?returnUrl=${encodeURIComponent(returnUrl)}`, {
-        method: "GET",
-        credentials: "same-origin"
-    });
+    const res = await fetch(`${window.RazorVars.getEmbedUrl}?returnUrl=${encodeURIComponent(returnUrl)}`,
+        {
+            method: "GET",
+            credentials: "same-origin"
+        }
+    );
 
     if (!res.ok) {
         const txt = await res.text();

@@ -1452,23 +1452,24 @@ namespace Workshop.Web.Controllers
                 }
 
                 MovementInvoice invoice = new MovementInvoice();
-                if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
-                {
-                    invoice.MovementId = movements.MovementId.Value;
-                    invoice.MasterId = movement.MasterId.Value;
-                    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
-                    invoice.InvoiceNo = movement.InvoceNo;
-                    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
-                    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
-                    invoice.DeductibleAmount = movement.DeductibleAmount ?? 0m;
-                    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts ?? 0m;
-                    invoice.Vat = movement.Vat ?? 0;
-                    invoice.PartsCost = movement.PartsCost.Value;
-                    invoice.LaborCost = movement.LaborCost.Value;
-                    invoice.Invoice_Date = DateTime.Now;
+                //duplicated
+                //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
+                //{
+                //    invoice.MovementId = movements.MovementId.Value;
+                //    invoice.MasterId = movement.MasterId.Value;
+                //    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
+                //    invoice.InvoiceNo = movement.InvoceNo;
+                //    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
+                //    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
+                //    invoice.DeductibleAmount = movement.DeductibleAmount ?? 0m;
+                //    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts ?? 0m;
+                //    invoice.Vat = movement.Vat ?? 0;
+                //    invoice.PartsCost = movement.PartsCost.Value;
+                //    invoice.LaborCost = movement.LaborCost.Value;
+                //    invoice.Invoice_Date = DateTime.Now;
 
-                    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
-                }
+                //    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
+                //}
 
 
                 // files uploaded in the request

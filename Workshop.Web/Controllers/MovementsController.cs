@@ -75,7 +75,11 @@ namespace Workshop.Web.Controllers
                 .ToList();
 
             var chassisList = await _vehicleApiClient.GetChassiDDL(CompanyId, 1); // To be modified for real vehicleType
-            ViewBag.Chassis = new SelectList(chassisList, "Id", "ChassisNo");
+            var chassisList_EX = await _vehicleApiClient.GetChassiDDL(CompanyId, 2);
+
+            var mergedChassisList = chassisList.Concat(chassisList_EX).ToList();
+
+            ViewBag.Chassis = new SelectList(mergedChassisList, "Id", "ChassisNo");
 
             //ToDo: Caching
             //if (cache.Get(string.Format(CacheKeys.VehiclesDDL, language)) != null)
