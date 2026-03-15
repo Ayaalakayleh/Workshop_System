@@ -1737,6 +1737,7 @@ namespace Workshop.Web.Controllers
                                 CreatedBy = UserId
                             };
                             await _apiClient.InsertWIPInvoice(wIPInvoiceDTO);
+                            await _apiClient.WIP_Close(dto.Id, (int)dto.ClosedBy);
 
                         }
 
