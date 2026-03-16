@@ -959,48 +959,6 @@ $("#SalesType").on("change", function () {
     });
 });
 
-//function getRateAmount(keyId, RTSId) {
-//    const model = {
-//        CustomerId: parseInt($('#CustomerId').val()),
-//        RTSId: parseInt(RTSId),
-//        WIPId: $('#Id').val(),
-//        AccountType: parseInt($('#AccountType').val()),
-//        SalesType: parseInt($('#SalesType').val())
-//    };
-
-//    $.ajax({
-//        type: 'POST',
-//        url: window.RazorVars.getLabourRateUrl,
-//        dataType: 'json',
-//        contentType: 'application/json; charset=utf-8',
-//        data: JSON.stringify(model)
-//    }).done(function (result) {
-//        if (result == null) return;
-
-//        const grid = $('#mainRTSGrid').dxDataGrid('instance');
-//        const rowIndex = grid.getRowIndexByKey(keyId); 
-//        if (rowIndex < 0) return;
-
-//        const rowData = grid.getVisibleRows()[rowIndex].data;
-//        const hours = parseFloat(rowData.StandardHours) || 1;
-//        const total = +(result * hours).toFixed(2);
-
-//        grid.cellValue(rowIndex, "Rate", result);
-//        grid.cellValue(rowIndex, "Total", total);
-
-//        const data = grid.option("dataSource");
-//        const target = data.find(x => x.KeyId === keyId);
-//        if (target) {
-//            target.Rate = result;
-//            target.Total = total;
-//        }
-
-//        grid.saveEditData();
-//        grid.refresh().done(() => updateTotalLabourFieldsFromGrid());
-//    }).fail(function (xhr, status, error) {
-//        console.error("Error:", error);
-//    });
-//}
 function getRateAmount(keyId, RTSId, rowAccountType) {
     pendingRateCalls++;
     setSaveBusy(true);
@@ -1012,12 +970,18 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
             ? parseInt(rowAccountType)
             : parseInt($('#AccountType').val());
 
+    const accountType = parseInt($('#AccountType').val()) || 0;
+    const partialAccountType = parseInt($('#PartialAccountType').val()) || 0;
+
+    const salesType = parseInt($('#SalesType').val()) || 0;
+    const partialSalesType = parseInt($('#PartialSalesType').val()) || 0;
+
     var model = {
-        CustomerId: parseInt($('#CustomerId').val()),
+        CustomerId: parseInt($('#CustomerId').val()) || parseInt($('#PartialCustomerId').val()) || 0,
         RTSId: parseInt(RTSId),
         WIPId: $('#Id').val(),
-        AccountType: effectiveAccountType,
-        SalesType: parseInt($('#SalesType').val())
+        AccountType: accountType || partialAccountType || 0,
+        SalesType: salesType || partialSalesType || 0
     };
 
     $.ajax({
@@ -1071,6 +1035,18 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
         }
     });
 }
+
+$("#CustomerId, #PartialCustomerId").on("change", function () {
+    const grid = $("#mainRTSGrid").dxDataGrid("instance");
+    if (!grid) return;
+
+    grid.saveEditData();
+
+    const items = grid.getDataSource().items() || [];
+    items.forEach(function (row) {
+        getRateAmount(row.KeyId, row.Id, row.AccountType);
+    });
+});
 
 $(document).ready(function () {
 
@@ -1224,9 +1200,9 @@ $(document).ready(function () {
 
     //var st = $("#statusId").val();
     //if (st == 2032) {
-    //    $("#statusId").prop("disabled", true);   
+    //    $("#statusId").prop("disabled", true);
     //} else {
-    //    $("#statusId").prop("disabled", false); 
+    //    $("#statusId").prop("disabled", false);
     //}
 });
 function validateGridsAccountTypeForPartialInv() {

@@ -146,12 +146,22 @@ function getRateAmount(keyId, RTSId) {
     setSaveBusy(true);
 
     const grid = $('#mainRTSGrid').dxDataGrid('instance');
+
+    const customer = parseInt($('#CustomerId').val()) || 0;
+    const partialCustomer = parseInt($('#PartialCustomerId').val()) || 0;
+
+    const accountType = parseInt($('#AccountType').val()) || 0;
+    const partialAccountType = parseInt($('#PartialAccountType').val()) || 0;
+
+    const salesType = parseInt($('#SalesType').val()) || 0;
+    const partialSalesType = parseInt($('#PartialSalesType').val()) || 0;
+
     var model = {
-        CustomerId: parseInt($('#CustomerId').val()),
+        CustomerId: customer || partialCustomer || null,
         RTSId: parseInt(RTSId),
         WIPId: $('#Id').val(),
-        AccountType: parseInt($('#AccountType').val()),
-        SalesType: parseInt($('#SalesType').val())
+        AccountType: accountType || partialAccountType || 0,
+        SalesType: salesType || partialSalesType || 0
     };
 
     $.ajax({
