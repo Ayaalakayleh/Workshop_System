@@ -69,13 +69,21 @@ namespace Workshop.Web.Controllers
             try
             {
                 vehicleMovementFilter ??= new WorkshopMovementFilter();
-                VehicleMovement ovehicleMovement = new VehicleMovement();
-                ovehicleMovement.ColMovements = new List<VehicleMovement>();
+
+                var ovehicleMovement = new VehicleMovement
+                {
+                    ColMovements = new List<VehicleMovement>()
+                };
+
                 vehicleMovementFilter.WorkshopId = BranchId;
                 vehicleMovementFilter.page ??= 1;
-                ovehicleMovement.ColMovements = await _apiClient.GetAllMovementsHistoryFilter(vehicleMovementFilter);
+
+                ovehicleMovement.ColMovements = await _apiClient.GetAllMovementsHistoryFilter(vehicleMovementFilter)
+                                                ?? new List<VehicleMovement>();
+
                 ovehicleMovement.ColBranches = await _erpApiClient.GetActiveBranchesByCompanyId(CompanyId);
-                List<VehicleNams> ExternalVehicles = new List<VehicleNams>();
+
+                List<VehicleNams> externalVehicles = new List<VehicleNams>();
 
                 if (cache.Get(string.Format(CacheKeys.VehiclesDDL, lang)) != null)
                 {
@@ -83,38 +91,43 @@ namespace Workshop.Web.Controllers
                 }
                 else
                 {
-                    ovehicleMovement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
+                    ovehicleMovement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId) ?? new List<VehicleNams>();
                     cache.Set(string.Format(CacheKeys.VehiclesDDL, lang), ovehicleMovement.vehicleNams, DateTimeOffset.Now.AddDays(10));
                 }
 
                 if (cache.Get(string.Format(CacheKeys.ExternalVehiclesDDL)) != null)
                 {
-                    ExternalVehicles = (List<VehicleNams>)cache.Get(string.Format(CacheKeys.ExternalVehiclesDDL));
+                    externalVehicles = (List<VehicleNams>)cache.Get(string.Format(CacheKeys.ExternalVehiclesDDL));
                 }
                 else
                 {
-                    ExternalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
-                    cache.Set(string.Format(CacheKeys.ExternalVehiclesDDL), ExternalVehicles, DateTimeOffset.Now.AddDays(5));
+                    externalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang) ?? new List<VehicleNams>();
+                    cache.Set(string.Format(CacheKeys.ExternalVehiclesDDL), externalVehicles, DateTimeOffset.Now.AddDays(5));
                 }
+
+                ovehicleMovement.vehicleNams ??= new List<VehicleNams>();
+                externalVehicles ??= new List<VehicleNams>();
 
                 foreach (var movement in ovehicleMovement.ColMovements)
                 {
-                    if (movement.IsExternal!=null && movement.IsExternal == true)
-                        movement.VehicleName = ExternalVehicles.Find(p => p.id == movement.VehicleID).VehicleName;
-                    else
-                        movement.VehicleName = ovehicleMovement.vehicleNams.Find(p => p.id == movement.VehicleID).VehicleName;
+                    if (movement == null)
+                        continue;
+
+                    VehicleNams? vehicle = movement.IsExternal == true
+                        ? externalVehicles.Find(p => p.id == movement.VehicleID)
+                        : ovehicleMovement.vehicleNams.Find(p => p.id == movement.VehicleID);
+
+                    movement.VehicleName = vehicle?.VehicleName ?? string.Empty;
                 }
 
                 return PartialView("MovementList", ovehicleMovement);
-
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
-                throw ex;
+                throw;
             }
         }
 
-        
+
     }
 }
