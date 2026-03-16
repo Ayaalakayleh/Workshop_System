@@ -393,6 +393,11 @@ async function updateTotalLabourFieldsFromGrid() {
     allRows.forEach(d => {
         d = d || {};
 
+        const status = parseInt(d.Status) || 0;
+        if (status === 24 || status === 26) {
+            return;
+        }
+
         const rate = ensureDiscountedRate(d);
         const hours = parseFloat(d.StandardHours) || 0;
         const pct = parseFloat(d.Discount) || 0;
