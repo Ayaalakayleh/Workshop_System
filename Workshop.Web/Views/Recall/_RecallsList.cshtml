@@ -24,7 +24,11 @@
                     @item.Title
                 </td>
                 <td>
-                    @item.Description
+                    @(string.IsNullOrEmpty(item.Description)
+                                    ? ""
+                                    : item.Description.Length > 80
+                                    ? item.Description.Substring(0, 80) + "..."
+                                    : item.Description)
                 </td>
                 <td>
                     <a href="@Url.Action("Edit", "Recall", new { id = item.Id })" class="btn btn-info btn-sm add-record"><i class="fad fa-pencil"></i>&nbsp;@Common["Button_Edit"]</a>

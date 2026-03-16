@@ -272,16 +272,17 @@ $(function () {
 
     function validateCodeUniqueness(code, callback) {
         if (!code || code.trim().length === 0) {
-            callback(true, ""); // Empty code is considered valid for uniqueness
+            callback(true, "");
             return;
         }
 
-        var excludeId = $("#Id").val() || null;
+        var excludeId = $("#Id").val() || "";
 
         $.ajax({
-            url: window.RazorVars.CheckRecallCodeUniqueUrl,
+            url: window.RazorVars.CheckRecallCodeUniqueUrl +
+                "?code=" + encodeURIComponent(code.trim()) +
+                "&excludeId=" + encodeURIComponent(excludeId),
             type: 'GET',
-            data: { code: code.trim(), excludeId: excludeId },
             success: function (response) {
                 callback(response.isUnique, response.message);
             },

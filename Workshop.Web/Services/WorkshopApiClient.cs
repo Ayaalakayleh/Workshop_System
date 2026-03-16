@@ -2508,7 +2508,7 @@ namespace Workshop.Web.Services
 
         public async Task<bool> CheckRecallCodeExistsAsync(string code)
         {
-            return await _httpClient.GetFromJsonAsync<bool>($"api/Recall/CodeExists/{code}");
+            return await _httpClient.GetFromJsonAsync<bool>($"api/Recall/CodeExists/{Uri.EscapeDataString(code)}");
         }
 
 
