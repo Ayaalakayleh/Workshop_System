@@ -319,8 +319,70 @@ $(document).ready(function() {
         validateTimeFields();
     });
 
+    function toggleInvalid($el, invalid) {
+        $el.toggleClass('is-invalid', invalid);
+
+        if ($el.hasClass('select2-hidden-accessible')) {
+            $el.next('.select2-container').find('.select2-selection').toggleClass('is-invalid', invalid);
+        }
+    }
+
+    function validateRequiredServiceReminderFields() {
+        var isValid = true;
+
+        var $year = $('#ReminderForm_ManufacturingYear');
+        var $service = $('#ReminderForm_ItemId');
+
+        $('#yearValidationMsg').text('');
+        $('#serviceValidationMsg').text('');
+
+        toggleInvalid($year, false);
+        toggleInvalid($service, false);
+
+        var yearVal = ($year.val() || '').trim();
+        var serviceVal = $service.val();
+
+        if (!yearVal) {
+            toggleInvalid($year, true);
+            $('#yearValidationMsg').text(RazorVars.requiredField || 'Required');
+            isValid = false;
+        }
+
+        if (!serviceVal || serviceVal === '' || serviceVal === '0') {
+            toggleInvalid($service, true);
+            $('#serviceValidationMsg').text(RazorVars.requiredField || 'Required');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    $('#ReminderForm_ManufacturingYear').on('input change', function () {
+        toggleInvalid($(this), false);
+        $('#yearValidationMsg').text('');
+    });
+
+    $('#ReminderForm_ItemId').on('change', function () {
+        toggleInvalid($(this), false);
+        $('#serviceValidationMsg').text('');
+    });
+
     // Form validation - ensure Manufacturing Year is required
-    $('#serviceReminderForm').on('submit', function(e) {
+    $('#serviceReminderForm').on('submit', function (e) {
+
+        if (!validateRequiredServiceReminderFields()) {
+            e.preventDefault();
+
+            if (!$('#ReminderForm_ManufacturingYear').val()) {
+                $('#ReminderForm_ManufacturingYear').focus();
+            } else {
+                $('#ReminderForm_ItemId').focus();
+            }
+
+            return false;
+        }
+
+
         var manufacturingYear = $('#ReminderForm_ManufacturingYear').val();
         if (!manufacturingYear || manufacturingYear.trim() === '') {
             e.preventDefault();
