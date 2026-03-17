@@ -158,6 +158,7 @@
             const fields = [
                 { id: "#AccountType", name: "Account Type" },
                 { id: "#SalesType", name: "Sales Type" },
+                { id: "#PartialSalesType", name: "Partial Sales Type" },
                 { id: "#statusId", name: "status" },
                 { id: "#WipDate", name: "date" },
             ];
@@ -174,6 +175,10 @@
                     $(f.id).removeClass("is-invalid");
                 }
             });
+
+            if (!isValid) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
 
             return isValid;
         }
