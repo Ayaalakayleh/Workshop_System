@@ -942,6 +942,32 @@ $(function () {
                         }
                     },
                     {
+                        hint: theMainLang == "en" ? "Reserve from warehouse" : "حجز قطع من المستودع",
+                        icon: "save",
+                        text: theMainLang == "en" ? "Reserve" : "حجز",
+                        type: "success",
+                        stylingMode: "contained",
+                        visible: function (e) {
+                            const stRaw = e?.row?.data?.Status;
+                            if (stRaw === undefined || stRaw === null || stRaw === "") return false;
+
+                            return !(wipStatus === Complete || wipStatus === Invoiced) &&
+                                (Permission_Issue && (
+                                    AllowActions &&
+                                    parseInt(e.row.data.Status) !== 41 &&
+                                    parseInt(e.row.data.Status) !== 37 &&
+                                    OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                                ));
+                        },
+                        disabled: function (e) {
+                            return parseInt(e.row.data.Status) === 42;
+                        },
+                        onClick: function (e) {
+                            CreateIssueVoucher(e.row.data, 0, 50, 11);
+                        
+                        }
+                    },
+                    {
                         hint: theMainLang === "en" ? "Price WF History" : "سجل اعتماد السعر",
                         icon: "info",
                         type: "default",
@@ -1408,6 +1434,8 @@ function statusTextById(statusId, forPopup = false) {
             statusId == 37 ? "Rejected" :
                 statusId == 41 ? "Waiting Part" :
                     statusId == 42 ? "Part Received" :
+                        statusId == 50 ? "Reserved" :
+                            statusId == 51 ? "Cancel Reserve" :
                         "Updated";
     } else {
         return statusId == 35 ? getStatusEstimateText(false) :
@@ -1688,7 +1716,7 @@ function saveData() {
         data: model
     });
 }
-function CreateIssueVoucher(row) {
+function CreateIssueVoucher(row, stockType = -1, nextStatus = 42, TransactionType = 1) {
     var valselect = "";
     let isValid = true;
     let message = "";
@@ -1696,7 +1724,6 @@ function CreateIssueVoucher(row) {
 
     let formData = new FormData();
 
-     ;
     const detailsList = [{
         FK_ItemId: row.ItemId,
         FK_UnitId: row.fk_UnitId,
@@ -1708,7 +1735,7 @@ function CreateIssueVoucher(row) {
         FK_LocatorId: row.LocatorId,
         FK_WarehouseId: row.WarehouseId
     }];
-     ;
+
     formData.append("Details", JSON.stringify(detailsList));
 
     var submitBtn = $("#IssueRequestPartsBTN");
@@ -1721,7 +1748,7 @@ function CreateIssueVoucher(row) {
     formData.append("RequestId", null);
     formData.append("FK_TransactionReferenceTypeId", 1006);
     formData.append("FK_WarehouseId", warehouseId);
-    formData.append("FK_TransactionTypeId", 1);
+    formData.append("FK_TransactionTypeId", TransactionType);
     formData.append("FK_TransactionStatusId", 2);
     formData.append("AttachmentPath", "1");
     formData.append("FK_FromWarehouseId", "");
@@ -1730,7 +1757,7 @@ function CreateIssueVoucher(row) {
     formData.append("FinancialTransactionNo", "1");
     formData.append("FinancialTransactionTypeNo", "1");
     formData.append("Fk_InvoiceType", 0);
-    formData.append("StockType", -1);
+    formData.append("StockType", stockType);
     formData.append("WIPId", wipid);
 
     const pondFiles = window.cuspond ? window.cuspond.getFiles() : [];
@@ -1757,52 +1784,10 @@ function CreateIssueVoucher(row) {
                 const grid = $("#mainItemsGrid").dxDataGrid("instance");
                 grid.getDataSource().store().update(row.KeyId, row).then(() => grid.refresh());
 
-                updateStatusItem(row, 42);
+                updateStatusItem(row, nextStatus);
                 return;
             }
             handleFailure(data);
-            //if (data == -2) {
-            //    Swal.fire({
-            //        icon: 'error',
-            //        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-            //        confirmButtonText: resources.ok
-            //    });
-            //} else if (data == -3) {
-            //    Swal.fire({
-            //        icon: 'error',
-            //        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-            //        confirmButtonText: resources.ok
-            //    });
-            //} else if (data == -4) {
-            //    Swal.fire({
-            //        icon: 'error',
-            //        title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-            //        confirmButtonText: resources.ok
-            //    });
-            //} else {
-            //    if (data && (data.success === true || data.Success === true || !data.hasOwnProperty('success'))) {
-            //        row.PartsIssueId = data.partsIssueId;
-            //         ;
-            //        const grid = $("#mainItemsGrid").dxDataGrid("instance");
-            //        grid.getDataSource().store().update(row.KeyId, row).then(() => {
-            //            grid.refresh();
-            //        });
-
-            //        updateStatusItem(row, 42);
-            //    } else {
-            //        const errorMessage =
-            //            data.message ||
-            //            data.Message ||
-            //            "T.validationErrorDefault" ||
-            //            'Failed to create the GRN due to validation errors.';
-            //        Swal.fire({
-            //            icon: 'error',
-            //            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
-            //            text: errorMessage,
-            //            confirmButtonText: 'OK'
-            //        });
-            //    }
-            //}
         },
         error: function (xhr) {
             submitBtn.html(originalText).prop('disabled', false);
@@ -1816,20 +1801,10 @@ function CreateIssueVoucher(row) {
                 handleFailure(data, true);
                 return;
             }
+
             const errorMessage =
                 (data && (data.message || data.Message)) ||
                 resources.error_msg;
-
-            //let errorMessage = resources.error_msg;
-
-            //if (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.Message)) {
-            //    errorMessage = xhr.responseJSON.message || xhr.responseJSON.Message;
-            //} else if (xhr.responseText) {
-            //    try {
-            //        const errorData = JSON.parse(xhr.responseText);
-            //        errorMessage = errorData.message || errorData.Message || errorMessage;
-            //    } catch (e) { }
-            //}
 
             Swal.fire({
                 icon: 'error',
