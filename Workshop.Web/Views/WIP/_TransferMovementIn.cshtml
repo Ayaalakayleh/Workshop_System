@@ -986,6 +986,18 @@
                 itemForm.append(`Services[${i}].IsFixed`, services[i].IsFixed);
             }
 
+             var partsCost = parseFloat($('#PartsCost').val()) || 0;
+             var laborCost = parseFloat($('#LaborCost').val()) || 0;
+             var totalWorkOrder = parseFloat($('#TotalWorkOrder').val()) || 0;
+
+             var hasInvoiceData = partsCost > 0 || laborCost > 0 || totalWorkOrder > 0;
+             var hasInvoiceFile = (cuspond && cuspond.getFiles().length > 0);
+             if (hasInvoiceData && !hasInvoiceFile) {
+                    Swal.fire('@Html.Raw(Common["Label_Error"])',  theMainLang == "en" ? 'Please upload file' : 'يجب إرفاق صورة الفاتورة', 'error');
+                    isValid = false;
+             }
+
+                
             if (isValid) {
                 $.ajax({
                     url: "@Url.Action("TransferMoveIn", "WIP")",

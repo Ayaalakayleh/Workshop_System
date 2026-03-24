@@ -119,6 +119,7 @@ namespace Workshop.Infrastructure.Repositories
                     Status = movement.Status ?? (object)DBNull.Value,
                     ExitDriverId = movement.ExitDriverId ?? (object)DBNull.Value,
                     ExitMeter = movement.ExitMeter ?? (object)DBNull.Value,
+                    ExitTime = movement.ExitTime ?? (object)DBNull.Value,
                     MovementOutId = movement.MovementOutId ?? (object)DBNull.Value,
                     LastVehicleStatus = movement.LastVehicleStatus ?? (object)DBNull.Value,
                     IsExternal = movement.IsExternal ?? (object)DBNull.Value,

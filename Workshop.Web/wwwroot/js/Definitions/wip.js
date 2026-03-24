@@ -158,10 +158,16 @@
             const fields = [
                 { id: "#AccountType", name: "Account Type" },
                 { id: "#SalesType", name: "Sales Type" },
-                { id: "#PartialSalesType", name: "Partial Sales Type" },
                 { id: "#statusId", name: "status" },
                 { id: "#WipDate", name: "date" },
             ];
+
+            if ($("#optPartialInv").is(":checked")) {
+                fields.push({ id: "#PartialSalesType", name: "Partial Sales Type" });
+            } else {
+                $("#PartialSalesType").siblings(".text-danger").text("");
+                $("#PartialSalesType").removeClass("is-invalid");
+            }
 
             fields.forEach(f => {
                 const val = $(f.id).val();
@@ -959,8 +965,7 @@ $("#SalesType").on("change", function () {
 
     const items = grid.getDataSource().items() || [];
     items.forEach(function (row) {
-
-        getRateAmount(row.KeyId, row.Id);
+        getRateAmount(row.KeyId, row.Id, row.AccountType);
     });
 });
 
@@ -969,14 +974,23 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
     setSaveBusy(true);
 
     const grid = $('#mainRTSGrid').dxDataGrid('instance');
+    const data = grid.option("dataSource") || [];
+    const target = data.find(r => r.KeyId === keyId);
+
+    if (!target) {
+        pendingRateCalls--;
+        if (pendingRateCalls <= 0) {
+            pendingRateCalls = 0;
+            setSaveBusy(false);
+        }
+        return;
+    }
 
     const effectiveAccountType =
         (rowAccountType !== undefined && rowAccountType !== null && rowAccountType !== "")
             ? parseInt(rowAccountType)
-            : parseInt($('#AccountType').val());
+            : (parseInt($('#AccountType').val()) || parseInt($('#PartialAccountType').val()) || 0);
 
-    const accountType = parseInt($('#AccountType').val()) || 0;
-    const partialAccountType = parseInt($('#PartialAccountType').val()) || 0;
 
     const salesType = parseInt($('#SalesType').val()) || 0;
     const partialSalesType = parseInt($('#PartialSalesType').val()) || 0;
@@ -985,7 +999,7 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
         CustomerId: parseInt($('#CustomerId').val()) || parseInt($('#PartialCustomerId').val()) || 0,
         RTSId: parseInt(RTSId),
         WIPId: $('#Id').val(),
-        AccountType: accountType || partialAccountType || 0,
+        AccountType: effectiveAccountType,
         SalesType: salesType || partialSalesType || 0
     };
 
@@ -1042,6 +1056,18 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
 }
 
 $("#CustomerId, #PartialCustomerId").on("change", function () {
+    const grid = $("#mainRTSGrid").dxDataGrid("instance");
+    if (!grid) return;
+
+    grid.saveEditData();
+
+    const items = grid.getDataSource().items() || [];
+    items.forEach(function (row) {
+        getRateAmount(row.KeyId, row.Id, row.AccountType);
+    });
+});
+
+$("#PartialSalesType, #PartialAccountType").on("change", function () {
     const grid = $("#mainRTSGrid").dxDataGrid("instance");
     if (!grid) return;
 

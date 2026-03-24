@@ -870,7 +870,8 @@ $(function () {
                             const stRaw = e?.row?.data?.Status;
                             if (stRaw === undefined || stRaw === null || stRaw === "") return false;
 
-                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                            return !(wipStatus === Complete || wipStatus === Invoiced) &&
+                                (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
                                 (Permission_Issue && (
                                     AllowActions &&
                                 parseInt(e.row.data.Status) !== 41 && parseInt(e.row.data.Status) !== 35 &&
@@ -901,7 +902,8 @@ $(function () {
                             const stRaw = e?.row?.data?.Status;
                             if (stRaw === undefined || stRaw === null || stRaw === "") return false;
 
-                            return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
+                            return !(wipStatus === Complete || wipStatus === Invoiced) &&
+                                (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
                                 (Permission_Issue && (
                                     AllowActions &&
                                     parseInt(e.row.data.Status) === 42 &&
@@ -957,9 +959,7 @@ $(function () {
                         icon: "menu",            
                         type: "default",
                         stylingMode: "contained",
-                        visible: function (e) {
-                            return true;
-                        },
+                        visible: Permission_StockCard,
                         onClick: function (e) {
                             const itemId = e?.row?.data?.ItemId || e?.row?.data?.Id;
                             if (!itemId) {

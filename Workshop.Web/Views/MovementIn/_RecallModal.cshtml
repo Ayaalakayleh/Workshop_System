@@ -4,6 +4,13 @@
 @inject IStringLocalizer<Messages> Message
 @model Workshop.Core.DTOs.RecallDTO
 
+<style>
+    .is-invalid {
+        border-color: red !important;
+        background-color: #ffdddd !important;
+    }
+</style>
+
 <!-- Button to open modal -->
 
 
@@ -105,5 +112,83 @@
         $(document).on("submit", "#newRecallForm", function () {
             console.log("Recall form submitted!");
         });
+    });
+
+
+    //validation
+     $(function () {
+
+        $.validator.addMethod("validRecallJson", function (value, element) {
+            value = $.trim(value || "");
+            return value !== "" && value !== "[]" && value !== "[ ]";
+        }, "Required");
+
+        $.validator.addMethod("endDateAfterStart", function (value, element) {
+            var startDate = $("#StartDate").val();
+            if (!startDate || !value) return true;
+            return new Date(value) >= new Date(startDate);
+        }, "End date must be greater than or equal to start date");
+
+        $("#newRecallForm").validate({
+            ignore: [],
+            errorClass: "is-invalid",
+            validClass: "",
+
+            rules: {
+                Code: {
+                    required: true
+                },
+                Title: {
+                    required: true
+                },
+                Description: {
+                    required: true
+                },
+                StartDate: {
+                    required: true
+                },
+                EndDate: {
+                    required: true,
+                    endDateAfterStart: true
+                },
+                recallJson: {
+                    validRecallJson: true
+                }
+            },
+
+            messages: {
+                Code: {
+                    required: "Required"
+                },
+                Title: {
+                    required: "Required"
+                },
+                Description: {
+                    required: "Required"
+                },
+                StartDate: {
+                    required: "Required"
+                },
+                EndDate: {
+                    required: "Required",
+                    endDateAfterStart: "End Date must be after Start Date"
+                },
+                recallJson: {
+                    validRecallJson: "Please select at least one vehicle"
+                }
+            },
+
+            errorPlacement: function () {
+            },
+
+            highlight: function (element) {
+                $(element).addClass("is-invalid");
+            },
+
+            unhighlight: function (element) {
+                $(element).removeClass("is-invalid");
+            }
+        });
+
     });
 </script>
