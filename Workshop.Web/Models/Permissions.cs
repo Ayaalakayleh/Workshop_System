@@ -232,8 +232,8 @@
         #region Movements History
         public static class MovementsHistory
         {
-            public const int View = 1965;
-            public const int Details = 1966;
+            public const int View = 2111;
+            public const int Details = 2112;
         }
         #endregion
 
