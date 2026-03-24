@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.Domain.Enum
 {
+    //Important: Check table in ERP WorkflowEnum to get right enum
     public enum WorkflowEnum
     {
         PriceQuotation = 1,
@@ -31,7 +32,18 @@ namespace Workshop.Domain.Enum
         PartsFourthLevel = 21,
         PartsFifthLevel = 22,
         RFQ = 23,
-        RFQIndirect = 24
+        RFQIndirect = 24,
+        ProjectReplacement = 25,
+        ReplacementCreditNote = 26,
+        ReplacementCreditNoteGreater = 27,
+        CustomerIRR = 28,
+        ReceivePOChangeQty = 29,
+        DeliveryNotedirect = 30,
+        DeliveryNoteIndirect = 31,
+        PaymentRequestdirect = 32,
+        PaymentRequestIndirect = 33,
+        PurchaseInvoicedirect = 34,
+        PurchaseInvoiceIndirect = 35,
 
     }
 }
