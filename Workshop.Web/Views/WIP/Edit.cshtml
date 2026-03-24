@@ -20,6 +20,7 @@
 	var Approve = PermissionHelper.UserHasPermission(Permissions.WIP.Approve);
 	var ChangeDate = PermissionHelper.UserHasPermission(Permissions.WIP.ChangeDate);
 	var PriceApproval = PermissionHelper.UserHasPermission(Permissions.WIP.PriceApproval);
+	var StockCard = PermissionHelper.UserHasPermission(Permissions.WIP.StockCard);
 }
 @{
 	var userInfo = System.Text.Json.JsonSerializer.Deserialize<Workshop.Core.DTOs.User>(Context.Session.GetString("UserInfo"));
@@ -492,6 +493,7 @@
   var Permission_Issue = @(Issue.ToString().ToLower());
   var Permission_Approve = @(Approve.ToString().ToLower());
   var Permission_PriceApproval = @(PriceApproval.ToString().ToLower());
+  var Permission_StockCard = @(StockCard.ToString().ToLower());
 	window.URLs = {
 		indexUrl: '@Url.Action("Index", "WIP")',
 		vehicleListUrl: '@Url.Action("VehicleList", "VehicleDefinition")',

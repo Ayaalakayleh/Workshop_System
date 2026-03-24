@@ -126,6 +126,9 @@
     const wipStatus = @WIPstatus;
     const Gone = @((int)WIPStatusEnum.G);
     const Invoiced = @((int)WIPStatusEnum.Invoiced);
+    const Complete = @((int)WIPStatusEnum.C);
+
+
     window.URL = Object.assign({}, window.URL || {}, {
         getAvailableTechnicians: '@Url.Action("GetAvailableTechnicians", "WIP")',
         getAvailableSlots: '@Url.Action("GetAvailableSlots", "Reservations")',
