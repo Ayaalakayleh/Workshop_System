@@ -785,7 +785,7 @@ $(function () {
             },
             {
                 dataField: "PartsIssueId", allowEditing: false,
-                caption: theMainLang == "en" ? "Issue No.": "رقم الإستلام",
+                caption: theMainLang == "en" ? "Ref. No.": "رقم المرجع",
                 visible: true,
                 alignment: "left"
             },

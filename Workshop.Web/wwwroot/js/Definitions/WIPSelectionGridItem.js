@@ -312,7 +312,7 @@ function updateSelectionCount(count) {
                     WarehouseId: item.warehouseId,
                     isDecimalUnit: item.isDecimalUnit,
                     FK_SubCategoryId: item.fK_SubCategoryId,
-
+                    AccountType: $("#optPartialInv").is(":checked") ? null : parseInt($("#AccountType").val()),
                     RequiresPriceApproval: !!item.requiresPriceApproval,
                     PriceWorkflowEnumId: item.priceWorkflowEnumId ?? null,
                     PriceWorkflowStatus: 0,       
@@ -414,7 +414,7 @@ function loadUnitsForRows(rows) {
     if (!grid) return;
 
     const store = grid.getDataSource().store();
-
+    debugger
     const tasks = rows.map(r => {
         return fetchItemUnitsCached(r.ItemId).then(units => {
 
