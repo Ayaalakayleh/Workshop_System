@@ -368,7 +368,8 @@ namespace Workshop.Web.Controllers
             vehicle.ManufacturerId = serviceReminderDTO.ReminderForm.ManufacturerId??0;
             vehicle.VehicleModelId = serviceReminderDTO.ReminderForm.VehicleModelId??0;
             vehicle.ManufacturingYear = serviceReminderDTO.ReminderForm.ManufacturingYear ?? 0;
-            
+            vehicle.CompanyId = CompanyId;
+
             var vehicles = new List<VehicleDefinitions>();
             if (serviceReminderDTO.ReminderForm.VehicleId == null)
             {
