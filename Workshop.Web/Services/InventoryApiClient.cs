@@ -385,5 +385,20 @@ namespace Workshop.Web.Services
             return await SendRequest<UpdateInventoryTransactionFinancialFieldsResultDTO>(url, HttpMethod.Post, request, requireAuth: false);
 
         }
+
+        public async Task<bool> SetStatus(InventoryTransactionHeaderSetStatusDTO request)
+        {
+            string url = "api/InventoryTransaction/SetStatus";
+            var response = await SendRequest<JsonElement>(url, HttpMethod.Post, request, requireAuth: false );
+                
+
+            if (response.TryGetProperty("success", out var successProperty))
+                return successProperty.GetBoolean();
+
+            if (response.TryGetProperty("Success", out successProperty))
+                return successProperty.GetBoolean();
+
+            return false;
+        }
     }
 }

@@ -60,14 +60,24 @@ namespace Workshop.Web.Controllers
                 WIPId = WIPByMovementId.FirstOrDefault().Id;
             }
 
-            // Get Invoice Net value
-            if(WIPId != null && WIPId > 0)
+            // Get Invoice Net value without Credit
+            if (WIPId != null && WIPId > 0)
             {
-                var invoice = await _workshopApiClient.WIPInvoiceGetById(WIPId, null);
-                if(invoice !=null && invoice.Count() > 0)
+                var invoices = await _workshopApiClient.WIPInvoiceGetById(WIPId, null);
+
+                if (invoices != null && invoices.Any())
                 {
-                    var NetValue = invoice.FirstOrDefault().Net;
-                    movement.TotalCost = NetValue;
+                    var creditedInvoiceNos = invoices
+                        .Where(x => x.InvoiceType == -3 && x.ReferanceNo != null)
+                        .Select(x => x.ReferanceNo.ToString())
+                        .ToHashSet();
+
+                    var validInvoicesTotal = invoices
+                        .Where(x => x.InvoiceType == 1
+                                    && !creditedInvoiceNos.Contains(x.InvoiceNo.ToString()))
+                        .Sum(x => x.Net ?? 0);
+
+                    movement.TotalCost = validInvoicesTotal;
                 }
             }
             //WorkOrders
