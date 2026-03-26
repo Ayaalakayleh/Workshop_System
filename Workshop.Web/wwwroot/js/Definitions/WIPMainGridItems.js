@@ -2357,25 +2357,89 @@ async function openInventoryItemTabsModal(itemId) {
 
 
 function showInvFrame(url) {
-    const frame = document.getElementById("invItemTabsFrame");
     const host = document.getElementById("invFrameHost");
+    const frame = document.getElementById("invItemTabsFrame");
+
+    if (!host || !frame) return;
+
+    // cleanup any broken previous state first
+    cleanupInvFrameArtifacts();
 
     frame.src = url;
+
+    host.style.display = "flex";          // or "block" based on your layout
+    host.setAttribute("aria-hidden", "false");
+
+    // force reflow before adding show (helps with flaky transitions)
+    void host.offsetWidth;
+
     host.classList.add("show");
+    document.body.classList.add("inv-frame-open");
 }
 
 function closeInvFrameHost() {
     const host = document.getElementById("invFrameHost");
     const frame = document.getElementById("invItemTabsFrame");
 
+    if (!host) {
+        cleanupInvFrameArtifacts();
+        return;
+    }
+
     host.classList.remove("show");
-    frame.src = "about:blank";
+    host.setAttribute("aria-hidden", "true");
+    host.style.pointerEvents = "none";
+
+    // wait a bit if you have CSS transition, then fully hide + cleanup
+    setTimeout(() => {
+        host.style.display = "none";
+        host.style.pointerEvents = "";
+        if (frame) frame.src = "about:blank";
+        cleanupInvFrameArtifacts();
+    }, 200);
 }
 
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeInvFrameHost();
+function cleanupInvFrameArtifacts() {
+    const host = document.getElementById("invFrameHost");
+
+    if (host) {
+        host.classList.remove("show");
+        host.style.pointerEvents = "";
+        host.setAttribute("aria-hidden", "true");
+
+        // only hide if not actively shown
+        if (!host.classList.contains("show")) {
+            host.style.display = "none";
+        }
+    }
+
+    document.body.classList.remove("inv-frame-open", "modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+
+    // remove any stuck bootstrap backdrops
+    document.querySelectorAll(".modal-backdrop, .dx-overlay-shader").forEach(el => {
+        el.remove();
+    });
+}
+
+// ESC
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+        closeInvFrameHost();
+    }
 });
 
-document.getElementById("invFrameHost")?.addEventListener("click", (e) => {
-    if (e.target.id === "invFrameHost") closeInvFrameHost();
+// click outside only
+document.getElementById("invFrameHost")?.addEventListener("click", function (e) {
+    if (e.target === e.currentTarget) {
+        closeInvFrameHost();
+    }
+});
+
+// if you have an X button, wire it explicitly
+document.getElementById("btnCloseInvFrame")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    closeInvFrameHost();
 });
