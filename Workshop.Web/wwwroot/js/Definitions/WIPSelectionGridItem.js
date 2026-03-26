@@ -284,7 +284,7 @@ function updateSelectionCount(count) {
                     const maxKeyId = Math.max(..._existingData.map(r => parseInt(r.KeyId, 10) || 0));
                     nextKeyId = maxKeyId + 1;
                 }
-
+                debugger
                 const transformedData = selectedRows.map(item => ({
                     KeyId: nextKeyId++,
                     Id: item.id,

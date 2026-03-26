@@ -217,6 +217,7 @@
 
             servicesGrid?.closeEditCell();
             itemsGrid?.closeEditCell();
+            itemsGrid.saveEditData();
 
             var saleType = $("#SalesType").val();
             var saleTypePartial = $("#PartialSalesType").val();
@@ -455,6 +456,11 @@
             return saveDataCore({
                 validate: function ({ gridItems }) {
                     var invalidItems = (gridItems || []).filter(function (row) {
+
+                        const st = Number(row.Status);
+
+                        if (st === 37) return false;
+
                         return row.UsedQuantity === null ||
                             row.UsedQuantity === undefined ||
                             String(row.UsedQuantity).trim() === "";
@@ -587,6 +593,39 @@
                             title: theMainLang == "en" ? "You have uncompleted service" : "لديك خدمة غير مكتملة",
                         });
                         return;
+                    }
+
+                    // Reserve items
+                    const hasReservedItems = (gridItems || []).some(function (row) {
+                        const st = toInt(row.Status);
+                        return st === 50;
+                    });
+
+                    if (hasReservedItems) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "Closing is not allowed" : "لا يسمح بالإغلاق", 
+                            text: theMainLang == "en"
+                                ? "Closing is not allowed because there are reserved parts. Please cancel the reservation first."
+                                : "لا يسمح بالإغلاق لوجود قطع محجوزة، يرجى إلغاء الحجز أولاً"
+                        });
+                        return;
+                    }
+
+                    // Rejected items
+                    const hasRejectedItems = (gridItems || []).some(function (row) {
+                        return Number(row.Status) === 37;
+                    });
+
+                    if (hasRejectedItems) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: theMainLang == "en" ? "Rejected parts exist" : "يوجد قطع مرفوضة",
+                            text: theMainLang == "en"
+                                ? "You have rejected parts, please remove them first"
+                                : "يوجد قطع مرفوضة، يرجى حذفها أولاً"
+                        });
+                        return false;
                     }
 
                     const notCompletedItems = (gridItems || []).filter(function (row) {
@@ -1374,7 +1413,7 @@ async function evaluateAndUpdateWIPStatus() {
     let targetStatusId = null;
     debugger
     //Compleated service & Items
-    if (serviceStatuses.length > 0 && itemStatuses.length > 0 && serviceStatuses.every(s => s === 25 || s === 26) && itemStatuses.every(s => s === 42)) {
+    if (serviceStatuses.length > 0 && itemStatuses.length > 0 && serviceStatuses.every(s => s === 25 || s === 26) && itemStatuses.every(s => s === 42 || s === 37)) {
         targetStatusId = 2031;
     }//Compleated or Transfer Compleated
     else if (serviceStatuses.length > 0 && itemStatuses.length == 0 && serviceStatuses.every(s => s === 25 || s === 26)) { 

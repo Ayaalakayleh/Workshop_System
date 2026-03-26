@@ -171,7 +171,18 @@ $(function () {
                             const id = e.itemData?.id;
 
                             if (id === "approve") priceWfApprove(row);
-                            else if (id === "reject") priceWfReject(row);
+                            else if (id === "reject") {
+                                priceWfReject(row).then(() => {
+                                    try {
+                                        row.Status = 37;
+                                        row.StatusText = statusTextById(37, true);
+
+                                        updateRowInGrid(row);
+                                    } catch {
+                                        location.reload();
+                                    }
+                                });
+                            }
                         }
                     }).appendTo(container);
                 }
@@ -253,7 +264,7 @@ $(function () {
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
-                    const canEdit = Number(row.Status) != 42;
+                    const canEdit = ![42, 37].includes(Number(row.Status));
 
                     const available = Number(row.AvailableQty) || 0;
                     const initialVal = cellInfo.value != null ? cellInfo.value : 0;
@@ -378,7 +389,7 @@ $(function () {
                     const row = cellInfo.data || {};
                     const status = Number(row.Status ?? row.status ?? 0);
 
-                    if (status === 42) {
+                    if ([42, 37].includes(status)) {
                         const selectedUnit = (row.ItemUnits || []).find(x => x.unitId == row.fk_UnitId);
 
                         const text = selectedUnit
@@ -511,7 +522,7 @@ $(function () {
                 alignment: "left",
                 editCellTemplate: function (cellElement, cellInfo) {
                     const row = cellInfo.data;
-                    const canEdit = Permission_AddParts && Number(row.Status) != 42;
+                    const canEdit = Permission_AddParts && ![42, 37].includes(Number(row.Status));
 
                     const reqQty = Number(row.RequestQuantity) || 0;
                     const maxQty = row.MaxQty != null ? Number(row.MaxQty) : null;
@@ -840,7 +851,9 @@ $(function () {
                         visible: function (e) {
                             debugger
                             return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
-                                (Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35));
+                                (Permission_Approve && (AllowActions &&
+                                    (parseInt(e.row.data.Status) == 35 || parseInt(e.row.data.Status) == 50 || parseInt(e.row.data.Status) == 51)
+                                ));
                         },
                         onClick: function (e) {
                             console.log("Approve clicked", e.row.data);
@@ -854,7 +867,9 @@ $(function () {
                         stylingMode: "contained",
                         visible: function (e) {
                             return (e.row.data.PriceWorkflowStatus == 2 || e.row.data.PriceWorkflowStatus == 0) &&
-                                (Permission_Approve && (AllowActions && parseInt(e.row.data.Status) == 35));
+                                (Permission_Approve && (AllowActions && 
+                                    (parseInt(e.row.data.Status) == 35 || parseInt(e.row.data.Status) == 50 || parseInt(e.row.data.Status) == 51)
+                                ));
                         },
                         onClick: function (e) {
                             console.log("Reject clicked", e.row.data);
@@ -942,8 +957,8 @@ $(function () {
                         }
                     },
                     {
-                        hint: theMainLang == "en" ? "Reserve from warehouse" : "حجز قطع من المستودع",
-                        icon: "save",
+                        hint: theMainLang == "en" ? "Reserve" : "حجز قطع من المستودع",
+                        icon: "bookmark",
                         text: theMainLang == "en" ? "Reserve" : "حجز",
                         type: "success",
                         stylingMode: "contained",
@@ -956,6 +971,9 @@ $(function () {
                                     AllowActions &&
                                     parseInt(e.row.data.Status) !== 41 &&
                                     parseInt(e.row.data.Status) !== 37 &&
+                                    parseInt(e.row.data.Status) !== 42 &&
+                                    parseInt(e.row.data.Status) !== 50 &&
+                                    parseInt(e.row.data.LocatorId) > 0 &&
                                     OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
                                 ));
                         },
@@ -965,6 +983,35 @@ $(function () {
                         onClick: function (e) {
                             CreateIssueVoucher(e.row.data, 0, 50, 11);
                         
+                        }
+                    },
+                    {
+                        hint: theMainLang == "en" ? "Cancel Reserve" : "الغاء حجز قطع من المستودع",
+                        icon: "clear",
+                        text: theMainLang == "en" ? "Cancel Reserve" : "الغاء حجز",
+                        type: "success",
+                        stylingMode: "contained",
+                        visible: function (e) {
+                            const stRaw = e?.row?.data?.Status;
+                            if (stRaw === undefined || stRaw === null || stRaw === "") return false;
+
+                            return !(wipStatus === Complete || wipStatus === Invoiced) &&
+                                (Permission_Issue && (
+                                AllowActions &&
+                                    parseInt(e.row.data.Status) !== 35 &&
+                                    parseInt(e.row.data.Status) !== 51 &&
+                                    parseInt(e.row.data.Status) !== 37 &&
+                                    parseInt(e.row.data.Status) !== 42 &&
+                                    parseInt(e.row.data.LocatorId) > 0 &&
+                                    OurWarehouses.includes(parseInt(e.row.data.WarehouseId))
+                                ));
+                        },
+                        disabled: function (e) {
+                            return parseInt(e.row.data.Status) === 42;
+                        },
+                        onClick: function (e) {
+                            UndoReservation(e.row.data);
+
                         }
                     },
                     {
@@ -1256,6 +1303,14 @@ function updateFieldsFromGrid() {
     const currentVAT = getAmount("#totVAT");
     const combinedVAT = currentVAT + totalVAT;
     setAmount("#totVAT", combinedVAT);
+
+
+    //const items = rows.map(r => r.data || {});
+    //const hasReturn = items.some(x =>
+    //    Number(x.UsedQuantity) < Number(x.Quantity)
+    //);
+
+    //$("#optReturnParts").prop("checked", hasReturn);
 
     updateSubtotal();
 }
@@ -2379,3 +2434,63 @@ document.addEventListener("keydown", (e) => {
 document.getElementById("invFrameHost")?.addEventListener("click", (e) => {
     if (e.target.id === "invFrameHost") closeInvFrameHost();
 });
+
+function UndoReservation(row) {
+    const grid = $("#mainItemsGrid").dxDataGrid("instance");
+    const wipId = Number($("#Id").val() || 0);
+
+    if (!(Number(row?.PartsIssueId || 0) > 0)) {
+        Swal.fire({
+            icon: "warning",
+            title: theMainLang == "en" ? "Issue required first" : "يجب تنفيذ الحجز أولاً",
+            text: theMainLang == "en"
+                ? "You cannot undo before reserve item."
+                : "لا يمكنك تنفيذ التراجع قبل الحجز."
+        });
+        return $.Deferred().reject("missing PartsIssueId").promise();
+    }
+
+    return $.ajax({
+        type: 'POST',
+        url: window.RazorVars.undoReservationUrl,
+        dataType: 'json',
+        data: {
+            PartReserveId: row.PartsIssueId,
+            WIPId: wipId,
+            Id: row.Id
+        }
+    }).done(function (res) {
+        if (!res || !res.success) {
+            Swal.fire({
+                icon: "error",
+                title: (res && (res.message || res.errorMessage))
+                    ? (res.message || res.errorMessage)
+                    : (theMainLang == "en" ? "Error Happened" : "حصل خطأ ما")
+            });
+            return;
+        }
+
+        row.PartsIssueId = null;
+        row.Status = 36;
+        row.StatusText = statusTextById(36, true);
+
+        updateRowInGrid(row).then(function () {
+            grid.refresh();
+
+            Swal.fire({
+                icon: "success",
+                title: theMainLang == "en" ? "Undo completed" : "تم إلغاء الحجز بنجاح"
+            }).then(() => {
+                location.reload();
+            });
+        });
+    }).fail(function (xhr, status, error) {
+        console.error("Undo failed:", status, error, xhr?.responseText);
+
+        Swal.fire({
+            icon: "error",
+            title: theMainLang == "en" ? "Error Happened" : "حصل خطأ ما",
+            text: xhr?.responseJSON?.message || xhr?.responseText || error || status || ""
+        });
+    });
+}
