@@ -3995,6 +3995,13 @@ namespace Workshop.Web.Controllers
                     UserId = UserId
                 });
 
+                await _apiClient.UpdatePartStatusForSingleItem(new UpdateSinglePartStatusDTO
+                {
+                    WIPId = dto.WIPId,
+                    Id = dto.Id,
+                    StatusId = 37
+                });
+
                 return Json(new
                 {
                     success = true,
@@ -4025,7 +4032,39 @@ namespace Workshop.Web.Controllers
 
             }
         }
-      
+
+        #endregion
+        //=====================================================================================================
+        #region Reservation item
+        public async Task<JsonResult> UndoReservationUrl(int PartReserveId, int WIPId, int Id)
+        {
+            var response = await _inventoryApiClient.SetStatus(new InventoryTransactionHeaderSetStatusDTO
+            {
+                HeaderId = PartReserveId,
+                NewStatusId = 3,
+                ModifiedBy = UserId
+            });
+
+            if(response)
+            {
+                await _apiClient.UpdateIssueIdToWIP(new UpdateIssueIdDTO
+                {
+                    IssueId = 0,
+                    WIPId = WIPId,
+                    Id = Id
+                });
+
+                await _apiClient.UpdatePartStatusForSingleItem(new UpdateSinglePartStatusDTO
+                {
+                    WIPId = WIPId,
+                    Id = Id,
+                    StatusId = 35
+                });
+
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
         #endregion
     }
 }
