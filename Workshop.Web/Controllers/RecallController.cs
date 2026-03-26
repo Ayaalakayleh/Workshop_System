@@ -224,6 +224,8 @@ namespace Workshop.Web.Controllers
             }
             catch (Exception e)
             {
+                /// rejester error in the database log 
+                /// Moh'd code review note 
             }
 
             ViewBag.Makes = await GetMakes();
@@ -235,7 +237,7 @@ namespace Workshop.Web.Controllers
                 if (recall.Id > 0)
                 {
 
-                    foreach (var vehicleRecallItem in vehicleRecallJson)
+                    foreach (var vehicleRecallItem in vehicleRecallJson)///vehicleRecallJson check if the object is null to a void any error 
                     {
                         if (recall.Vehicles == null)
                             recall.Vehicles = new List<VehicleRecallDTO>();
@@ -255,7 +257,7 @@ namespace Workshop.Web.Controllers
                                 vehicleRecallItem.ModelID, null, null);
                             foreach (var externalVehicle in externalVehicles)
                             {
-                                recall.Vehicles.Add(new VehicleRecallDTO
+                                recall.Vehicles.Add(new VehicleRecallDTO ///duplicate code, please create a function to fill the data in the list
                                 {
                                     Chassis = externalVehicle.ChassisNo,
                                     RecallID = recall.Id,
@@ -269,7 +271,7 @@ namespace Workshop.Web.Controllers
                               vehicleRecallItem.ModelID, null, null);
                             foreach (var internalVehicle in internalVehicles)
                             {
-                                recall.Vehicles.Add(new VehicleRecallDTO
+                                recall.Vehicles.Add(new VehicleRecallDTO ///duplicate code, please create a function to fill the data in the list
                                 {
                                     Chassis = internalVehicle.ChassisNo,
                                     RecallID = recall.Id,
@@ -307,8 +309,8 @@ namespace Workshop.Web.Controllers
                             var externalVehicles = await _vehicleApiClient.GetAllExternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
                                 vehicleRecallItem.ModelID, null, null);
                             foreach (var externalVehicle in externalVehicles)
-                            {
-                                recall.Vehicles.Add(new VehicleRecallDTO
+                            { 
+                                recall.Vehicles.Add(new VehicleRecallDTO ///duplicate code, please create a function to fill the data in the list
                                 {
                                     Chassis = externalVehicle.ChassisNo,
                                     RecallID = recall.Id,
@@ -321,7 +323,7 @@ namespace Workshop.Web.Controllers
                             }
                             var internalVehicles = await _vehicleApiClient.GetAllInternalWSVehiclesDetails(CompanyId, vehicleRecallItem.MakeID,
                               vehicleRecallItem.ModelID, null, null);
-                            foreach (var internalVehicle in internalVehicles)
+                            foreach (var internalVehicle in internalVehicles)///duplicate code, please create a function to fill the data in the list
                             {
                                 recall.Vehicles.Add(new VehicleRecallDTO
                                 {
@@ -368,6 +370,7 @@ namespace Workshop.Web.Controllers
             return new CreateRecallDTO
             {
                 Code = recallDTO.Code,
+              
                 Description = recallDTO.Description,
                 Title = recallDTO.Title,
                 StartDate = recallDTO.StartDate,
@@ -425,7 +428,7 @@ namespace Workshop.Web.Controllers
                 })
                 .ToList();
 
-            return result;
+            return result; /// add defult value if the object is null
         }
 
         public async Task<VehicleDefinitions> GetVehicleById(int Id)
@@ -435,7 +438,7 @@ namespace Workshop.Web.Controllers
         }
 
 
-        public async Task<IActionResult> DownloadTemplate(string GridData)
+        public async Task<IActionResult> DownloadTemplate(string GridData)/// move it to sherd class to use it in multible loction 
         {
             try
             {

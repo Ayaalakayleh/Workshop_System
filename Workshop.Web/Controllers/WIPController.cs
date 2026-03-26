@@ -719,7 +719,7 @@ namespace Workshop.Web.Controllers
             }
             return PartialView("_VehicleSelectList", colVehicleDefinitions);
         }
-        public async Task<IActionResult> GetAccountNumber(int Id)
+        public async Task<IActionResult> GetAccountNumber(int Id)////Change int to bigint for any id in the system 
         {
 
             var TypeList = await _accountingApiClient.TypeSalesPurchases_GetAll(CompanyId, BranchId, 1, 1);
@@ -750,7 +750,7 @@ namespace Workshop.Web.Controllers
             {
                 Value = m.Id.ToString(),
                 Text = lang == "en" ? m.VehicleModelPrimaryName : m.VehicleModelSecondaryName
-            }).ToList();
+            }).ToList();////plase replace m with name
         }
 
 
@@ -987,11 +987,11 @@ namespace Workshop.Web.Controllers
             int headerId = accountType == (int)AccountTypeEnum.Internal ? 9 : 10;
             var matches = await _apiClient.GetAllLookupDetailsByHeaderIdAsync(headerId, CompanyId);
 
-            return matches.Select(sc => new SelectListItem
+            return matches.Select(sc => new SelectListItem //// add defult value if null
             {
                 Value = sc.Id.ToString(),
                 Text = lang == "en" ? sc.PrimaryName : sc.SecondaryName
-            }).ToList();
+            }).ToList(); /// حlease use completed name "sc"
         }
 
         [HttpPost]
@@ -1024,7 +1024,7 @@ namespace Workshop.Web.Controllers
         public async Task<JsonResult> ScheduleGetById(int RTSId, int WIPId, int KeyId)
         {
             WIPSChedule model = null;
-            model = await _apiClient.WIP_SChedule_Get(RTSId, WIPId, KeyId);
+            model = await _apiClient.WIP_SChedule_Get(RTSId, WIPId, KeyId);/// please fix the worning 
             return Json(model);
         }
 
@@ -1415,10 +1415,10 @@ namespace Workshop.Web.Controllers
 
             try
             {
-                var ExternalWorkshop = await _apiClient.GetWorkshopByIdAsync((int)movement.MoveOutWorkshopId);
+                var ExternalWorkshop = await _apiClient.GetWorkshopByIdAsync((int)movement.MoveOutWorkshopId);/// Change the ID to bigint
                 if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
                 {
-                    bool IsValid = await _accountingApiClient.AccountSalesMaster_IsValidSupplierInvoiceNo((int)ExternalWorkshop.SupplierId, movement.InvoceNo);
+                    bool IsValid = await _accountingApiClient.AccountSalesMaster_IsValidSupplierInvoiceNo((int)ExternalWorkshop.SupplierId, movement.InvoceNo);/// Change the ID to bigint
                     if (!IsValid)
                     {
                         resultJson.IsSuccess = false;
@@ -1537,7 +1537,7 @@ namespace Workshop.Web.Controllers
                     items = await _accountingApiClient.GetItemsByCategoryNo(-1, lang);
                     var InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetById((int)movement.InvoiceTypeId);
 
-
+                    ///Create function to fill the object without doublicate code
                     oAccountSales.AccountSalesMaster = new AccountSalesMaster()
                     {
 
@@ -1696,6 +1696,7 @@ namespace Workshop.Web.Controllers
                 resultJson.IsSuccess = false;
                 resultJson.Type = "error";
                 return Json(resultJson);
+                ///save the error message in the Database
             }
         }
 
