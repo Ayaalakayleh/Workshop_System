@@ -83,7 +83,6 @@
             vertical-align: middle;
         }
 
-    /* ==== Vehicle hero – premium header (bigger car image + button-style status) ==== */
     .the-movements .vehicle-hero__card {
         border-radius: 18px;
         box-shadow: 0 8px 24px rgba(23,23,40,.07);
@@ -92,7 +91,7 @@
 
     .the-movements .vehicle-hero__grid {
         display: grid;
-        grid-template-columns: 260px 1fr 240px; /* bigger left column for the image */
+        grid-template-columns: 260px 1fr 240px;
         gap: 24px;
         align-items: stretch;
     }
@@ -138,7 +137,7 @@
 
     .the-movements .vehicle-hero__photo {
         width: 100%;
-        height: 180px; /* taller visual */
+        height: 180px;
         object-fit: cover;
         border-radius: 14px;
         box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
@@ -245,7 +244,6 @@
         padding: 10px 12px;
     }
 
-    /* Top-right status = button-style tile */
     .the-movements .vehicle-hero__status {
         display: flex;
         align-items: center;
@@ -255,7 +253,7 @@
     .the-movements .status-button {
         width: 100%;
         background: var(--bg-body);
-        border:1px solid var(--bs-border-color);
+        border: 1px solid var(--bs-border-color);
         cursor: pointer;
         border-radius: 18px;
         padding: 16px 14px;
@@ -316,58 +314,59 @@
             box-shadow: 0 0 0 3px rgba(52,211,153,.15);
         }
 
-    /* Scratches canvas (unchanged) */
-    .the-movements .lc-picker, .the-movements .lc-options {
-        display: none
+    .the-movements .lc-picker,
+    .the-movements .lc-options {
+        display: none;
     }
 
-    #panel.scratch-inner, #panel {
+    .the-movements .scratch-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .the-movements #panel.scratch-inner,
+    .the-movements #panel {
         position: relative;
-        min-height: 240px;
-        background-color: #f5f5f5;
+        height: 394px;
+        min-width: 950px;
         border-radius: .5rem;
         border: 1px dashed #ccc;
+        background-image: url('@Url.Content("~/images/tajeer-car-assets/tajeer-car.jpeg")');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: #fff;
+        margin: 0 auto;
     }
 
     .the-movements .mark-scratces-section .shape {
         position: absolute;
         z-index: 9;
-    }
-
-    .the-movements #deep-scratch,
-    .the-movements #small-scratch,
-    .the-movements #very-deep-scratch,
-    .the-movements #bend-in-body {
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        cursor: grab;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
     }
 
-    .the-movements #deep-scratch {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
-    }
+        .the-movements .mark-scratces-section .shape.deep-scratch {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
+        }
 
-    .the-movements #small-scratch {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
-    }
+        .the-movements .mark-scratces-section .shape.small-scratch {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
+        }
 
-    .the-movements #very-deep-scratch {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
-    }
+        .the-movements .mark-scratces-section .shape.very-deep-scratch {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
+        }
 
-    .the-movements #bend-in-body {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
-    }
+        .the-movements .mark-scratces-section .shape.bend-in-body {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
+        }
 
-    /* ==========================================================
-               COMPACT + LIGHTWEIGHT UI ONLY INSIDE mark-scratces-section
-               - smaller sizes
-               - remove uppercase
-               - table-sm
-               ========================================================== */
     .the-movements .mark-scratces-section {
         font-size: .82rem;
         line-height: 1.25;
@@ -963,19 +962,26 @@
 <script>
     $(document).ready(function () {
         if ($("#GettingVehicleId").val() > 0) {
-            GetVehicleData();
+            initializeDetailsPage();
         }
+
         $(".lc-picker-contents div:nth-child(8)").trigger("click");
-    $('.select2').select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        placeholder: function () {
-            return $(this).data('placeholder') || 'Select an option';
-        }
-    });
+
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: function () {
+                return $(this).data('placeholder') || 'Select an option';
+            }
+        });
     });
 
-    function GetVehicleData() {
+    function initializeDetailsPage() {
+        loadVehicleDetails();
+        loadMovementStrikes();
+    }
+
+    function loadVehicleDetails() {
         var type = '@Model.IsExternal' == 'True' ? 2 : 1;
 
         $.ajax({
@@ -989,27 +995,241 @@
                 $("#VehicleModel").text(Data.RefVehicleModels.VehicleModelPrimaryName);
             }
         });
+    }
 
+    function normalizeDamageType(value) {
+        if (!value) return null;
+
+        var normalized = String(value).trim().toLowerCase();
+
+        var map = {
+            "deep-scratch": "deep-scratch",
+            "deepscratch": "deep-scratch",
+            "deep scratch": "deep-scratch",
+
+            "small-scratch": "small-scratch",
+            "smallscratch": "small-scratch",
+            "small scratch": "small-scratch",
+            "minor-scratch": "small-scratch",
+            "minorscratch": "small-scratch",
+            "minor scratch": "small-scratch",
+
+            "very-deep-scratch": "very-deep-scratch",
+            "verydeepscratch": "very-deep-scratch",
+            "very deep scratch": "very-deep-scratch",
+
+            "bend-in-body": "bend-in-body",
+            "bendinbody": "bend-in-body",
+            "bend in body": "bend-in-body",
+            "bend-body": "bend-in-body",
+            "body-bend": "bend-in-body",
+            "curvaturestructure": "bend-in-body",
+            "curvature-structure": "bend-in-body"
+        };
+
+        return map[normalized] || null;
+    }
+
+    function extractDamageArray(data) {
+        if (!data) return [];
+
+        var parsed = data;
+
+        if (typeof parsed === "string") {
+            parsed = parsed.trim();
+            if (!parsed) return [];
+
+            try {
+                parsed = JSON.parse(parsed);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        if (typeof parsed === "string") {
+            try {
+                parsed = JSON.parse(parsed);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        if (Array.isArray(parsed)) return parsed;
+        if (parsed.data && Array.isArray(parsed.data)) return parsed.data;
+        if (parsed.result && Array.isArray(parsed.result)) return parsed.result;
+        if (parsed.items && Array.isArray(parsed.items)) return parsed.items;
+
+        return [];
+    }
+
+    function getPanelImageRect() {
+        var $panel = $("#panel");
+        var panel = $panel[0];
+
+        if (!panel) return null;
+
+        var panelWidth = $panel.innerWidth();
+        var panelHeight = $panel.innerHeight();
+
+        var imageWidth = 1600;
+        var imageHeight = 662;
+
+        var imageRatio = imageWidth / imageHeight;
+        var panelRatio = panelWidth / panelHeight;
+
+        var drawWidth, drawHeight, left, top;
+
+        if (imageRatio > panelRatio) {
+            drawWidth = panelWidth;
+            drawHeight = panelWidth / imageRatio;
+            left = 0;
+            top = (panelHeight - drawHeight) / 2;
+        } else {
+            drawHeight = panelHeight;
+            drawWidth = panelHeight * imageRatio;
+            top = 0;
+            left = (panelWidth - drawWidth) / 2;
+        }
+
+        return {
+            left: left,
+            top: top,
+            width: drawWidth,
+            height: drawHeight
+        };
+    }
+
+    function oldPixelToImagePercent(x, y) {
+        var rect = getPanelImageRect();
+        if (!rect) return null;
+
+        var xPercent = ((x - rect.left) / rect.width) * 100;
+        var yPercent = ((y - rect.top) / rect.height) * 100;
+
+        return {
+            xPercent: xPercent,
+            yPercent: yPercent
+        };
+    }
+
+    function imagePercentToPanelPoint(xPercent, yPercent) {
+        var rect = getPanelImageRect();
+        if (!rect) return null;
+
+        return {
+            x: rect.left + (xPercent / 100) * rect.width,
+            y: rect.top + (yPercent / 100) * rect.height
+        };
+    }
+
+    function normalizeDamageItem(item) {
+        if (!item) return null;
+
+        var rawType =
+            item.type ??
+            item.Type ??
+            item.damageType ??
+            item.DamageType ??
+            item.name ??
+            item.Name;
+
+        var type = normalizeDamageType(rawType);
+        if (!type) return null;
+
+        var xPercent = item.xPercent ?? item.XPercent ?? item.xp ?? item.imageXPercent ?? item.ImageXPercent;
+        var yPercent = item.yPercent ?? item.YPercent ?? item.yp ?? item.imageYPercent ?? item.ImageYPercent;
+
+        if (xPercent != null && yPercent != null) {
+            xPercent = Number(xPercent);
+            yPercent = Number(yPercent);
+
+            if (isNaN(xPercent) || isNaN(yPercent)) return null;
+
+            return {
+                type: type,
+                xPercent: xPercent,
+                yPercent: yPercent
+            };
+        }
+
+        var x = Number(item.x ?? item.X ?? item.left ?? item.Left ?? item.positionX ?? item.PositionX);
+        var y = Number(item.y ?? item.Y ?? item.top ?? item.Top ?? item.positionY ?? item.PositionY);
+
+        if (isNaN(x) || isNaN(y)) return null;
+
+        var converted = oldPixelToImagePercent(x, y);
+        if (!converted) return null;
+
+        return {
+            type: type,
+            xPercent: converted.xPercent,
+            yPercent: converted.yPercent
+        };
+    }
+
+    function renderShape(shape, index) {
+        var point = imagePercentToPanelPoint(shape.xPercent, shape.yPercent);
+        if (!point) return;
+
+        var $shape = $('<div></div>', {
+            'class': 'shape ' + shape.type + ' shape-' + index,
+            'data-shape-type': shape.type
+        });
+
+        $shape.css({
+            left: point.x + 'px',
+            top: point.y + 'px'
+        });
+
+        $("#panel").append($shape);
+    }
+
+    function redrawDetailsShapes(shapes) {
+        $("#panel").find(".shape").remove();
+
+        for (var i = 0; i < shapes.length; i++) {
+            renderShape(shapes[i], i);
+        }
+
+        $("#strikes").val(JSON.stringify(shapes));
+    }
+
+    function loadMovementStrikes() {
         $.ajax({
             type: "GET",
             url: "@Url.Action("GetStrike", "Movements")" + '?MovementId=' + @Model.MovementId,
-            dataType: "JSON",
+            dataType: "text",
             success: function (Data) {
-                if (Data != "") {
-                    let jsonObject = JSON.parse(Data);
-                    for (var i = 0; i < jsonObject.length; i++) {
-                        var shapetype = jsonObject[i].type;
-                        var xcoord = jsonObject[i].x -20;
-                        var ycoord = jsonObject[i].y -20;
-                        var $shape = $('<div class="shape shape-' + i + '" id="' + shapetype + '"></div>');
-                        $shape.css({ 'left': xcoord - 2, 'top': ycoord - 2 });
-                        $("#panel").append($shape);
-                    }
+                var items = extractDamageArray(Data);
+                var normalizedShapes = [];
+
+                for (var i = 0; i < items.length; i++) {
+                    var shape = normalizeDamageItem(items[i]);
+                    if (!shape) continue;
+                    normalizedShapes.push(shape);
                 }
+
+                redrawDetailsShapes(normalizedShapes);
+            },
+            error: function (xhr) {
+                console.log("GetStrike error:", xhr.status, xhr.responseText);
             }
         });
-
     }
+
+    $(window).on('resize', function () {
+        var current = $("#strikes").val();
+        if (!current) return;
+
+        try {
+            var shapes = JSON.parse(current);
+            if (Array.isArray(shapes)) {
+                redrawDetailsShapes(shapes);
+            }
+        } catch (e) {
+            console.log("Resize redraw parse error:", e);
+        }
+    });
 
     var cuspond;
     var validCusPhoto = true;
@@ -1022,15 +1242,15 @@
 
         @foreach (var item in Model.MovementInvoice)
         {
-             <text>
-                   var source = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-                        FileService.GetFileFullPath(item.FileName, item.FilePath)
-                   ));
+                <text>
+                    var source = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                                            FileService.GetFileFullPath(item.FileName, item.FilePath)
+                                    ));
 
-                   var fi = { "source": source, options: { type: 'local' } };
-                   file.files.push(fi);
-           </text>
-        }
+                var fi = { "source": source, options: { type: 'local' } };
+                file.files.push(fi);
+            </text>
+                }
 
         cuspond = FilePond.create(inputElement, {
             imageCropAspectRatio: '1:1',
@@ -1049,14 +1269,6 @@
             }
         });
     });
-
-    //     $(document).ready(function () {
-    //     $("#recallList").select2({
-    //         allowClear: true,
-    //         width: "100%"
-    //     });
-    // });
-
 </script>
 <script>
     $(document).on('click', '#createJobCardBtn', function () {

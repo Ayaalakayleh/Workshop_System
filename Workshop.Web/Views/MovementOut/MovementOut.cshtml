@@ -29,7 +29,6 @@
         padding: 20px;
     }
 
-    /* Signature canvas wrapper */
     .signature {
         border: 2px dotted black;
         background-color: lightgrey;
@@ -50,7 +49,6 @@
         position: relative;
     }
 
-    /* Fieldset theme (match MovementIn) */
     .ui-fieldset {
         border: 2px dashed var(--primary-100, #e5e7eb);
         border-radius: .75rem;
@@ -64,7 +62,8 @@
             padding: 0 .5rem;
         }
 
-    .select2-dropdown, .select2-dropdown--above {
+    .select2-dropdown,
+    .select2-dropdown--above {
         z-index: 999999999999 !important;
     }
 
@@ -101,11 +100,11 @@
         cursor: grab;
     }
 
-    .lc-picker, .lc-options {
+    .lc-picker,
+    .lc-options {
         display: none;
     }
 
-    /* === Vehicle hero (borrowed from MovementIn) === */
     .vehicle-hero {
         margin-bottom: 1rem;
     }
@@ -126,12 +125,9 @@
     }
 
     @@media (max-width: 991.98px) {
-        .vehicle-hero__grid
-
-    {
-        grid-template-columns: 1fr;
-    }
-
+        .vehicle-hero__grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .vehicle-hero__facts {
@@ -265,7 +261,6 @@
             font-weight: 600;
         }
 
-    /* === Scratch canvas + cursors (aligned with MovementIn, keep your dimensions) === */
     .mark-scratces-section {
         margin-top: .5rem;
     }
@@ -279,7 +274,7 @@
     }
 
     .scratches-container {
-        overflow-x:auto;
+        overflow-x: auto;
         width: 100%;
     }
 
@@ -288,11 +283,14 @@
     #panel-canvas {
         position: relative;
         height: 394px;
+        min-width: 950px;
         border: 1px dashed #ccc;
         border-radius: .5rem;
         background-image: url('@Url.Content("~/images/tajeer-car-assets/tajeer-car.jpeg")');
-        background-size: cover;
+        background-size: contain;
+        background-position: center;
         background-repeat: no-repeat;
+        background-color: #fff;
         margin: 0 auto;
     }
 
@@ -312,39 +310,38 @@
         cursor: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")') 16 16, auto;
     }
 
-    .mark-scratces-section .shape {
-        position: absolute;
-    }
-
     .shape {
+        position: absolute;
         z-index: 999999 !important;
         width: 30px;
         height: 30px;
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
     }
 
-    /* Per damage type icons (keep your existing IDs to match JS) */
-    .mark-scratces-section #deep-scratch {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
-    }
+        .shape.deep-scratch {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/DeepScratch.png")');
+        }
 
-    .mark-scratces-section #small-scratch {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
-    }
+        .shape.small-scratch {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/MinorScratch.png")');
+        }
 
-    .mark-scratces-section #very-deep-scratch {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
-    }
+        .shape.very-deep-scratch {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/VeryDeepScratch.png")');
+        }
 
-    .mark-scratces-section #bend-in-body {
-        background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
-    }
+        .shape.bend-in-body {
+            background-image: url('@Url.Content("~/images/tajeer-car-assets/CurvatureStructure.png")');
+        }
+
     @@media (max-width: 450px) {
-    .mark-scratces-section #panel{
-        width:55rem
-    }
+        .mark-scratces-section #panel {
+            width: 55rem;
+        }
     }
 </style>
 
@@ -376,11 +373,9 @@
 
                         <input type="hidden" id="WorkshopMovDmg" name="WorkshopMovDmg" value="" />
 
-                        <!-- === VEHICLE HERO HEADER (styled like MovementIn) === -->
                         <div class="vehicle-hero">
                             <div class="vehicle-hero__card">
                                 <div class="vehicle-hero__grid">
-                                    <!-- Vehicle facts -->
                                     <div class="vehicle-hero__facts">
                                         <div class="vehicle-hero__row">
                                             <div class="vehicle-hero__fact">
@@ -425,7 +420,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Status radios styled like MovementIn -->
                                     <div class="vehicle-hero__status">
                                         <div class="status-stack" role="group" aria-label="maintenance-type">
                                             <label class="w-100 mb-0">
@@ -456,7 +450,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Customer card styled -->
                                     <div>
                                         <div class="customer-card">
                                             <div class="customer-card__icon" aria-hidden="true">
@@ -478,7 +471,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- === END VEHICLE HERO === -->
 
                         <div class="row">
                             <div class="col-lg-6 col-md-12 col-sm-12">
@@ -674,17 +666,17 @@
                             <i class="fa fa-save"></i>&nbsp;@Common["Button_Save"]
                         </button>
                     </div>
-                     }
+                                        }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script src="~/js/site.js"></script>
 
 <script>
     $(document).ready(function () {
-        /* Start Scratches js */
         var d = new Date(),
             h = d.getHours(),
             m = d.getMinutes();
@@ -694,143 +686,370 @@
 
         $('#ExitTime').val(h + ":" + m);
 
+        var $panel = $('#panel');
+        var $undoButton = $('#undo-button');
+        var $clearButton = $('#clear-button');
+
+        var shapesJson = [];
+        var shapeType = null;
+        var shapeCount = 0;
+
+        var DAMAGE_TYPES = {
+            "deep-scratch": true,
+            "small-scratch": true,
+            "very-deep-scratch": true,
+            "bend-in-body": true
+        };
+
+        var panelImage = new Image();
+        panelImage.src = '@Url.Content("~/images/tajeer-car-assets/tajeer-car.jpeg")';
+
         function updateDamageHidden() {
             $('#WorkshopMovDmg').val(JSON.stringify(shapesJson));
         }
 
         function resetCursorClasses() {
-            $("#panel").removeClass("deep-scratch-cursor small-scratch-cursor very-deep-cursor bend-body-cursor");
+            $panel.removeClass("deep-scratch-cursor small-scratch-cursor very-deep-cursor bend-body-cursor");
         }
 
-        var shapesJson = [];
-        var shapeType;
-        var xCoord;
-        var yCoord;
-        var shapeCount = 0;
+        function normalizeDamageType(value) {
+            if (!value) return null;
 
-        var undoButton = $('#undo-button');
-        var clearButton = $('#clear-button');
+            var normalized = String(value).trim().toLowerCase();
 
-        $('#DeepScratch-btn').click(function () {
-            shapeType = 'deep-scratch';
-            $('#coordinates').text('DeepScratch coordinates: ');
-            resetCursorClasses();
-            $("#panel").addClass("deep-scratch-cursor");
-        });
+            var map = {
+                "deep-scratch": "deep-scratch",
+                "deepscratch": "deep-scratch",
+                "deep scratch": "deep-scratch",
 
-        $('#SmallScratch-btn').click(function () {
-            shapeType = 'small-scratch';
-            $('#coordinates').text('SmallScratch coordinates: ');
-            resetCursorClasses();
-            $("#panel").addClass("small-scratch-cursor");
-        });
+                "small-scratch": "small-scratch",
+                "smallscratch": "small-scratch",
+                "small scratch": "small-scratch",
+                "minor-scratch": "small-scratch",
+                "minorscratch": "small-scratch",
+                "minor scratch": "small-scratch",
 
-        $('#VeryDeepScratch-btn').click(function () {
-            shapeType = 'very-deep-scratch';
-            $('#coordinates').text('VeryDeepScratch coordinates: ');
-            resetCursorClasses();
-            $("#panel").addClass("very-deep-cursor");
-        });
+                "very-deep-scratch": "very-deep-scratch",
+                "verydeepscratch": "very-deep-scratch",
+                "very deep scratch": "very-deep-scratch",
 
-        $('#BendInBody-btn').click(function () {
-            shapeType = 'bend-in-body';
-            $('#coordinates').text('BendInBody coordinates: ');
-            resetCursorClasses();
-            $("#panel").addClass("bend-body-cursor");
-        });
+                "bend-in-body": "bend-in-body",
+                "bendinbody": "bend-in-body",
+                "bend in body": "bend-in-body",
+                "bend-body": "bend-in-body",
+                "body-bend": "bend-in-body",
+                "curvaturestructure": "bend-in-body",
+                "curvature-structure": "bend-in-body"
+            };
 
-        // Get existing strikes
-        $.ajax({
-            type: "GET",
-            url: "@Url.Action("GetStrike", "Movements")" + '?MovementId=' + '@Model.MovementId',
-            dataType: "text",
-            success: function (Data) {
-                if (!Data || Data === "") return;
+            return map[normalized] || null;
+        }
 
-                var jsonObject;
+        function extractDamageArray(data) {
+            if (!data) return [];
+
+            var parsed = data;
+
+            if (typeof parsed === "string") {
+                parsed = parsed.trim();
+                if (!parsed) return [];
+
                 try {
-                    jsonObject = (typeof Data === 'string') ? JSON.parse(Data) : Data;
+                    parsed = JSON.parse(parsed);
                 } catch (e) {
-                    jsonObject = Data;
+                    return [];
                 }
+            }
 
-                if (!jsonObject || !jsonObject.length) return;
-
-                for (var i = 0; i < jsonObject.length; i++) {
-                    var shapeTypeLocal = jsonObject[i].type;
-                    var xCoordLocal = jsonObject[i].x + 35;
-                    var yCoordLocal = jsonObject[i].y + 23;
-
-                    var $shape = $('<div class="shape shape-' + i + '" id="' + shapeTypeLocal + '"></div>');
-                    $shape.css({ 'left': xCoordLocal - 2, 'top': yCoordLocal - 2 });
-
-                    $("#panel").append($shape);
-
-                    shapesJson.push({
-                        "type": "" + shapeTypeLocal + "",
-                        "x": xCoordLocal - 35,
-                        "y": yCoordLocal - 23
-                    });
+            if (typeof parsed === "string") {
+                try {
+                    parsed = JSON.parse(parsed);
+                } catch (e) {
+                    return [];
                 }
+            }
 
+            if (Array.isArray(parsed)) return parsed;
+            if (parsed.data && Array.isArray(parsed.data)) return parsed.data;
+            if (parsed.result && Array.isArray(parsed.result)) return parsed.result;
+            if (parsed.items && Array.isArray(parsed.items)) return parsed.items;
+
+            return [];
+        }
+
+        function getImageRect() {
+            var panelW = $panel.innerWidth();
+            var panelH = $panel.innerHeight();
+
+            if (!panelImage.naturalWidth || !panelImage.naturalHeight) {
+                return {
+                    left: 0,
+                    top: 0,
+                    width: panelW,
+                    height: panelH
+                };
+            }
+
+            var imageRatio = panelImage.naturalWidth / panelImage.naturalHeight;
+            var panelRatio = panelW / panelH;
+
+            var drawW, drawH, left, top;
+
+            if (imageRatio > panelRatio) {
+                drawW = panelW;
+                drawH = panelW / imageRatio;
+                left = 0;
+                top = (panelH - drawH) / 2;
+            } else {
+                drawH = panelH;
+                drawW = panelH * imageRatio;
+                top = 0;
+                left = (panelW - drawW) / 2;
+            }
+
+            return {
+                left: left,
+                top: top,
+                width: drawW,
+                height: drawH
+            };
+        }
+
+        function panelPointToImagePercent(x, y) {
+            var rect = getImageRect();
+
+            if (x < rect.left || x > rect.left + rect.width || y < rect.top || y > rect.top + rect.height) {
+                return null;
+            }
+
+            return {
+                xPercent: ((x - rect.left) / rect.width) * 100,
+                yPercent: ((y - rect.top) / rect.height) * 100
+            };
+        }
+
+        function imagePercentToPanelPoint(xPercent, yPercent) {
+            var rect = getImageRect();
+
+            return {
+                x: rect.left + (xPercent / 100) * rect.width,
+                y: rect.top + (yPercent / 100) * rect.height
+            };
+        }
+
+        function normalizeDamageItem(item) {
+            if (!item) return null;
+
+            var rawType =
+                item.type ??
+                item.Type ??
+                item.damageType ??
+                item.DamageType ??
+                item.name ??
+                item.Name;
+
+            var normalizedType = normalizeDamageType(rawType);
+            if (!normalizedType || !DAMAGE_TYPES[normalizedType]) return null;
+
+            var xPercent = item.xPercent ?? item.XPercent ?? item.xp ?? item.imageXPercent ?? item.ImageXPercent;
+            var yPercent = item.yPercent ?? item.YPercent ?? item.yp ?? item.imageYPercent ?? item.ImageYPercent;
+
+            if (xPercent != null && yPercent != null) {
+                xPercent = Number(xPercent);
+                yPercent = Number(yPercent);
+
+                if (isNaN(xPercent) || isNaN(yPercent)) return null;
+
+                return {
+                    type: normalizedType,
+                    xPercent: xPercent,
+                    yPercent: yPercent
+                };
+            }
+
+            var x = item.x ?? item.X ?? item.left ?? item.Left ?? item.positionX ?? item.PositionX;
+            var y = item.y ?? item.Y ?? item.top ?? item.Top ?? item.positionY ?? item.PositionY;
+
+            x = Number(x);
+            y = Number(y);
+
+            if (isNaN(x) || isNaN(y)) return null;
+
+            var converted = panelPointToImagePercent(x, y);
+            if (!converted) return null;
+
+            return {
+                type: normalizedType,
+                xPercent: converted.xPercent,
+                yPercent: converted.yPercent
+            };
+        }
+
+        function renderShape(shape, pushToJson) {
+            if (!shape || !DAMAGE_TYPES[shape.type]) return;
+
+            var point = imagePercentToPanelPoint(shape.xPercent, shape.yPercent);
+
+            shapeCount++;
+
+            var $shape = $('<div></div>', {
+                'class': 'shape ' + shape.type + ' shape-' + shapeCount,
+                'data-shape-type': shape.type
+            });
+
+            $shape.css({
+                left: point.x + 'px',
+                top: point.y + 'px'
+            });
+
+            $panel.append($shape);
+
+            if (pushToJson !== false) {
+                shapesJson.push({
+                    type: shape.type,
+                    xPercent: shape.xPercent,
+                    yPercent: shape.yPercent
+                });
                 updateDamageHidden();
             }
+        }
+
+        function redrawAllShapes() {
+            $panel.find('.shape').remove();
+            shapeCount = 0;
+
+            for (var i = 0; i < shapesJson.length; i++) {
+                renderShape(shapesJson[i], false);
+            }
+        }
+
+        function loadExistingStrikes() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetStrike", "Movements")" + '?MovementId=' + '@Model.MovementId',
+                dataType: "text",
+                success: function (data) {
+                    var items = extractDamageArray(data);
+
+                    shapesJson = [];
+                    shapeCount = 0;
+                    $panel.find('.shape').remove();
+
+                    if (!items.length) {
+                        updateDamageHidden();
+                        return;
+                    }
+
+                    for (var i = 0; i < items.length; i++) {
+                        var normalized = normalizeDamageItem(items[i]);
+                        if (!normalized) continue;
+
+                        shapesJson.push({
+                            type: normalized.type,
+                            xPercent: normalized.xPercent,
+                            yPercent: normalized.yPercent
+                        });
+                    }
+
+                    redrawAllShapes();
+                    updateDamageHidden();
+                },
+                error: function (xhr) {
+                    console.log("GetStrike error:", xhr.status, xhr.responseText);
+                    updateDamageHidden();
+                }
+            });
+        }
+
+        $('#DeepScratch-btn').on('click', function () {
+            shapeType = 'deep-scratch';
+            resetCursorClasses();
+            $panel.addClass("deep-scratch-cursor");
         });
 
-        // Add new strike
-        $('#panel').click(function (e) {
+        $('#SmallScratch-btn').on('click', function () {
+            shapeType = 'small-scratch';
+            resetCursorClasses();
+            $panel.addClass("small-scratch-cursor");
+        });
+
+        $('#VeryDeepScratch-btn').on('click', function () {
+            shapeType = 'very-deep-scratch';
+            resetCursorClasses();
+            $panel.addClass("very-deep-cursor");
+        });
+
+        $('#BendInBody-btn').on('click', function () {
+            shapeType = 'bend-in-body';
+            resetCursorClasses();
+            $panel.addClass("bend-body-cursor");
+        });
+
+        $panel.on('click', function (e) {
             if (!shapeType) return;
 
-            var id = ++shapeCount;
-            xCoord = e.pageX - $(this).offset().left;
-            yCoord = e.pageY - $(this).offset().top;
+            var offset = $(this).offset();
+            var x = e.pageX - offset.left;
+            var y = e.pageY - offset.top;
 
-            var $shape = $('<div class="shape shape-' + id + '" id="' + shapeType + '"></div>');
-            $shape.css({ 'left': xCoord - 2, 'top': yCoord - 2 });
+            var point = panelPointToImagePercent(x, y);
+            if (!point) return;
 
-            $(this).append($shape);
-
-            $('#coordinates').append(shapeType + ': (' + xCoord + ', ' + yCoord + ') ');
             shapesJson.push({
-                "type": "" + shapeType + "",
-                "x": xCoord - 35,
-                "y": yCoord - 23
+                type: shapeType,
+                xPercent: point.xPercent,
+                yPercent: point.yPercent
             });
 
+            redrawAllShapes();
             updateDamageHidden();
         });
 
-        // Undo
-        undoButton.on('click', function () {
-            var lastShape = shapesJson.pop();
-            if (lastShape) {
-                $('.shape:last-child').remove();
-                updateDamageHidden();
-            }
+        $undoButton.on('click', function () {
+            if (!shapesJson.length) return;
+
+            shapesJson.pop();
+            redrawAllShapes();
+            updateDamageHidden();
         });
 
-        // Clear
-        clearButton.on('click', function () {
+        $clearButton.on('click', function () {
             shapesJson = [];
-            $("#panel").empty();
+            shapeCount = 0;
+            $panel.find('.shape').remove();
             updateDamageHidden();
         });
 
-        /* End Scratches js */
-
-        GetVehicleData();
-
-        $("#ExitMeter").val(parseFloat($("#ReceivedMeter").val()) + 1);
-
-        document.querySelectorAll('input[name="Type"]').forEach(radio => {
-            radio.addEventListener('change', function () {
-                const isRegularMaintenance = this.value === 'option1';
-                $('#IsRegularMaintenance').val(isRegularMaintenance);
-            });
+        $(window).on('resize', function () {
+            redrawAllShapes();
         });
+
+        function initializeScratchPanel() {
+            loadExistingStrikes();
+            GetVehicleData();
+            $("#ExitMeter").val(parseFloat($("#ReceivedMeter").val()) + 1);
+
+            document.querySelectorAll('input[name="Type"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    var isRegularMaintenance = this.value === 'option1';
+                    $('#IsRegularMaintenance').val(isRegularMaintenance);
+                });
+            });
+        }
+
+        if (panelImage.complete) {
+            initializeScratchPanel();
+        } else {
+            panelImage.onload = function () {
+                initializeScratchPanel();
+            };
+            panelImage.onerror = function () {
+                initializeScratchPanel();
+            };
+        }
     });
 
-    var rowCount = $('#tblMainteneance  >tbody >tr').length;
+    var rowCount = $('#tblMainteneance > tbody > tr').length;
 
     function toBool(v) {
         if (typeof v === "boolean") return v;
@@ -843,7 +1062,6 @@
     }
 
     function getSuccessFlag(resp) {
-        // resp might be: {isSuccess:true} OR {IsSuccess:true} OR {success:true} OR plain true/1/"true"
         if (resp && typeof resp === "object") {
             return toBool(resp.IsSuccess ?? resp.isSuccess ?? resp.success ?? resp.Success ?? resp.ok);
         }
@@ -855,10 +1073,9 @@
         return resp.Message ?? resp.message ?? resp.error ?? resp.Error ?? "";
     }
 
-        function ValidOut() {
+    function ValidOut() {
         var isValid = true;
 
-        // ---- validation (keep yours, I only made it safer) ----
         if ($("#OutfuelLevelId").length && ($("#OutfuelLevelId").val() == "" || $("#OutfuelLevelId").val() == "0")) {
             $("#OutfuelLevelId").next().children(':first-child').children(':first-child').css("border-color", "red");
             isValid = false;
@@ -894,12 +1111,10 @@
             $("#VehicleSubStatusId").next().children().children().removeClass("invalid");
         }
 
-        // ---- build maintenance cards with backend-friendly names ----
         var cards = [];
         var i = 0;
         $('#tblMainteneance > tbody > tr').each(function () {
             cards.push({
-                // Use WorkOrderId (your view uses item.WorkOrderId)
                 WorkOrderId: parseInt($(this).find('#MaintenanceType_' + i).val()) || null,
                 Description: $(this).find('#MaintenanceDesc_' + i).val() || "",
                 status: $(this).find('#switchh_' + i).is(":checked"),
@@ -908,13 +1123,9 @@
             i++;
         });
 
-        // robust bool parsing
         var isRegularMaintenanceVal = String($('#IsRegularMaintenance').val() ?? '').toLowerCase() === 'true';
         var isExternalVal = String($('#IsExternal').val() ?? '').toLowerCase() === 'true';
 
-        // ✅ IMPORTANT: send the property names your server likely expects
-        // - MovementId (not MovementInId)
-        // - WorkshopMovDmg (not strikes)
         var movement = {
             MovementId: parseInt($('#MovementId').val()) || null,
             InvoiceId: parseInt('@Model.InvoiceId') || null,
@@ -932,7 +1143,6 @@
             IsRegularMaintenance: isRegularMaintenanceVal,
             IsExternal: isExternalVal,
 
-            // send damage in the expected field name
             WorkshopMovDmg: $('#WorkshopMovDmg').val() || "[]",
 
             LastVehicleStatus: parseInt($('#LastVehicleStatus').val()) || null,
@@ -947,10 +1157,7 @@
 
         if (!isValid) return;
 
-        // ✅ send anti-forgery token (ASP.NET Core reads this header by default)
         var token = $('input[name="__RequestVerificationToken"]').val();
-
-        // prevent double submit
         $("#btnCreate").prop("disabled", true);
 
         $.ajax({
@@ -966,7 +1173,6 @@
 
                 var ok = getSuccessFlag(data);
 
-                // if API returns 200 with empty body, treat it as OK
                 if (!ok && (data == null || data === "")) {
                     ok = (xhr && xhr.status >= 200 && xhr.status < 300);
                 }
@@ -987,7 +1193,6 @@
             }
         });
     }
-
 
     function GetVehicleData() {
         var type = '@Model.IsExternal' == 'True' ? 2 : 1;
