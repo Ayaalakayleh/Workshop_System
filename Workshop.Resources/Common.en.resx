@@ -2835,4 +2835,13 @@
   <data name="Label_UploadedFile" xml:space="preserve">
     <value>Uploaded File</value>
   </data>
+  <data name="Title_MovementsHistory" xml:space="preserve">
+    <value>Movements History</value>
+  </data>
+  <data name="Label_ExternalWorkshop" xml:space="preserve">
+    <value>External Workshop</value>
+  </data>
+  <data name="Label_InternalWorkshop" xml:space="preserve">
+    <value>Internal Workshop</value>
+  </data>
 </root>

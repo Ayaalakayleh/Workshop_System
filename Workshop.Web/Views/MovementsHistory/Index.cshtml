@@ -11,7 +11,7 @@
     <div class="col-12">
         <div id="panel-1" class="panel">
             <div class="panel-hdr px-2">
-                <h2 class="font-weight-bold">@Common["Movements History"]</h2>
+                <h2 class="font-weight-bold">@Common["Title_MovementsHistory"]</h2>
             </div>
             <div class="panel-container show">
                 <div class="panel-content text-start">
@@ -74,7 +74,9 @@
 </div>
 
 <div id="MovementList"></div>
-<div id="contentPager" hidden></div>
+<div class="d-flex justify-content-end">
+    <div id="contentPager" hidden></div>
+</div>
 
 <script src="~/js/site.js"></script>
 
@@ -132,8 +134,8 @@
                         itemsOnPage: 1,
                         currentPage: page,
                         cssStyle: 'light-theme',
-                        prevText: 'Previous',
-                        nextText: 'Next',
+                        prevText: '@Common["Label_Previous"]',
+                        nextText: '@Common["DT_Paginate_Next"]',
                         onPageClick: function (pageNumber, event) {
                             if (event) {
                                 event.preventDefault();

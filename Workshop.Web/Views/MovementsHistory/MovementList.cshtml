@@ -8,15 +8,7 @@
     <div class="col-12">
         <div id="panel-1" class="panel">
             <div class="panel-hdr px-2">
-                <h2 class="font-weight-bold">@Common["MovementList"]</h2>
-                <div class="panel-toolbar">
-                    <button class="btn btn-panel" data-action="panel-collapse" data-offset="0,10" title="Collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                    <button class="btn btn-panel" data-action="panel-fullscreen" data-offset="0,10" title="Fullscreen">
-                        <i class="fa fa-arrows"></i>
-                    </button>
-                </div>
+                <h2 class="font-weight-bold">@Common["Title_MovementsHistory"]</h2>
             </div>
 
             <div class="panel-container show">
@@ -24,7 +16,7 @@
                     <table class="table table-bordered table-hover w-100 text-center main-table" id="tblData">
                         <thead>
                             <tr>
-                                <th>@Common["Vehicle"]</th>
+                                <th>@Common["Label_Vehicle"]</th>
                                 <th>@Html.DisplayName(Common["Label_MovementDate"])</th>
                                 <th>@Html.DisplayName(Common["Label_MovementIn"])</th>
                                 <th>@Html.DisplayName(Common["Label_MovementOut"])</th>
@@ -74,26 +66,26 @@
                                         <td>
                                             @if (item.MovementIN == true && item.MovementOutId != 0 && item.MoveInWorkshopId != 0 && item.MoveOutWorkshopId != 0)
                                             {
-                                                <label>@Common["Workshop"] @Common["External"]</label>
+                                                <label>@Common["Label_ExternalWorkshop"]</label>
                                             }
                                             else if (item.MovementIN == true && item.MovementOutId == 0)
                                             {
-                                                <label>@Common["Workshop"] @Common["Internal"]</label>
+                                                <label>@Common["Label_InternalWorkshop"]</label>
                                             }
                                             else if (item.MovementOut == true && item.MovementInId != 0 && item.MoveInWorkshopId != 0 && item.MoveOutWorkshopId != 0)
                                             {
-                                                <label>@Common["Workshop"] @Common["External"]</label>
+                                                <label>@Common["Label_ExternalWorkshop"]</label>
                                             }
                                             else if (item.MovementOut == true && item.MovementInId != 0)
                                             {
-                                                <label>@Common["Workshop"] @Common["Internal"]</label>
+                                                <label>@Common["Label_InternalWorkshop"]</label>
                                             }
                                         </td>
                                         <td>
                                             <a href="@Url.Action("VehicleMovementFind", "Movements", new { MovementId = item.MovementId })" class="btn btn-success">
                                                 <i class="fa fa-eye"></i>
                                                 &nbsp;
-                                                @Common["View"]
+                                                @Common["Button_View"]
                                             </a>
                                         </td>
                                     </tr>
@@ -102,10 +94,12 @@
                         </tbody>
                     </table>
 
-                    @if (Model.ColMovements != null && Model.ColMovements.Count > 0)
-                    {
-                        <input id="total_pages" value="@Math.Ceiling((decimal)Model.ColMovements.ToList()[0].TotalPages / 25)" hidden />
-                    }
+
+                        @if (Model.ColMovements != null && Model.ColMovements.Count > 0)
+                        {
+                            <input id="total_pages" value="@Math.Ceiling((decimal)Model.ColMovements.ToList()[0].TotalPages / 25)" hidden />
+                        }
+
                 </div>
             </div>
         </div>
