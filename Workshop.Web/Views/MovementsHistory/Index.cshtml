@@ -26,24 +26,24 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-3 col-sm-12" ShowDate">
+                            <div class="col-md-3 col-sm-12">
                                 <div class="form-group" id="mYear">
                                     <label>@Common["Label_FromDate"]</label>
                                     <div class="input-group">
                                         @Html.EditorFor(model => model.FromDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "FromDate", type = "date" } })
-                                     
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 col-sm-12" ShowDate">
+
+                            <div class="col-md-3 col-sm-12">
                                 <div class="form-group" id="mYear">
                                     <label>@Common["Label_ToDate"]</label>
                                     <div class="input-group">
-                                        @Html.EditorFor(model => model.ToDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "ToDate", type = "date"} })
-                                     
+                                        @Html.EditorFor(model => model.ToDate, new { htmlAttributes = new { @class = "form-control flat-picker", id = "ToDate", type = "date" } })
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-md-3 text-start mt-3">
                                 <div class="custom-control custom-switch mt-1">
                                     @Html.CheckBox("MovementIN", new { @class = "custom-control-input" })
@@ -57,26 +57,39 @@
                         </div>
 
                         <div class="text-center mt-3">
-                            <button id="searchVehicleMovment" type="button" class="btn btn-primary btn-w-m"><i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]</button>
-                            <button id="reset-fields" type="reset" class="btn btn-secondary btn-w-m"><i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]</button>
+                            <button id="searchVehicleMovment" type="button" class="btn btn-primary btn-w-m">
+                                <i class="fa fa-search"></i>&nbsp;@Common["Button_Search"]
+                            </button>
+                            <button id="reset-fields" type="reset" class="btn btn-secondary btn-w-m">
+                                <i class="fa fa-times"></i>&nbsp;@Common["Button_Reset"]
+                            </button>
                             <input type="hidden" id="hidSearchVehicleDefinitions" value="0" />
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div id="MovementList"></div>
-<div id="contentPager"></div>
+<div id="contentPager" hidden></div>
 
 <script src="~/js/site.js"></script>
+
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
         getData(1);
 
-        $("#searchVehicleMovment").click(function () {
+        $("#searchVehicleMovment").on("click", function () {
             getData(1);
+        });
+
+        $("#reset-fields").on("click", function () {
+            setTimeout(function () {
+                getData(1);
+            }, 50);
         });
 
         function getData(page) {
@@ -86,43 +99,59 @@ $(document).ready(function () {
             var FromDate = $("#FromDate").val();
             var ToDate = $("#ToDate").val();
 
-            vehicleMovementFilter = {
-                  VehicleID: VehicleID,
-                  page: page,
-                  FromDate: FromDate,
-                  ToDate:ToDate,
-                  MovementIN: MovementIn,
-                  MovementOut: MovementOut
+            var vehicleMovementFilter = {
+                VehicleID: VehicleID,
+                page: page,
+                FromDate: FromDate,
+                ToDate: ToDate,
+                MovementIN: MovementIn,
+                MovementOut: MovementOut
             };
 
             $.ajax({
                 type: 'POST',
                 url: '@Url.Action("MovementList", "MovementsHistory")',
                 dataType: 'html',
-                data: vehicleMovementFilter 
-
+                data: vehicleMovementFilter
             }).done(function (result) {
-
                 $("#MovementList").html(result);
-                if ($("#total_pages").val() != undefined) {
-                    $("#contentPager").attr("hidden", false);
+
+                var totalPages = parseInt($("#total_pages").val(), 10);
+
+                if (!isNaN(totalPages) && totalPages > 0) {
+                    $("#contentPager").removeAttr("hidden");
+
+                    if ($('#contentPager').data("pagination")) {
+                        $('#contentPager').pagination('destroy');
+                    }
+
+                    $("#contentPager").empty();
+
                     $('#contentPager').pagination({
-                        items: $("#total_pages").val(),
-                        itemOnPage: 25,
+                        items: totalPages,
+                        itemsOnPage: 1,
                         currentPage: page,
                         cssStyle: 'light-theme',
-                        onInit: function () {
-                            // fire first page loading
-                        },
-                        onPageClick: function (page, evt) {
-                            getData(page);
+                        prevText: 'Previous',
+                        nextText: 'Next',
+                        onPageClick: function (pageNumber, event) {
+                            if (event) {
+                                event.preventDefault();
+                            }
+                            getData(pageNumber);
                         }
                     });
+                } else {
+                    if ($('#contentPager').data("pagination")) {
+                        $('#contentPager').pagination('destroy');
+                    }
+
+                    $("#contentPager").attr("hidden", true).empty();
                 }
-                else {
-                    $("#contentPager").attr("hidden", true);
-                }
+            }).fail(function () {
+                $("#MovementList").html('<div class="alert alert-danger">Error loading data.</div>');
+                $("#contentPager").attr("hidden", true).empty();
             });
         }
-});
+    });
 </script>

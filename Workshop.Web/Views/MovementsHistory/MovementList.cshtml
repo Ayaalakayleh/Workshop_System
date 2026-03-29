@@ -3,45 +3,37 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
+
 <div class="row">
     <div class="col-12">
         <div id="panel-1" class="panel">
             <div class="panel-hdr px-2">
                 <h2 class="font-weight-bold">@Common["MovementList"]</h2>
                 <div class="panel-toolbar">
-                    <button class="btn btn-panel" data-action="panel-collapse" data-offset="0,10" title="Collapse"><i class="fa fa-minus"></i></button>
-                    <button class="btn btn-panel" data-action="panel-fullscreen" data-offset="0,10" title="Fullscreen"><i class="fa fa-arrows"></i></button>
+                    <button class="btn btn-panel" data-action="panel-collapse" data-offset="0,10" title="Collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button class="btn btn-panel" data-action="panel-fullscreen" data-offset="0,10" title="Fullscreen">
+                        <i class="fa fa-arrows"></i>
+                    </button>
                 </div>
             </div>
+
             <div class="panel-container show">
                 <div class="panel-content">
                     <table class="table table-bordered table-hover w-100 text-center main-table" id="tblData">
                         <thead>
                             <tr>
-                                <th>
-                                    @Common["Vehicle"]
-                                </th>
-                                <th>
-                                    @Html.DisplayName(Common["Label_MovementDate"])
-                                </th>
-                                <th>
-                                    @Html.DisplayName(Common["Label_MovementIn"])
-                                </th>
-                                <th>
-                                    @Html.DisplayName(Common["Label_MovementOut"])
-                                </th>
-                                <th>
-                                    @Html.DisplayName(Common["NoOfLateDays"])
-                                </th>
-                                <th>
-                                    @Html.DisplayName(Common["WorkshopType"])
-                                </th>
-                                <th>
-                                    @Common["Label_Action"]
-                                </th>
+                                <th>@Common["Vehicle"]</th>
+                                <th>@Html.DisplayName(Common["Label_MovementDate"])</th>
+                                <th>@Html.DisplayName(Common["Label_MovementIn"])</th>
+                                <th>@Html.DisplayName(Common["Label_MovementOut"])</th>
+                                <th>@Html.DisplayName(Common["NoOfLateDays"])</th>
+                                <th>@Html.DisplayName(Common["WorkshopType"])</th>
+                                <th>@Common["Label_Action"]</th>
                             </tr>
                         </thead>
-                        <tbody id="tblData">
+                        <tbody>
                             @if (Model.ColMovements != null)
                             {
                                 foreach (var item in Model.ColMovements)
@@ -49,45 +41,30 @@
                                     <tr>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.VehicleName)
-
                                         </td>
                                         <td>
                                             @(item.GregorianMovementDate?.ToString("dd-MM-yyyy") ?? "")
                                         </td>
-                                        @if (item.MovementIN == true)
-                                        {
-                                            <td>
+                                        <td>
+                                            @if (item.MovementIN == true)
+                                            {
                                                 @Common["MovedIn"]
-                                            </td>
-                                        }
-                                        else
-                                        {
-                                            <td>
-                                            </td>
-                                        }
-                                        @if (item.MovementOut == true)
-                                        {
-                                            <td>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.MovementOut == true)
+                                            {
                                                 @Common["MoveOut"]
-                                            </td>
-                                        }
-                                        else
-                                        {
-                                            <td>
-                                            </td>
-                                        }
+                                            }
+                                        </td>
                                         <td>
                                             @if (item.Days > 0)
                                             {
-                                                <label>
-                                                    @item.Days
-                                                </label>
+                                                <label>@item.Days</label>
                                             }
                                             else if (item.Days < 0)
                                             {
-                                                <label>
-                                                    @(item.Days * -1)
-                                                </label>
+                                                <label>@(item.Days * -1)</label>
                                             }
                                             else
                                             {
@@ -122,9 +99,9 @@
                                     </tr>
                                 }
                             }
-
                         </tbody>
                     </table>
+
                     @if (Model.ColMovements != null && Model.ColMovements.Count > 0)
                     {
                         <input id="total_pages" value="@Math.Ceiling((decimal)Model.ColMovements.ToList()[0].TotalPages / 25)" hidden />
@@ -132,39 +109,26 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
-
-
-
-
 <script>
-
-        $(document).on('click', 'a[href^="#page-"]', function (e) {
-        e.preventDefault();
-        const page = parseInt(this.getAttribute('href').replace('#page-', ''), 10);
-        const rows = 25; 
-        window.location.href =
-            '@Url.Action("Index", "MovementsHistory")' + '?PageNumber=' + page + '&RowsPerPage=' + rows + '#tblData';
-        });
-
-        
-
-     $('.main-table').DataTable({
-        responsive: true,
-        pageLength: 10,
-        ordering: false,
-        info: false,
-        paging: false,
-        dom: 'tp',
-        language: {
-            emptyTable: resources.EmptyData
+    $(function () {
+        if ($.fn.DataTable.isDataTable('#tblData')) {
+            $('#tblData').DataTable().destroy();
         }
+
+        $('#tblData').DataTable({
+            responsive: true,
+            pageLength: 10,
+            ordering: false,
+            info: false,
+            paging: false,
+            searching: false,
+            dom: 'tp',
+            language: {
+                emptyTable: resources.EmptyData
+            }
+        });
     });
 </script>
-
-
-
-
