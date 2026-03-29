@@ -109,8 +109,44 @@
         });
 
         // Debug: confirm submit event
-        $(document).on("submit", "#newRecallForm", function () {
+        $(document).on("submit", "#newRecallForm", function (e) {
+            e.preventDefault();
+
+            var vehicles = [
+                {
+                    MakeID: parseInt($("#MakeID").val()) || null,
+                    ModelID: parseInt($("#ModelID").val()) || null,
+                    Chassis: $("#ClassID").val() || null,
+                    RecallStatus: 1
+                        
+                }
+            ];
+                       
+            $("#recallJson").val(JSON.stringify(vehicles));
             console.log("Recall form submitted!");
+
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr("action"),
+                type: "POST",
+                data: form.serialize(),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                success: function (res) {
+                    if (res.success) {
+                        $("#recallModal").modal("hide");
+                         Swal.fire({
+                            title: theMainLang == "en" ? 'Success' : 'تم بنجاح',
+                            text: theMainLang == "en"
+                            ? 'Recall has been created successfully for this vehicle'
+                            : 'تم إنشاء أمر الاستدعاء لهذه السيارة بنجاح',
+                            icon: 'success',
+                        });
+                    }
+                }
+            });
         });
     });
 

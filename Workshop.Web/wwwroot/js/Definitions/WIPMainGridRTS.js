@@ -264,7 +264,7 @@ $(function () {
                         visible: function (e) {
                             return !(wipStatus === Complete || wipStatus === Invoiced) &&
                                 e.row.data.Status != 1 && e.row.data.Status != 20 && //&& e.row.data.Status === 23;
-                                parseInt(e.row.data.Status) !== 24 &&
+                                //parseInt(e.row.data.Status) !== 24 &&
                                 parseInt(e.row.data.Status) !== 26;
                         },
                         onClick: function (e) {

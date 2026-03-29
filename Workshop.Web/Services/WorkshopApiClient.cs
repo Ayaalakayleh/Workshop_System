@@ -954,6 +954,13 @@ namespace Workshop.Web.Services
             try
             {
                 var response = await _httpClient.GetAsync($"api/WorkshopMovement/GetLastVehicleMovementByVehicleId/{vehicleId}");
+            
+                if(response == null) return new VehicleMovement();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    return new VehicleMovement();
+
+
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<VehicleMovement>();
             }

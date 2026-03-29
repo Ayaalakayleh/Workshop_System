@@ -886,6 +886,9 @@
             $("#LastVehicleStatus").val(Data.VehicleStatusId);
             $("#VehicleSubStatusId").val(String(Data.VehicleSubStatusId)).trigger("change");
             $("#VehicleSubStatusId").trigger("change.select2");
+            $("#MakeID").val(Data.RefManufacturers.Id);
+            $("#ModelID").val(Data.RefVehicleModels.Id);
+            $("#ClassID").val(Data.RefVehicleClasses.Id);
 
             $.ajax({
                 type: "GET",

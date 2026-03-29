@@ -138,6 +138,27 @@ namespace Workshop.Web.Controllers
                 {
                     colVehicleDefinitions = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicles(filter.PageNumber, filter.ManufacturerId == 0 ? default(int?) : filter.ManufacturerId, filter.PlateNumber, filter.VehicleModelId == 0 ? default(int?) : filter.VehicleModelId, filter.ChassisNo);
                 }
+
+
+                var filtered = new List<VehicleDefinitions>();
+
+                foreach (var vehicle in colVehicleDefinitions)
+                {
+                    var lastMovement = await _apiClient.GetLastVehicleMovementByVehicleIdAsync(vehicle.Id);
+
+                    if (lastMovement == null)
+                    {
+                        filtered.Add(vehicle);
+                        continue;
+                    }
+
+                    if (lastMovement.MovementIN != true)
+                    {
+                        filtered.Add(vehicle);
+                    }
+                }
+
+                colVehicleDefinitions = filtered; 
                 return PartialView("_VehicleSelectList", colVehicleDefinitions);
             }
             catch(Exception ex)

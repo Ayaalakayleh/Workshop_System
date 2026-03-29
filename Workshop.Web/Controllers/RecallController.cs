@@ -344,9 +344,9 @@ namespace Workshop.Web.Controllers
 
             }
 
-            var referer = Request.Headers["Referer"].ToString();
-            if (!string.IsNullOrEmpty(referer))
-                return Redirect(referer);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return Json(new { success = true });
+
             return RedirectToAction("Index");
         }
 

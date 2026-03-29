@@ -218,6 +218,11 @@
 	@Html.HiddenFor(model => model.strikes, new { id = "strikes" })
 	@Html.HiddenFor(model => model.IsRegularMaintenance, new { id = "IsRegularMaintenance" })
 	@Html.HiddenFor(model => model.LastVehicleStatus, new { id = "LastVehicleStatus" })
+
+	<input type="hidden" id="MakeID" />
+	<input type="hidden" id="ModelID" />
+	<input type="hidden" id="ClassID" />
+
 	<input type="hidden" id="VehicleOdoMeter" value="0" />
 	<input type="hidden" id="GettingVehicleId" value="@Model?.VehicleID" />
 	@* <input type="hidden" id="VehicleTypeId" value="@Model?.VehicleTypeId" /> *@

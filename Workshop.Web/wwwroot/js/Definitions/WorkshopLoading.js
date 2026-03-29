@@ -650,6 +650,13 @@ function hhmmToMinutes(s) {
     return Number(m[1]) * 60 + Number(m[2]);
 }
 
+function formatMinutesHHMM(totalMinutes) {
+    totalMinutes = Math.max(0, Math.round(Number(totalMinutes) || 0));
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 function renderAvailability() {
     const tbody = document.getElementById("availTbody");
     if (!tbody) return;
@@ -666,16 +673,13 @@ function renderAvailability() {
         if (workingMins < 0) workingMins += 24 * 60;
         if (workingMins > 12 * 60) workingMins = (24 * 60) - workingMins;
 
-        const assignedMins = hhmmToMinutes(a?.assigned);
-        const availableMins = Math.max(0, workingMins - assignedMins);
-
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${t.name}</td>
           <td>${toUITime(shiftStart)}–${toUITime(shiftEnd)}</td>
-          <td>${(workingMins / 60).toFixed(1)}</td>
-          <td>${(assignedMins / 60).toFixed(1)}</td>
-          <td class="fw-bold">${(availableMins / 60).toFixed(1)}</td>
+          <td>${a?.workingHours ?? formatMinutesHHMM(workingMins)}</td>
+          <td>${a?.assigned ?? "00:00"}</td>
+          <td class="fw-bold">${a?.available ?? formatMinutesHHMM(workingMins)}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -1269,6 +1273,10 @@ function wireControls() {
     if (datePicker) datePicker.addEventListener("change", async (e) => {
         const picked = convertDateFormat(e.target.value);
         await gotoDate(parseYMD(picked));
+
+        if (CurrentDuration) {
+            await GetAvailableTechsForLabour(picked, CurrentDuration);
+        }
     });
 
     document.querySelectorAll("[data-view]").forEach(btn => {
@@ -1448,6 +1456,7 @@ function SaveSchedule(WIPSCheduleObject) {
 function TechnicianAvailabilty(date) {
     const reqISO = apiDateISO(date) || convertDateFormat(date);
     if (reqISO) currentDate = parseYMD(reqISO);
+    AvailableTechnicians.length = 0;
 
     return $.ajax({
         url: window.RazorVars.getTechnicianAvailabilityUrl,
