@@ -912,15 +912,17 @@ namespace Workshop.Web.Controllers
                 }
 
                 var cleanFilePath = workShop.FilePath.Replace("/", Path.DirectorySeparatorChar.ToString()).Trim();
-                var root = _configuration["FileUpload:DirectoryPath"] ?? "Uploads";
-                var fullPath = Path.Combine( root, cleanFilePath, workShop.FileName);
-                  
+                var insidePath = _configuration["FileUpload:DirectoryInsidePath"] ?? "Uploads";
+                var fullPath = Path.Combine(_env.WebRootPath, insidePath, cleanFilePath, workShop.FileName);
+
                 if (!System.IO.File.Exists(fullPath))
                 {
                     return NotFound($"File not found on server: {fullPath}");
                 }
 
-                return Json(fullPath);
+                var fileUrl = "/" + insidePath + "/" + workShop.FilePath.Replace("\\", "/").Trim('/') + "/" + workShop.FileName;
+
+                return Json(fileUrl);
             }
             catch (Exception ex)
             {
