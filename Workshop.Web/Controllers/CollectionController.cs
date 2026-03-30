@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.Data;
+using System.Globalization;
 using System.Text.Json;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.AccountingDTOs;
 using Workshop.Core.DTOs.ExternalWorkshopExp;
+using Workshop.Core.DTOs.General;
 using Workshop.Core.DTOs.TempData;
 using Workshop.Core.DTOs.Vehicle;
 using Workshop.Core.DTOs.WorkshopMovement;
+using Workshop.Infrastructure;
 using Workshop.Web.Interfaces.Services;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
@@ -113,8 +116,9 @@ namespace Workshop.Web.Controllers
                 filter.CompanyId = CompanyId;
                 var Excel_Mappin = (await _workshopApiClient.GetExcelMappingAsync(filter))?.Select(a => a.WorkshopId)?.ToList();
                 Excel_Mappin ??= new List<int>();
+                ViewBag.ExternalWorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.SecondaryName, r.PrimaryName)*/ lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
 
-                ViewBag.ExternalWorkshopList = _External_Workshop.Where(a => a.Id.HasValue && Excel_Mappin.Contains(a.Id.Value)).Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.PrimaryName, r.SecondaryName)*/ lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
+                //ViewBag.ExternalWorkshopList = _External_Workshop.Where(a => a.Id.HasValue && Excel_Mappin.Contains(a.Id.Value)).Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.PrimaryName, r.SecondaryName)*/ lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
                 data.InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetAll(CompanyId, BranchId, 1, 2);
 
                 return View(data);
@@ -488,7 +492,21 @@ namespace Workshop.Web.Controllers
                         }
                         try
                         {
-                            workOrder.VehicleId = Vehicles.Where(a => a.PlateNumber.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == dExternalWorkshopExps[i].License_Plate_No.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper()).FirstOrDefault().Id;
+                            //workOrder.VehicleId = Vehicles.Where(a => a.PlateNumber.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == dExternalWorkshopExps[i].License_Plate_No.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper()).FirstOrDefault().Id;
+                            var plateNo = dExternalWorkshopExps[i].License_Plate_No?.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper();
+        
+                            var vehicle = Vehicles.FirstOrDefault(a => (a.PlateNumber ?? "").Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == plateNo);
+                                  
+
+                            if (vehicle == null)
+                            {
+                                res.Errors.Add(GetCurrentBilanguage( "رقم اللوحة لا ينتمي إلى أي مركبة", "The Plate Number Does Not Belong to Any Vehicle"));
+                                     
+                            }
+                            else
+                            {
+                                workOrder.VehicleId = vehicle.Id;
+                            }
                         }
                         catch (Exception)
                         {
@@ -708,9 +726,9 @@ namespace Workshop.Web.Controllers
                             if (!string.IsNullOrEmpty(row.Cell(Col_Invoice_No_Index).Value.ToString()))
                             {
                                 Invoice_No = Col_Invoice_No_Index != 0 ? row.Cell(Col_Invoice_No_Index).Value.ToString() : "";
-                                var _Invoice_Date = Col_Invoice_Date_Index != 0 ? row.Cell(Col_Invoice_Date_Index).Value.ToString() : DateTime.Now.ToString();
+                                //var _Invoice_Date = Col_Invoice_Date_Index != 0 ? row.Cell(Col_Invoice_Date_Index).Value.ToString() : DateTime.Now.ToString();
                                 dataRow.Invoice_No = Invoice_No;
-                                dataRow.Invoice_Date = Convert.ToDateTime(_Invoice_Date);
+                                //dataRow.Invoice_Date = Convert.ToDateTime(_Invoice_Date);
                                 dataRow.License_Plate_No = Col_License_plate_No_Index != 0 ? row.Cell(Col_License_plate_No_Index).Value.ToString() : "";
                                 dataRow.Business_Line = Col_Business_Line_Index != 0 ? row.Cell(Col_Business_Line_Index).Value.ToString() : "";
                                 dataRow.MILAGE = Col_MILAGE_Index != 0 ? Convert.ToInt32(string.IsNullOrEmpty(row.Cell(Col_MILAGE_Index).Value.ToString()) == true ? "0" : row.Cell(Col_MILAGE_Index).Value.ToString()) : 0;
@@ -735,6 +753,15 @@ namespace Workshop.Web.Controllers
                                 }
                                 dataRow.Description = Col_Description_Index != 0 ? row.Cell(Col_Description_Index).Value.ToString() : "";
                                 dataRow.Price = Col_Price_Index != 0 ? Convert.ToDecimal(string.IsNullOrEmpty(row.Cell(Col_Price_Index).Value.ToString()) == true ? "0" : row.Cell(Col_Price_Index).Value.ToString()) : 0;
+
+                                // Date ========================
+                                if (Col_Invoice_Date_Index == 0)
+                                {
+                                    throw new Exception("Invoice Date mapping is missing.");
+                                }
+
+                                dataRow.Invoice_Date = ParseExcelDate(row.Cell(Col_Invoice_Date_Index));
+
                                 jsonData.Add(dataRow);
                             }
                             else
@@ -773,9 +800,30 @@ namespace Workshop.Web.Controllers
 
 
                         }
+
+                        //var result = jsonData.Select(x => new
+                        //{
+                        //    x.Invoice_No, 
+                        //    x.City, 
+                        //    Invoice_Date = x.Invoice_Date.ToString("dd-MM-yyyy"),
+                        //    x.License_Plate_No,
+                        //    x.Business_Line,
+                        //    x.MILAGE,
+                        //    x.Maker,
+                        //    x.Model,
+                        //    x.Year,
+                        //    x.Service_Type,
+                        //    x.Quantity,
+                        //    x.Price,
+                        //    x.SubTotal_BeforVat,
+                        //    x.Vat,
+                        //    x.Total,
+                        //    x.Description
+                        //}).ToList();
+
                         return Json(new { success = true, data = jsonData }, new JsonSerializerOptions
                         {
-                            PropertyNamingPolicy = null, // This preserves the original case
+                            PropertyNamingPolicy = null,
                             DictionaryKeyPolicy = null
                         });
                     }
@@ -784,13 +832,52 @@ namespace Workshop.Web.Controllers
                 }
                 catch (Exception)
                 {
-                    return Json(new { success = false, Message = "Ther Is An Issue With Uploaded File." });
+                    return Json(new { success = false, Message = "There Is An Issue With Uploaded File." });
                 }
             }
             else
             {
-                return Json(new { success = false, Message = "Ther Is No Uploaded File." });
+                return Json(new { success = false, Message = "There Is No Uploaded File." });
             }
+        }
+
+        private DateTime ParseExcelDate(IXLCell cell)
+        {
+            if (cell == null || cell.IsEmpty())
+                throw new Exception("Invoice date is empty.");
+
+            if (cell.TryGetValue<DateTime>(out var dt))
+                return dt;
+
+            var text = cell.GetFormattedString().Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
+                throw new Exception("Invoice date is empty.");
+
+            string[] formats =
+            {
+                "M/d/yyyy", "MM/dd/yyyy",
+                "d/M/yyyy", "dd/MM/yyyy",
+                "yyyy-MM-dd",
+                "d-M-yyyy", "dd-MM-yyyy",
+                "M-d-yyyy", "MM-d-yyyy",
+                "M/d/yyyy h:mm:ss tt",
+                "MM/dd/yyyy h:mm:ss tt",
+                "M/d/yyyy HH:mm:ss",
+                "dd/MM/yyyy HH:mm:ss",
+                "yyyy-MM-dd HH:mm:ss"
+            };
+
+            if (DateTime.TryParseExact(text, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out dt))
+                return dt;
+
+            if (DateTime.TryParse(text, new CultureInfo("en-US"), DateTimeStyles.AllowWhiteSpaces, out dt))
+                return dt;
+
+            if (DateTime.TryParse(text, new CultureInfo("en-GB"), DateTimeStyles.AllowWhiteSpaces, out dt))
+                return dt;
+
+            throw new Exception($"Invalid invoice date format: {text}");
         }
 
         private string GetCurrentBilanguage(string ar, string en)
@@ -802,6 +889,42 @@ namespace Workshop.Web.Controllers
             else
             {
                 return ar;
+            }
+        }
+
+        public async Task<IActionResult> DownloadTemplate(int workShopId)
+        {
+            try
+            {
+                ExcelMappingFilterDTO filter = new ExcelMappingFilterDTO
+                {
+                    CompanyId = CompanyId,
+                    WorkshopId = workShopId
+                };
+
+                var workShop = (await _workshopApiClient.GetExcelMappingAsync(filter))?.FirstOrDefault();
+
+                if (workShop == null ||
+                    string.IsNullOrWhiteSpace(workShop.FilePath) ||
+                    string.IsNullOrWhiteSpace(workShop.FileName))
+                {
+                    return NotFound("File path or file name missing");
+                }
+
+                var cleanFilePath = workShop.FilePath.Replace("/", Path.DirectorySeparatorChar.ToString()).Trim();
+                var root = _configuration["FileUpload:DirectoryPath"] ?? "Uploads";
+                var fullPath = Path.Combine( root, cleanFilePath, workShop.FileName);
+                  
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    return NotFound($"File not found on server: {fullPath}");
+                }
+
+                return Json(fullPath);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

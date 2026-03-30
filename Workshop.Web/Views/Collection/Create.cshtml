@@ -89,7 +89,7 @@
                                     <div class="input-group">
                                         <input type="file" class="form-control" id="fileInput" accept=".xlsx, .xls">
                                         <div class="input-group-append">
-                                            <button class="btn btn-primary" id="BrowseFile" type="button"> @Common["Browse"]</button>
+                                            <button class="btn btn-primary" id="BrowseFile" type="button"> @Common["ViewData"] </button>
                                         </div>
                                     </div>
                                 </div>
@@ -201,8 +201,12 @@
                     url: '@Url.Action("DownloadTemplate", "Collection")' + '?WorkShopId=' + _Prvider_Name,
                     contentType: 'application/json',
                     dataType: 'json',
-                    data: {}
+                    data: {},
+                    error: function(xhr){
+                        debugger
+                    }
                 }).done(function (result) {
+                    debugger
                     var link = document.createElement('a');
                     link.href = result ;
                     link.download = $("#ExternalWorkshopId option:selected").text();

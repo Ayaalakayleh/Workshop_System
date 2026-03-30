@@ -2835,4 +2835,7 @@
   <data name="Label_UploadedFile" xml:space="preserve">
     <value>الملفات المرفقة</value>
   </data>
+  <data name="ViewData" xml:space="preserve">
+    <value>عرض البيانات</value>
+  </data>
 </root>
