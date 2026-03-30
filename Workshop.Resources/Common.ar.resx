@@ -2835,6 +2835,15 @@
   <data name="Label_UploadedFile" xml:space="preserve">
     <value>الملفات المرفقة</value>
   </data>
+  <data name="Title_MovementsHistory" xml:space="preserve">
+    <value>قائمة الحركات</value>
+  </data>
+  <data name="Label_ExternalWorkshop" xml:space="preserve">
+    <value>ورشة خارجية</value>
+  </data>
+  <data name="Label_InternalWorkshop" xml:space="preserve">
+    <value>ورشة داخلية</value>
+  </data>
   <data name="ViewData" xml:space="preserve">
     <value>عرض البيانات</value>
   </data>

@@ -17,6 +17,7 @@ $(document).ready(function () {
             });
         });
     });
+
 });
 
 // Delete functionality (with SweetAlert2)
@@ -372,75 +373,75 @@ $(document).ready(function () {
 });
 
 // Simple client-side pagination
-$(function () {
-    var $table = $('#data');
-    var $tbody = $table.find('tbody');
-    var rowsShown = 25;
-    var rowsTotal = $tbody.find('tr').length;
-    if (!rowsTotal) return;
+//$(function () {
+//    var $table = $('#data');
+//    var $tbody = $table.find('tbody');
+//    var rowsShown = 25;
+//    var rowsTotal = $tbody.find('tr').length;
+//    if (!rowsTotal) return;
 
-    var numPages = Math.ceil(rowsTotal / rowsShown);
-    var currentPage = 0;
+//    var numPages = Math.ceil(rowsTotal / rowsShown);
+//    var currentPage = 0;
 
-    $('#data').next('.pagination-wrapper').remove();
+//    $('#data').next('.pagination-wrapper').remove();
 
-    var $wrapper = $('<div class="pagination-wrapper d-flex justify-content-end mt-2"></div>');
-    var $nav = $('<ul id="nav" class="pagination pagination-sm mb-0"></ul>');
-    $wrapper.append($nav);
-    $table.after($wrapper);
+//    var $wrapper = $('<div class="pagination-wrapper d-flex justify-content-end mt-2"></div>');
+//    var $nav = $('<ul id="nav" class="pagination pagination-sm mb-0"></ul>');
+//    $wrapper.append($nav);
+//    $table.after($wrapper);
 
-    function renderRows(pageIdx) {
-        var startItem = pageIdx * rowsShown;
-        var endItem = startItem + rowsShown;
+//    function renderRows(pageIdx) {
+//        var startItem = pageIdx * rowsShown;
+//        var endItem = startItem + rowsShown;
 
-        $tbody.find('tr')
-            .stop(true, true).css('opacity', 0).hide()
-            .slice(startItem, endItem)
-            .css('display', 'table-row')
-            .animate({ opacity: 1 }, 300);
-    }
+//        $tbody.find('tr')
+//            .stop(true, true).css('opacity', 0).hide()
+//            .slice(startItem, endItem)
+//            .css('display', 'table-row')
+//            .animate({ opacity: 1 }, 300);
+//    }
 
-    function renderPagination() {
-        $nav.empty();
+//    function renderPagination() {
+//        $nav.empty();
 
-        if (currentPage === 0) {
-            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Previous"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></span></li>');
-        } else {
-            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Previous" data-prev="1"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></a></li>');
-        }
+//        if (currentPage === 0) {
+//            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Previous"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></span></li>');
+//        } else {
+//            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Previous" data-prev="1"><span aria-hidden="true"><i class="sa sa-chevron-left"></i></span></a></li>');
+//        }
 
-        for (var i = 0; i < numPages; i++) {
-            if (i === currentPage) {
-                $nav.append('<li class="page-item active" aria-current="page"><span class="page-link">' + (i + 1) + '<span class="visually-hidden">(current)</span></span></li>');
-            } else {
-                $nav.append('<li class="page-item"><a class="page-link" href="#" data-page="' + i + '">' + (i + 1) + '</a></li>');
-            }
-        }
+//        for (var i = 0; i < numPages; i++) {
+//            if (i === currentPage) {
+//                $nav.append('<li class="page-item active" aria-current="page"><span class="page-link">' + (i + 1) + '<span class="visually-hidden">(current)</span></span></li>');
+//            } else {
+//                $nav.append('<li class="page-item"><a class="page-link" href="#" data-page="' + i + '">' + (i + 1) + '</a></li>');
+//            }
+//        }
 
-        if (currentPage === numPages - 1) {
-            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Next"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></span></li>');
-        } else {
-            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Next" data-next="1"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></a></li>');
-        }
-    }
+//        if (currentPage === numPages - 1) {
+//            $nav.append('<li class="page-item disabled"><span class="page-link" aria-label="Next"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></span></li>');
+//        } else {
+//            $nav.append('<li class="page-item"><a class="page-link" href="#" aria-label="Next" data-next="1"><span aria-hidden="true"><i class="sa sa-chevron-right"></i></span></a></li>');
+//        }
+//    }
 
-    function goToPage(idx) {
-        if (idx < 0 || idx >= numPages) return;
-        currentPage = idx;
-        renderRows(currentPage);
-        renderPagination();
-    }
+//    function goToPage(idx) {
+//        if (idx < 0 || idx >= numPages) return;
+//        currentPage = idx;
+//        renderRows(currentPage);
+//        renderPagination();
+//    }
 
-    renderRows(0);
-    renderPagination();
+//    renderRows(0);
+//    renderPagination();
 
-    $nav.on('click', 'a.page-link[data-page]', function (e) {
-        e.preventDefault(); goToPage(parseInt($(this).attr('data-page'), 10));
-    });
-    $nav.on('click', 'a.page-link[data-prev]', function (e) {
-        e.preventDefault(); goToPage(currentPage - 1);
-    });
-    $nav.on('click', 'a.page-link[data-next]', function (e) {
-        e.preventDefault(); goToPage(currentPage + 1);
-    });
-});
+//    $nav.on('click', 'a.page-link[data-page]', function (e) {
+//        e.preventDefault(); goToPage(parseInt($(this).attr('data-page'), 10));
+//    });
+//    $nav.on('click', 'a.page-link[data-prev]', function (e) {
+//        e.preventDefault(); goToPage(currentPage - 1);
+//    });
+//    $nav.on('click', 'a.page-link[data-next]', function (e) {
+//        e.preventDefault(); goToPage(currentPage + 1);
+//    });
+//});
