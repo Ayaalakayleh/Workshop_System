@@ -14,5 +14,7 @@ namespace Workshop.Core.Interfaces.IRepositories
         Task<IEnumerable<ConsumptionReportDTO>> GetConsumptionReport(ConsumptionReportFilterDTO filterDTO);
         Task<IEnumerable<WIPReportDTO>> GetWIPReport(WIPReportFilterDTO filterDTO);
 
+        Task<IEnumerable<PartsSummaryDTO>> GetPartsSummaryReport(PartsSummaryFilterDTO filterDTO);
+
     }
 }

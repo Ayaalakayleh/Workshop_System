@@ -6,21 +6,7 @@ namespace Workshop.Web.Services
 {
     public class ReportsServiceApiClient
     {
-        //public ReportsServiceApiClient(
-        // HttpClient httpClient,
-        // IConfiguration config,
-        // IApiAuthStrategy apiAuthStrategy
-        // ) : base(
-        //     httpClient,
-        //     new ApiSettings
-        //     {
-        //         ApiUser = config.GetValue<string>("ApiSettings:ReportsApiUser"),
-        //         ApiPassword = config.GetValue<string>("ApiSettings:ReportsApiPassword"),
-
-        //     }, apiAuthStrategy
-        // )
-        //{
-        //}
+     
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 

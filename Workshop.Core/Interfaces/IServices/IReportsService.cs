@@ -13,5 +13,6 @@ namespace Workshop.Core.Interfaces.IServices
         Task<IEnumerable<MonthlyRepairCostBranchWiseReportDTO>> GetMonthlyRepairCostBranchWiseReport(MonthlyRepairCostReportFilterDTO filterDTO);
         Task<IEnumerable<ConsumptionReportDTO>> GetConsumptionReport(ConsumptionReportFilterDTO filterDTO);
         Task<IEnumerable<WIPReportDTO>> GetWIPReport(WIPReportFilterDTO filterDTO);
+        Task<IEnumerable<PartsSummaryDTO>> GetPartsSummaryReport(PartsSummaryFilterDTO filterDTO);
     }
 }

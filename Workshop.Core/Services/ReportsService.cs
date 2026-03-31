@@ -33,6 +33,11 @@ namespace Workshop.Core.Services
         {
             return await _repository.GetWIPReport(filterDTO);
         }
+        public async Task<IEnumerable<PartsSummaryDTO>> GetPartsSummaryReport(PartsSummaryFilterDTO filterDTO)
+        {
+            return await _repository.GetPartsSummaryReport(filterDTO);
+        }   
+       
     }
 }
 

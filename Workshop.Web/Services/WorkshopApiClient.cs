@@ -2966,6 +2966,13 @@ namespace Workshop.Web.Services
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<IEnumerable<WIPReportDTO>>();
         }
+
+        public async Task<IEnumerable<PartsSummaryDTO>> GetPartsSummaryReport(PartsSummaryFilterDTO filterDTO)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Reports/GetPartsSummary", filterDTO);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<PartsSummaryDTO>>();
+        }
         #endregion
 
     }

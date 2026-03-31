@@ -43,5 +43,12 @@ namespace Workshop.API.Controllers
             var result = await _service.GetWIPReport(filter);
             return Ok(result);
         }
+
+        [HttpPost("GetPartsSummary")]
+        public async Task<IActionResult> GetPartsSummaryReport([FromBody] PartsSummaryFilterDTO filter)
+        {
+            var result = await _service.GetPartsSummaryReport(filter);
+            return Ok(result);
+        }
     }
 }

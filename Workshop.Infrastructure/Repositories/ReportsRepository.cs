@@ -101,6 +101,22 @@ namespace Workshop.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<IEnumerable<PartsSummaryDTO>> GetPartsSummaryReport(PartsSummaryFilterDTO filterDTO)
+        {
 
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("FromDate", filterDTO.FromDate);
+            parameters.Add("ToDate", filterDTO.ToDate);
+            parameters.Add("AccountType", filterDTO.AccountType);
+            parameters.Add("SalesType", filterDTO.SalesType);
+            parameters.Add("IsAll", filterDTO.IsAll);
+            parameters.Add("IsWIPClose", filterDTO.IsWIPClose);
+
+            var result = await connection.QueryAsync<PartsSummaryDTO>("GetPartsSummary", parameters, commandType: CommandType.StoredProcedure);
+
+            return result;
+        }
     }
 }
