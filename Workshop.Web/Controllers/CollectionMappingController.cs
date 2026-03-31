@@ -123,8 +123,24 @@ namespace Workshop.Web.Controllers
                 {
                     if (validationResult.IsSuccess)
                     {
-                        var (filePath, fileName) = await _fileService.SaveFileAsync(File, "Collection_Mapping");
-                        mExcelMapping.FilePath = filePath;
+                        string guid = Guid.NewGuid().ToString();
+                        string insidePath = _configuration["FileUpload:DirectoryInsidePath"] ?? "Uploads";
+                        string subFolder = "Collection_Mapping";
+                        string fileName = $"{DateTime.Now.Ticks}{Path.GetExtension(File.FileName)}";
+
+                        var folderPath = Path.Combine(_env.WebRootPath, insidePath, subFolder, guid);
+
+                        if (!Directory.Exists(folderPath))
+                            Directory.CreateDirectory(folderPath);
+
+                        var fullPath = Path.Combine(folderPath, fileName);
+
+                        using (var stream = new FileStream(fullPath, FileMode.Create))
+                        {
+                            await File.CopyToAsync(stream);
+                        }
+
+                        mExcelMapping.FilePath = Path.Combine(subFolder, guid).Replace("\\", "/");
                         mExcelMapping.FileName = fileName;
                     }
                     else
@@ -134,7 +150,6 @@ namespace Workshop.Web.Controllers
                         return Json(result);
                     }
                 }
-
                 mExcelMapping.BranchId = BranchId;
                 mExcelMapping.CompanyId = CompanyId;
 
