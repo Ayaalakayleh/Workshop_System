@@ -703,7 +703,7 @@
     <value>مغلق</value>
   </data>
   <data name="Label_VIN" xml:space="preserve">
-    <value>VIN</value>
+    <value>رقم المركبة</value>
   </data>
   <data name="Label_Reg" xml:space="preserve">
     <value>التسجيل</value>
@@ -2824,7 +2824,7 @@
     <value>نوع الورشة</value>
   </data>
   <data name="Label_ServiceCode" xml:space="preserve">
-    <value>Service Code</value>
+    <value>رمز الخدمة</value>
   </data>
   <data name="Label_PlateNumberAR" xml:space="preserve">
     <value>رقم اللوحة باللغة العربية</value>
@@ -2846,5 +2846,68 @@
   </data>
   <data name="ViewData" xml:space="preserve">
     <value>عرض البيانات</value>
+  </data>
+  <data name="PriceWorkflow" xml:space="preserve">
+    <value>سير عمل التسعير</value>
+  </data>
+  <data name="Title_MonthlyRepairCostReport" xml:space="preserve">
+    <value>تقرير تكاليف الإصلاح الشهرية</value>
+  </data>
+  <data name="Button_Export_Excel" xml:space="preserve">
+    <value>تصدير الى إكسل</value>
+  </data>
+  <data name="Label_WIPNumber" xml:space="preserve">
+    <value>رقم كرت الصيانة</value>
+  </data>
+  <data name="Label_InvoiceNumber" xml:space="preserve">
+    <value>رقم الفاتورة</value>
+  </data>
+  <data name="Label_CompanyCode" xml:space="preserve">
+    <value>رمز الشركة</value>
+  </data>
+  <data name="Label_TotalAmount" xml:space="preserve">
+    <value>القيمة</value>
+  </data>
+  <data name="Label_TotalLabours" xml:space="preserve">
+    <value>العمال</value>
+  </data>
+  <data name="Label_TotalParts" xml:space="preserve">
+    <value>مجموع القطع</value>
+  </data>
+  <data name="Label_OPNumber" xml:space="preserve">
+    <value>رقم المشغل</value>
+  </data>
+  <data name="Label_OPName" xml:space="preserve">
+    <value>اسم المشغل</value>
+  </data>
+  <data name="Title_MonthlyRepairCostBranchWiseReport" xml:space="preserve">
+    <value>تقرير تكلفة الإصلاح الشهرية حسب الفرع</value>
+  </data>
+  <data name="Label_Fran" xml:space="preserve">
+    <value>الوكالة</value>
+  </data>
+  <data name="Label_TotalLubes" xml:space="preserve">
+    <value>الزيت</value>
+  </data>
+  <data name="Label_TotalPaints" xml:space="preserve">
+    <value>إجمالي الدهانات</value>
+  </data>
+  <data name="ConsumptionReport" xml:space="preserve">
+    <value>تقرير الإستهلاك</value>
+  </data>
+  <data name="Label_PartNo" xml:space="preserve">
+    <value>رقم القطعة</value>
+  </data>
+  <data name="Label_DueIn" xml:space="preserve">
+    <value>موعد الإستحقاق</value>
+  </data>
+  <data name="Label_DueOut" xml:space="preserve">
+    <value>موعد الإصدار</value>
+  </data>
+  <data name="Label_Ageing" xml:space="preserve">
+    <value>أعمار الذمم</value>
+  </data>
+  <data name="Label_VehcileIn/Out" xml:space="preserve">
+    <value>دخول / خروج المركبة</value>
   </data>
 </root>

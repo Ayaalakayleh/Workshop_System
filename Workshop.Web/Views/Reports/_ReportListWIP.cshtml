@@ -7,23 +7,23 @@
 <table class="table table-bordered table-hover text-center w-100 main-table">
     <thead>
         <tr>
-            <th>@Common["WIP"]</th>
-            <th>@Common["Status"]</th>
-            <th>@Common["Created Date"]</th>
-            <th>@Common["Due In"]</th>
-            <th>@Common["Due Out"]</th>
-            <th>@Common["Ageing"]</th>
-             <th>@Common["Customer Name"]</th>
-            <th>@Common["Total Amount"]</th>
-            <th>@Common["Total Labours"]</th>
-            <th>@Common["Total Parts"]</th>
-             <th>@Common["VIN"]</th>
-            <th>@Common["Plate Number"]</th>
-            <th>@Common["Make"]</th>
-            <th>@Common["Model"]</th>
-             <th>@Common["Service Advisor"]</th>
-            <th>@Common["Branch"]</th>
-            <th>@Common["Vehcile In/Out"]</th>
+            <th>@Common["Label_WIP"]</th>
+            <th>@Common["Label_Status"]</th>
+            <th>@Common["Label_CreatedDate"]</th>
+            <th>@Common["Label_DueIn"]</th>
+            <th>@Common["Label_DueOut"]</th>
+            <th>@Common["Label_Ageing"]</th>
+            <th>@Common["Label_CustomerName"]</th>
+            <th>@Common["Label_TotalAmount"]</th>
+            <th>@Common["Label_TotalLabours"]</th>
+            <th>@Common["Label_TotalParts"]</th>
+            <th>@Common["Label_VIN"]</th>
+            <th>@Common["Label_PlateNumber"]</th>
+            <th>@Common["Label_Make"]</th>
+            <th>@Common["Label_Model"]</th>
+            <th>@Common["Label_ServiceAdvisor"]</th>
+            <th>@Common["Label_Branch"]</th>
+            <th>@Common["Label_VehcileIn/Out"]</th>
         </tr>
     </thead>
     <tbody>
@@ -51,12 +51,6 @@
                     <td>@item.VehicleInOut</td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="16">@Common["NoData"]</td>
-            </tr>
         }
     </tbody>
 </table>

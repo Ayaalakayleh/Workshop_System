@@ -2847,4 +2847,67 @@
   <data name="ViewData" xml:space="preserve">
     <value>View Data</value>
   </data>
+  <data name="PriceWorkflow" xml:space="preserve">
+    <value>Price Workflow</value>
+  </data>
+  <data name="Title_MonthlyRepairCostReport" xml:space="preserve">
+    <value>Monthly Repair Cost Report</value>
+  </data>
+  <data name="Button_Export_Excel" xml:space="preserve">
+    <value>Export Excel</value>
+  </data>
+  <data name="Label_WIPNumber" xml:space="preserve">
+    <value>WIP Number</value>
+  </data>
+  <data name="Label_InvoiceNumber" xml:space="preserve">
+    <value>Invoice Number</value>
+  </data>
+  <data name="Label_CompanyCode" xml:space="preserve">
+    <value>Company Code</value>
+  </data>
+  <data name="Label_TotalAmount" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+  <data name="Label_TotalLabours" xml:space="preserve">
+    <value>Total Labours</value>
+  </data>
+  <data name="Label_TotalParts" xml:space="preserve">
+    <value>Total Parts</value>
+  </data>
+  <data name="Label_OPNumber" xml:space="preserve">
+    <value>OP Number</value>
+  </data>
+  <data name="Label_OPName" xml:space="preserve">
+    <value>OP Name</value>
+  </data>
+  <data name="Title_MonthlyRepairCostBranchWiseReport" xml:space="preserve">
+    <value>Monthly Repair Cost Branch Wise Report</value>
+  </data>
+  <data name="Label_Fran" xml:space="preserve">
+    <value>Franchise</value>
+  </data>
+  <data name="Label_TotalLubes" xml:space="preserve">
+    <value>Total Lubes</value>
+  </data>
+  <data name="Label_TotalPaints" xml:space="preserve">
+    <value>Total Paints</value>
+  </data>
+  <data name="ConsumptionReport" xml:space="preserve">
+    <value>Consumption Report</value>
+  </data>
+  <data name="Label_PartNo" xml:space="preserve">
+    <value>Part No</value>
+  </data>
+  <data name="Label_DueIn" xml:space="preserve">
+    <value>Due In</value>
+  </data>
+  <data name="Label_DueOut" xml:space="preserve">
+    <value>Due Out</value>
+  </data>
+  <data name="Label_Ageing" xml:space="preserve">
+    <value>Ageing</value>
+  </data>
+  <data name="Label_VehcileIn/Out" xml:space="preserve">
+    <value>Vehicle In/Out</value>
+  </data>
 </root>
