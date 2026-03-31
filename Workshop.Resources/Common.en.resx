@@ -2847,4 +2847,46 @@
   <data name="ViewData" xml:space="preserve">
     <value>View Data</value>
   </data>
+  <data name="PriceWorkflow" xml:space="preserve">
+    <value>Price Workflow</value>
+  </data>
+  <data name="Title_MonthlyRepairCostReport" xml:space="preserve">
+    <value>Monthly Repair Cost Report</value>
+  </data>
+  <data name="Button_Export_Excel" xml:space="preserve">
+    <value>Export Excel</value>
+  </data>
+  <data name="Label_WIPNumber" xml:space="preserve">
+    <value>WIP Number</value>
+  </data>
+  <data name="Label_InvoiceNumber" xml:space="preserve">
+    <value>Invoice Number</value>
+  </data>
+  <data name="Label_CompanyCode" xml:space="preserve">
+    <value>Company Code</value>
+  </data>
+  <data name="Label_TotalAmount" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+  <data name="Label_TotalLabours" xml:space="preserve">
+    <value>Total Labours</value>
+  </data>
+  <data name="Label_TotalParts" xml:space="preserve">
+    <value>Total Parts</value>
+  </data>
+  <data name="Label_OPNumber" xml:space="preserve">
+    <value>OP Number</value>
+  </data>
+  <data name="Label_OPName" xml:space="preserve">
+    <value>OP Name</value>
+  </data>
+  <data name="Title_MonthlyRepairCostBranchWiseReport" xml:space="preserve">
+    <value>Monthly Repair Cost Branch Wise Report</value>
+  </data>
+  <data name="Label_Fran" xml:space="preserve">
+    <value>Franchise</value>
+  </data>
+  <data name="Label_TotalLubes" xml:space="preserve">
+    <value>Total Lubes</value>
+  </data>
 </root>

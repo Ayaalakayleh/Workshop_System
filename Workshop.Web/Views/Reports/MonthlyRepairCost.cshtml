@@ -9,29 +9,19 @@
     <div class="col-12">
         <div id="panel-1" class="panel">
             <div class="panel-hdr">
-                <h2 class="font-weight-bold">@Common["Monthly Repair Cost Report"]</h2>
+                <h2 class="font-weight-bold">@Common["Title_MonthlyRepairCostReport"]</h2>
             </div>
 
             <div class="panel-container show">
                 <div class="panel-content">
-
-                    <!-- Search Filters -->
                     @await Html.PartialAsync("_Filter")
-
-                    <!-- Action Buttons -->
                     <div class="text-center mt-3 mb-3">
-            @*             <button type="button" class="btn btn-primary" id="btnPrintReport">
-                            <i class="fad fa-print"></i>&nbsp;@Common["Button_Print"]
-                        </button> *@
                         <button type="button" class="btn btn-success ml-2" id="btnExportExcel">
                             <i class="fad fa-file-excel"></i>&nbsp;@Common["Button_Export_Excel"]
                         </button>
                     </div>
-
-                    <!-- List -->
                     <hr />
                     <div id="ReportListContainer">
-                        @* Initial render of report data *@
                         @await Html.PartialAsync("_ReportList", Model?.ReportData ?? new List<MonthlyRepairCostReportDTO>())
                     </div>
                 </div>

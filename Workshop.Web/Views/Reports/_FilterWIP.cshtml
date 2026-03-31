@@ -6,17 +6,17 @@
 <div class="row">
     <div class="col-md-3">
         <div class="form-group">
-            <label>@Common["WIP Number"]</label>
+            <label>@Common["Label_WIPNumber"]</label>
             <input type="number" id="WIP" name="WIP" class="form-control" placeholder="e.g. 12345">
         </div>
     </div>
     <div class="col-md-3">
         <div class="form-group">
-            <label>@Common["Status"]</label>
+            <label>@Common["Label_Status"]</label>
             @Html.DropDownList(
                         "StatusId",
                         (IEnumerable<SelectListItem>)ViewBag.Status,
-                        "Select Status",
+                        Common["Label_Select"],
                         new { @class = "form-control"  }
                         )
         </div>
@@ -27,7 +27,7 @@
             @Html.DropDownList(
                         "CustomerId",
                         (IEnumerable<SelectListItem>)ViewBag.Customers,
-                        "Select Customer",
+                        Common["Label_Select"],
                         new { @class = "form-control"  }
                         )
         </div>

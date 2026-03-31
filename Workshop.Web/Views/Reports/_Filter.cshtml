@@ -4,33 +4,33 @@
 @inject IStringLocalizer<Messages> Message
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
-            <label>@Common["WIP Number"]</label>
+            <label>@Common["Label_WIPNumber"]</label>
             <input type="number" id="WIP" name="WIP" class="form-control" placeholder="e.g. 12345">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
-            <label>@Common["Invoice Date From"]</label>
-            <input type="date" id="InvoiceDateStart" name="InvoiceDateStart" class="form-control">
+            <label>@Common["Label_FromDate"]</label>
+            <input type="date" id="InvoiceDateStart" name="InvoiceDateStart" class="form-control flat-picker">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
-            <label>@Common["Invoice Date To"]</label>
-            <input type="date" id="InvoiceDateEnd" name="InvoiceDateEnd" class="form-control">
+            <label>@Common["Label_ToDate"]</label>
+            <input type="date" id="InvoiceDateEnd" name="InvoiceDateEnd" class="form-control flat-picker">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
-            <label>@Common["Customer"]</label>
+            <label>@Common["Label_Customer"]</label>
             @* <input type="number" id="CustomerId" name="CustomerId" class="form-control" placeholder="Customer ID"> *@
             @Html.DropDownList(
                         "CustomerId",
                         (IEnumerable<SelectListItem>)ViewBag.Customers,
-                        "Select Customer",
-                        new { @class = "form-control"  }
+                        Common["Label_Select"],
+                        new { @class = "form-control" }
                         )
         </div>
     </div>
