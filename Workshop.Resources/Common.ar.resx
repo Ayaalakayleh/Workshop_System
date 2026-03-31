@@ -2889,4 +2889,25 @@
   <data name="Label_TotalLubes" xml:space="preserve">
     <value>الزيت</value>
   </data>
+  <data name="Label_TotalPaints" xml:space="preserve">
+    <value>إجمالي الدهانات</value>
+  </data>
+  <data name="ConsumptionReport" xml:space="preserve">
+    <value>تقرير الإستهلاك</value>
+  </data>
+  <data name="Label_PartNo" xml:space="preserve">
+    <value>رقم القطعة</value>
+  </data>
+  <data name="Label_DueIn" xml:space="preserve">
+    <value>موعد الإستحقاق</value>
+  </data>
+  <data name="Label_DueOut" xml:space="preserve">
+    <value>موعد الإصدار</value>
+  </data>
+  <data name="Label_Ageing" xml:space="preserve">
+    <value>أعمار الذمم</value>
+  </data>
+  <data name="Label_VehcileIn/Out" xml:space="preserve">
+    <value>دخول / خروج المركبة</value>
+  </data>
 </root>

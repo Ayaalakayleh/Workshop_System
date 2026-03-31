@@ -4,25 +4,25 @@
 @inject IStringLocalizer<Messages> Message
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_WIPNumber"]</label>
             <input type="number" id="WIP" name="WIP" class="form-control" placeholder="e.g. 12345">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_FromDate"]</label>
-            <input type="date" id="InvoiceDateStart" name="InvoiceDateStart" class="form-control">
+            <input type="date" id="InvoiceDateStart" name="InvoiceDateStart" class="form-control flat-picker">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_ToDate"]</label>
-            <input type="date" id="InvoiceDateEnd" name="InvoiceDateEnd" class="form-control">
+            <input type="date" id="InvoiceDateEnd" name="InvoiceDateEnd" class="form-control flat-picker">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_Customer"]</label>
             @Html.DropDownList(
@@ -33,7 +33,7 @@
                         )
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_Type"]</label>
              @Html.DropDownList(

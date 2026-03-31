@@ -2889,4 +2889,25 @@
   <data name="Label_TotalLubes" xml:space="preserve">
     <value>Total Lubes</value>
   </data>
+  <data name="Label_TotalPaints" xml:space="preserve">
+    <value>Total Paints</value>
+  </data>
+  <data name="ConsumptionReport" xml:space="preserve">
+    <value>Consumption Report</value>
+  </data>
+  <data name="Label_PartNo" xml:space="preserve">
+    <value>Part No</value>
+  </data>
+  <data name="Label_DueIn" xml:space="preserve">
+    <value>Due In</value>
+  </data>
+  <data name="Label_DueOut" xml:space="preserve">
+    <value>Due Out</value>
+  </data>
+  <data name="Label_Ageing" xml:space="preserve">
+    <value>Ageing</value>
+  </data>
+  <data name="Label_VehcileIn/Out" xml:space="preserve">
+    <value>Vehicle In/Out</value>
+  </data>
 </root>

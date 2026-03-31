@@ -4,13 +4,13 @@
 @inject IStringLocalizer<Messages> Message
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_WIPNumber"]</label>
             <input type="number" id="WIP" name="WIP" class="form-control" placeholder="e.g. 12345">
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Label_Status"]</label>
             @Html.DropDownList(
@@ -21,7 +21,7 @@
                         )
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="form-group">
             <label>@Common["Customer"]</label>
             @Html.DropDownList(
