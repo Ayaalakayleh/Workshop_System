@@ -2179,123 +2179,128 @@ namespace Workshop.Web.Controllers
                 });
             }
 
+            long headerId = result.HeaderId!.Value;
 
-            // Step 2: If inventory transaction succeeded, create the accounting transaction
-            try {
-                var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
-                var TranTypeNo = accountDefinitions.FK_JournalNameId;
-                var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
-                var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
-                var CreditAccount = AccountTable?.FirstOrDefault(a => a.ID == warehouse.FK_AccountId).AccountNo;
-                var DebitAccount = AccountTable?.FirstOrDefault(a => a.ID == accountDefinitions.FK_WIPAccountId).AccountNo;
-
-                var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
-                   TranTypeNo,
-                   (decimal)model.Details.Sum(x => x.Total),// avg cost * Qty 
-                   DebitAccount,
-                   CompanyId,
-                   BranchId,
-                   UserId,
-                   CreditAccount,
-                   model.TransactionDate,
-                   "WIP :" + wipId,
-                   CurrencyId,
-                   null
-                );
-
-                // Step 3: If accounting transaction succeeded, update financial fields
-                if (accountingResponse != null && accountingResponse.ID > 0)
+            UpdateIssueIdDTO dto = new UpdateIssueIdDTO
                 {
-                    var updateFinancialFieldsRequest = new UpdateInventoryTransactionFinancialFieldsDTO
-                    {
-                        HeaderId = result.HeaderId!.Value,
-                        FinancialTransactionNo = accountingResponse.TranNo,
-                        FinancialTransactionTypeNo = accountingResponse.TranTypeNo,
-                        Fk_FinancialTransactionMasterId = accountingResponse.ID,
-                        Fk_InvoiceType = accountDefinitions.FK_InvoiceTypeId
-                    };
+                    IssueId = (int)headerId,
+                    WIPId = wipId,
+                    Id = keyId
+                };
+          
+           var addIssueToWIP = await _apiClient.UpdateIssueIdToWIP(dto);
 
-                    await _inventoryApiClient.UpdateFinancialFieldsAsync(updateFinancialFieldsRequest);
+            if(model.FK_TransactionTypeId != 11)
+            {
+
+                // Step 2: If inventory transaction succeeded, create the accounting transaction
+                try {
+                    var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
+                    var TranTypeNo = accountDefinitions.FK_JournalNameId;
+                    var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
+                    var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
+                    var CreditAccount = AccountTable?.FirstOrDefault(a => a.ID == warehouse.FK_AccountId).AccountNo;
+                    var DebitAccount = AccountTable?.FirstOrDefault(a => a.ID == accountDefinitions.FK_WIPAccountId).AccountNo;
+
+                    var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
+                       TranTypeNo,
+                       (decimal)model.Details.Sum(x => x.Total),// avg cost * Qty 
+                       DebitAccount,
+                       CompanyId,
+                       BranchId,
+                       UserId,
+                       CreditAccount,
+                       model.TransactionDate,
+                       "WIP :" + wipId,
+                       CurrencyId,
+                       null
+                    );
+
+                    // Step 3: If accounting transaction succeeded, update financial fields
+                    if (accountingResponse != null && accountingResponse.ID > 0)
+                    {
+                        var updateFinancialFieldsRequest = new UpdateInventoryTransactionFinancialFieldsDTO
+                        {
+                            HeaderId = result.HeaderId!.Value,
+                            FinancialTransactionNo = accountingResponse.TranNo,
+                            FinancialTransactionTypeNo = accountingResponse.TranTypeNo,
+                            Fk_FinancialTransactionMasterId = accountingResponse.ID,
+                            Fk_InvoiceType = accountDefinitions.FK_InvoiceTypeId
+                        };
+
+                        await _inventoryApiClient.UpdateFinancialFieldsAsync(updateFinancialFieldsRequest);
+                    }
+                    else
+                    {
+                        return JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            message = "Inventory transaction created but accounting transaction failed. Please contact administrator."
+                        });
+                    }
                 }
-                else
+                catch (Exception accountingEx)
                 {
                     return JsonConvert.SerializeObject(new
                     {
                         success = false,
-                        message = "Inventory transaction created but accounting transaction failed. Please contact administrator."
+                        message = $"Inventory transaction created but accounting process failed: {accountingEx.Message}"
                     });
                 }
-            }
-            catch (Exception accountingEx)
-            {
-                return JsonConvert.SerializeObject(new
+
+                var responseString = await _inventoryApiClient.GetAllGRNByIdHead(headerId);
+
+                var response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
+                  responseString,
+                  new JsonSerializerOptions
+                  {
+                      PropertyNameCaseInsensitive = true
+                  });
+
+                if (response == null || response.Details == null)
                 {
-                    success = false,
-                    message = $"Inventory transaction created but accounting process failed: {accountingEx.Message}"
-                });
-            }
-
-            long headerId = result.HeaderId!.Value;
-
-            UpdateIssueIdDTO dto = new UpdateIssueIdDTO
-            {
-                IssueId = (int)headerId,
-                WIPId = wipId,
-                Id = keyId
-            };
-          
-            var addIssueToWIP = await _apiClient.UpdateIssueIdToWIP(dto);
-
-            var responseString = await _inventoryApiClient.GetAllGRNByIdHead(headerId);
-
-            var response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
-              responseString,
-              new JsonSerializerOptions
-              {
-                  PropertyNameCaseInsensitive = true
-              });
-
-            if (response == null || response.Details == null)
-            {
-                Console.WriteLine(" No details in response!");
-                return null;
-            }
+                    Console.WriteLine(" No details in response!");
+                    return null;
+                }
 
 
-            var itemUnitList = new List<BaseItemDTO>();
+                var itemUnitList = new List<BaseItemDTO>();
 
-            foreach (var d in response.Details)
-            {
-                var matchingDetail = model.Details?
-                    .FirstOrDefault(x => x.FK_ItemId == d.FK_ItemId && x.FK_UnitId == d.FK_UnitId);
-
-
-                var baseItem = new BaseItemDTO
+                foreach (var d in response.Details)
                 {
-                    WIPId = model.TransactionReferenceNo.HasValue ? (int)model.TransactionReferenceNo : 0,
-                    RequestId = model.RequestId,
-                    ItemId = d.FK_ItemId,
-                    fk_UnitId = d.FK_UnitId.HasValue ? (int)d.FK_UnitId : 0,
-                    RequestQuantity = matchingDetail?.Quantity ?? 0,
-                    Quantity = d.UnitQuantity,
-                    UsedQuantity = 0,
-                    CostPrice = d.Price,
-                    SalePrice = d.Price,
-                    ModifyBy = UserId,
-                    AccountType = null,
-                    Discount = 0,
-                    Total = 0
-                };
+                    var matchingDetail = model.Details?
+                        .FirstOrDefault(x => x.FK_ItemId == d.FK_ItemId && x.FK_UnitId == d.FK_UnitId);
 
 
-                itemUnitList.Add(baseItem);
+                    var baseItem = new BaseItemDTO
+                    {
+                        WIPId = model.TransactionReferenceNo.HasValue ? (int)model.TransactionReferenceNo : 0,
+                        RequestId = model.RequestId,
+                        ItemId = d.FK_ItemId,
+                        fk_UnitId = d.FK_UnitId.HasValue ? (int)d.FK_UnitId : 0,
+                        RequestQuantity = matchingDetail?.Quantity ?? 0,
+                        Quantity = d.UnitQuantity,
+                        UsedQuantity = 0,
+                        CostPrice = d.Price,
+                        SalePrice = d.Price,
+                        ModifyBy = UserId,
+                        AccountType = null,
+                        Discount = 0,
+                        Total = 0
+                    };
+
+
+                    itemUnitList.Add(baseItem);
+                }
             }
+        
+
             var responseToClient = new
-            {
-                success = true,
-                partsIssueId = headerId,
-                wipId = wipId
-            };
+                {
+                    success = true,
+                    partsIssueId = headerId,
+                    wipId = wipId
+                };
 
             return JsonConvert.SerializeObject(responseToClient);
         }
