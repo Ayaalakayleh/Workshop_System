@@ -1238,7 +1238,11 @@ async function gotoDate(dateObj) {
     const dp = document.getElementById("datePicker");
     if (dp) dp.value = iso;
 
-    await GetAllTechnicians(iso);
+    await Promise.all([
+        GetAllTechnicians(iso),
+        TechnicianAvailabilty(iso)
+    ]);
+
     refreshAll();
 }
 

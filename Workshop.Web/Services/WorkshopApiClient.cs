@@ -1763,6 +1763,12 @@ namespace Workshop.Web.Services
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<List<GetPriceMatrixDTO>>();
         }
+        public async Task<PriceMatrixValidationResultDto> PriceMatrixIsValid(PriceMatrixValidationDto filter)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/PriceMatrix/IsValid", filter);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<PriceMatrixValidationResultDto>();
+        }
 
         public async Task<int?> AddPricesAsync(CreatePriceMatrixDTO dto)
         {

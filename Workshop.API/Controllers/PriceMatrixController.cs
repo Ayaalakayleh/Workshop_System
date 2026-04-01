@@ -77,5 +77,11 @@ namespace Workshop.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("IsValid")]
+        public async Task<IActionResult> PriceMatrixIsValid([FromBody] PriceMatrixValidationDto dto)
+        {
+            var result = await _service.PriceMatrixIsValid(dto);
+            return Ok(result);
+        }
     }
 }

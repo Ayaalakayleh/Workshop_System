@@ -50,5 +50,10 @@ namespace Workshop.Core.Services
         {
             return await _repository.GetAllPagedAsync(filter);
         }
+
+        public async Task<PriceMatrixValidationResultDto?> PriceMatrixIsValid(PriceMatrixValidationDto dto)
+        {
+            return await _repository.PriceMatrixIsValid(dto);
+        }
     }
 }

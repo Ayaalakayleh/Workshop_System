@@ -16,5 +16,6 @@ namespace Workshop.Core.Interfaces.IRepositories
         public Task<int> DeleteAsync(int Id);
         public Task<GetPriceMatrixDTO> GetAsync(GetPriceMatrixDTO getPriceMatrixDTO);
         public Task<PagedPriceMatrixResultDTO> GetAllPagedAsync(PriceMatrixFilter filter);
+        public Task<PriceMatrixValidationResultDto?> PriceMatrixIsValid(PriceMatrixValidationDto dto);
     }
 }
