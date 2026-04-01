@@ -1,16 +1,25 @@
 ﻿$(document).ready(function () {
     function checkDuplicate() {
+        const customerIds = $('#Customers').val() || [];
+        const matchIds = $('#MatchValue').val() || [];
+
         const dto = {
-            Id: parseInt($('#Id').val() || "0", 10),          
-            Applies: $('#Applies').val(),
-            Basis: parseInt($('#Basis').val() || "0", 10),
-            AccountType: $('#AccountType').val(),
+            id: parseInt($('#Id').val() || "0", 10),
+            applies: parseInt($('#Applies').val() || "0", 10),
+            accountType: parseInt($('#AccountType').val() || "0", 10),
+            fK_AccountId: parseInt($('#AccountId').val() || "0", 10),
+            basisId: parseInt($('#Basis').val() || "0", 10),
+            customerIds: customerIds.join(','),
+            matchIds: matchIds.join(',')
         };
+
+        console.log("validation dto", dto);
 
         return $.ajax({
             url: RazorVars.isValidUrl,
             type: 'POST',
-            data: dto
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(dto)
         });
     }
 

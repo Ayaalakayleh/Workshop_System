@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -286,6 +287,27 @@ namespace Workshop.Infrastructure.Repositories
                 parameters,
                 commandType: CommandType.StoredProcedure
               );
+            return result;
+        }
+        public async Task<PriceMatrixValidationResultDto?> PriceMatrixIsValid(PriceMatrixValidationDto dto)
+        {
+            using var connection = _context.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@Id", dto.Id);
+            parameters.Add("@Applies", dto.Applies);
+            parameters.Add("@AccountType", (int)dto.AccountType);
+            parameters.Add("@FK_AccountId", dto.FK_AccountId);
+            parameters.Add("@BasisId", dto.BasisId);
+            parameters.Add("@CustomerIds", dto.CustomerIds);
+            parameters.Add("@MatchIds", dto.MatchIds);
+
+            var result = await connection.QueryFirstOrDefaultAsync<PriceMatrixValidationResultDto>(
+                "PriceMatrix_IsValid",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
             return result;
         }
     }

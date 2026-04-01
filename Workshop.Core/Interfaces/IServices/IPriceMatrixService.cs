@@ -18,5 +18,6 @@ namespace Workshop.Core.Interfaces.IServices
 
         // Paged
         public Task<PagedPriceMatrixResultDTO> GetAllPagedAsync(PriceMatrixFilter filter);
+        public Task<PriceMatrixValidationResultDto?> PriceMatrixIsValid(PriceMatrixValidationDto dto);
     }
 }

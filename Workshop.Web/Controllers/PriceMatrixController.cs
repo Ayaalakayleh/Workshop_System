@@ -417,29 +417,32 @@ namespace Workshop.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> isValid(PriceMatrixFilter dto)
+        public async Task<JsonResult> isValid([FromBody] PriceMatrixValidationDto dto)
         {
             try
             {
-                var priceList = await _apiClient.GetAllRows(new PriceMatrixFilter());
-
-                if (dto.Basis is null)
+                if (dto.BasisId == 0)
                     return Json(new { isSuccess = true });
 
-                bool duplicateExists = priceList?.Any(v =>
-                    v.Applies == dto.Applies &&
-                    v.BasisId == (int)dto.Basis &&                 
-                    v.AccountType == dto.AccountType &&     
-                    v.Id != dto.Id                          
-                ) ?? false;
+                var result = await _apiClient.PriceMatrixIsValid(dto);
 
-                return Json(new { isSuccess = !duplicateExists });
+                return Json(new
+                {
+                    isSuccess = result?.IsSuccess ?? false,
+                    duplicateId = result?.DuplicateId,
+                    message = result != null && !result.IsSuccess
+                        ? "A record with the same values already exists."
+                        : null
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { isSuccess = false, message = ex.Message });
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = ex.Message
+                });
             }
         }
-
     }
 }

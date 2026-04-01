@@ -54,7 +54,7 @@ namespace Workshop.Core.DTOs
 
     public class PriceMatrixFilter
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string? Name { get; set; }
         public string? AppliesTo { get; set; }
         public int Applies { get; set; }
@@ -72,6 +72,24 @@ namespace Workshop.Core.DTOs
         public int TotalPages { get; set; }
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
+    }
+
+    public class PriceMatrixValidationDto
+    {
+        public int Id { get; set; }
+        public int Applies { get; set; }
+        public AccountTypeEnum AccountType { get; set; }
+        public int FK_AccountId { get; set; }
+        public int BasisId { get; set; }
+        public string CustomerIds { get; set; } = string.Empty;
+        public string MatchIds { get; set; } = string.Empty;
+        public Basis? Basis { get; set; }
+    }
+
+    public class PriceMatrixValidationResultDto
+    {
+        public bool IsSuccess { get; set; }
+        public int? DuplicateId { get; set; }
     }
 
 }
