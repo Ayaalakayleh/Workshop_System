@@ -98,15 +98,15 @@
 
 						<div class="col-md-6 mb-3">
 							@Html.Label("updatedTeam.Code", Common["Code"].ToString(), new { @for = "Code" })
-							@Html.TextBox("updatedTeam.Code", "", new { @id = "Code", @class = "form-control", @required = "required" })
+							@Html.TextBox("updatedTeam.Code", "", new { @id = "Code", @class = "form-control" })
 						</div>
 						<div class="col-md-6 mb-3">
 							@Html.Label("updatedTeam.Short", Common["ShortName"].ToString(), new { @for = "Short" })
-							@Html.TextBox("updatedTeam.Short", "", new { @id = "Short", @class = "form-control", @required = "required" })
+							@Html.TextBox("updatedTeam.Short", "", new { @id = "Short", @class = "form-control" })
 						</div>
 						<div class="col-md-6 mb-3">
 							@Html.Label("updatedTeam.PrimaryName", Common["Label_PrimaryName"].ToString(), new { @for = "Description" })
-							@Html.TextBox("updatedTeam.PrimaryName", "", new { @id = "Description", @class = "form-control copyInput", @required = "required" })
+							@Html.TextBox("updatedTeam.PrimaryName", "", new { @id = "Description", @class = "form-control copyInput" })
 						</div>
 						<div class="col-md-6 mb-3">
 							@Html.Label("updatedTeam.SecondaryName", Common["Label_Secondaryname"].ToString(), new { @for = "SecondDescription" })
