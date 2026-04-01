@@ -2910,4 +2910,7 @@
   <data name="Label_VehcileIn/Out" xml:space="preserve">
     <value>Vehicle In/Out</value>
   </data>
+  <data name="Label_Workflow" xml:space="preserve">
+    <value>Workflow</value>
+  </data>
 </root>

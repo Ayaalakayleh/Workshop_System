@@ -2910,4 +2910,7 @@
   <data name="Label_VehcileIn/Out" xml:space="preserve">
     <value>دخول / خروج المركبة</value>
   </data>
+  <data name="Label_Workflow" xml:space="preserve">
+    <value>سير العمل</value>
+  </data>
 </root>

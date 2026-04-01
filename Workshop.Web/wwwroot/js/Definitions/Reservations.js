@@ -273,7 +273,7 @@
             noDetails: tr('No reservation details found.', 'لم يتم العثور على تفاصيل للحجز.'),
             noDesc: tr('No description provided', 'لا يوجد وصف'),
             duration: tr('Duration', 'المدة'),
-            minutes: tr('min', 'دقيقة'),
+            minutes: tr('hours', 'ساعة'),
             chassis: tr('Chassis', 'رقم الشاصي'),
             company: tr('Company', 'الشركة'),
             startTime: tr('Start time', 'وقت البدء'),
