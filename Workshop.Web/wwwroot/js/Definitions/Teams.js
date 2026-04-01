@@ -101,15 +101,20 @@ var currentFilter = {
 };
 
 $(function () {
-    // Initialize pagination from server-rendered data using simplePagination plugin
     initializePagination();
 
-    // Update search form to reset to page 1
+    // clear search form on page load / reload
+    resetSearchForm();
+
     $('#searchForm').on('submit', function (e) {
-        currentFilter.name = $('#_Name').val() || '';
-        currentFilter.code = $('#_Code').val() || '';
+        e.preventDefault(); // stop normal submit
+
+        currentFilter.name = $('#_Name').val().trim() || '';
+        currentFilter.code = $('#_Code').val().trim() || '';
         currentFilter.pageNumber = 1;
-        // Let form submit normally for initial search
+
+        // allow search with one field only, or even both empty if you want all data
+        loadPage(1);
     });
 });
 
@@ -362,10 +367,10 @@ function deleteTeam(teamId) {
                         // Delete failed (result <= 0, typically -1)
                         var errorMessage = response && response.message 
                             ? response.message 
-                            : 'Team could not be deleted. It may be in use or does not exist.';
+                            : 'Team could not be deleted. It may be in use';
                         Swal.fire({
                             icon: 'warning',
-                            title: theMainLang == "en" ? 'Error Happened' : "حصل خطأ ما",
+                            title: theMainLang == "en" ? 'Not Allowed to delete this team, It may be in use' : "لا يمكن حذف هذا الفريق لانه مستخدم بالفعل",
                             confirmButtonText: RazorVars.btnOk || 'OK',
                             confirmButtonColor: '#dc3545'
                         });
@@ -418,11 +423,28 @@ $(document).on("click", "#deleteBtn", function () {
     deleteTeam(teamId);
 });
 $(document).on("click", "#btnReset", function (e) {
-    window.location.reload();
+    e.preventDefault();
+    resetSearchForm();
+    loadPage(1);
+});
+$(window).on('pageshow', function () {
+    resetSearchForm();
 });
 
 
+function resetSearchForm() {
+    $('#searchForm')[0].reset();
 
+    $('#_Name').val('');
+    $('#_Code').val('');
+
+    currentFilter = {
+        name: '',
+        code: '',
+        pageNumber: 1,
+        pageSize: 25
+    };
+}
 
 function resetTeamForm() {
     $("#Id").val("");
