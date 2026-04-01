@@ -276,7 +276,7 @@ namespace Workshop.Infrastructure.Repositories
                 parameters.Add("@VehicleModelId", getServiceReminderDTO.VehicleModelId);
                 parameters.Add("@ReminderStatus", getServiceReminderDTO.ReminderStatus);
                 parameters.Add("@ManufacturingYear", getServiceReminderDTO.ManufacturingYear);
-                parameters.Add("@SelectedServices", getServiceReminderDTO.ServiceName);
+                parameters.Add("@ServiceId", getServiceReminderDTO.ItemId);
 
                 // ✅ Use parameters directly
                 var reminders = (await connection.QueryAsync<GetServiceReminderDTO>(
