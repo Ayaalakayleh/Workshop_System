@@ -66,7 +66,7 @@ $(document).ready(function () {
     $(document).on("click", "#btnReset", function () {
         $("#_Manufacturer").val('').trigger('change');
         $("#_Services").val('').trigger('change');
-        $("#Model").val('').trigger('change');
+        $("#_Model").val('').trigger('change');
         $("#_Vehicle").val('').trigger('change');
         $("#_Year").val('').trigger('change');
         $("#btnSearch").trigger('click');
