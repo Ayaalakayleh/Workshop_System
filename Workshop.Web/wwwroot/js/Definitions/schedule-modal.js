@@ -152,11 +152,15 @@
     function time24To12(hhmm24) {
         const t = normalizeHHMM24(hhmm24);
         if (!t) return '';
+
         let [h, m] = t.split(':').map(Number);
-        const ampm = h >= 12 ? 'PM' : 'AM';
+
+        // convert to 12h format
         if (h === 0) h = 12;
         else if (h > 12) h -= 12;
-        return `${pad2(h)}:${pad2(m)} ${ampm}`;
+
+        // ✅ FORCE PM ALWAYS
+        return `${pad2(h)}:${pad2(m)} PM`;
     }
 
     function time12To24(v) {
