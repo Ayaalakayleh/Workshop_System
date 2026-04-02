@@ -31,5 +31,30 @@ namespace Workshop.Web.Services
             return await response.Content.ReadAsByteArrayAsync();
         }
 
+
+
+        public async Task<byte[]> PartsSalesSummaryReportReportAsync(IEnumerable<PartsSummaryDTO> model,string CompanyName)
+        {
+
+            var oPartsSummaryReportModel = new PartsSummaryReportModel();
+            oPartsSummaryReportModel.CompanyName = CompanyName;
+            oPartsSummaryReportModel.data = model;
+            var response = await _httpClient.PostAsJsonAsync("api/reports/partsSummary", oPartsSummaryReportModel);
+            //var response = await _httpClient.PostAsJsonAsync("api/reports/partsSummary", new { Data = model, CompanyName = CompanyName });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Status: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
+                return Array.Empty<byte>();
+            }
+
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+
+
+      
+
     }
 }
