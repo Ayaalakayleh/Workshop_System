@@ -479,7 +479,7 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public PartsSalesSummaryRow AddPartsSalesSummaryRow(string AccountType, string SalesType, string AccountTypePrimaryName, string AccountTypeSecondaryName, string SalesTypePrimaryName, string SalesTypeSecondaryName, string RetailValue, string SaleValue, string Discount, string DiscountPercentage, string CostValue, string Quantity, string Profit) {
+            public PartsSalesSummaryRow AddPartsSalesSummaryRow(string AccountType, string SalesType, string AccountTypePrimaryName, string AccountTypeSecondaryName, string SalesTypePrimaryName, string SalesTypeSecondaryName, decimal RetailValue, decimal SaleValue, decimal Discount, decimal DiscountPercentage, decimal CostValue, decimal Quantity, decimal Profit) {
                 PartsSalesSummaryRow rowPartsSalesSummaryRow = ((PartsSalesSummaryRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         AccountType,
@@ -547,19 +547,19 @@ namespace ReportsService.DataSets {
                 base.Columns.Add(this.columnSalesTypePrimaryName);
                 this.columnSalesTypeSecondaryName = new global::System.Data.DataColumn("SalesTypeSecondaryName", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnSalesTypeSecondaryName);
-                this.columnRetailValue = new global::System.Data.DataColumn("RetailValue", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnRetailValue = new global::System.Data.DataColumn("RetailValue", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnRetailValue);
-                this.columnSaleValue = new global::System.Data.DataColumn("SaleValue", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnSaleValue = new global::System.Data.DataColumn("SaleValue", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnSaleValue);
-                this.columnDiscount = new global::System.Data.DataColumn("Discount", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnDiscount = new global::System.Data.DataColumn("Discount", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnDiscount);
-                this.columnDiscountPercentage = new global::System.Data.DataColumn("DiscountPercentage", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnDiscountPercentage = new global::System.Data.DataColumn("DiscountPercentage", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnDiscountPercentage);
-                this.columnCostValue = new global::System.Data.DataColumn("CostValue", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnCostValue = new global::System.Data.DataColumn("CostValue", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnCostValue);
-                this.columnQuantity = new global::System.Data.DataColumn("Quantity", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnQuantity = new global::System.Data.DataColumn("Quantity", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnQuantity);
-                this.columnProfit = new global::System.Data.DataColumn("Profit", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnProfit = new global::System.Data.DataColumn("Profit", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnProfit);
                 this.ExtendedProperties.Add("Generator_TablePropName", "_PartsSalesSummary");
                 this.ExtendedProperties.Add("Generator_UserTableName", "PartsSalesSummary");
@@ -805,10 +805,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string RetailValue {
+            public decimal RetailValue {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.RetailValueColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.RetailValueColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'RetailValue\' in table \'PartsSalesSummary\' is DBNull.", e);
@@ -821,10 +821,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string SaleValue {
+            public decimal SaleValue {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.SaleValueColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.SaleValueColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'SaleValue\' in table \'PartsSalesSummary\' is DBNull.", e);
@@ -837,10 +837,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string Discount {
+            public decimal Discount {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.DiscountColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.DiscountColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'Discount\' in table \'PartsSalesSummary\' is DBNull.", e);
@@ -853,10 +853,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string DiscountPercentage {
+            public decimal DiscountPercentage {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.DiscountPercentageColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.DiscountPercentageColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'DiscountPercentage\' in table \'PartsSalesSummary\' is DBNull." +
@@ -870,10 +870,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string CostValue {
+            public decimal CostValue {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.CostValueColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.CostValueColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'CostValue\' in table \'PartsSalesSummary\' is DBNull.", e);
@@ -886,10 +886,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string Quantity {
+            public decimal Quantity {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.QuantityColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.QuantityColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'Quantity\' in table \'PartsSalesSummary\' is DBNull.", e);
@@ -902,10 +902,10 @@ namespace ReportsService.DataSets {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public string Profit {
+            public decimal Profit {
                 get {
                     try {
-                        return ((string)(this[this.tablePartsSalesSummary.ProfitColumn]));
+                        return ((decimal)(this[this.tablePartsSalesSummary.ProfitColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("The value for column \'Profit\' in table \'PartsSalesSummary\' is DBNull.", e);
