@@ -176,6 +176,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CompanyData.xsd</DependentUpon>
     </Compile>
+    <Compile Include="DataSets\PartsSalesSummary.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PartsSalesSummary.xsd</DependentUpon>
+    </Compile>
     <Compile Include="DataSets\RepairItemsDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -207,6 +212,7 @@
     <Compile Include="Models\CompanyDataModel.cs" />
     <Compile Include="Models\CreateWIPServiceModel.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="Models\PartsSummaryReportModel.cs" />
     <Compile Include="Models\RepairOrderRequestReportModel.cs" />
     <Compile Include="Models\VehicleChecklist.cs" />
     <Compile Include="Models\VehicleInfoModel.cs" />
@@ -216,6 +222,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CryHeaderEn.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\PartsSalesSummary.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PartsSalesSummary.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Reports\SubTiresChecklistReport.cs">
@@ -286,6 +298,17 @@
     <Content Include="DataSets\CompanyData.xss">
       <DependentUpon>CompanyData.xsd</DependentUpon>
     </Content>
+    <Content Include="DataSets\PartsSalesSummary.xsc">
+      <DependentUpon>PartsSalesSummary.xsd</DependentUpon>
+    </Content>
+    <None Include="DataSets\PartsSalesSummary.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PartsSalesSummary.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="DataSets\PartsSalesSummary.xss">
+      <DependentUpon>PartsSalesSummary.xsd</DependentUpon>
+    </Content>
     <None Include="DataSets\RepairItemsDataSet.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
@@ -341,6 +364,10 @@
     <EmbeddedResource Include="Reports\CryHeaderEn.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>CryHeaderEn.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\PartsSalesSummary.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>PartsSalesSummary.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\SubTiresChecklistReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>

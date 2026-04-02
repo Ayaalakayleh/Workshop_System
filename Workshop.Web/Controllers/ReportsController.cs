@@ -2,11 +2,12 @@
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Net.Http;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.Vehicle;
+using Workshop.Domain.Enum;
 using Workshop.Web.Models;
 using Workshop.Web.Services;
-using Workshop.Domain.Enum;
 
 namespace Workshop.Web.Controllers
 {
@@ -19,12 +20,14 @@ namespace Workshop.Web.Controllers
         private readonly VehicleApiClient _vehicleApiClient;
         private readonly InventoryApiClient _inventoryApiClient;
         public readonly string lang;
+        private readonly ReportsServiceApiClient _reportsServiceApiClient;
         public ReportsController(
             WorkshopApiClient apiClient,
             IConfiguration configuration,
             ERPApiClient eRPApiClient,
             AccountingApiClient accountingApiClient,
             VehicleApiClient vehicleApiClient,
+            ReportsServiceApiClient repo,
             InventoryApiClient inventoryApiClient,
             IWebHostEnvironment env) : base(null, configuration, env)
         {
@@ -32,6 +35,7 @@ namespace Workshop.Web.Controllers
             _erpClient = eRPApiClient;
             _accountingApiClient = accountingApiClient;
             _vehicleApiClient = vehicleApiClient;
+            _reportsServiceApiClient = repo;
             _inventoryApiClient = inventoryApiClient;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
@@ -1179,6 +1183,39 @@ namespace Workshop.Web.Controllers
             }
 
         }
+
+
+        public IActionResult PartsSalesSummary()
+        {
+            ViewBag.AccountTypes = Enum.GetValues(typeof(AccountTypeEnum))
+                .Cast<AccountTypeEnum>()
+                .Select(e => new SelectListItem
+                {
+                    Value = ((int)e).ToString(),
+                    Text = e.ToString()
+                }).ToList();
+
+            var model = new PartsSalesSummaryReport();
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> PartsSalesSummary(PartsSummaryFilterDTO filter)
+        {
+            var data = await _apiClient.GetPartsSummaryReport(filter);
+            var companyInfo = await _erpClient.GetCompanyById(CompanyId);
+            var CompanyName = lang=="en" ? companyInfo.CompanyPrimaryName : companyInfo.CompanySecondaryName;
+            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(data, CompanyName);
+
+            Response.Headers["Content-Disposition"] = "inline; filename=Wip.pdf";
+            return File(bytes, "application/pdf");
+
+
+
+        }
+
 
 
     }
