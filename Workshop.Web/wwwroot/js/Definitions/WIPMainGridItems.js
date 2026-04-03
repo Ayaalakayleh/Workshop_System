@@ -1032,7 +1032,7 @@ $(function () {
                         icon: "menu",            
                         type: "default",
                         stylingMode: "contained",
-                        visible: Permission_StockCard,
+                        visible: function (e) { return Permission_StockCard; },
                         onClick: function (e) {
                             const itemId = e?.row?.data?.ItemId || e?.row?.data?.Id;
                             if (!itemId) {
