@@ -421,9 +421,21 @@ namespace Workshop.Web.Controllers
                 }
                 else if (state == Status.ClockOut)
                 {
+                    if (clockItem.StatusID == (int)Status.Break)
+                    {
+                        var lastBreak = await _apiClient.GetLastBreakByClockID(clockItem.ID ?? 0);
+                        if (lastBreak != null && lastBreak.EndAt == null)
+                        {
+                            lastBreak.EndAt = DateTime.Now;
+                            await _apiClient.UpdateClockBreak(lastBreak);
+                        }
+                    }
+
                     clockItem.StatusID = (int)Status.ClockOut;
                     clockItem.EndedAt = DateTime.Now;
                     clockItem.Elapsed = (clockItem.Elapsed ?? TimeSpan.Zero) + (clockItem.EndedAt - clockItem.StartedAt);
+
+
 
                     var result = await _apiClient.UpdateClock(clockItem);
                     if (result > 0 && main.ClockingList != null)
