@@ -611,7 +611,18 @@ namespace Workshop.Web.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllRecallsDDL()
+        {
+            var recalls = await _apiClient.GetAllRecallsDDLAsync();
 
+            var result = recalls?.Select(r => new {
+                value = r.Id,
+                text = r.Code
+            });
+
+            return Json(result);
+        }
         #region Data
 
         private async Task<List<SelectListItem>> GetMakes()

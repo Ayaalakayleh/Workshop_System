@@ -137,6 +137,7 @@
                 success: function (res) {
                     if (res.success) {
                         $("#recallModal").modal("hide");
+                        ReloadRecallList();
                          Swal.fire({
                             title: theMainLang == "en" ? 'Success' : 'تم بنجاح',
                             text: theMainLang == "en"
