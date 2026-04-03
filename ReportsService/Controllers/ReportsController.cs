@@ -332,5 +332,160 @@ namespace ReportsService.Controllers
             }
         }
 
+
+
+        [HttpPost]
+        [Route("api/reports/partsSummary/")]
+        public HttpResponseMessage GetPartsSummaryReport(PartsSummaryReportModel model)
+        {
+            ReportDocument rpt = new ReportDocument();
+
+            try
+            {
+                var company = model.CompanyName;
+                // Create dataset
+                var ds = new DataSet("PartsSummaryDataSet");
+                var dt = new DataTable("DataTable1");
+
+                // Define columns
+                dt.Columns.Add("AccountTypePrimaryName", typeof(string));
+                dt.Columns.Add("AccountTypeSecondaryName", typeof(string ));
+                dt.Columns.Add("SalesTypePrimaryName", typeof(string));
+                dt.Columns.Add("SalesTypeSecondaryName", typeof(string));
+                dt.Columns.Add("RetailValue", typeof(decimal));
+                dt.Columns.Add("SaleValue", typeof(decimal));
+                dt.Columns.Add("Discount", typeof(decimal));
+                dt.Columns.Add("DiscountPercentage", typeof(decimal));
+                dt.Columns.Add("CostValue", typeof(decimal));
+                dt.Columns.Add("Quantity", typeof(decimal));
+                dt.Columns.Add("Profit", typeof(decimal));
+
+
+                // Fill data
+                //var r = dt.NewRow();
+                //r["AccountTypePrimaryName"] = model.AccountTypePrimaryName ?? 0;
+                //r["SaleVal"] = model.AccountTypeSecondaryName ?? 0;
+
+
+                foreach (var item in model.data)
+                {
+                    var r = dt.NewRow();
+
+                    r["AccountTypePrimaryName"] = item.AccountTypePrimaryName ?? "";
+                    r["AccountTypeSecondaryName"] = item.AccountTypeSecondaryName ?? "";
+                    r["SalesTypePrimaryName"] = item.SalesTypePrimaryName ?? "";
+                    r["SalesTypeSecondaryName"] = item.SalesTypeSecondaryName ?? "";
+
+                    r["RetailValue"] = item.RetailValue ?? 0;
+                    r["SaleValue"] = item.SaleValue ?? 0;
+                    r["Discount"] = item.Discount ?? 0;
+                    r["DiscountPercentage"] = item.DiscountPercentage ?? 0;
+                    r["CostValue"] = item.CostValue ?? 0;
+                    r["Quantity"] = item.Quantity ?? 0;
+                    r["Profit"] = item.Profit ?? 0;
+
+                    dt.Rows.Add(r);
+                }
+
+
+
+                //dt.Rows.Add(r);
+                ds.Tables.Add(dt);
+
+
+
+
+
+                // CompanyData Table ========================
+                var dtCompanyData = new DataTable("CompanyData");
+                dtCompanyData.Columns.Add("CompanyPrimaryName", typeof(string));
+                dtCompanyData.Columns.Add("Branch", typeof(string));
+                dtCompanyData.Columns.Add("Img", typeof(byte[]));
+                dtCompanyData.Columns.Add("Title", typeof(string));
+
+                dtCompanyData.Rows.Add(
+                    company ?? "",
+                    "" ?? "",
+                    DBNull.Value ?? DBNull.Value,
+                    "Parts Summary"
+
+                );
+                ds.Tables.Add(dtCompanyData);
+                // End CompanyData Table
+
+
+                // Load report
+                rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummary.rpt"));
+
+                foreach (CrystalDecisions.CrystalReports.Engine.Table t in rpt.Database.Tables)
+                {
+                    t.SetDataSource(ds.Tables[0]);
+                }
+
+                //Header Subreport
+                var sub_Header = rpt.OpenSubreport("CryHeaderEn.rpt");
+                sub_Header.Database.Tables["CompanyData"].SetDataSource(ds.Tables["CompanyData"]);
+
+                // Export to PDF
+                Stream stream = rpt.ExportToStream(ExportFormatType.PortableDocFormat);
+                stream.Position = 0;
+
+                byte[] bytes;
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    bytes = ms.ToArray();
+                }
+
+                var resp = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(bytes)
+                };
+                resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+                resp.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
+                {
+                    FileName = $"PartsSummary_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
+                };
+                resp.Headers.CacheControl = new CacheControlHeaderValue
+                {
+                    NoCache = true,
+                    NoStore = true,
+                    MustRevalidate = true
+                };
+                resp.Headers.Pragma.Add(new NameValueHeaderValue("no-cache"));
+
+                return resp;
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                string logDirectory = @"C:\LogFiles";
+                Directory.CreateDirectory(logDirectory);
+
+                string logFile = Path.Combine(
+                    logDirectory,
+                    "Log_" + DateTime.Now.ToString("dd_MM_yyyy") + ".txt"
+                );
+
+                using (StreamWriter sw = new StreamWriter(logFile, true))
+                {
+                    sw.WriteLine($"{DateTime.Now:dd/MM/yyyy HH:mm:ss} ==> {ex.Message} {ex.StackTrace}");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.ToString())
+                };
+            }
+            finally
+            {
+                rpt.Close();
+                rpt.Dispose();
+            }
+        }
+
+
+
+
     }
 }
