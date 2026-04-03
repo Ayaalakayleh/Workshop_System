@@ -8,6 +8,7 @@
 
 <!DOCTYPE html>
 <html data-bs-theme="light|dark"
+class="set-nav-dark"
       dir="@(System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("ar") ? "rtl" : "ltr")"
       lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
 
@@ -82,14 +83,19 @@
 (function () {
   const KEY = 'sa-theme-style';
   const DEFAULT = 'earth';
-  const THEMES = ['earth','olive','nebula','solar','lunar','night','aurora','flare','storm']; // keep in sync with your files
+  const THEMES = ['earth','olive','nebula','solar','lunar','night','aurora','flare','storm'];
   const base = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
 
-  const saved = (localStorage.getItem(KEY) || '').toLowerCase().trim();
-  const theme = THEMES.includes(saved) ? saved : DEFAULT;
+  let saved = localStorage.getItem(KEY);
+
+  // ✅ Force earth if nothing saved
+  if (!saved || !THEMES.includes(saved)) {
+    saved = DEFAULT;
+    localStorage.setItem(KEY, DEFAULT);
+  }
 
   const link = document.getElementById('theme-style');
-  if (link) link.href = base + theme + '.css';
+  if (link) link.href = base + saved + '.css';
 })();
 </script>
 
@@ -731,7 +737,9 @@
                 </div>
 
                 <div class="d-flex" style="gap:10px">
-                    <button type="button" onclick="appDOM.resetStyle();" class="btn reset-button btn-outline-danger flex-grow-1"> <i class="sa sa-reload align-base me-1"></i> Factory Reset</button>
+                    <button type="button"
+        onclick="resetToEarthTheme(); appDOM.resetStyle();"
+        class="btn reset-button btn-outline-danger flex-grow-1"></button>
                     <button type="button" onclick="resetPanelState();" class="btn btn-outline-secondary flex-grow-1"><i class="sa sa-reload align-base me-1"></i> Reset Panel</button>
                 </div>
             </div>
@@ -1011,7 +1019,7 @@
 </script>
 
 <script>
-  @*   (() => {
+    (() => {
         const themeBase = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
         const themeLink = document.getElementById('theme-style');
 
@@ -1037,7 +1045,7 @@
                 applyTheme(el.dataset.themeStyle);
             }
         }, true);
-    })(); *@
+    })();
     /*Start fix change Lang/Branch on mobile menu*/
     document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".dropdown-menu .dropdown-toggle").forEach((toggle) => {
@@ -1434,7 +1442,23 @@ $(document).on('error.dt', function (e, settings, techNote, message) {
 lockFormControls();
 
 </script>
+<script>
+function resetToEarthTheme() {
+    const KEY = 'sa-theme-style';
+    const theme = 'earth';
+    const base = '@Url.Content("~/smartadmin-5-styles/css/themes/")';
 
+    localStorage.setItem(KEY, theme);
+
+    const link = document.getElementById('theme-style');
+    if (link) link.href = base + theme + '.css';
+
+    // sync radio button
+    document.querySelectorAll('input[data-action="theme-style"]').forEach(r => {
+        r.checked = ((r.dataset.themeStyle || '').toLowerCase() === theme);
+    });
+}
+</script>
 @await RenderSectionAsync("Scripts", required: false)
 
 </body>
