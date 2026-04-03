@@ -1239,13 +1239,13 @@
         var file = {};
         var files = [];
         file.files = files;
-
+        debugger;
         @foreach (var item in Model.MovementInvoice)
         {
                 <text>
                     var source = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-                                            FileService.GetFileFullPath(item.FileName, item.FilePath)
-                                    ));
+                            FileService.GetFileFullPath(item.FilePath, item.FileName)
+                    ));
 
                 var fi = { "source": source, options: { type: 'local' } };
                 file.files.push(fi);

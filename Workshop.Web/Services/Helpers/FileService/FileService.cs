@@ -1,4 +1,5 @@
 ﻿
+using Workshop.Infrastructure;
 using Workshop.Web.Interfaces.Services;
 
 namespace Workshop.Web.Services
@@ -21,7 +22,7 @@ namespace Workshop.Web.Services
             return await SaveFileAsync(file, subFolder, null);
         }
 
-        public async Task<(string FilePath, string FileName)> SaveFileAsync(IFormFile file, string subFolder, string customFileName)
+        public async Task<(string FilePath, string FileName)> SaveFileAsync(IFormFile file, string subFolder, string customFileName)  
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is null or empty", nameof(file));
@@ -29,11 +30,13 @@ namespace Workshop.Web.Services
             if (string.IsNullOrEmpty(subFolder))
                 throw new ArgumentException("SubFolder is required", nameof(subFolder));
 
+            var uploadsRoot = Path.Combine(_env.WebRootPath, "Uploads");
+
             string guid = Guid.NewGuid().ToString();
             var fileName = customFileName ?? $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}";
 
-            // Create folder path: wwwroot/Uploads/subFolder/guid
-            var folderPath = Path.Combine(_env.WebRootPath, _baseUploadPath, subFolder, guid);
+            // wwwroot/Uploads/subFolder/guid
+            var folderPath = Path.Combine(uploadsRoot, subFolder, guid);
 
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);

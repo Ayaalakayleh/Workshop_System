@@ -1495,10 +1495,10 @@ namespace Workshop.Web.Controllers
                         }
 
                         var (savedRelativePath, savedFileName) =
-                            await _fileService.SaveFileAsync(file, Path.Combine("ExternalWorkshopInvoice", guid));
+                            await _fileService.SaveFileAsync(file, Path.Combine("ExternalWorkshopInvoice"));
 
                         invoice.FileName = savedFileName; 
-                        invoice.FilePath = guid;
+                        invoice.FilePath = savedRelativePath;
                         invoice.MovementId = movements.MovementId.Value;
                         invoice.Invoice_Date = DateTime.Now;
 
