@@ -41,7 +41,8 @@ namespace Workshop.Web.Controllers
                 .Select(e => new SelectListItem
                 {
                     Value = ((int)e).ToString(),
-                    Text = e.ToString()
+                    Text = lang == "en" ? e.ToString() : (e == AccountTypeEnum.Internal ? "داخلي" : e == AccountTypeEnum.External ? "خارجي" : "")
+
                 }).ToList() ?? new List<SelectListItem>();
 
 
@@ -49,7 +50,8 @@ namespace Workshop.Web.Controllers
                 .Select(e => new SelectListItem
                 {
                     Value = ((int)e).ToString(),
-                    Text = e.ToString()
+                    Text = lang == "en" ? e.ToString() : (e == PriceMatrixEnum.Labour ? "الاجور" : e == PriceMatrixEnum.Parts ? "القطع" : "")
+
                 }).ToList();
 
             ViewBag.SalesType = new List<SelectListItem>();
