@@ -264,7 +264,7 @@ $(function () {
                         } else {
                             Swal.fire({
                                 icon: "error",
-                                title: RazorVars.required_field,
+                                title: RazorVars.fillAllReqFields,
                                 confirmButtonText: RazorVars.btnOk,
                                 confirmButtonColor: "var(--primary-600)"
                             });

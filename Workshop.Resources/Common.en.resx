@@ -2913,4 +2913,10 @@
   <data name="Label_Workflow" xml:space="preserve">
     <value>Workflow</value>
   </data>
+  <data name="Label_Imported" xml:space="preserve">
+    <value>Imported</value>
+  </data>
+  <data name="Message_ImportSuccess" xml:space="preserve">
+    <value />
+  </data>
 </root>
