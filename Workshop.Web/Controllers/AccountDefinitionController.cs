@@ -51,7 +51,7 @@ namespace Workshop.Web.Controllers
             var accountsList = await _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(companyId, branchId, lang);
             ViewBag.Accounts = accountsList.Select(t => new SelectListItem
             {
-                Text = t.AccountName,
+                Text = t.AccountNameNo,
                 Value = t.ID.ToString(),
                 Selected =
                     t.ID == dto.JournalId ||
