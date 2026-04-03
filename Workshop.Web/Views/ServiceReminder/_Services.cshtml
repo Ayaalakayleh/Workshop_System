@@ -68,14 +68,16 @@
         }
     </tbody>
 </table>
-@* <script>
+<script>
 $(document).ready(function(){
                 $('.service-reminder-table').DataTable({
             responsive: true,
             pageLength: 10,
             info: false,
             paging: true,
-            ordering: true
+                searching: false,
+                    lengthChange: false,
+            ordering: false
         });
 })
-</script> *@
+</script>
