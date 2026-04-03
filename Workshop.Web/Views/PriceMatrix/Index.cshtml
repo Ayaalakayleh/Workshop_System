@@ -156,7 +156,24 @@
 							<select onchange="onBasisChange(this)" class="form-control" name="Basis" id="Basis">
 								@foreach (var bas in Enum.GetValues(typeof(Basis)))
 								{
-									<option value="@((int)bas)">@bas</option>
+										
+											string text = bas.ToString();
+
+											if (lang != "en")
+											{
+												text = bas switch
+												{
+													Basis.All => "الكل",
+													Basis.Skill => "المهارات",
+													Basis.Franchise => "الوكيل",
+													Basis.RTS => "الخدمات",
+													_ => bas.ToString()
+												};
+											}
+										
+									<option value="@((int)bas)">@text</option>
+									
+									
 								}
 							</select>
 						</div>
