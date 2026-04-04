@@ -9,12 +9,14 @@ namespace Workshop.Web.Services
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
         private readonly string _baseUploadPath;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileService(IWebHostEnvironment env, IConfiguration configuration)
+        public FileService(IWebHostEnvironment env, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _env = env;
             _configuration = configuration;
             _baseUploadPath = _configuration["FileUpload:DirectoryPath"] ?? "Uploads";
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<(string FilePath, string FileName)> SaveFileAsync(IFormFile file, string subFolder)
@@ -78,12 +80,25 @@ namespace Workshop.Web.Services
             return File.Exists(fullPath);
         }
 
+        //public string GetFileFullPath(string relativeFilePath, string fileName)
+        //{
+        //    if (string.IsNullOrEmpty(relativeFilePath) || string.IsNullOrEmpty(fileName))
+        //        return string.Empty;
+
+        //    return Path.Combine(_env.WebRootPath, _baseUploadPath, relativeFilePath, fileName).Replace("\\", "/");
+        //}
+
         public string GetFileFullPath(string relativeFilePath, string fileName)
         {
             if (string.IsNullOrEmpty(relativeFilePath) || string.IsNullOrEmpty(fileName))
                 return string.Empty;
 
-            return Path.Combine(_env.WebRootPath, _baseUploadPath, relativeFilePath, fileName).Replace("\\", "/");
+            var pathBase = _httpContextAccessor.HttpContext?.Request.PathBase.Value ?? "";
+
+            var filePath = Path.Combine(_baseUploadPath, relativeFilePath, fileName)
+                .Replace("\\", "/");
+
+            return $"{pathBase}/{filePath}".Replace("//", "/");
         }
 
         public string GetFileFullPath(string relativeFilePath)
