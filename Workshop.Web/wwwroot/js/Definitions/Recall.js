@@ -553,8 +553,8 @@ $(function () {
                 if (window.Swal) {
                     Swal.fire({
                         icon: 'success',
-                        title: LABELS.ImportSuccessTitle || 'Imported',
-                        text: LABELS.ImportSuccessText || 'File imported successfully.'
+                        title: theMainLang == "en" ? "File Imported Successfully" : "تم تصدير الملف بنجاح",
+                        //text: LABELS.ImportSuccessText || 'File imported successfully.'
                     });
                 }
             },
