@@ -2917,6 +2917,6 @@
     <value>Imported</value>
   </data>
   <data name="Message_ImportSuccess" xml:space="preserve">
-    <value> </value>
+    <value>تمت عملية تصدير الملف بنجاح</value>
   </data>
 </root>
