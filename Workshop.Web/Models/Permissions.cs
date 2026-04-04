@@ -155,7 +155,7 @@
             public const int AddDiscount = 1945;
             public const int ChangeDate = 2071;
             public const int PriceApproval = 2072;
-            public const int StockCard = 2072;
+            public const int StockCard = 2122;
         }
         #endregion
 
