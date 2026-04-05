@@ -34,7 +34,7 @@
 
         <div class="col-md-3">
             <label>Sale Type</label>
-            <select id="SaleType" name="SaleType" class="form-control">
+                        <select id="SalesType" name="SalesType" class="form-control">
                 <option value="">-- Select --</option>
             </select>
         </div>
@@ -88,12 +88,12 @@
      
         $("#AccountType").change(function () {
             const accountId = $(this).val();
-            loadSalesTypes(accountId, $("#SaleType"));
+            loadSalesTypes(accountId, $("#SalesType"));
         });
 
 
         if ($("#AccountType").val()) {
-            loadSalesTypes($("#AccountType").val(), $("#SaleType"));
+            loadSalesTypes($("#AccountType").val(), $("#SalesType"));
         }
     });
 </script>
