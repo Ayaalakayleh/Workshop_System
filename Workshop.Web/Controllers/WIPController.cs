@@ -819,10 +819,10 @@ namespace Workshop.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetAllItems(int fK_GroupId, int fK_CategoryId, int fK_SubCategoryId)
+        public async Task<JsonResult> GetAllItems(int fK_GroupId, int fK_CategoryId, int fK_SubCategoryId, int wipId)
         {
-            var items = await _inventoryApiClient.GetItemsWithStockAndLocation(fK_GroupId, fK_CategoryId, fK_SubCategoryId);
-            
+            var items = await _inventoryApiClient.GetItemsWithStockAndLocation(fK_GroupId, fK_CategoryId, fK_SubCategoryId, wipId);
+
             var allCategories = await _inventoryApiClient.GetAllCategoriesAsync();
             var allUnits = await _inventoryApiClient.GetAllUnitDDL();
 

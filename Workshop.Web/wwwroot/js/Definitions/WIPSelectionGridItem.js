@@ -457,11 +457,13 @@ function showItemSelectionModal() {
 
 function loadItemsData() {
     const grid = $("#gridContainer").dxDataGrid("instance");
+    const wipId = parseInt($("#Id").val() || "0");
 
     $.ajax({
         url: window.RazorVars.getAllItemsUrl,
         method: 'POST',
         dataType: 'json',
+        data: { wipId: wipId },
         beforeSend: function () {
             grid.option("loadPanel.enabled", true);
         },
