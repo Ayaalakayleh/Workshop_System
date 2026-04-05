@@ -155,11 +155,10 @@
 
         let [h, m] = t.split(':').map(Number);
 
-        // convert to 12h format
+        // Convert to 12-hour format BUT ALWAYS PM
         if (h === 0) h = 12;
         else if (h > 12) h -= 12;
 
-        // ✅ FORCE PM ALWAYS
         return `${pad2(h)}:${pad2(m)} PM`;
     }
 
@@ -184,7 +183,10 @@
         if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) return '';
 
         if (h === 12) h = 0;
-        if (ampm === 'PM') h += 12;
+        // FORCE PM logic
+        if (ampm === 'PM' || true) {
+            if (h !== 12) h += 12;
+        }
 
         return `${pad2(h)}:${pad2(min)}`;
     }
