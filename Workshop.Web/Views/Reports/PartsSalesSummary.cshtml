@@ -4,17 +4,24 @@
 @inject IStringLocalizer<Common> Common 
 @inject IStringLocalizer<Messages> Message
 
+
+<div id="panel-1" class="panel">
+    <div class="panel-hdr">
+        <h2 class="font-weight-bold">Parts Summary Report</h2>
+    </div>
+    <div class="panel-container show">
+        <div class="panel-content">
 <form asp-action="PartsSalesSummary" method="post" target="_blank">
     <div class="row g-3">
 
         <div class="col-md-3">
             <label>From Date</label>
-            <input type="date" name="FromDate" class="form-control" />
+            <input type="text" name="FromDate" class="form-control flat-picker" />
         </div>
 
         <div class="col-md-3">
             <label>To Date</label>
-            <input type="date" name="ToDate" class="form-control" />
+            <input type="text" name="ToDate" class="form-control flat-picker" />
         </div>
 
         <div class="col-md-3">
@@ -27,20 +34,37 @@
 
         <div class="col-md-3">
             <label>Sale Type</label>
-            <select id="SaleType" name="SaleType" class="form-control">
+                        <select id="SalesType" name="SalesType" class="form-control">
                 <option value="">-- Select --</option>
             </select>
         </div>
 
-        <div class="col-md-3 d-flex align-items-end">
-            <button type="submit" class="btn btn-success w-100">
-                Print
-            </button>
-        </div>
+        <div class="col-md-3">
+                <input type="checkbox" name="IsAll" value="true" class="form-check-input" id="IsAll" />
+                <label class="form-check-label" for="IsAll">All</label>
+           </div>
+
+                    <div class="col-md-3">
+                <input type="checkbox" name="IsWIPClose" value="true" class="form-check-input" id="IsWIPClose" />
+                <label class="form-check-label" for="IsWIPClose">WIP Close</label>
+            </div>
+                  
+
+
+
 
     </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success ml-2">
+                        <i class="fa fa-print"></i>&nbsp;@Common["Button_Print"]
+                    </button>
+                </div>
 </form>
-
+</div>
+</div>
+</div>
+<script src="~/js/site.js"></script>
+<script src="~/js/Definitions/reports.js"></script>
 <script>
     $(document).ready(function () {
 
@@ -64,12 +88,12 @@
      
         $("#AccountType").change(function () {
             const accountId = $(this).val();
-            loadSalesTypes(accountId, $("#SaleType"));
+            loadSalesTypes(accountId, $("#SalesType"));
         });
 
 
         if ($("#AccountType").val()) {
-            loadSalesTypes($("#AccountType").val(), $("#SaleType"));
+            loadSalesTypes($("#AccountType").val(), $("#SalesType"));
         }
     });
 </script>
