@@ -32,24 +32,11 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: min(1200px, calc(100vw - 48px));
-            height: min(760px, calc(100vh - 80px));
+            width: 62rem;
+            height: 54%;
             border-radius: 12px;
             overflow: hidden;
             background: transparent;
-        }
-
-        #invFrameHost .closeBtn {
-            position: absolute;
-            right: 14px;
-            top: 14px;
-            z-index: 3;
-            border: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: rgba(255,255,255,.85);
-            cursor: pointer;
         }
 
     #gridContainer .dx-datagrid-headers .dx-datagrid-text-content {
@@ -223,7 +210,18 @@
     var Permission_Undo = true;
 
     }
+        const iframe = document.getElementById('invItemTabsFrame');
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
 
+    const style = doc.createElement('style');
+    style.textContent = `
+    #invItemTabsFrame #itemTabsModal {
+        width: auto !important;
+        height: auto !important;
+    }
+    `;
+    doc.head.appendChild(style);
 </script>
+
 <script src="~/js/definitions/wipmaingriditems.js"></script>
 <script src="~/js/definitions/wipselectiongriditem.js"></script>

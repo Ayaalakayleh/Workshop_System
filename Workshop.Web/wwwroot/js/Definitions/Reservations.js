@@ -308,7 +308,7 @@
             const moveUrl = buildMovementInUrl(vehicleId, vehicleTypeId);
 
             const duration = (r.duration != null)
-                ? `${r.duration} ${isAr ? txt.minutes : 'min'}`
+                ? `${r.duration} ${isAr ? txt.minutes : 'Hours'}`
                 : '—';
 
             const description = (r.description || '').trim()

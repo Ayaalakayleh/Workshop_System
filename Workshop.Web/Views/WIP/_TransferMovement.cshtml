@@ -206,15 +206,28 @@
                 GregorianMovementEndDate: {
                     required: true
                 },
-                Reason: { required: true }
+                Reason: { required: true },
+                ExitDriverId: { required: true }
             },
             // default messages used (no custom messages)
             errorPlacement: function (error, element) {
                 // make message block-level and under field
                 error.addClass("d-block");
                 error.appendTo(element.closest(".form-group"));
+            },
+            highlight: function (element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function (element) {
+                $(element).removeClass("is-invalid");
             }
         });
+
+
+        $('.select2').on('change', function () {
+            $(this).next().find('.select2-selection').css("border-color", "");
+        });
+
 
         $('#IsPart').change(function () { toggleIsPart(); });
         toggleIsPart();

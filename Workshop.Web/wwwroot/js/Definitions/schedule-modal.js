@@ -152,11 +152,14 @@
     function time24To12(hhmm24) {
         const t = normalizeHHMM24(hhmm24);
         if (!t) return '';
+
         let [h, m] = t.split(':').map(Number);
-        const ampm = h >= 12 ? 'PM' : 'AM';
+
+        // Convert to 12-hour format BUT ALWAYS PM
         if (h === 0) h = 12;
         else if (h > 12) h -= 12;
-        return `${pad2(h)}:${pad2(m)} ${ampm}`;
+
+        return `${pad2(h)}:${pad2(m)} PM`;
     }
 
     function time12To24(v) {
@@ -180,7 +183,10 @@
         if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) return '';
 
         if (h === 12) h = 0;
-        if (ampm === 'PM') h += 12;
+        // FORCE PM logic
+        if (ampm === 'PM' || true) {
+            if (h !== 12) h += 12;
+        }
 
         return `${pad2(h)}:${pad2(min)}`;
     }
