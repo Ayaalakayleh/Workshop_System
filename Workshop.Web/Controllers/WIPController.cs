@@ -333,8 +333,9 @@ namespace Workshop.Web.Controllers
                         .Select(e => new SelectListItem
                         {
                             Value = ((int)e).ToString(),
-                            Text = e.ToString()
-                        }).ToList();
+                            Text = lang == "en" ? e.ToString() : (e == AccountTypeEnum.Internal ? "داخلي" : e == AccountTypeEnum.External ? "خارجي" : "")
+
+                        }).ToList() ?? new List<SelectListItem>();
                 }
                 catch
                 {
