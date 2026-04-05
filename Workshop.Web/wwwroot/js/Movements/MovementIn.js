@@ -971,6 +971,20 @@
         });
     }
 
+
+    window.ReloadRecallList = function () {
+        $.get(RazorVars.GetAllRecallsDDLUrl, function (data) {
+
+            var $recall = $("#recallList");
+            $recall.empty();
+
+            $.each(data, function (_, item) {
+                $recall.append(new Option(item.text, item.value));
+            });
+
+            GetRecallsByVehicleId($("#GettingVehicleId").val());
+        });
+    }
       function buildWipList(title, list) {
         if (!list || list.length === 0) return '';
 

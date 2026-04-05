@@ -1,4 +1,5 @@
 ﻿
+using Workshop.Infrastructure;
 using Workshop.Web.Interfaces.Services;
 
 namespace Workshop.Web.Services
@@ -8,12 +9,14 @@ namespace Workshop.Web.Services
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
         private readonly string _baseUploadPath;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileService(IWebHostEnvironment env, IConfiguration configuration)
+        public FileService(IWebHostEnvironment env, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _env = env;
             _configuration = configuration;
             _baseUploadPath = _configuration["FileUpload:DirectoryPath"] ?? "Uploads";
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<(string FilePath, string FileName)> SaveFileAsync(IFormFile file, string subFolder)
@@ -21,7 +24,7 @@ namespace Workshop.Web.Services
             return await SaveFileAsync(file, subFolder, null);
         }
 
-        public async Task<(string FilePath, string FileName)> SaveFileAsync(IFormFile file, string subFolder, string customFileName)
+        public async Task<(string FilePath, string FileName)> SaveFileAsync(IFormFile file, string subFolder, string customFileName)  
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is null or empty", nameof(file));
@@ -29,11 +32,13 @@ namespace Workshop.Web.Services
             if (string.IsNullOrEmpty(subFolder))
                 throw new ArgumentException("SubFolder is required", nameof(subFolder));
 
+            var uploadsRoot = Path.Combine(_env.WebRootPath, "Uploads");
+
             string guid = Guid.NewGuid().ToString();
             var fileName = customFileName ?? $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}";
 
-            // Create folder path: wwwroot/Uploads/subFolder/guid
-            var folderPath = Path.Combine(_env.WebRootPath, _baseUploadPath, subFolder, guid);
+            // wwwroot/Uploads/subFolder/guid
+            var folderPath = Path.Combine(uploadsRoot, subFolder, guid);
 
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
@@ -75,12 +80,25 @@ namespace Workshop.Web.Services
             return File.Exists(fullPath);
         }
 
+        //public string GetFileFullPath(string relativeFilePath, string fileName)
+        //{
+        //    if (string.IsNullOrEmpty(relativeFilePath) || string.IsNullOrEmpty(fileName))
+        //        return string.Empty;
+
+        //    return Path.Combine(_env.WebRootPath, _baseUploadPath, relativeFilePath, fileName).Replace("\\", "/");
+        //}
+
         public string GetFileFullPath(string relativeFilePath, string fileName)
         {
             if (string.IsNullOrEmpty(relativeFilePath) || string.IsNullOrEmpty(fileName))
                 return string.Empty;
 
-            return Path.Combine(_env.WebRootPath, _baseUploadPath, relativeFilePath, fileName).Replace("\\", "/");
+            var pathBase = _httpContextAccessor.HttpContext?.Request.PathBase.Value ?? "";
+
+            var filePath = Path.Combine(_baseUploadPath, relativeFilePath, fileName)
+                .Replace("\\", "/");
+
+            return $"{pathBase}/{filePath}".Replace("//", "/");
         }
 
         public string GetFileFullPath(string relativeFilePath)

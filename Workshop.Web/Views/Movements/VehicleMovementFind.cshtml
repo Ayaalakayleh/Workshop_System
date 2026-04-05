@@ -691,7 +691,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>@Common["Label_TotalInvoice"]</label>
-                                                    <input id="TotalInvoice" value="@Model.MovementInvoice[0].TotalInvoice" class="form-control" disabled>
+                                                    <input id="TotalInvoice" value="@Model.MovementInvoice[0].TotalAmount" class="form-control" disabled>
                                                 </div>
                                             </div>
                                         </div>
@@ -701,6 +701,10 @@
                         </div>
 
                         <!-- scratches + checklist + tires (ALL compact ONLY here) -->
+                        @if (Model.MovementInvoice.Count > 0)
+                        {
+                            
+                        }
                         <div class="row mt-3">
                             <div class="col-12">
                                 <fieldset class="text-start">
@@ -1177,7 +1181,7 @@
         });
 
         $shape.css({
-            left: point.x + 'px',
+            left: point.x  + 'px',
             top: point.y + 'px'
         });
 
@@ -1239,13 +1243,13 @@
         var file = {};
         var files = [];
         file.files = files;
-
+        debugger;
         @foreach (var item in Model.MovementInvoice)
         {
                 <text>
                     var source = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-                                            FileService.GetFileFullPath(item.FileName, item.FilePath)
-                                    ));
+                            FileService.GetFileFullPath(item.FilePath, item.FileName)
+                    ));
 
                 var fi = { "source": source, options: { type: 'local' } };
                 file.files.push(fi);

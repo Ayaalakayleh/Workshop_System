@@ -2603,8 +2603,8 @@ namespace Workshop.Web.Services
 
         public async Task<IEnumerable<TechnicianAvailabiltyDTO>> Get_TechnicianAvailabilty(DateTime Date)
         {
-
-            var obj = await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianAvailabiltyDTO>>($"api/WorkshopLoading/GetTechnicianAvailabilty?Date={Date}");
+            var dateString = Date.ToString("o", CultureInfo.InvariantCulture);
+            var obj = await _httpClient.GetFromJsonAsync<IEnumerable<TechnicianAvailabiltyDTO>>($"api/WorkshopLoading/GetTechnicianAvailabilty?Date={Uri.EscapeDataString(dateString)}");
             return obj;
         }
         

@@ -1,0 +1,75 @@
+﻿@using Workshop.Core.DTOs 
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization 
+@inject IStringLocalizer<Common> Common 
+@inject IStringLocalizer<Messages> Message
+
+<form asp-action="PartsSalesSummary" method="post" target="_blank">
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <label>From Date</label>
+            <input type="date" name="FromDate" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label>To Date</label>
+            <input type="date" name="ToDate" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Account Type</label>
+            @Html.DropDownList("AccountType",
+                        (IEnumerable<SelectListItem>)ViewBag.AccountTypes,
+                        "-- Select --",
+                        new { @class = "form-control", id = "AccountType" })
+        </div>
+
+        <div class="col-md-3">
+            <label>Sale Type</label>
+            <select id="SaleType" name="SaleType" class="form-control">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">
+                Print
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+
+        window.appUrls = {
+            getSalesType: '@Url.Action("GetSalesType", "WIP")'
+        };
+
+
+        function loadSalesTypes(accountId, $ddl) {
+            const prev = $ddl.val();
+            $.getJSON(window.appUrls.getSalesType, { accountId: accountId })
+                .done(function (data) {
+                    $ddl.empty().append($('<option>', { value: "", text: "-- Select --" }));
+                    $.each(data, function (i, item) {
+                        $ddl.append($('<option>', { value: item.value, text: item.text }));
+                    });
+                    if (prev) $ddl.val(prev);
+                });
+        }
+
+     
+        $("#AccountType").change(function () {
+            const accountId = $(this).val();
+            loadSalesTypes(accountId, $("#SaleType"));
+        });
+
+
+        if ($("#AccountType").val()) {
+            loadSalesTypes($("#AccountType").val(), $("#SaleType"));
+        }
+    });
+</script>

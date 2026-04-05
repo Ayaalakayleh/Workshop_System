@@ -424,7 +424,7 @@ namespace Workshop.Web.Controllers
                 .Select(e => new SelectListItem
                 {
                     Value = ((int)e).ToString(),
-                    Text = e.ToString()
+                    Text = lang == "en" ? e.ToString() : (e == VehicleRecallStatus.Open ? "مفتوح" : e == VehicleRecallStatus.Done ? "منتهي" : "")
                 })
                 .ToList();
 

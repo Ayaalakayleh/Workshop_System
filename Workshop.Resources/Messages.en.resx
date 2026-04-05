@@ -126,6 +126,9 @@
   <data name="ErrorHappend" xml:space="preserve">
     <value>Error Happend</value>
   </data>
+  <data name="fillAllReqFields" xml:space="preserve">
+    <value>Please Fill All Required Fields</value>
+  </data>
   <data name="InvalidPhoneNumber" xml:space="preserve">
     <value>Invalid Phone Number</value>
   </data>

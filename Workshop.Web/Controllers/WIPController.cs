@@ -1452,26 +1452,7 @@ namespace Workshop.Web.Controllers
                 }
 
                 MovementInvoice invoice = new MovementInvoice();
-                //duplicated
-                //if (!string.IsNullOrEmpty(movement.InvoceNo) && movement.TotalWorkOrder != null && movement.TotalWorkOrder > 0)
-                //{
-                //    invoice.MovementId = movements.MovementId.Value;
-                //    invoice.MasterId = movement.MasterId.Value;
-                //    invoice.ExternalWorkshopId = Convert.ToInt32(movement.MoveOutWorkshopId);
-                //    invoice.InvoiceNo = movement.InvoceNo;
-                //    invoice.TotalInvoice = Convert.ToDecimal(movement.TotalWorkOrder);
-                //    invoice.WorkOrderId = Convert.ToInt32(movement.WorkOrderId);
-                //    invoice.DeductibleAmount = movement.DeductibleAmount ?? 0m;
-                //    invoice.ConsumptionValueOfSpareParts = movement.ConsumptionValueOfSpareParts ?? 0m;
-                //    invoice.Vat = movement.Vat ?? 0;
-                //    invoice.PartsCost = movement.PartsCost.Value;
-                //    invoice.LaborCost = movement.LaborCost.Value;
-                //    invoice.Invoice_Date = DateTime.Now;
-
-                //    await _apiClient.WorkshopInvoiceInsertAsync(invoice);
-                //}
-
-
+             
                 // files uploaded in the request
                 var allFiles = Request.Form.Files;
 
@@ -1495,10 +1476,10 @@ namespace Workshop.Web.Controllers
                         }
 
                         var (savedRelativePath, savedFileName) =
-                            await _fileService.SaveFileAsync(file, Path.Combine("ExternalWorkshopInvoice", guid));
+                            await _fileService.SaveFileAsync(file, Path.Combine("ExternalWorkshopInvoice"));
 
                         invoice.FileName = savedFileName; 
-                        invoice.FilePath = guid;
+                        invoice.FilePath = savedRelativePath;
                         invoice.MovementId = movements.MovementId.Value;
                         invoice.Invoice_Date = DateTime.Now;
 
@@ -2179,123 +2160,128 @@ namespace Workshop.Web.Controllers
                 });
             }
 
+            long headerId = result.HeaderId!.Value;
 
-            // Step 2: If inventory transaction succeeded, create the accounting transaction
-            try {
-                var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
-                var TranTypeNo = accountDefinitions.FK_JournalNameId;
-                var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
-                var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
-                var CreditAccount = AccountTable?.FirstOrDefault(a => a.ID == warehouse.FK_AccountId).AccountNo;
-                var DebitAccount = AccountTable?.FirstOrDefault(a => a.ID == accountDefinitions.FK_WIPAccountId).AccountNo;
-
-                var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
-                   TranTypeNo,
-                   (decimal)model.Details.Sum(x => x.Total),// avg cost * Qty 
-                   DebitAccount,
-                   CompanyId,
-                   BranchId,
-                   UserId,
-                   CreditAccount,
-                   model.TransactionDate,
-                   "WIP :" + wipId,
-                   CurrencyId,
-                   null
-                );
-
-                // Step 3: If accounting transaction succeeded, update financial fields
-                if (accountingResponse != null && accountingResponse.ID > 0)
+            UpdateIssueIdDTO dto = new UpdateIssueIdDTO
                 {
-                    var updateFinancialFieldsRequest = new UpdateInventoryTransactionFinancialFieldsDTO
-                    {
-                        HeaderId = result.HeaderId!.Value,
-                        FinancialTransactionNo = accountingResponse.TranNo,
-                        FinancialTransactionTypeNo = accountingResponse.TranTypeNo,
-                        Fk_FinancialTransactionMasterId = accountingResponse.ID,
-                        Fk_InvoiceType = accountDefinitions.FK_InvoiceTypeId
-                    };
+                    IssueId = (int)headerId,
+                    WIPId = wipId,
+                    Id = keyId
+                };
+          
+           var addIssueToWIP = await _apiClient.UpdateIssueIdToWIP(dto);
 
-                    await _inventoryApiClient.UpdateFinancialFieldsAsync(updateFinancialFieldsRequest);
+            if(model.FK_TransactionTypeId != 11)
+            {
+
+                // Step 2: If inventory transaction succeeded, create the accounting transaction
+                try {
+                    var accountDefinitions = await _inventoryApiClient.GetInventoryAccountDefinitions();
+                    var TranTypeNo = accountDefinitions.FK_JournalNameId;
+                    var AccountTable = _accountingApiClient.ChartOfAccountAcceptTransByCompanyIdAndBranchId(CompanyId, BranchId).Result;
+                    var warehouse = await _inventoryApiClient.GetWarehouseByIdAsync((int)model.FK_WarehouseId);
+                    var CreditAccount = AccountTable?.FirstOrDefault(a => a.ID == warehouse.FK_AccountId).AccountNo;
+                    var DebitAccount = AccountTable?.FirstOrDefault(a => a.ID == accountDefinitions.FK_WIPAccountId).AccountNo;
+
+                    var accountingResponse = await _accountingApiClient.SaveIssueTransaction(
+                       TranTypeNo,
+                       (decimal)model.Details.Sum(x => x.Total),// avg cost * Qty 
+                       DebitAccount,
+                       CompanyId,
+                       BranchId,
+                       UserId,
+                       CreditAccount,
+                       model.TransactionDate,
+                       "WIP :" + wipId,
+                       CurrencyId,
+                       null
+                    );
+
+                    // Step 3: If accounting transaction succeeded, update financial fields
+                    if (accountingResponse != null && accountingResponse.ID > 0)
+                    {
+                        var updateFinancialFieldsRequest = new UpdateInventoryTransactionFinancialFieldsDTO
+                        {
+                            HeaderId = result.HeaderId!.Value,
+                            FinancialTransactionNo = accountingResponse.TranNo,
+                            FinancialTransactionTypeNo = accountingResponse.TranTypeNo,
+                            Fk_FinancialTransactionMasterId = accountingResponse.ID,
+                            Fk_InvoiceType = accountDefinitions.FK_InvoiceTypeId
+                        };
+
+                        await _inventoryApiClient.UpdateFinancialFieldsAsync(updateFinancialFieldsRequest);
+                    }
+                    else
+                    {
+                        return JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            message = "Inventory transaction created but accounting transaction failed. Please contact administrator."
+                        });
+                    }
                 }
-                else
+                catch (Exception accountingEx)
                 {
                     return JsonConvert.SerializeObject(new
                     {
                         success = false,
-                        message = "Inventory transaction created but accounting transaction failed. Please contact administrator."
+                        message = $"Inventory transaction created but accounting process failed: {accountingEx.Message}"
                     });
                 }
-            }
-            catch (Exception accountingEx)
-            {
-                return JsonConvert.SerializeObject(new
+
+                var responseString = await _inventoryApiClient.GetAllGRNByIdHead(headerId);
+
+                var response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
+                  responseString,
+                  new JsonSerializerOptions
+                  {
+                      PropertyNameCaseInsensitive = true
+                  });
+
+                if (response == null || response.Details == null)
                 {
-                    success = false,
-                    message = $"Inventory transaction created but accounting process failed: {accountingEx.Message}"
-                });
-            }
-
-            long headerId = result.HeaderId!.Value;
-
-            UpdateIssueIdDTO dto = new UpdateIssueIdDTO
-            {
-                IssueId = (int)headerId,
-                WIPId = wipId,
-                Id = keyId
-            };
-          
-            var addIssueToWIP = await _apiClient.UpdateIssueIdToWIP(dto);
-
-            var responseString = await _inventoryApiClient.GetAllGRNByIdHead(headerId);
-
-            var response = JsonSerializer.Deserialize<InventoryTransactionByIdDTO>(
-              responseString,
-              new JsonSerializerOptions
-              {
-                  PropertyNameCaseInsensitive = true
-              });
-
-            if (response == null || response.Details == null)
-            {
-                Console.WriteLine(" No details in response!");
-                return null;
-            }
+                    Console.WriteLine(" No details in response!");
+                    return null;
+                }
 
 
-            var itemUnitList = new List<BaseItemDTO>();
+                var itemUnitList = new List<BaseItemDTO>();
 
-            foreach (var d in response.Details)
-            {
-                var matchingDetail = model.Details?
-                    .FirstOrDefault(x => x.FK_ItemId == d.FK_ItemId && x.FK_UnitId == d.FK_UnitId);
-
-
-                var baseItem = new BaseItemDTO
+                foreach (var d in response.Details)
                 {
-                    WIPId = model.TransactionReferenceNo.HasValue ? (int)model.TransactionReferenceNo : 0,
-                    RequestId = model.RequestId,
-                    ItemId = d.FK_ItemId,
-                    fk_UnitId = d.FK_UnitId.HasValue ? (int)d.FK_UnitId : 0,
-                    RequestQuantity = matchingDetail?.Quantity ?? 0,
-                    Quantity = d.UnitQuantity,
-                    UsedQuantity = 0,
-                    CostPrice = d.Price,
-                    SalePrice = d.Price,
-                    ModifyBy = UserId,
-                    AccountType = null,
-                    Discount = 0,
-                    Total = 0
-                };
+                    var matchingDetail = model.Details?
+                        .FirstOrDefault(x => x.FK_ItemId == d.FK_ItemId && x.FK_UnitId == d.FK_UnitId);
 
 
-                itemUnitList.Add(baseItem);
+                    var baseItem = new BaseItemDTO
+                    {
+                        WIPId = model.TransactionReferenceNo.HasValue ? (int)model.TransactionReferenceNo : 0,
+                        RequestId = model.RequestId,
+                        ItemId = d.FK_ItemId,
+                        fk_UnitId = d.FK_UnitId.HasValue ? (int)d.FK_UnitId : 0,
+                        RequestQuantity = matchingDetail?.Quantity ?? 0,
+                        Quantity = d.UnitQuantity,
+                        UsedQuantity = 0,
+                        CostPrice = d.Price,
+                        SalePrice = d.Price,
+                        ModifyBy = UserId,
+                        AccountType = null,
+                        Discount = 0,
+                        Total = 0
+                    };
+
+
+                    itemUnitList.Add(baseItem);
+                }
             }
+        
+
             var responseToClient = new
-            {
-                success = true,
-                partsIssueId = headerId,
-                wipId = wipId
-            };
+                {
+                    success = true,
+                    partsIssueId = headerId,
+                    wipId = wipId
+                };
 
             return JsonConvert.SerializeObject(responseToClient);
         }

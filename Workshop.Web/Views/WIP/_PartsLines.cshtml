@@ -21,16 +21,10 @@
         inset: 0;
         display: none;
         z-index: 2000;
-        background: rgba(0, 0, 0, 0.45);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
     }
 
         #invFrameHost.show {
             display: block;
-            opacity: 1;
-            pointer-events: auto;
         }
 
         #invFrameHost .frameBox {
@@ -38,45 +32,12 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: min(1200px, calc(100vw - 48px));
-            height: min(760px, calc(100vh - 80px));
+            width: 62rem;
+            height: 54%;
             border-radius: 12px;
             overflow: hidden;
             background: transparent;
-            /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); */
         }
-
-        #invFrameHost .closeBtn {
-            position: absolute;
-            right: 14px;
-            top: 14px;
-            z-index: 3;
-            border: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.92);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            #invFrameHost .closeBtn:hover {
-                background: #fff;
-            }
-
-        #invFrameHost iframe {
-            display: block;
-            width: 100%;
-            height: 100%;
-            border: 0;
-            background: #fff;
-        }
-
-    body.inv-frame-open {
-        overflow: hidden;
-    }
 
     #gridContainer .dx-datagrid-headers .dx-datagrid-text-content {
         white-space: normal !important;
@@ -96,7 +57,7 @@
 </style>
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-       <div class="d-flex Justify-contet-ceter align-items-center gap-3">
+        <div class="d-flex Justify-contet-ceter align-items-center gap-3">
             <h5 class="mb-0">@Common["Title_PartsLines"]</h5>
             @* <div id="WarehouseDiv">
                 @Html.DropDownList("FK_WarehouseId", new SelectList(ViewBag.Warehouses ?? new List<SelectListItem>(), "Value", "Text"), "Select Warehouse", new { @class = "form-control form-control-sm", id = "FK_WarehouseId" })
@@ -106,20 +67,20 @@
             @* @if (WIPId != null && WIPId > 0)
             { *@
             @if (WIP_status != (int)WIPStatusEnum.Invoiced && WIP_status != (int)WIPStatusEnum.C)
+            {
+                @if (AddParts)
                 {
-                    @if (AddParts)
+                    @if (GeneralRequest)
                     {
-                        @if (GeneralRequest)
-                        {
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#addPartGeneralModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp; @Common["GeneralRequest"]</button>
-                        }
-                        else
-                        {
-                            <button type="button" id="btnAddPart" data-bs-toggle="modal" data-bs-target="#addPartModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddParts"]</button>
-                        }
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#addPartGeneralModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp; @Common["GeneralRequest"]</button>
                     }
-
+                    else
+                    {
+                        <button type="button" id="btnAddPart" data-bs-toggle="modal" data-bs-target="#addPartModal" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;@Common["Button_AddParts"]</button>
+                    }
                 }
+
+            }
             @* } *@
         </div>
     </div>
@@ -249,7 +210,18 @@
     var Permission_Undo = true;
 
     }
+        const iframe = document.getElementById('invItemTabsFrame');
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
 
+    const style = doc.createElement('style');
+    style.textContent = `
+    #invItemTabsFrame #itemTabsModal {
+        width: auto !important;
+        height: auto !important;
+    }
+    `;
+    doc.head.appendChild(style);
 </script>
+
 <script src="~/js/definitions/wipmaingriditems.js"></script>
 <script src="~/js/definitions/wipselectiongriditem.js"></script>
