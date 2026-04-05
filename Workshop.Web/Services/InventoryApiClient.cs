@@ -42,7 +42,7 @@ namespace Workshop.Web.Services
             return await SendRequest<List<ItemDTO>>(url, HttpMethod.Post, requestBody, requireAuth: false);
 
         }
-        public async Task<List<ItemDTO>> GetItemsWithStockAndLocation(int fK_GroupId, int fK_CategoryId, int fK_SubCategoryId)
+        public async Task<List<ItemDTO>> GetItemsWithStockAndLocation(int fK_GroupId, int fK_CategoryId, int fK_SubCategoryId, int wipId)
         {
             string url = $"api/InventoryTransaction/GetItemsWithStockAndLocation";
             var requestBody = new
@@ -50,7 +50,8 @@ namespace Workshop.Web.Services
                 groupId = fK_GroupId,
                 categoryId = fK_CategoryId,
                 subCategoryId = fK_SubCategoryId,
-                itemId=0,
+                wipId,
+                itemId =0,
                 warehouseId= 0,
                 locatorId= 0,
                 companyId= 0,
