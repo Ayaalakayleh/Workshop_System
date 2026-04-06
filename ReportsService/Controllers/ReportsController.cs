@@ -343,6 +343,9 @@ namespace ReportsService.Controllers
             try
             {
                 var company = model.CompanyName;
+
+                var Lang = model.Lang;
+
                 // Create dataset
                 var ds = new DataSet("PartsSummaryDataSet");
                 var dt = new DataTable("DataTable1");
@@ -414,8 +417,21 @@ namespace ReportsService.Controllers
                 // End CompanyData Table
 
 
+
+
+                if (Lang == "ar")
+                {
+                    rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummaryAr.rpt"));
+
+                }
+                else
+                {
+                    rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummary.rpt"));
+
+                }
+
                 // Load report
-                rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummary.rpt"));
+                //rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummary.rpt"));
 
                 foreach (CrystalDecisions.CrystalReports.Engine.Table t in rpt.Database.Tables)
                 {

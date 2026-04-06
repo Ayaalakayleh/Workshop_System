@@ -39,6 +39,10 @@ namespace Workshop.Web.Services
             var oPartsSummaryReportModel = new PartsSummaryReportModel();
             oPartsSummaryReportModel.CompanyName = CompanyName;
             oPartsSummaryReportModel.data = model;
+            var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+
+            oPartsSummaryReportModel.Lang = lang;
+
             var response = await _httpClient.PostAsJsonAsync("api/reports/partsSummary", oPartsSummaryReportModel);
             //var response = await _httpClient.PostAsJsonAsync("api/reports/partsSummary", new { Data = model, CompanyName = CompanyName });
 

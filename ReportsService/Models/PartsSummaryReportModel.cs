@@ -9,7 +9,8 @@ namespace ReportsService.Models
     {
         public IEnumerable<PartsSummaryModel> data { get; set; } 
         public string CompanyName { get; set; }
-         
+        public string Lang { get; set; }
+
     }
 
     public class PartsSummaryModel

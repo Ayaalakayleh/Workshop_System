@@ -7,7 +7,7 @@
 
 <div id="panel-1" class="panel">
     <div class="panel-hdr">
-        <h2 class="font-weight-bold">Parts Summary Report</h2>
+        <h2 class="font-weight-bold">@Common["PartsSummaryReport"]</h2>
     </div>
     <div class="panel-container show">
         <div class="panel-content">
@@ -15,17 +15,17 @@
     <div class="row g-3">
 
         <div class="col-md-3">
-            <label>From Date</label>
+                        <label>@Common["Label_FromDate"]</label>
             <input type="text" name="FromDate" class="form-control flat-picker" />
         </div>
 
         <div class="col-md-3">
-            <label>To Date</label>
+                        <label>@Common["Label_ToDate"]</label>
             <input type="text" name="ToDate" class="form-control flat-picker" />
         </div>
 
         <div class="col-md-3">
-            <label>Account Type</label>
+                        <label>@Common["Label_AccountType"]</label>
             @Html.DropDownList("AccountType",
                         (IEnumerable<SelectListItem>)ViewBag.AccountTypes,
                         "-- Select --",
@@ -33,7 +33,7 @@
         </div>
 
         <div class="col-md-3">
-            <label>Sale Type</label>
+                        <label>@Common["SalesType"]</label>
                         <select id="SalesType" name="SalesType" class="form-control">
                 <option value="">-- Select --</option>
             </select>
@@ -41,12 +41,12 @@
 
         <div class="col-md-3">
                 <input type="checkbox" name="IsAll" value="true" class="form-check-input" id="IsAll" />
-                <label class="form-check-label" for="IsAll">All</label>
+                        <label class="form-check-label" for="IsAll">@Common["Label_All"]</label>
            </div>
 
                     <div class="col-md-3">
                 <input type="checkbox" name="IsWIPClose" value="true" class="form-check-input" id="IsWIPClose" />
-                <label class="form-check-label" for="IsWIPClose">WIP Close</label>
+                        <label class="form-check-label" for="IsWIPClose">@Common["WIPClose"]</label>
             </div>
                   
 

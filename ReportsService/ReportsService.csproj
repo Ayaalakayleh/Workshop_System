@@ -224,6 +224,12 @@
       <DependentUpon>CryHeaderEn.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Reports\PartsSalesSummaryAr.cs">
+      <DependentUpon>PartsSalesSummaryAr.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Reports\PartsSalesSummary.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -364,6 +370,10 @@
     <EmbeddedResource Include="Reports\CryHeaderEn.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>CryHeaderEn.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\PartsSalesSummaryAr.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>PartsSalesSummaryAr.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\PartsSalesSummary.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
