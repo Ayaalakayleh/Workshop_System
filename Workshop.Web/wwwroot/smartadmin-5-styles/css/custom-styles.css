@@ -3603,3 +3603,6 @@ html[data-bs-theme="dark"] .dxc-title text {
 .dx-widget .dx-page-sizes {
     display: none !important
 }
+.ui-widget.ui-widget-content{
+    width:50% !important
+}
