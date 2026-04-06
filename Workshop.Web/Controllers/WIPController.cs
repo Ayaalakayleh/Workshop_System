@@ -333,8 +333,9 @@ namespace Workshop.Web.Controllers
                         .Select(e => new SelectListItem
                         {
                             Value = ((int)e).ToString(),
-                            Text = e.ToString()
-                        }).ToList();
+                            Text = lang == "en" ? e.ToString() : (e == AccountTypeEnum.Internal ? "داخلي" : e == AccountTypeEnum.External ? "خارجي" : "")
+
+                        }).ToList() ?? new List<SelectListItem>();
                 }
                 catch
                 {
@@ -2685,12 +2686,16 @@ namespace Workshop.Web.Controllers
                     model.CustomerMobileNumber = agreement.CustomerPhoneNumber;
                 }
 
-                    var root = _configuration["FileUpload:DirectoryPath"]; 
+                    var root = _configuration["FileUpload:DirectoryInsidePath"]; 
                 //Images
                 if (!string.IsNullOrWhiteSpace(movement.DamageImagePath) && !string.IsNullOrWhiteSpace(movement.DamageImageName))
                 {
+                    var fixedPath = movement.DamageImagePath
+                    .Replace("\\", Path.DirectorySeparatorChar.ToString())
+                    .Replace("/", Path.DirectorySeparatorChar.ToString());
+
                     var physicalPath = Path.Combine(_env.WebRootPath, root,
-                        movement.DamageImagePath.Replace("/", Path.DirectorySeparatorChar.ToString()),
+                          fixedPath,
                         movement.DamageImageName);
 
                     if (System.IO.File.Exists(physicalPath))

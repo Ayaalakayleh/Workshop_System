@@ -2919,4 +2919,12 @@
   <data name="Message_ImportSuccess" xml:space="preserve">
     <value>تمت عملية استيراد الملف بنجاح</value>
   </data>
+  <data name="PartsSummaryReport" xml:space="preserve">
+    <value>تقرير ملخص الاجزاء</value>
+    <comment>تقرير ملخص الأجزاء</comment>
+  </data>
+  <data name="WIPClose" xml:space="preserve">
+    <value>اغلاق كرت الصيانة</value>
+    <comment>WIP Close</comment>
+  </data>
 </root>
