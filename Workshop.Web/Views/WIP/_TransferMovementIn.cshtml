@@ -1062,6 +1062,13 @@
             $('#PettyCash_InvoiceNo').removeClass('is-invalid');
         }
 
+        if (!$('#PettyCash_Description').val().trim()) {
+            $('#PettyCash_Description').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#PettyCash_Description').removeClass('is-invalid');
+        }
+
         // Updated validation for Parts Cost and Labor Cost
         if (!$('#PettyCash_PartsCost').val() && !$('#PettyCash_LaborCost').val()) {
             $('#PettyCash_PartsCost').addClass('is-invalid');
