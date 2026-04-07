@@ -5841,8 +5841,8 @@ textarea.form-control-lg {
     --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     --bs-accordion-body-padding-x: 1.25rem;
     --bs-accordion-body-padding-y: 1.25rem;
-    --bs-accordion-active-color: var(--bs-info-text-emphasis);
-    --bs-accordion-active-bg: var(--bs-info-bg-subtle)
+    --bs-accordion-active-color: var(--bs-primary-text-emphasis);
+    --bs-accordion-active-bg: var(--bs-primary-bg-subtle)
 }
 
 .accordion-button {
@@ -6190,10 +6190,10 @@ textarea.form-control-lg {
     }
 
 .alert-primary {
-    --bs-alert-color: var(--bs-info-text-emphasis);
-    --bs-alert-bg: var(--bs-info-bg-subtle);
-    --bs-alert-border-color: var(--bs-info-border-subtle);
-    --bs-alert-link-color: var(--bs-info-text-emphasis)
+    --bs-alert-color: var(--bs-primary-text-emphasis);
+    --bs-alert-bg: var(--bs-primary-bg-subtle);
+    --bs-alert-border-color: var(--bs-primary-border-subtle);
+    --bs-alert-link-color: var(--bs-primary-text-emphasis)
 }
 
 .alert-secondary {
@@ -6670,16 +6670,16 @@ textarea.form-control-lg {
         }
 
 .list-group-item-primary {
-    --bs-list-group-color: var(--bs-info-text-emphasis);
-    --bs-list-group-bg: var(--bs-info-bg-subtle);
-    --bs-list-group-border-color: var(--bs-info-border-subtle);
+    --bs-list-group-color: var(--bs-primary-text-emphasis);
+    --bs-list-group-bg: var(--bs-primary-bg-subtle);
+    --bs-list-group-border-color: var(--bs-primary-border-subtle);
     --bs-list-group-action-hover-color: var(--bs-emphasis-color);
-    --bs-list-group-action-hover-bg: var(--bs-info-border-subtle);
+    --bs-list-group-action-hover-bg: var(--bs-primary-border-subtle);
     --bs-list-group-action-active-color: var(--bs-emphasis-color);
-    --bs-list-group-action-active-bg: var(--bs-info-border-subtle);
-    --bs-list-group-active-color: var(--bs-info-bg-subtle);
-    --bs-list-group-active-bg: var(--bs-info-text-emphasis);
-    --bs-list-group-active-border-color: var(--bs-info-text-emphasis)
+    --bs-list-group-action-active-bg: var(--bs-primary-border-subtle);
+    --bs-list-group-active-color: var(--bs-primary-bg-subtle);
+    --bs-list-group-active-bg: var(--bs-primary-text-emphasis);
+    --bs-list-group-active-border-color: var(--bs-primary-text-emphasis)
 }
 
 .list-group-item-secondary {
@@ -8707,7 +8707,7 @@ textarea.form-control-lg {
 
 .text-bg-primary {
     color: #fff !important;
-    background-color: RGBA(var(--bs-info-rgb),var(--bs-bg-opacity,1)) !important
+    background-color: RGBA(var(--bs-primary-rgb),var(--bs-bg-opacity,1)) !important
 }
 
 .text-bg-secondary {
@@ -8746,8 +8746,8 @@ textarea.form-control-lg {
 }
 
 .link-primary {
-    color: RGBA(var(--bs-info-rgb),var(--bs-link-opacity,1)) !important;
-    text-decoration-color: RGBA(var(--bs-info-rgb),var(--bs-link-underline-opacity,1)) !important
+    color: RGBA(var(--bs-primary-rgb),var(--bs-link-opacity,1)) !important;
+    text-decoration-color: RGBA(var(--bs-primary-rgb),var(--bs-link-underline-opacity,1)) !important
 }
 
     .link-primary:focus, .link-primary:hover {
@@ -9297,7 +9297,7 @@ textarea.form-control-lg {
 }
 
 .focus-ring-primary {
-    --bs-focus-ring-color: rgba(var(--bs-info-rgb), var(--bs-focus-ring-opacity))
+    --bs-focus-ring-color: rgba(var(--bs-primary-rgb), var(--bs-focus-ring-opacity))
 }
 
 .focus-ring-secondary {
@@ -9453,7 +9453,7 @@ textarea.form-control-lg {
 
 .border-primary {
     --bs-border-opacity: 1;
-    border-color: rgba(var(--bs-info-rgb),var(--bs-border-opacity)) !important
+    border-color: rgba(var(--bs-primary-rgb),var(--bs-border-opacity)) !important
 }
 
 .border-secondary {
@@ -9502,7 +9502,7 @@ textarea.form-control-lg {
 }
 
 .border-primary-subtle {
-    border-color: var(--bs-info-border-subtle) !important
+    border-color: var(--bs-primary-border-subtle) !important
 }
 
 .border-secondary-subtle {
@@ -10555,7 +10555,7 @@ textarea.form-control-lg {
 
 .text-primary {
     --bs-text-opacity: 1;
-    color: rgba(var(--bs-info-rgb),var(--bs-text-opacity)) !important
+    color: rgba(var(--bs-primary-rgb),var(--bs-text-opacity)) !important
 }
 
 .text-secondary {
@@ -10660,7 +10660,7 @@ textarea.form-control-lg {
 }
 
 .text-primary-emphasis {
-    color: var(--bs-info-text-emphasis) !important
+    color: var(--bs-primary-text-emphasis) !important
 }
 
 .text-secondary-emphasis {
@@ -10757,7 +10757,7 @@ textarea.form-control-lg {
 
 .link-underline-primary {
     --bs-link-underline-opacity: 1;
-    text-decoration-color: rgba(var(--bs-info-rgb),var(--bs-link-underline-opacity)) !important
+    text-decoration-color: rgba(var(--bs-primary-rgb),var(--bs-link-underline-opacity)) !important
 }
 
 .link-underline-secondary {
@@ -10850,7 +10850,7 @@ textarea.form-control-lg {
 
 .bg-primary {
     --bs-bg-opacity: 1;
-    background-color: rgba(var(--bs-info-rgb),var(--bs-bg-opacity)) !important
+    background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity)) !important
 }
 
 .bg-secondary {
@@ -10939,7 +10939,7 @@ textarea.form-control-lg {
 }
 
 .bg-primary-subtle {
-    background-color: var(--bs-info-bg-subtle) !important
+    background-color: var(--bs-primary-bg-subtle) !important
 }
 
 .bg-secondary-subtle {
@@ -16763,7 +16763,7 @@ textarea.form-control-lg {
     --secondary-700: #545b62;
     --secondary-800: #494f54;
     --secondary-900: #3d4246;
-    --bs-primary: #2198f3;
+    --bs-primary: #886ab5;
     --bs-primary-rgb: 136,106,181;
     --bs-primary-text-emphasis: #3e2c5a;
     --bs-primary-bg-subtle: #dad0e8;
@@ -16830,7 +16830,7 @@ textarea.form-control-lg {
     --app-nav-item-active-bg: rgba(var(--secondary), 0.07);
     --app-nav-item-active-indicator: var(--app-nav-link-active-color);
     --app-nav-collapse-sign-color: var(--bs-body-color);
-    --bs-link-color: #2198f3;
+    --bs-link-color: #886ab5;
     --bs-link-color-rgb: 136,106,181;
     --bs-link-hover-color-rgb: 110,78,158;
     --bs-link-decoration: underline;
@@ -16896,26 +16896,26 @@ textarea.form-control-lg {
 }
 
 .nav-pills {
-    --bs-nav-pills-link-active-bg: #2198f3
+    --bs-nav-pills-link-active-bg: #886ab5
 }
 
 .progress, .progress-stacked {
-    --bs-progress-bar-bg: #2198f3
+    --bs-progress-bar-bg: #886ab5
 }
 
 .list-group {
-    --bs-list-group-active-bg: #2198f3;
-    --bs-list-group-active-border-color: #2198f3
+    --bs-list-group-active-bg: #886ab5;
+    --bs-list-group-active-border-color: #886ab5
 }
 
 .form-check-input:checked {
-    background-color: #2198f3;
-    border-color: #2198f3
+    background-color: #886ab5;
+    border-color: #886ab5
 }
 
 .form-check-input[type=checkbox]:indeterminate {
-    background-color: #2198f3;
-    border-color: #2198f3
+    background-color: #886ab5;
+    border-color: #886ab5
 }
 
 .list-group-item.active {
@@ -18680,7 +18680,7 @@ html[dir=rtl] .app-logo {
                     }
 
                     .primary-nav ul li a > i::before {
-                        color: rgba(var(--info),.9)
+                        color: rgba(var(--primary),.9)
                     }
 
         .primary-nav ul.nav-menu ul.active {
@@ -18996,7 +18996,7 @@ html[dir=rtl] .app-logo {
 }
 
     #searchInput:focus {
-        background-color: rgba(var(--bs-info-rgb),.03)
+        background-color: rgba(var(--bs-primary-rgb),.03)
     }
 
 #js-nav-menu:has(li:not(.js-filter-hide)) + .no-results-msg {
@@ -19009,7 +19009,7 @@ html[dir=rtl] .app-logo {
     --app-nav-collapse-sign-color: rgba(255, 255, 255, 0.5);
     --app-nav-item-active-indicator: rgba(255, 255, 255, 0.5);
     --app-nav-background: var(--app-nav-bg);
-    --app-content-background: rgba(var(--bs-info-rgb), 0.04);
+    --app-content-background: rgba(var(--bs-primary-rgb), 0.04);
     --app-nav-parent-fw: 500
 }
 
@@ -19989,8 +19989,8 @@ html[dir=rtl] .app-logo {
 
 .bg-subtlelight-fade {
     background-color: var(--bs-body-bg);
-    background-image: -webkit-gradient(linear,right bottom,right top,from(var(--bs-body-bg)),to(rgba(var(--bs-info-rgb),.04)));
-    background-image: linear-gradient(to top,var(--bs-body-bg),rgba(var(--bs-info-rgb),.04))
+    background-image: -webkit-gradient(linear,right bottom,right top,from(var(--bs-body-bg)),to(rgba(var(--bs-primary-rgb),.04)));
+    background-image: linear-gradient(to top,var(--bs-body-bg),rgba(var(--bs-primary-rgb),.04))
 }
 
 .body-bg {
@@ -20456,11 +20456,11 @@ a[target]:not(.btn) {
     }
 
 .bg-trans-gradient {
-    background: linear-gradient(-250deg,#2198f3,#2196f3)
+    background: linear-gradient(-250deg,#886ab5,#2196f3)
 }
 
 .bg-primary-gradient {
-    background-image: linear-gradient(-250deg,rgba(var(--bs-info-rgb),.5),transparent)
+    background-image: linear-gradient(-250deg,rgba(var(--bs-primary-rgb),.5),transparent)
 }
 
 .bg-danger-gradient {
@@ -21355,12 +21355,12 @@ hr {
 
 .offer-card:has(.form-check-input:checked) {
     border-color: var(--primary-500);
-    background-color: rgba(var(--bs-info-rgb),.1)
+    background-color: rgba(var(--bs-primary-rgb),.1)
 }
 
 .channel-card:has(.form-check-input:checked) {
     border-color: var(--primary-500);
-    background-color: rgba(var(--bs-info-rgb),.1)
+    background-color: rgba(var(--bs-primary-rgb),.1)
 }
 
 .toast:not(:last-child) {
@@ -21638,7 +21638,7 @@ span.img-share {
 }
 
 .dropdown-menu {
-    --bs-dropdown-link-active-bg: rgba(var(--info), 0.9);
+    --bs-dropdown-link-active-bg: rgba(var(--primary), 0.9);
     --bs-dropdown-link-hover-bg: var(--app-nav-item-hover-bg);
     --bs-dropdown-link-hover-color: var(--primary-500);
     --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
@@ -22042,8 +22042,8 @@ span.img-share {
 }
 
 .card, .card-group {
-    -webkit-box-shadow: 0 0 13px 0 rgba(var(--bs-info-rgb),.08);
-    box-shadow: 0 0 13px 0 rgba(var(--bs-info-rgb),.08)
+    -webkit-box-shadow: 0 0 13px 0 rgba(var(--bs-primary-rgb),.08);
+    box-shadow: 0 0 13px 0 rgba(var(--bs-primary-rgb),.08)
 }
 
 .card {
@@ -22316,7 +22316,7 @@ th {
 }
 
 .table {
-    --bs-table-hover-bg: rgba(var(--bs-info-rgb), 0.14);
+    --bs-table-hover-bg: rgba(var(--bs-primary-rgb), 0.14);
     font-weight: 300;
     font-size: .875rem
 }
@@ -22739,8 +22739,8 @@ th {
             background: var(--primary-500);
             border-color: var(--primary-700);
             color: #fff;
-            -webkit-box-shadow: 0 1px 2px 0 rgba(var(--bs-info-rgb),.1);
-            box-shadow: 0 1px 2px 0 rgba(var(--bs-info-rgb),.1)
+            -webkit-box-shadow: 0 1px 2px 0 rgba(var(--bs-primary-rgb),.1);
+            box-shadow: 0 1px 2px 0 rgba(var(--bs-primary-rgb),.1)
         }
 
 .st-expand {
@@ -23047,8 +23047,8 @@ th {
 
 .btn-primary {
     --bs-btn-color: var(--bs-white);
-    --bs-btn-bg: #2198f3;
-    --bs-btn-border-color: #2198f3;
+    --bs-btn-bg: #886ab5;
+    --bs-btn-border-color: #886ab5;
     --bs-btn-hover-color: var(--bs-white);
     --bs-btn-hover-bg: #6e4e9e;
     --bs-btn-hover-border-color: #62468d;
@@ -23057,8 +23057,8 @@ th {
     --bs-btn-active-bg: #62468d;
     --bs-btn-active-border-color: #563d7c;
     --bs-btn-disabled-color: var(--bs-white);
-    --bs-btn-disabled-bg: #2198f3;
-    --bs-btn-disabled-border-color: #2198f3
+    --bs-btn-disabled-bg: #886ab5;
+    --bs-btn-disabled-border-color: #886ab5
 }
 
 .btn-success {
@@ -23142,18 +23142,18 @@ th {
 }
 
 .btn-outline-primary {
-    --bs-btn-color: #2198f3;
-    --bs-btn-border-color: #2198f3;
+    --bs-btn-color: #886ab5;
+    --bs-btn-border-color: #886ab5;
     --bs-btn-hover-color: var(--bs-white);
-    --bs-btn-hover-bg: #2198f3;
-    --bs-btn-hover-border-color: #2198f3;
+    --bs-btn-hover-bg: #886ab5;
+    --bs-btn-hover-border-color: #886ab5;
     --bs-btn-focus-shadow-rgb: 136,106,181;
     --bs-btn-active-color: var(--bs-white);
-    --bs-btn-active-bg: #2198f3;
-    --bs-btn-active-border-color: #2198f3;
-    --bs-btn-disabled-color: #2198f3;
+    --bs-btn-active-bg: #886ab5;
+    --bs-btn-active-border-color: #886ab5;
+    --bs-btn-disabled-color: #886ab5;
     --bs-btn-disabled-bg: transparent;
-    --bs-btn-disabled-border-color: #2198f3
+    --bs-btn-disabled-border-color: #886ab5
 }
 
 .btn-outline-success {
@@ -23261,7 +23261,7 @@ th {
         }
 
         .btn-system i::before {
-            color: rgba(var(--info),.9)
+            color: rgba(var(--primary),.9)
         }
 
     .btn-system::before {
@@ -23801,7 +23801,7 @@ th {
     }
 
     .mobile-menu-icon:active {
-        background: rgba(var(--info),.9);
+        background: rgba(var(--primary),.9);
         scale: .95
     }
 
@@ -24821,7 +24821,7 @@ body:not(.no-slimscroll) .custom-scroll {
         }
 
         .notification li.unread {
-            background: rgba(var(--bs-info-rgb),.05)
+            background: rgba(var(--bs-primary-rgb),.05)
         }
 
             .notification li.unread .name {
@@ -25724,7 +25724,7 @@ pre code.hljs {
 }
 
     .button:hover {
-        background-color: rgba(var(--info),.9)
+        background-color: rgba(var(--primary),.9)
     }
 
     .button:active {
@@ -28151,7 +28151,7 @@ a.fc-more {
 
 .fc-day-other {
     background-image: linear-gradient(-135deg,rgba(var(--bs-body-color-rgb),.02) 25%,transparent 25%,transparent 50%,rgba(var(--bs-body-color-rgb),.02) 50%,rgba(var(--bs-body-color-rgb),.02) 75%,transparent 75%,transparent);
-    background-color: rgba(var(--bs-info-rgb),.05);
+    background-color: rgba(var(--bs-primary-rgb),.05);
     background-size: 1rem 1rem
 }
 
@@ -28619,7 +28619,7 @@ svg {
             -webkit-box-pack: center;
             -ms-flex-pack: center;
             justify-content: center;
-            background: var(--bs-info);
+            background: var(--bs-primary);
             border-radius: 50%;
             color: #fff;
             margin-bottom: 1.5rem
@@ -28655,7 +28655,7 @@ svg {
         }
 
         .app-landing .testimonial-section .testimonial-content .testimonial-author img {
-            border: 3px solid var(--bs-info);
+            border: 3px solid var(--bs-primary);
             padding: 3px
         }
 
@@ -28667,7 +28667,7 @@ svg {
     .app-landing .stats-section .stat-number {
         font-size: 3rem;
         font-weight: 700;
-        color: var(--bs-info);
+        color: var(--bs-primary);
         min-width: 100px;
         display: inline-block
     }
@@ -28740,7 +28740,7 @@ svg {
     }
 
         .app-landing .newsletter-section .newsletter-form .form-control:focus {
-            border-color: var(--bs-info);
+            border-color: var(--bs-primary);
             -webkit-box-shadow: none;
             box-shadow: none
         }
@@ -28771,7 +28771,7 @@ svg {
     }
 
         .app-landing .faq-section .accordion-button:not(.collapsed) {
-            color: var(--bs-info);
+            color: var(--bs-primary);
             background-color: var(--bs-gray-100);
             -webkit-box-shadow: none;
             box-shadow: none
@@ -28826,7 +28826,7 @@ svg {
             }
 
                 .app-landing .footer .footer-links li a:hover {
-                    color: var(--bs-info)
+                    color: var(--bs-primary)
                 }
 
     .app-landing .footer .h6, .app-landing .footer h6 {
@@ -28848,7 +28848,7 @@ svg {
     }
 
         .app-landing .footer .social-links a:hover {
-            color: var(--bs-info)
+            color: var(--bs-primary)
         }
 
 .app-landing .journey-section {
@@ -28893,14 +28893,14 @@ svg {
             .app-landing .journey-section .timeline .timeline-item .timeline-dot {
                 width: 16px;
                 height: 16px;
-                background: var(--bs-info);
+                background: var(--bs-primary);
                 border-radius: 50%;
                 position: absolute;
                 right: -3rem;
                 top: 8px;
                 border: 3px solid #fff;
-                -webkit-box-shadow: 0 0 0 2px var(--bs-info);
-                box-shadow: 0 0 0 2px var(--bs-info)
+                -webkit-box-shadow: 0 0 0 2px var(--bs-primary);
+                box-shadow: 0 0 0 2px var(--bs-primary)
             }
 
 .app-landing #typewriter-text {
@@ -30205,12 +30205,12 @@ svg {
         }
 
             .profile-page-nav .nav-tabs-clean .nav-link:hover {
-                color: var(--bs-info)
+                color: var(--bs-primary)
             }
 
             .profile-page-nav .nav-tabs-clean .nav-link.active {
-                color: var(--bs-info);
-                border-bottom-color: var(--bs-info)
+                color: var(--bs-primary);
+                border-bottom-color: var(--bs-primary)
             }
 
             .profile-page-nav .nav-tabs-clean .nav-link .sa-icon {
@@ -30252,8 +30252,8 @@ svg {
     height: 16px;
     border-radius: 50%;
     border: 2px solid var(--bs-body-bg);
-    -webkit-box-shadow: 0 0 0 2px var(--bs-info);
-    box-shadow: 0 0 0 2px var(--bs-info)
+    -webkit-box-shadow: 0 0 0 2px var(--bs-primary);
+    box-shadow: 0 0 0 2px var(--bs-primary)
 }
 
 .profile-edit-mode {
@@ -30319,7 +30319,7 @@ html.profile-edit-mode .profile-edit-mode {
 .contact-form .form-control:focus {
     -webkit-box-shadow: none;
     box-shadow: none;
-    border-color: var(--bs-info)
+    border-color: var(--bs-primary)
 }
 
 .social-links .btn-icon {
@@ -30340,7 +30340,7 @@ html.profile-edit-mode .profile-edit-mode {
 }
 
     .social-links .btn-icon:hover {
-        background-color: var(--bs-info);
+        background-color: var(--bs-primary);
         color: #fff
     }
 
@@ -30373,7 +30373,7 @@ html.profile-edit-mode .profile-edit-mode {
     }
 
         .comments-section .comment .btn-link:hover {
-            color: var(--bs-info)
+            color: var(--bs-primary)
         }
 
 .comments-section .comment-reply {
@@ -30574,7 +30574,7 @@ html.profile-edit-mode .profile-edit-mode {
 }
 
 .js-showcase-icon.has-svg:hover .icon-preview {
-    background: rgba(var(--info),.9) !important
+    background: rgba(var(--primary),.9) !important
 }
 
     .js-showcase-icon.has-svg:hover .icon-preview > div {
@@ -30587,7 +30587,7 @@ html.profile-edit-mode .profile-edit-mode {
 
     .js-showcase-icon:hover .icon-preview {
         color: rgba(var(--white),.9);
-        background: rgba(var(--info),.9) !important
+        background: rgba(var(--primary),.9) !important
     }
 
         .js-showcase-icon:hover .icon-preview > div {
