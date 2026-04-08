@@ -68,13 +68,13 @@ namespace Workshop.Web.Controllers
             ViewBag.Vehicles = vehicleList;
             VehicleTypeId vehicleTypeId;
             ViewBag.VehicleType = Enum.GetValues(typeof(VehicleTypeId))
-     .Cast<VehicleTypeId>()
-     .Select(v => new SelectListItem
-     {
-         Text = v.ToString(),        // "Internal", "External", etc.
-         Value = ((int)v).ToString() // "1", "2", "3"
-     })
-     .ToList();
+             .Cast<VehicleTypeId>()
+             .Select(v => new SelectListItem
+             {
+                 Text = v.ToString(),        // "Internal", "External", etc.
+                 Value = ((int)v).ToString() // "1", "2", "3"
+             })
+             .ToList();
 
             ViewBag.FK_AgreementId = new List<SelectListItem>();
             ViewBag.FkVehicleMovementId = new List<SelectListItem>();

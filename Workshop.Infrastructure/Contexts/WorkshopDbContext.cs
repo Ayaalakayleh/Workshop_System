@@ -153,29 +153,29 @@ public partial class WorkshopDbContext : DbContext
         {
             entity.ToTable("D_External_Workshop_Exp");
 
-            entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.BusinessLine)
+            entity.Property(e => e.ID).HasColumnName("ID");
+            entity.Property(e => e.Business_Line)
                 .HasMaxLength(550)
                 .HasColumnName("Business_Line");
             entity.Property(e => e.City).HasMaxLength(550);
             entity.Property(e => e.HeaderId).HasColumnName("HeaderID");
-            entity.Property(e => e.InvoiceDate)
+            entity.Property(e => e.Invoice_Date)
                 .HasColumnType("datetime")
                 .HasColumnName("Invoice_Date");
-            entity.Property(e => e.InvoiceNo)
+            entity.Property(e => e.Invoice_No)
                 .HasMaxLength(550)
                 .HasColumnName("Invoice_No");
-            entity.Property(e => e.LicensePlateNo)
+            entity.Property(e => e.License_Plate_No)
                 .HasMaxLength(50)
                 .HasColumnName("License_Plate_No");
             entity.Property(e => e.Maker).HasMaxLength(550);
-            entity.Property(e => e.Milage).HasColumnName("MILAGE");
+            entity.Property(e => e.MILAGE).HasColumnName("MILAGE");
             entity.Property(e => e.Model).HasMaxLength(550);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.ServiceType)
+            entity.Property(e => e.Service_Type)
                 .HasMaxLength(550)
                 .HasColumnName("Service_Type");
-            entity.Property(e => e.SubTotalBeforVat)
+            entity.Property(e => e.SubTotal_BeforVat)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("SubTotal_BeforVat");
             entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");

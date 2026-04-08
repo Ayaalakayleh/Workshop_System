@@ -107,18 +107,18 @@ namespace Workshop.Web.Controllers
             try
             {
                 
-                
-
-
-                var _External_Workshop = await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId);
-
+                var externalWorkshops = await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId, null, lang);
                 ExcelMappingFilterDTO filter = new ExcelMappingFilterDTO() { CompanyId = CompanyId, BranchId = BranchId };
-                filter.CompanyId = CompanyId;
-                var Excel_Mappin = (await _workshopApiClient.GetExcelMappingAsync(filter))?.Select(a => a.WorkshopId)?.ToList();
-                Excel_Mappin ??= new List<int>();
-                ViewBag.ExternalWorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.SecondaryName, r.PrimaryName)*/ lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
+                
+                var excelMappingWorkshopIds = (await _workshopApiClient.GetExcelMappingAsync(filter))?.Select(a => a.WorkshopId).ToList() ?? new List<int>();
 
-                //ViewBag.ExternalWorkshopList = _External_Workshop.Where(a => a.Id.HasValue && Excel_Mappin.Contains(a.Id.Value)).Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.PrimaryName, r.SecondaryName)*/ lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
+                ViewBag.ExternalWorkshopList = externalWorkshops.Where(a => excelMappingWorkshopIds.Contains(a.Id)).Select(r => new SelectListItem
+                     {
+                         Text = lang == "en" ? r.PrimaryName : r.SecondaryName,
+                         Value = r.Id.ToString()
+                     })
+                     .ToList();
+
                 data.InvoiceType = await _accountingApiClient.TypeSalesPurchases_GetAll(CompanyId, BranchId, 1, 2);
 
                 return View(data);
@@ -134,12 +134,18 @@ namespace Workshop.Web.Controllers
         [CustomAuthorize(Permissions.Collection.Create)]
         public async Task<IActionResult> Create(MExternalWorkshopExpDTO CreateExternal_Workshop)
         {
-            CreateExternal_Workshop.Excel_Date = DateTime.Now;
+            //CreateExternal_Workshop.Excel_Date = DateTime.Now;
             TempData result = new TempData();
             int workOrderId = 0;
             try
             {
+                var companyInfoJson = HttpContext.Session.GetString("CompanyInfo");
+                if (string.IsNullOrWhiteSpace(companyInfoJson))
+                {
+                    throw new Exception("CompanyInfo not found in session.");
+                }
 
+                var companyInfo = JsonConvert.DeserializeObject<CompanyInfo>(companyInfoJson);
                 CreateExternal_Workshop.DExternalWorkshopExp = JsonConvert.DeserializeObject<List<DExternalWorkshopExpDTO>>(CreateExternal_Workshop.External_Workshop_ExpjsonList);
                 CreateExternal_Workshop.CompanyId = CompanyId;
                 CreateExternal_Workshop.BranchId = BranchId;
@@ -156,13 +162,18 @@ namespace Workshop.Web.Controllers
 
                 var Supplier = await _accountingApiClient.Supplier_Find(ExternalWorkshop.SupplierId.Value);
                 string Invoices = string.Join(",", CreateExternal_Workshop.DExternalWorkshopExp?.Select(x => x.Invoice_No));
-                bool isExist = await _accountingApiClient.AccountSalesMaster_IsValidSupplierInvoiceNo(Supplier.Id, Invoices);
-                if (isExist)
+                var ValidSupplierInvoicesNo = new ValidSupplierInvoicesNo()
+                {
+                    SupplierId = Supplier.Id,
+                    Invoices = Invoices,
+                };
+                List<string> data = await _accountingApiClient.AccountSalesMaster_IsValidSupplierInvoicesNo(ValidSupplierInvoicesNo);
+                if (data.Count > 0)
                 {
                     result.IsSuccess = false;
+                    result.Message = "InvoiceNo" + " " + string.Join(", ", data) + " " + "AlreadyExist";
 
-                    //ToDo: Localize
-                    result.Message = $"InvoiceNo {Invoices} AlreadyExist";
+
                     return Json(result);
                 }
                 var items = new List<Item>();
@@ -196,20 +207,25 @@ namespace Workshop.Web.Controllers
                     var oAccountSalesDetails = new AccountSalesDetails();
                     try
                     {
-                        //6464 - K D S 6464 - K D S
+                        oVehicle = Vehicles.Where(a => a.PlateNumber.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == item.License_Plate_No.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper()).FirstOrDefault();
+                        
+                        if (oVehicle == null)
+                            throw new Exception($"Vehicle not found for plate number: {item.License_Plate_No}");
+
                         workOrder.VehicleId = oVehicle.Id;
                         workOrder.WorkOrderType = 2;
+                        workOrder.VehicleType = 1;
                         workOrder.GregorianDamageDate = item.Invoice_Date;
                         workOrder.IsFix = true;
                         workOrder.Description = item.Description;
                         workOrder.WorkOrderTitle = item.Invoice_No;
-                        //workOrder.JobCardStatus = 4;
                         workOrder.WorkOrderStatus = 4;
                         workOrder.InvoicingStatus = 2;
                         workOrder.CreatedBy = UserId;
                         workOrder.CompanyId = CompanyId;
                         workOrder.BranchId = BranchId;
-                        workOrderId = _workshopApiClient.InsertMWorkOrderAsync(workOrder).Id;
+                        var insertedWorkOrder = await _workshopApiClient.InsertMWorkOrderAsync(workOrder);
+                        workOrderId = insertedWorkOrder.Id;
                         item.WorkOrderId = workOrderId;
                         item.VehicleId = workOrder.VehicleId;
                         MovementInvoice.WorkOrderId = workOrderId;
@@ -361,13 +377,14 @@ namespace Workshop.Web.Controllers
                                 CustomerAccountNo = AccountList.Where(x => x.ID == Supplier.AccountNoPayableId).FirstOrDefault().AccountNo,
                             };
                             oAccountSales.AccountSalesMaster.UserId = UserId.ToString();
-                            oAccountSales.AccountSalesMaster.CurrencyID = Supplier.CurrencyId;//((CompanyInfo)Session["CompanyInfo"]).CurrencyIDH;
+                            oAccountSales.AccountSalesMaster.CurrencyID = Supplier.CurrencyId==0 ? companyInfo.CurrencyIDH : Supplier.CurrencyId;
                             oAccountSales.AccountSalesMaster.AccSalesBranch = BranchId;
                             oAccountSales.AccountSalesMaster.PaymentTerms = Supplier.oLDBPaymentType > 0 ? Supplier.oLDBPaymentType : 0;
                             oAccountSales.CompanyId = CompanyId;
                             oAccountSales.BranchId = BranchId;
                             oAccountSales.AccountSalesMaster.InventoryAccountId = InvoiceType.AccountId;
-                            oAccountSales.CompanyType = 1;// ((CompanyInfo)Session["CompanyInfo"]).CompanyType;
+                            oAccountSales.CompanyType = companyInfo.CompanyType;
+
                             await _accountingApiClient.AccountSalesMaster_Insert(oAccountSales);
                         }
 
@@ -399,8 +416,8 @@ namespace Workshop.Web.Controllers
 
                     var Insert_External_Workshop = await _workshopApiClient.InsertExternalWorkshopExpAsync(createExternalWorkshopExpDTO);
                 }
-                //var _External_Workshop = await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId);
-                //ViewBag.ExternalWorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.PrimaryName, r.SecondaryName)*/language == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
+                var _External_Workshop = await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId);
+                ViewBag.ExternalWorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.PrimaryName, r.SecondaryName)*/lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
 
                 result.DataList.Add(JsonConvert.SerializeObject(resultsuccess, Formatting.Indented));
                 result.DataList.Add(JsonConvert.SerializeObject(resultfault, Formatting.Indented));
@@ -430,12 +447,17 @@ namespace Workshop.Web.Controllers
             {
                 var resultData = new List<Error>();
                 Error res = null;
-                
-                var dExternalWorkshopExps = JsonConvert.DeserializeObject<List<DExternalWorkshopExpDTO>>(CreateExternal_Workshop.External_Workshop_ExpjsonList);
+
+                var D_External_Workshop_Exp = JsonConvert.DeserializeObject<List<DExternalWorkshopExp>>(CreateExternal_Workshop.External_Workshop_ExpjsonList);
                 var Vehicles = await _vehicleApiClient.GetVehiclesPlatesByCompanyId(CompanyId);
+
+                External_Workshop_Exp_Filter filter = new External_Workshop_Exp_Filter();
                 List<ExternalWorkshopExpReportDTO> externalWorkshopExpReports = new List<ExternalWorkshopExpReportDTO>();
 
-                var Invoice_NoDBList = await _workshopApiClient.GetExternalWorkshopExpReportAsync(new ExternalWorkshopExpReportFilterDTO { CompanyId = CompanyId });
+                filter.CompanyId = CompanyId;
+                filter.ExternalWorkshopId = CreateExternal_Workshop.ExternalWorkshopId;
+
+                var Invoice_NoDBList = await _workshopApiClient.GetExternalWorkshopExpReportAsync(filter);
                 List<string> Invoice_NoExcelList = new List<string>();
                 decimal Vat;
                 try
@@ -450,7 +472,7 @@ namespace Workshop.Web.Controllers
 
                 var workOrder = new MWorkOrderDTO();
                 var movementInvoice = new MovementInvoice();
-                for (int i = 0; i < dExternalWorkshopExps.Count; i++)
+                for (int i = 0; i < D_External_Workshop_Exp.Count; i++)
                 {
                     res = new Error
                     {
@@ -462,83 +484,99 @@ namespace Workshop.Web.Controllers
                         try
                         {
                             int count = 0;
-                            var x = Invoice_NoDBList.Where(a => a.Invoice_No.Replace(" ", "").ToUpper() == dExternalWorkshopExps[i].Invoice_No.Replace(" ", "").ToUpper()).Count();
+                            if (D_External_Workshop_Exp.GroupBy(a => a.Invoice_No).Any(g => g.Count() > 1))
+                            {
+                                res.Errors.Add(GetCurrentBilanguage("رقم الفاتورة مكرر" + " " + D_External_Workshop_Exp
+                                   .GroupBy(a => a.Invoice_No)
+                                   .Where(g => g.Count() > 1)
+                                   .Select(g => g.Key) // just the invoice numbers
+                                   .FirstOrDefault(), "The Invoice Number is duplicates") + " " + D_External_Workshop_Exp
+                                   .GroupBy(a => a.Invoice_No)
+                                   .Where(g => g.Count() > 1)
+                                   .Select(g => g.Key) // just the invoice numbers
+                                   .FirstOrDefault());
+                            }
+
+                            var x = Invoice_NoDBList.Where(a => a.Invoice_No.Replace(" ", "").ToUpper() == D_External_Workshop_Exp[i].Invoice_No.Replace(" ", "").ToUpper()).Count();
                             if (x > 0)
                             {
                                 count++;
                             }
                             if (Invoice_NoExcelList.Count == 0)
                             {
-                                Invoice_NoExcelList.Add(dExternalWorkshopExps[i].Invoice_No);
+                                Invoice_NoExcelList.Add(D_External_Workshop_Exp[i].Invoice_No);
                             }
                             else
                             {
-                                var y = Invoice_NoDBList.Where(a => a.Invoice_No.Replace(" ", "").ToUpper() == dExternalWorkshopExps[i].Invoice_No.Replace(" ", "").ToUpper()).Count();
+                                var y = Invoice_NoDBList.Where(a => a.Invoice_No.Replace(" ", "").ToUpper() == D_External_Workshop_Exp[i].Invoice_No.Replace(" ", "").ToUpper()).Count();
                                 if (y > 0)
                                 {
                                     count++;
                                 }
-                                Invoice_NoExcelList.Add(dExternalWorkshopExps[i].Invoice_No);
+                                Invoice_NoExcelList.Add(D_External_Workshop_Exp[i].Invoice_No);
                             }
                             if (count > 0)
                             {
                                 throw new Exception();
                             }
-                            //Damage.VehicleId = Vehicles.Where(a => a.PlateNumber.Replace(" ", "").ToUpper() == dExternalWorkshopExps[i].License_plate_No.Replace(" ", "").ToUpper()).FirstOrDefault().Id;
                         }
                         catch (Exception)
                         {
                             res.Errors.Add(GetCurrentBilanguage("رقم الفاتورة موجود بالفعل", "The Invoice Number is Already Exist"));
                         }
+
                         try
                         {
-                            //workOrder.VehicleId = Vehicles.Where(a => a.PlateNumber.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == dExternalWorkshopExps[i].License_Plate_No.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper()).FirstOrDefault().Id;
-                            var plateNo = dExternalWorkshopExps[i].License_Plate_No?.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper();
-        
-                            var vehicle = Vehicles.FirstOrDefault(a => (a.PlateNumber ?? "").Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == plateNo);
-                                  
-
-                            if (vehicle == null)
-                            {
-                                res.Errors.Add(GetCurrentBilanguage( "رقم اللوحة لا ينتمي إلى أي مركبة", "The Plate Number Does Not Belong to Any Vehicle"));
-                                     
-                            }
-                            else
-                            {
-                                workOrder.VehicleId = vehicle.Id;
-                            }
+                            workOrder.VehicleId = Vehicles.Where(a => a.PlateNumber.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper() == D_External_Workshop_Exp[i].License_Plate_No.Replace(" ", "").Replace("-", "").Replace("/", "").ToUpper()).FirstOrDefault().Id;
                         }
                         catch (Exception)
                         {
                             res.Errors.Add(GetCurrentBilanguage("رقم اللوحة لا ينتمي إلى أي مركبة", "The Plate Number Does Not Belong to Any Vehicle"));
                         }
+
                         try
                         {
-                            workOrder.GregorianDamageDate = dExternalWorkshopExps[i].Invoice_Date;
+                            workOrder.GregorianDamageDate = D_External_Workshop_Exp[i].Invoice_Date;
                         }
                         catch (Exception)
                         {
                             res.Errors.Add(GetCurrentBilanguage("تنسيق التاريخ غير صحيح، الرجاء إدخال تاريخ مثل هذا (dd-MM-yyyy)", "The Date Format is wrong, Please Enter date like this (dd-MM-yyyy)"));
                         }
+
                         try
                         {
-                            workOrder.Description = dExternalWorkshopExps[i].Description;
+                            if (workOrder.GregorianDamageDate > DateTime.Now.Date)
+                            {
+                                res.Errors.Add(GetCurrentBilanguage("تاريخ الفاتورة اكبر من تاريخ اليوم", "Invoice date is greater than today's date"));
+
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            res.Errors.Add(GetCurrentBilanguage("تاريخ الفاتورة اكبر من تاريخ اليوم", "Invoice date is greater than today's date"));
+                        }
+
+                        try
+                        {
+                            workOrder.Description = D_External_Workshop_Exp[i].Description;
                         }
                         catch (Exception)
                         {
                             res.Errors.Add(GetCurrentBilanguage("يرجى التحقق من الوصف", "Please Check Description"));
                         }
+
                         try
                         {
-                            workOrder.WorkOrderTitle = dExternalWorkshopExps[i].Invoice_No;
+                            workOrder.WorkOrderTitle = D_External_Workshop_Exp[i].Invoice_No;
                         }
                         catch (Exception)
                         {
                             res.Errors.Add(GetCurrentBilanguage("يرجى التحقق من رقم الفاتورة", "Please Check Invoice No"));
                         }
+
                         try
                         {
-                            movementInvoice.TotalInvoice = dExternalWorkshopExps[i].Total ?? 0;
+                            movementInvoice.TotalInvoice = D_External_Workshop_Exp[i].Total ?? 0;
                         }
                         catch (Exception)
                         {
@@ -681,11 +719,19 @@ namespace Workshop.Web.Controllers
                         Vat = 0;
                     }
                     var mappingColumn = await _workshopApiClient.GetExcelMappingDetailsByIdAsync(null, workshopId);
-                    var mExcelMapping = new MExcelMappingDTO();
-                    mExcelMapping.WorkshopId = workshopId;
-                    mExcelMapping.CompanyId = CompanyId;
+                   
+                    var mappingFilter = new ExcelMappingFilterDTO
+                    {
+                        CompanyId = CompanyId,
+                        BranchId = BranchId,
+                        WorkshopId = workshopId
+                    };
 
-                    var mapingData = (await _workshopApiClient.GetExcelMappingAsync(new ExcelMappingFilterDTO() { CompanyId = CompanyId, BranchId = BranchId }))?.FirstOrDefault();
+                    var mapingData = (await _workshopApiClient.GetExcelMappingAsync(mappingFilter))?.FirstOrDefault();
+                    if (mapingData == null)
+                    {
+                        return Json(new { success = false, Message = "No mapping found for selected workshop." });
+                    }
                     using (var workbook = new XLWorkbook(file.OpenReadStream()))
                     {
                         var worksheet = workbook.Worksheet(1);

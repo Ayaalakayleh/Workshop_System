@@ -735,7 +735,7 @@ namespace Workshop.Web.Services
             }
         }
 
-        public async Task<IEnumerable<ExternalWorkshopExpReportDTO>?> GetExternalWorkshopExpReportAsync(ExternalWorkshopExpReportFilterDTO filter)
+        public async Task<IEnumerable<ExternalWorkshopExpReportDTO>?> GetExternalWorkshopExpReportAsync(External_Workshop_Exp_Filter filter)
         {
             try
             {

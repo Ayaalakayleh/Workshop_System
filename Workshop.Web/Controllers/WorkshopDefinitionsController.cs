@@ -144,9 +144,9 @@ namespace Workshop.Controllers
 
                 bool isSuccess = false;
 
-                if (workshop.Id != null)
+                if (workshop.Id > 0)
                 {
-                    var data = await _workshopApiClient.GetWorkshopByIdAsync(workshop.Id.Value);
+                    var data = await _workshopApiClient.GetWorkshopByIdAsync(workshop.Id);
 
                     if (data != null)
                     {

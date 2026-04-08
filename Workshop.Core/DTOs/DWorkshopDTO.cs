@@ -45,8 +45,8 @@ namespace Workshop.Core.DTOs.WorkshopDTOs
 
     public class WorkShopDefinitionDTO : WorkShopFullDetailsDTO
     {
+        public int Id { get; set; }
         public string? Name { get; set; }
-        public int? Id { get; set; }
         public int UpdatedBy { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -5,21 +5,21 @@ namespace Workshop.Infrastructure;
 
 public partial class DExternalWorkshopExp
 {
-    public int Id { get; set; }
+    public int ID { get; set; }
 
     public int? HeaderId { get; set; }
 
     public int? VehicleId { get; set; }
 
-    public string? InvoiceNo { get; set; }
+    public string? Invoice_No { get; set; }
 
-    public string LicensePlateNo { get; set; } = null!;
+    public string License_Plate_No { get; set; } = null!;
 
-    public DateTime? InvoiceDate { get; set; }
+    public DateTime? Invoice_Date { get; set; }
 
-    public string? BusinessLine { get; set; }
+    public string? Business_Line { get; set; }
 
-    public int? Milage { get; set; }
+    public int? MILAGE { get; set; }
 
     public string? City { get; set; }
 
@@ -37,13 +37,13 @@ public partial class DExternalWorkshopExp
 
     public string? Year { get; set; }
 
-    public decimal? SubTotalBeforVat { get; set; }
+    public decimal? SubTotal_BeforVat { get; set; }
 
     public decimal? Vat { get; set; }
 
     public decimal? Total { get; set; }
 
-    public string? ServiceType { get; set; }
+    public string? Service_Type { get; set; }
 
     public int? WorkOrderId { get; set; }
 

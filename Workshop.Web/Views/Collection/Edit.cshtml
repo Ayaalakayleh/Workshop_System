@@ -157,8 +157,8 @@
 
 		$.each(jsonData, function (index, item) {
 			var row = $('<tr>');
-			row.append('<td contenteditable="false" hidden>' +index+ '</td>');
-			row.append('<td id="ck_'+index+ '"class="check-or-uncheck" contenteditable="false"><div class="the-loader"></div></td>');
+			// row.append('<td contenteditable="false" hidden>' +index+ '</td>');
+			// row.append('<td id="ck_'+index+ '"class="check-or-uncheck" contenteditable="false"><div class="the-loader"></div></td>');
 			row.append('<td contenteditable="true">' + item.Invoice_No + '</td>');
 			row.append('<td contenteditable="true">' + item.City + '</td>');
 			row.append('<td contenteditable="true">' + (item.Invoice_Date ? item.Invoice_Date : '') + '</td>');
@@ -175,7 +175,7 @@
 			row.append('<td contenteditable="true">' + (item.Vat ? item.Vat.toFixed(2) : '') + '</td>');
 			row.append('<td contenteditable="true">' + (item.Total ? item.Total.toFixed(2) : '' )+ '</td>');
 			row.append('<td contenteditable="true">' + item.Description + '</td>');
-			row.append('<td class="errorReason" id="cr_' + index + '" contenteditable="true"></td>');
+			// row.append('<td class="errorReason" id="cr_' + index + '" contenteditable="true"></td>');
 			row.append('<td><button type="button" class="btn btn-danger btn-w-m btn-sm delete"><i class="fa fa-trash"></i>&nbsp;@Common["Delete"]</button></td>');
 			table.append(row);
 		});

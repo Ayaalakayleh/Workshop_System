@@ -1,5 +1,5 @@
 ﻿
-namespace Workshop.Core.DTOs.City
+namespace Workshop.Core.DTOs
 {
     public class City
     {

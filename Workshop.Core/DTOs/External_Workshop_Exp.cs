@@ -1,5 +1,7 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 using Workshop.Core.DTOs.AccountingDTOs;
+using Workshop.Core.DTOs.Vehicle;
 
 namespace Workshop.Core.DTOs.ExternalWorkshopExp
 {
@@ -95,6 +97,23 @@ namespace Workshop.Core.DTOs.ExternalWorkshopExp
         public int? BranchId { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+    }
+
+    public class External_Workshop_Exp_Filter
+    {
+        public DateTime? FromDate { set; get; }
+        public DateTime? ToDate { set; get; }
+        public int? ExternalWorkshopId { get; set; }
+        public List<SelectListItem> ExternalWorkshopList { get; set; }
+        public int? page { get; set; }
+        public int TotalPages { get; set; }
+        public int CompanyId { get; set; }
+        public int? BranchId { get; set; }
+        public int VehicleId { get; set; }
+
+
+        public List<WorkshopDefinition> Workshop { get; set; }
+        public List<VehicleNams> VehicleNams { get; set; }
     }
 
     //New Dtos
@@ -198,7 +217,7 @@ namespace Workshop.Core.DTOs.ExternalWorkshopExp
 
     public class MExcelMappingDTO
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public int WorkshopId { get; set; }
         public string FilePath { get; set; }
         public string FileName { get; set; }

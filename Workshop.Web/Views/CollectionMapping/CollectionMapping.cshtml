@@ -149,6 +149,25 @@
             $('.ShowById').show();
         }
 
+        const inputElement = document.querySelector('#fileInput');
+        const pond = FilePond.create(inputElement, {
+            allowMultiple: false
+        });
+
+        const filePath = $('#FilePath').val();
+        const fileName = $('#FileName').val();
+
+        if (filePath && fileName) {
+            const fullPath = '/Uploads/' + filePath + '/' + fileName;
+
+            pond.addFile(fullPath, {
+                type: 'local',
+                file: {
+                    name: fileName
+                }
+            });
+        }
+
         if (jsonData && jsonData.length > 0) {
             apppendTable();
             if (jsonData.length < 17)
@@ -157,7 +176,7 @@
 
         $("#Download").click(function () {
 
-            var FinalPath = "@fileService.GetFileFullPath(Model.FilePath)";
+            var FinalPath = "@fileService.GetFileFullPath(Model.FilePath)" + "/@Model.FileName";
 
             var link = document.createElement('a');
             link.href = FinalPath;
@@ -466,50 +485,58 @@
     }
 
     function Dropdownchange(selectElement) {
-        var selectedOption = $(selectElement).val();
+
+        const $currentRow = $(selectElement).closest('tr');
+        const $currentDropdown = $currentRow.find('.dropdown');
+
+        const selectedText = $currentDropdown.find('option:selected').text()
+            .replace(/ - Data Type : .+$/, '')
+            .trim();
 
         ColMappingColumnDB = [];
-        const tableRows = $('#collection-mapping-table tbody tr');
-        tableRows.each(function () {
-            var Mapping_ColumnDB = $(this).find('td:eq(2) select option:selected').text();
-            if (Mapping_ColumnDB == '') {
-                ColMappingColumnDB.push($(this).find('td:eq(2)').text());
-            } else {
-                ColMappingColumnDB.push(Mapping_ColumnDB.replace(/ - Data Type : \w+/, ''));
+        $('#collection-mapping-table tbody tr').each(function () {
+            const txt = $(this).find('select.dropdown option:selected').text()
+                .replace(/ - Data Type : .+$/, '')
+                .trim();
+
+            if (txt) {
+                ColMappingColumnDB.push(txt);
             }
         });
-        var currentRowDropdown = $(selectElement).closest('tr').find('.dropdown');
-        currentRowDropdown.empty();
-        currentRowDropdown.append('<option value="">Select an option</option>');
-        $.each(Excel_MappingColumnsList, function (index, item) {
-            currentRowDropdown.append('<option value="' + index + '">' + item.COLUMN_NAME + " - Data Type : " + item.DATA_TYPE + '</option>');
-        });
 
-        $.each(ColMappingColumnDB, function (index, item) {
-            var dropdownOption = currentRowDropdown.find('option').filter(function () {
-                return $(this).text().replace(/ - Data Type : \w+/, '') === item;
-            });
+        $('#collection-mapping-table tbody tr').each(function () {
 
-            if (dropdownOption) {
-                dropdownOption.prop('selected', true);
-                if (dropdownOption.text().replace(/ - Data Type : \w+/, '') != "Service_Type") {
-                    dropdownOption.attr("disabled", true);
-                    dropdownOption.css("color", "#ccc");
+            const $row = $(this);
+            const $ddl = $row.find('.dropdown');
+
+            if (!$ddl.length) return;
+
+            const currentSelected = $ddl.find('option:selected').text()
+                .replace(/ - Data Type : .+$/, '')
+                .trim();
+
+            $ddl.find('option').each(function () {
+
+                const optionText = $(this).text()
+                    .replace(/ - Data Type : .+$/, '')
+                    .trim();
+
+                if (optionText === currentSelected || optionText === 'Service_Type') {
+                    $(this).prop('disabled', false).css('color', '');
+                }
+                else if (ColMappingColumnDB.includes(optionText)) {
+                    $(this).prop('disabled', true).css('color', '#ccc');
+                }
+                else {
+                    $(this).prop('disabled', false).css('color', '');
                 }
 
-            } else {
-                dropdownOption.prop('selected', false);
-                dropdownOption.attr("disabled", false);
-                dropdownOption.css("color", "");
+            });
+
+            if ($.fn.select2 && $ddl.data('select2')) {
+                $ddl.trigger('change.select2');
             }
         });
-
-        updateDropdownOptions(selectElement);
-
-        // Ensure Select2 UI stays in sync
-        if ($.fn.select2) {
-            currentRowDropdown.trigger('change'); // normal change event
-        }
     }
 
     function validateTableRows() {

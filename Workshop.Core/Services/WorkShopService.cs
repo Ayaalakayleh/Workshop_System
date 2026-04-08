@@ -50,7 +50,7 @@ namespace Workshop.Core.Services
         public async Task<int> UpdateWorkshopAsync(UpdateWorkShopDTO updateDto)
         {
             // Validate existence first
-            var existing = await _workShopRepository.GetByIdAsync(updateDto.Id.Value);
+            var existing = await _workShopRepository.GetByIdAsync(updateDto.Id);
             if (existing == null)
                 throw new KeyNotFoundException("Workshop not found");
 

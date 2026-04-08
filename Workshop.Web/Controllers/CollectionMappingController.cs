@@ -100,7 +100,7 @@ namespace Workshop.Web.Controllers
             else
             {
                 var WorkshopIds = (await _workshopApiClient.GetExcelMappingAsync(filter))?.Select(a => a.WorkshopId).ToList();
-                var _External_Workshop = (await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId))?.Where(a => a.Id.HasValue && !WorkshopIds.Contains(a.Id.Value)).ToList();
+                var _External_Workshop = (await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId))?.Where(a => a.Id > 0 && !WorkshopIds.Contains(a.Id)).ToList();
                 ViewBag.WorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.SecondaryName, r.PrimaryName)*/ lang == "en" ? r.SecondaryName : r.PrimaryName, Value = r.Id.ToString() }).ToList();
             }
 
@@ -166,7 +166,7 @@ namespace Workshop.Web.Controllers
                     }
                 }
 
-                if (mExcelMapping.Id.HasValue)
+                if (mExcelMapping.Id > 0)
                 {
                     mExcelMapping.UpdatedBy = UserId;
                     UpdateExcelMappingDTO updateExcelMappingDTO = new UpdateExcelMappingDTO();

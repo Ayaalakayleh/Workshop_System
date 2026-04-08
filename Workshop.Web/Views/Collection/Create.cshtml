@@ -15,7 +15,7 @@
 @using (Html.BeginForm("Create", "Collection", FormMethod.Post, new { enctype = "multipart/form-data", @id = "form" }))
 {
     @Html.HiddenFor(model => model.External_Workshop_ExpjsonList);
-    @Html.AntiForgeryToken();
+   
 
     <style>
         #Clear {
