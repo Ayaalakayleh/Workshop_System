@@ -46,11 +46,30 @@ namespace Workshop.Web.Controllers
                 .Select(e => new SelectListItem
                 {
                     Value = ((int)e).ToString(),
-                    Text = e.ToString()
+                    Text = lang == "en" ? e.ToString() : GetArabicName(e)
                 })
                 .ToList();
 
             return View();
+        }
+
+        private string GetArabicName(WorkflowEnum e)
+        {
+            switch (e)
+            {
+                case WorkflowEnum.PartsFirstLevel:
+                    return "المستوى الأول";
+                case WorkflowEnum.PartsSecondLevel:
+                    return "المستوى الثاني";
+                case WorkflowEnum.PartsThirdLevel:
+                    return "المستوى الثالث";
+                case WorkflowEnum.PartsFourthLevel:
+                    return "المستوى الرابع";
+                case WorkflowEnum.PartsFifthLevel:
+                    return "المستوى الخامس";
+                default:
+                    return e.ToString();
+            }
         }
 
         [HttpPost]
