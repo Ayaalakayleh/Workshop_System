@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using NPOI.SS.Formula.Functions;
+using System.Net.Http.Json;
 using Workshop.Core.DTOs;
 using Workshop.Web.Models;
 
@@ -33,13 +34,15 @@ namespace Workshop.Web.Services
 
 
 
-        public async Task<byte[]> PartsSalesSummaryReportReportAsync(IEnumerable<PartsSummaryDTO> model,string CompanyName)
+        public async Task<byte[]> PartsSalesSummaryReportReportAsync(IEnumerable<PartsSummaryDTO> model,string CompanyName, Byte[] Logo)
         {
 
             var oPartsSummaryReportModel = new PartsSummaryReportModel();
             oPartsSummaryReportModel.CompanyName = CompanyName;
             oPartsSummaryReportModel.data = model;
             var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+
+            oPartsSummaryReportModel.Img = Logo;
 
             oPartsSummaryReportModel.Lang = lang;
 

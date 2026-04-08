@@ -1207,7 +1207,10 @@ namespace Workshop.Web.Controllers
             var data = await _apiClient.GetPartsSummaryReport(filter);
             var companyInfo = await _erpClient.GetCompanyById(CompanyId);
             var CompanyName = lang=="en" ? companyInfo.CompanyPrimaryName : companyInfo.CompanySecondaryName;
-            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(data, CompanyName);
+
+             Byte[] Logo = companyInfo.Img;
+
+            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(data, CompanyName, Logo);
 
             Response.Headers["Content-Disposition"] = "inline; filename=Wip.pdf";
             return File(bytes, "application/pdf");
