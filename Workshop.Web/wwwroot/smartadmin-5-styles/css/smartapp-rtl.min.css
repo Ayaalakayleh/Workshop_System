@@ -2811,6 +2811,7 @@ progress {
     font-size: .875em;
     color: var(--bs-secondary-color)
 }
+
 .select2-container--bootstrap-5 .select2-selection {
     background-color: var(--bs-body-bg);
     border: var(--bs-border-width) solid var(--bs-border-color);
@@ -2818,17 +2819,21 @@ progress {
     -webkit-transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
     text-align: right
 }
+
 .select2-container--bootstrap-5 .select2-selection--single {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='var(--bs-border-color)' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
 }
+
     .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__clear, .select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
         left: 2.25rem;
         right: unset;
-        text-align:right
+        text-align: right
     }
-.select2-results{
-    text-align:right
+
+.select2-results {
+    text-align: right
 }
+
 .form-control {
     display: block;
     width: 100%;
@@ -16668,7 +16673,6 @@ textarea.form-control-lg {
     --bs-cyan: #20a0e7;
     --bs-black: #000;
     --bs-white: #fff;
-    --primary-10: #ecf7ff;
     --primary-50: #9ad0fa;
     --primary-100: #82c5f8;
     --primary-200: #6abaf7;
@@ -31008,6 +31012,14 @@ html.profile-edit-mode .profile-edit-mode {
     padding: 20px;
     font-style: italic;
     color: #666
+}
+
+.error {
+    color: #d9534f;
+    padding: 10px;
+    border: 1px solid #d9534f;
+    border-radius: 4px;
+    margin-top: 20px
 }
 
 .unread .mail-sender, .unread .mail-subject {

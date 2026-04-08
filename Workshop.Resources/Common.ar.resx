@@ -2917,7 +2917,7 @@
     <value>Imported</value>
   </data>
   <data name="Message_ImportSuccess" xml:space="preserve">
-    <value>تمت عملية تصدير الملف بنجاح</value>
+    <value>تمت عملية استيراد الملف بنجاح</value>
   </data>
   <data name="PartsSummaryReport" xml:space="preserve">
     <value>تقرير ملخص الاجزاء</value>

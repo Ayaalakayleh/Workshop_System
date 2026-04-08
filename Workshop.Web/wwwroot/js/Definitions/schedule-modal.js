@@ -155,11 +155,12 @@
 
         let [h, m] = t.split(':').map(Number);
 
-        // Convert to 12-hour format BUT ALWAYS PM
+        const ampm = h < 12 ? 'AM' : 'PM';
+
         if (h === 0) h = 12;
         else if (h > 12) h -= 12;
 
-        return `${pad2(h)}:${pad2(m)} PM`;
+        return `${pad2(h)}:${pad2(m)} ${ampm}`;
     }
 
     function time12To24(v) {
@@ -182,9 +183,9 @@
 
         if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) return '';
 
-        if (h === 12) h = 0;
-        // FORCE PM logic
-        if (ampm === 'PM' || true) {
+        if (ampm === 'AM') {
+            if (h === 12) h = 0;
+        } else if (ampm === 'PM') {
             if (h !== 12) h += 12;
         }
 

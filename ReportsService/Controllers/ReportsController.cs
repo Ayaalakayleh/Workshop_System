@@ -344,6 +344,8 @@ namespace ReportsService.Controllers
             {
                 var company = model.CompanyName;
 
+                var Logo = model.Img;
+
                 var Lang = model.Lang;
 
                 // Create dataset
@@ -409,7 +411,7 @@ namespace ReportsService.Controllers
                 dtCompanyData.Rows.Add(
                     company ?? "",
                     "" ?? "",
-                    DBNull.Value ?? DBNull.Value,
+                    Logo,
                     "Parts Summary"
 
                 );
