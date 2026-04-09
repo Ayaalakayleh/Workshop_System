@@ -177,7 +177,7 @@
 
                             Swal.fire({
                                 icon: 'success',
-                                title: "Success",
+                                title: theMainLang == "en" ? 'Done Successfully' : "تمت العملية بنجاح",
                                 confirmButtonText: theMainLang == "en" ? 'Ok' : "حسناً",
                                 confirmButtonColor: 'var(--primary-600)',
                                 timer: 3000,
