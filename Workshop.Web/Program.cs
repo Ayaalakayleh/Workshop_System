@@ -79,6 +79,31 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture("en");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
+
+    options.RequestCultureProviders = new List<IRequestCultureProvider>
+    {
+        new CustomRequestCultureProvider(context =>
+        {
+            var lang = context.Request.Cookies["Language"];
+
+            if (!string.IsNullOrWhiteSpace(lang))
+            {
+                lang = lang.Trim().ToLower();
+
+                if (lang == "ar" || lang == "en")
+                {
+                    return Task.FromResult<ProviderCultureResult?>(
+                        new ProviderCultureResult(lang, lang));
+                }
+            }
+
+            return Task.FromResult<ProviderCultureResult?>(null);
+        }),
+
+        new QueryStringRequestCultureProvider(),
+        new CookieRequestCultureProvider(),
+        new AcceptLanguageHeaderRequestCultureProvider()
+    };
 });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
@@ -130,14 +155,21 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession();
+
 app.UseStaticFiles();
 
 // Add localization middleware
-app.UseRequestLocalization();
+//app.UseRequestLocalization();
 
 app.UseRouting();
 app.UseSession();
+
+
+var locOptions = app.Services
+    .GetRequiredService<Microsoft.Extensions.Options.IOptions<RequestLocalizationOptions>>()
+    .Value;
+
+app.UseRequestLocalization(locOptions);
 
 app.UseAuthorization();
 

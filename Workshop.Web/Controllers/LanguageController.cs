@@ -11,19 +11,29 @@ namespace Workshop.Web.Controllers
             if (string.IsNullOrWhiteSpace(culture))
                 return BadRequest();
 
-            // Set culture cookie
+            culture = culture.Trim().ToLower();
+
+            if (culture != "ar" && culture != "en")
+                culture = "en";
+
+            var cookieOptions = new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddYears(1),
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = false,
+                Path = "/"
+            };
+
+            Response.Cookies.Append("Language", culture, cookieOptions);
+
             Response.Cookies.Append(
                 CookieRequestCultureProvider.DefaultCookieName,
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddYears(1),
-                    IsEssential = true,
-                    SameSite = SameSiteMode.Lax
-                }
+                cookieOptions
             );
 
-            return LocalRedirect(returnUrl ?? "~/");
+            return Ok();
         }
     }
 }
