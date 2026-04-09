@@ -292,14 +292,14 @@ namespace Workshop.Web.Controllers
                     if (!movement.VehicleID.HasValue || movement.VehicleID.Value <= 0)
                     {
                         resultJson.IsSuccess = false;
-                        resultJson.Message = "Vehicle is required.";
+                        resultJson.Message = lang == "en" ?"Vehicle is required." :"الرجاء تحديد المركبة";
                         return Json(resultJson);
                     }
 
                     if (!movement.VehicleSubStatusId.HasValue || movement.VehicleSubStatusId.Value <= 0)
                     {
                         resultJson.IsSuccess = false;
-                        resultJson.Message = "Vehicle sub status is required.";
+                        resultJson.Message = lang == "en" ?"Vehicle sub status is required." : "الرجاء تحديد الحالة الفرعية للمركبة";
                         return Json(resultJson);
                     }
                     MWorkOrderDTO workOrder = null;
