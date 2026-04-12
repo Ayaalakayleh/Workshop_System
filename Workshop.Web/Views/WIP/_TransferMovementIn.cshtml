@@ -386,8 +386,9 @@
 
             <div class="col-12">
                 <div class="form-group">
-                    <label>@Common["Label_UploadInvoice"] <span class="text-warning">@Common["Hint_FileTypesAllowed"]</span></label>
-                    <input type="file" id="PettyCash_Files" name="PettyCash_Files" class="form-control" accept=".pdf,.png,.jpg,.jpeg" />
+                    <label>@Common["Label_UploadInvoice"] <span class="text-danger">*</span> <span class="text-warning">@Common["Hint_FileTypesAllowed"]</span></label>
+                    <input type="file" id="PettyCash_Files" name="PettyCash_Files" class="form-control" accept=".pdf,.png,.jpg,.jpeg" required />
+                    <span id="PettyCash_Files_Error" class="text-danger" style="display:none;">@Common["Label_FillRequired"]</span>
                 </div>
             </div>
 
@@ -1092,6 +1093,16 @@
             isValid = false;
         }
 
+        // Validate PettyCash file upload
+        if (!$('#PettyCash_Files').val()) {
+            $('#PettyCash_Files').addClass('is-invalid');
+            $('#PettyCash_Files_Error').show();
+            isValid = false;
+        } else {
+            $('#PettyCash_Files').removeClass('is-invalid');
+            $('#PettyCash_Files_Error').hide();
+        }
+
         if (isValid) {
             var services = [];
             $('.pettycash-service-checkbox').each(function () {
@@ -1103,6 +1114,9 @@
 
             // Submit petty cash form
             var formData = new FormData($('#PettyCashInvoiceForm').get(0));
+
+            // Explicitly append checkbox value since unchecked checkboxes are not included in FormData
+            formData.set('PettyCash_NotTaxable', $('#PettyCash_NotTaxable').is(':checked') ? 'true' : 'false');
 
             for (var i = 0; i < services.length; i++) {
                 formData.append(`Services[${i}].ServiceId`, services[i].ServiceId);
