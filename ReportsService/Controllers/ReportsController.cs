@@ -416,6 +416,9 @@ namespace ReportsService.Controllers
                 var sub_Header = rpt.OpenSubreport("CryHeaderEn.rpt");
                 sub_Header.Database.Tables["CompanyData"].SetDataSource(ds.Tables["CompanyData"]);
 
+                var sub_Footer = rpt.OpenSubreport("CryFooterEn.rpt");
+                sub_Footer.Database.Tables["CompanyData"].SetDataSource(ds.Tables["CompanyData"]);
+
 
                 DateTime? fromDate =  model.FromDate == DateTime.MinValue ? (DateTime?)null : model.FromDate;
 
