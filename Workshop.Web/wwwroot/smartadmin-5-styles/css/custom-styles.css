@@ -3606,3 +3606,19 @@ html[data-bs-theme="dark"] .dxc-title text {
 .ui-widget.ui-widget-content{
     width:50% !important
 }
+.btn.btn-excel {
+    background-color: #026E39;
+    color: #fff
+}
+
+.btn.btn-pdf {
+    background-color: #A40101;
+    color: #fff
+}
+
+.btn.btn-outline-pdf {
+    background-color: #fff;
+    color: #A40101;
+    border: 1px solid #A40101;
+    transition: 0.2s ease-in
+}

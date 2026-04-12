@@ -1201,23 +1201,63 @@ namespace Workshop.Web.Controllers
         }
 
 
+ 
+
         [HttpPost]
-        public async Task<IActionResult> PartsSalesSummary(PartsSummaryFilterDTO filter)
+        public async Task<IActionResult> PartsSalesSummary(PartsSummaryFilterDTO filter, string ReportType)
         {
             var data = await _apiClient.GetPartsSummaryReport(filter);
+
             var companyInfo = await _erpClient.GetCompanyById(CompanyId);
-            var CompanyName = lang=="en" ? companyInfo.CompanyPrimaryName : companyInfo.CompanySecondaryName;
 
-             Byte[] Logo = companyInfo.Img;
+            var companyName = lang == "en"
+                ? companyInfo.CompanyPrimaryName
+                : companyInfo.CompanySecondaryName;
 
-            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(data, CompanyName, Logo);
+            byte[] logo = companyInfo.Img;
 
-            Response.Headers["Content-Disposition"] = "inline; filename=Wip.pdf";
-            return File(bytes, "application/pdf");
+            DateTime? fromDate = filter.FromDate;
+            DateTime? toDate = filter.ToDate;
 
+            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(
+                data,
+                companyName,
+                logo,
+                fromDate,
+                toDate,
+                ReportType
+            );
 
+            var type = ReportType?.Trim().ToLower();
 
+            string fileName;
+            string contentType;
+            string disposition;
+
+            if (type == "excel")
+            {
+                fileName = "PartsSalesSummary.xls";
+                contentType = "application/vnd.ms-excel";
+                disposition = "attachment"; // download excel
+            }
+            else if (type == "preview")
+            {
+                Response.Headers["Content-Disposition"] = "inline; filename=crReport.pdf";
+                return File(bytes, "application/pdf");
+            }
+            else
+            {
+                fileName = "PartsSalesSummary.pdf";
+                contentType = "application/pdf";
+                disposition = "attachment"; // default download pdf
+            }
+
+            Response.Headers["Content-Disposition"] =
+                $"{disposition}; filename={fileName}";
+
+            return File(bytes, contentType, fileName);
         }
+
 
 
 

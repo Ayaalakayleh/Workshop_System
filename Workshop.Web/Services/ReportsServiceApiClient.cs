@@ -34,7 +34,7 @@ namespace Workshop.Web.Services
 
 
 
-        public async Task<byte[]> PartsSalesSummaryReportReportAsync(IEnumerable<PartsSummaryDTO> model,string CompanyName, Byte[] Logo)
+        public async Task<byte[]> PartsSalesSummaryReportReportAsync(IEnumerable<PartsSummaryDTO> model,string CompanyName, Byte[] Logo,DateTime? FromDate ,DateTime? ToDate, string ReportType)
         {
 
             var oPartsSummaryReportModel = new PartsSummaryReportModel();
@@ -45,6 +45,12 @@ namespace Workshop.Web.Services
             oPartsSummaryReportModel.Img = Logo;
 
             oPartsSummaryReportModel.Lang = lang;
+
+            oPartsSummaryReportModel.FromDate = FromDate;
+            oPartsSummaryReportModel.ToDate = ToDate;
+
+
+            oPartsSummaryReportModel.ReportType=ReportType;
 
             var response = await _httpClient.PostAsJsonAsync("api/reports/partsSummary", oPartsSummaryReportModel);
             //var response = await _httpClient.PostAsJsonAsync("api/reports/partsSummary", new { Data = model, CompanyName = CompanyName });
