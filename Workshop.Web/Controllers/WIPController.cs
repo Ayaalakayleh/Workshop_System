@@ -2359,7 +2359,7 @@ namespace Workshop.Web.Controllers
                 };
 
                 var deleteResult = await _inventoryApiClient.InventoryTransactionDelete(deleteDTO);
-                if (deleteResult == 0)
+                if (deleteResult == 1)
                 {
                     await _apiClient.UpdateIssueIdToWIP(new UpdateIssueIdDTO
                     {
@@ -2375,7 +2375,7 @@ namespace Workshop.Web.Controllers
                         StatusId = 36
                     });
                 }
-                if (deleteResult != 0)
+                if (deleteResult != 1)
                 {
                     return Json(new
                     {
