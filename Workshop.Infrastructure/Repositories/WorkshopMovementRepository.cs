@@ -126,7 +126,8 @@ namespace Workshop.Infrastructure.Repositories
                     WorkOrderId = movement.WorkOrderId ?? (object)DBNull.Value,
                     isPart = movement.isPart,
                     DamageImageName = movement.DamageImageName,
-                    DamageImagePath = movement.DamageImagePath
+                    DamageImagePath = movement.DamageImagePath,
+                    IsPettyCash = movement.IsPettyCash
                 };
 
                 var result = await _database.ExecuteAddStoredProcedure<VehicleMovement>(

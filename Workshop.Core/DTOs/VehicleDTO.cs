@@ -266,6 +266,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public int? fk_VehicleId { get; set; }
 		public int? RecordNo { get; set; }
 		public int? MovementId { get; set; }
+		public int? DamageId { get; set; }
 		public string? MovementType { get; set; }
 		public int? ExitBranchId { get; set; }
 		public TimeSpan? ExitTime { get; set; }
@@ -358,6 +359,7 @@ namespace Workshop.Core.DTOs.Vehicle
 		public string? Complaint { get; set; }
 		public string? ComplaintNote { get; set; }
 		public bool? IsExternal { get; set; }
+		public bool IsPettyCash { get; set; }
 		public List<MovementInvoice>? MovementInvoice { get; set; }
 		public int? Days { get; set; }
 		public bool? AddService { get; set; }

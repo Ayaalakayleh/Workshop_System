@@ -183,6 +183,7 @@ namespace Workshop.Web.Controllers
                     car = await _vehicleApiClient.M_VehicleDefinitionsGetPlateNumberCostCenterById((int)movement.VehicleID);
                 }
 
+                movement.IsPettyCash = false;
                 movementInId = (await _workshopApiClient.InsertVehicleMovementAsync(movement))?.MovementId;
 
                 if (movementInId != 0 && !movement.IsExternal.Value)
