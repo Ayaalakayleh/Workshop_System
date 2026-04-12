@@ -419,7 +419,7 @@ namespace Workshop.Web.Controllers
             filter.CompanyId = CompanyId;
             filter.language = lang;
             filter.Type = type;
-            filter.IsExternal = isExternal == 1 ? false : true;
+            filter.IsExternal = isExternal == 1 ? true : false;
             workOders = await _apiClient.GetMWorkOrdersAsync(filter);
 
             return Json(workOders, new JsonSerializerOptions

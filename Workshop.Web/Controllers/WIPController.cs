@@ -1285,7 +1285,7 @@ namespace Workshop.Web.Controllers
                 movement.LastVehicleStatus = move.LastVehicleStatus;
                 movement.IsExternal = move.IsExternal;
                 movement.VehicleID = move.VehicleID;
-
+                movement.IsPettyCash = false;
                 var movements = await _apiClient.InsertVehicleMovementAsync(movement);
                 await _apiClient.TransferMaintenanceMovement(movements.MovementId.Value, (int)movement.MoveInWorkshopId, movement.MasterId.Value, movement.Reason);
 
@@ -1444,6 +1444,7 @@ namespace Workshop.Web.Controllers
                 movement.WorkshopId = BranchId;
                 movement.Status = 1;
                 movement.IsExternal = true;
+                movement.IsPettyCash = false;
                 //Check
                 //Movement.DamageId = Movement.ColMaintenanceCard[0].DamageId;
                 var movements = await _apiClient.InsertVehicleMovementAsync(movement);
@@ -1712,9 +1713,9 @@ namespace Workshop.Web.Controllers
                                 InvoiceNo = (int)Internalinvoice.TranNo,
                                 InvoiceDate = Internalinvoice.TranDate,
                                 TransactionMasterId = (int)Internalinvoice.ID,
-                                Total = dto.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity),
+                                Total = dto.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.UsedQuantity),
                                 Tax = 0,
-                                Net = dto.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.Quantity),
+                                Net = dto.ItemsList.Where(x => x.AccountType == (int)AccountTypeEnum.Internal).Sum(x => x.CostPrice * (decimal)x.UsedQuantity),
                                 InvoiceType = (int)AccountTypeEnum.Internal,
                                 AccountType = (int)AccountTypeEnum.Internal,
                                 CreatedBy = UserId
@@ -3438,7 +3439,7 @@ namespace Workshop.Web.Controllers
                         });
                     }
                 }
-
+                ViewBag.Currency = CurrencyId;
                 return Json(result);
             }
             catch (Exception ex)
@@ -3506,7 +3507,11 @@ namespace Workshop.Web.Controllers
                     currencyName = lang == "en" ? c.CurrencyPrimaryName : c.CurrencySecondlyName
                 }).ToList();
 
-                return Json(result);
+                return Json(new
+                {
+                    currencies = result,
+                    selectedCurrency = CurrencyId
+                });
             }
             catch (Exception ex)
             {
@@ -3746,7 +3751,7 @@ namespace Workshop.Web.Controllers
                     resultJson.Message = "Cannot make In before last movement in " + vehicleMovementStatus.lastmovemnetDate;
                     return Json(resultJson);
                 }
-
+                vehicleMovement.IsPettyCash = true;
                 // Insert vehicle movement
                 var movements = await _apiClient.InsertVehicleMovementAsync(vehicleMovement);
 

@@ -618,8 +618,8 @@ $(function () {
                     }).appendTo(cellElement);
                 }
             },
-            { dataField: "CostPrice", caption: "Cost Price", dataType: "number", visible: false, alignment: "left" },
-            { dataField: "SalePrice", caption: "SalePrice", dataType: "number", visible: false, alignment: "left" },
+            { dataField: "CostPrice", caption: "Cost Price", dataType: "number", visible: true, alignment: "left" },
+            { dataField: "SalePrice", caption: "SalePrice", dataType: "number", visible: true, alignment: "left" },
             {
                 dataField: "Price",
                 caption: window.RazorVars.DXPrice,
@@ -643,7 +643,9 @@ $(function () {
                     let basePrice = 0;
 
                     if (type === "1") {
-                        basePrice = parseFloat(rowData.CostPrice);
+                        const factor = parseFloat(rowData.UnitFactor) || 1;
+                        basePrice = parseFloat(rowData.CostPrice) / factor;
+          
                         if (isNaN(basePrice)) basePrice = 0;
 
                     } else if (type === "2") {

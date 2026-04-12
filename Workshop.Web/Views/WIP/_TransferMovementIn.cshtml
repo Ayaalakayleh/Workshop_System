@@ -327,7 +327,7 @@
                 <div class="form-group">
                     <label>@Common["Label_Currency"] <span class="text-danger">*</span></label>
                     <select id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" class="form-control select2" required>
-                        <option value="">@Common["Select"]</option>
+                        <option value="@ViewBag.Currency">@Common["Select"]</option>
                     </select>
                 </div>
             </div>
@@ -682,19 +682,24 @@
             $.ajax({
                 url: '@Url.Action("GetCurrencies", "WIP")',
                 type: 'GET',
-                success: function (data) {
+                success: function (res) {
+
                     var $dropdown = $('#PettyCash_CurrencyId');
                     $dropdown.empty().append('<option value="">Select</option>');
-                    if (data && data.length > 0) {
-                        $.each(data, function (i, item) {
+
+                    if (res.currencies && res.currencies.length > 0) {
+
+                        $.each(res.currencies, function (i, item) {
                             $dropdown.append($('<option>', {
                                 value: item.currencyId,
                                 text: item.currencyCode + " - " + item.currencyName
                             }));
                         });
-                        // Set default currency if available
-                        if (data.length === 1) {
-                            $dropdown.val(data[0].currencyId);
+
+                        // ✅ القيمة الجاية من السيرفر
+                        if (res.selectedCurrency) {
+                            $dropdown.val(res.selectedCurrency);
+                            $dropdown.prop('disabled', true);
                         }
                     }
                 }

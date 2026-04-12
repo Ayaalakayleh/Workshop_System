@@ -116,30 +116,7 @@ namespace Workshop.Web.Controllers
 
                 movement.vehicleNams = await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId);
 
-                //ToDo: Caching
-                //if (cache.Get(string.Format(CacheKeys.VehiclesDDL, language)) != null)
-                //{
-                //    movement.vehicleNams = (List<VehicleNams>)cache.Get(string.Format(CacheKeys.VehiclesDDL, language));
-                //}
-                //else
-                //{
-                //    movement.vehicleNams = VehicleApi.GetVehiclesDDL(language, CompanyId);
-                //    cache.Set(string.Format(CacheKeys.VehiclesDDL, language), movement.vehicleNams, DateTimeOffset.Now.AddDays(10));
-                //}
-
-
                 ExternalVehicles = await _vehicleApiClient.GetExteralVehicleName(lang);
-
-                //ToDo: Caching
-                //if (cache.Get(string.Format(CacheKeys.ExternalVehiclesDDL)) != null)
-                //{
-                //    ExternalVehicles = (List<VehicleNams>)cache.Get(string.Format(CacheKeys.ExternalVehiclesDDL));
-                //}
-                //else
-                //{
-                //    ExternalVehicles = VehicleApi.GetExteralVehicleName(language);
-                //    cache.Set(string.Format(CacheKeys.ExternalVehiclesDDL), ExternalVehicles, DateTimeOffset.Now.AddDays(5));
-                //}
 
                 foreach (var m in movement.ColMovements)
                 {

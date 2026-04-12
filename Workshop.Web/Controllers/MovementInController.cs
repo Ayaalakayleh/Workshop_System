@@ -182,7 +182,7 @@ namespace Workshop.Web.Controllers
             workOrderFilter.VehicleID = vehicleId;
             workOrderFilter.CompanyId = CompanyId;
             workOrderFilter.language = lang;
-            workOrderFilter.Id = movement.WorkOrderId;
+            workOrderFilter.Id = movement.DamageId;
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);
             movement.Services = new List<Item>();
 
@@ -345,6 +345,7 @@ namespace Workshop.Web.Controllers
 
 
                     checkpoint = "InsertMovement";
+                    movement.IsPettyCash = false;
                     VehicleMovement newMovement = await _workshopapiClient.InsertVehicleMovementAsync(movement);
 
                     if (newMovement != null)
