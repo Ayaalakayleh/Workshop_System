@@ -343,18 +343,17 @@ namespace ReportsService.Controllers
             try
             {
                 var company = model.CompanyName;
-
                 var Logo = model.Img;
-
                 var Lang = model.Lang;
 
-                // Create dataset
+                var ReportType = model.ReportType;
+
+
                 var ds = new DataSet("PartsSummaryDataSet");
                 var dt = new DataTable("DataTable1");
 
-                // Define columns
                 dt.Columns.Add("AccountTypePrimaryName", typeof(string));
-                dt.Columns.Add("AccountTypeSecondaryName", typeof(string ));
+                dt.Columns.Add("AccountTypeSecondaryName", typeof(string));
                 dt.Columns.Add("SalesTypePrimaryName", typeof(string));
                 dt.Columns.Add("SalesTypeSecondaryName", typeof(string));
                 dt.Columns.Add("RetailValue", typeof(decimal));
@@ -364,13 +363,6 @@ namespace ReportsService.Controllers
                 dt.Columns.Add("CostValue", typeof(decimal));
                 dt.Columns.Add("Quantity", typeof(decimal));
                 dt.Columns.Add("Profit", typeof(decimal));
-
-
-                // Fill data
-                //var r = dt.NewRow();
-                //r["AccountTypePrimaryName"] = model.AccountTypePrimaryName ?? 0;
-                //r["SaleVal"] = model.AccountTypeSecondaryName ?? 0;
-
 
                 foreach (var item in model.data)
                 {
@@ -392,16 +384,9 @@ namespace ReportsService.Controllers
                     dt.Rows.Add(r);
                 }
 
-
-
-                //dt.Rows.Add(r);
                 ds.Tables.Add(dt);
 
-
-
-
-
-                // CompanyData Table ========================
+                // ================= Company Table =================
                 var dtCompanyData = new DataTable("CompanyData");
                 dtCompanyData.Columns.Add("CompanyPrimaryName", typeof(string));
                 dtCompanyData.Columns.Add("Branch", typeof(string));
@@ -410,73 +395,128 @@ namespace ReportsService.Controllers
 
                 dtCompanyData.Rows.Add(
                     company ?? "",
-                    "" ?? "",
+                    "",
                     Logo,
                     "Parts Summary"
-
                 );
+
                 ds.Tables.Add(dtCompanyData);
-                // End CompanyData Table
 
+                // ================= Load Report =================
+                string reportPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports",
+                    Lang == "ar" ? "PartsSalesSummaryAr.rpt" : "PartsSalesSummary.rpt");
 
-
-
-                if (Lang == "ar")
-                {
-                    rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummaryAr.rpt"));
-
-                }
-                else
-                {
-                    rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummary.rpt"));
-
-                }
-
-                // Load report
-                //rpt.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "PartsSalesSummary.rpt"));
+                rpt.Load(reportPath);
 
                 foreach (CrystalDecisions.CrystalReports.Engine.Table t in rpt.Database.Tables)
                 {
                     t.SetDataSource(ds.Tables[0]);
                 }
 
-                //Header Subreport
                 var sub_Header = rpt.OpenSubreport("CryHeaderEn.rpt");
                 sub_Header.Database.Tables["CompanyData"].SetDataSource(ds.Tables["CompanyData"]);
 
-                // Export to PDF
-                Stream stream = rpt.ExportToStream(ExportFormatType.PortableDocFormat);
-                stream.Position = 0;
 
-                byte[] bytes;
-                using (var ms = new MemoryStream())
+                DateTime? fromDate =  model.FromDate == DateTime.MinValue ? (DateTime?)null : model.FromDate;
+
+                DateTime? toDate =
+                    model.ToDate == DateTime.MinValue ? (DateTime?)null : model.ToDate;
+
+                rpt.SetParameterValue("FromDate",model.FromDate == DateTime.MinValue ? "": model.FromDate.ToString("yyyy-MM-dd"));
+
+
+                rpt.SetParameterValue("ToDate", model.ToDate == DateTime.MinValue ? "" : model.ToDate.ToString("yyyy-MM-dd"));
+
+
+                // ================= PREVIEW =================
+                if (ReportType == "preview")
                 {
-                    stream.CopyTo(ms);
-                    bytes = ms.ToArray();
+                    Stream streamPreview = rpt.ExportToStream(ExportFormatType.PortableDocFormat);
+                    streamPreview.Position = 0;
+
+                    byte[] previewBytes;
+                    using (var ms = new MemoryStream())
+                    {
+                        streamPreview.CopyTo(ms);
+                        previewBytes = ms.ToArray();
+                    }
+
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new ByteArrayContent(previewBytes)
+                        {
+                            Headers =
+                    {
+                        ContentType = new MediaTypeHeaderValue("application/pdf")
+                    }
+                        }
+                    };
                 }
 
-                var resp = new HttpResponseMessage(HttpStatusCode.OK)
+                // ================= PDF =================
+                if (ReportType == "pdf")
                 {
-                    Content = new ByteArrayContent(bytes)
-                };
-                resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
-                resp.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
-                {
-                    FileName = $"PartsSummary_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
-                };
-                resp.Headers.CacheControl = new CacheControlHeaderValue
-                {
-                    NoCache = true,
-                    NoStore = true,
-                    MustRevalidate = true
-                };
-                resp.Headers.Pragma.Add(new NameValueHeaderValue("no-cache"));
+                    Stream stream = rpt.ExportToStream(ExportFormatType.PortableDocFormat);
+                    stream.Position = 0;
 
-                return resp;
+                    byte[] bytes;
+                    using (var ms = new MemoryStream())
+                    {
+                        stream.CopyTo(ms);
+                        bytes = ms.ToArray();
+                    }
+
+                    var resp = new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new ByteArrayContent(bytes)
+                    };
+
+                    resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+                    resp.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
+                    {
+                        FileName = $"PartsSummary_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
+                    };
+
+                    return resp;
+                }
+
+
+                // ================= EXCEL =================
+                if (ReportType == "excel")
+                {
+                    rpt.ReportDefinition.Sections["Section1"].SectionFormat.EnableSuppress = true;
+                    rpt.ReportDefinition.Sections["Section5"].SectionFormat.EnableSuppress = true;
+
+                    using (Stream stream = rpt.ExportToStream(ExportFormatType.Excel))
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            stream.CopyTo(ms);
+                            byte[] bytes = ms.ToArray();
+
+                            var response = new HttpResponseMessage(HttpStatusCode.OK);
+                            response.Content = new ByteArrayContent(bytes);
+
+                            response.Content.Headers.ContentType =
+                                new MediaTypeHeaderValue("application/vnd.ms-excel");
+
+                            response.Content.Headers.ContentDisposition =
+                                new ContentDispositionHeaderValue("attachment")
+                                {
+                                    FileName = $"PartsSummary_{DateTime.Now:yyyyMMdd_HHmmss}.xls"
+                                };
+
+                            response.Content.Headers.ContentLength = bytes.Length;
+
+                            return response;
+                        }
+                    }
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
-                // Log exception
                 string logDirectory = @"C:\LogFiles";
                 Directory.CreateDirectory(logDirectory);
 
@@ -501,8 +541,6 @@ namespace ReportsService.Controllers
                 rpt.Dispose();
             }
         }
-
-
 
 
     }

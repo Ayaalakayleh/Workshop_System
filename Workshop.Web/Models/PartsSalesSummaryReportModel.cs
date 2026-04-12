@@ -10,7 +10,12 @@ namespace Workshop.Web.Models
         public string CompanyName { get; set; }
         public string Lang { get; set; }
 
-        public Byte[] Img { get; set; } 
+        public Byte[] Img { get; set; }
+
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+
+        public string ReportType { get; set; }
 
     }
 }

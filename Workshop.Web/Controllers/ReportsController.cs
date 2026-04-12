@@ -1201,24 +1201,54 @@ namespace Workshop.Web.Controllers
         }
 
 
+
         [HttpPost]
-        public async Task<IActionResult> PartsSalesSummary(PartsSummaryFilterDTO filter)
+        public async Task<IActionResult> PartsSalesSummary(PartsSummaryFilterDTO filter, string ReportType)
         {
             var data = await _apiClient.GetPartsSummaryReport(filter);
+
             var companyInfo = await _erpClient.GetCompanyById(CompanyId);
-            var CompanyName = lang=="en" ? companyInfo.CompanyPrimaryName : companyInfo.CompanySecondaryName;
 
-             Byte[] Logo = companyInfo.Img;
+            var companyName = lang == "en"
+                ? companyInfo.CompanyPrimaryName
+                : companyInfo.CompanySecondaryName;
 
-            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(data, CompanyName, Logo);
+            DateTime? fromDate = filter.FromDate;
+            DateTime? toDate = filter.ToDate;
 
-            Response.Headers["Content-Disposition"] = "inline; filename=Wip.pdf";
-            return File(bytes, "application/pdf");
+            byte[] logo = companyInfo.Img;
 
+            var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(
+                data,
+                companyName,
+                logo,
+                fromDate,
+                toDate,
+                ReportType
+            );
 
+            string fileName;
+            string contentType;
 
+            var type = ReportType?.Trim().ToLower();
+
+            if (type == "excel")
+            {
+                // IMPORTANT: Crystal Reports usually generates XLS, NOT XLSX
+                fileName = "PartsSalesSummary.xls";
+
+                contentType = "application/vnd.ms-excel";
+            }
+            else
+            {
+                fileName = "PartsSalesSummary.pdf";
+                contentType = "application/pdf";
+            }
+
+            Response.Headers["Content-Disposition"] = $"inline; filename={fileName}";
+
+            return File(bytes, contentType, fileName);
         }
-
 
 
     }
