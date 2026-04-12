@@ -643,8 +643,8 @@ $(function () {
                     let basePrice = 0;
 
                     if (type === "1") {
-                        const factor = parseFloat(rowData.UnitFactor) || 1;
-                        basePrice = parseFloat(rowData.CostPrice) / factor;
+                        //const factor = parseFloat(rowData.UnitFactor) || 1;
+                        basePrice = parseFloat(rowData.CostPrice);
           
                         if (isNaN(basePrice)) basePrice = 0;
 

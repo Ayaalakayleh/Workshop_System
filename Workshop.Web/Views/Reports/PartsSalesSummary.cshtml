@@ -11,7 +11,11 @@
     </div>
     <div class="panel-container show">
         <div class="panel-content">
-<form asp-action="PartsSalesSummary" method="post" target="_blank">
+@* <form asp-action="PartsSalesSummary" method="post" target="_blank"> *@
+                <form asp-controller="Reports"
+                      asp-action="PartsSalesSummary"
+                      method="post"
+                      target="_blank">
     <div class="row g-3">
 
         <div class="col-md-3">
@@ -55,9 +59,24 @@
 
     </div>
                 <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-success ml-2">
+               @*      <button type="submit" class="btn btn-success ml-2">
                         <i class="fa fa-print"></i>&nbsp;@Common["Button_Print"]
-                    </button>
+                    </button> *@
+                    <div class="text-center mt-3">
+
+                        <button class="btn btn-pdf btn-w-m" value="pdf" name="ReportType" type="submit">
+                            <i class="fa fa-file-pdf"></i>&nbsp; PDF
+                        </button>
+
+                        <button class="btn btn-excel btn-w-m" value="excel" name="ReportType" type="submit">
+                            <i class="fa fa-file-excel"></i>&nbsp; Excel
+                        </button>
+
+                        <button class="btn btn-primary btn-w-m" value="preview" name="ReportType" type="submit">
+                            <i class="fa fa-eye"></i>&nbsp; Preview
+                        </button>
+
+                    </div>
                 </div>
 </form>
 </div>

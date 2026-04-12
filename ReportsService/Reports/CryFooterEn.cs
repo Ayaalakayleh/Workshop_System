@@ -16,14 +16,14 @@ namespace ReportsService.Reports {
     using CrystalDecisions.CrystalReports.Engine;
     
     
-    public class PartsSalesSummary : ReportClass {
+    public class CryFooterEn : ReportClass {
         
-        public PartsSalesSummary() {
+        public CryFooterEn() {
         }
         
         public override string ResourceName {
             get {
-                return "PartsSalesSummary.rpt";
+                return "CryFooterEn.rpt";
             }
             set {
                 // Do nothing
@@ -41,7 +41,7 @@ namespace ReportsService.Reports {
         
         public override string FullResourceName {
             get {
-                return "ReportsService.Reports.PartsSalesSummary.rpt";
+                return "ReportsService.Reports.CryFooterEn.rpt";
             }
             set {
                 // Do nothing
@@ -66,7 +66,7 @@ namespace ReportsService.Reports {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section GroupHeaderSection1 {
+        public CrystalDecisions.CrystalReports.Engine.Section Section3 {
             get {
                 return this.ReportDefinition.Sections[2];
             }
@@ -74,7 +74,7 @@ namespace ReportsService.Reports {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section Section3 {
+        public CrystalDecisions.CrystalReports.Engine.Section Section4 {
             get {
                 return this.ReportDefinition.Sections[3];
             }
@@ -82,49 +82,17 @@ namespace ReportsService.Reports {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section GroupFooterSection1 {
-            get {
-                return this.ReportDefinition.Sections[4];
-            }
-        }
-        
-        [Browsable(false)]
-        [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section Section4 {
-            get {
-                return this.ReportDefinition.Sections[5];
-            }
-        }
-        
-        [Browsable(false)]
-        [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public CrystalDecisions.CrystalReports.Engine.Section Section5 {
             get {
-                return this.ReportDefinition.Sections[6];
-            }
-        }
-        
-        [Browsable(false)]
-        [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.Shared.IParameterField Parameter_FromDate {
-            get {
-                return this.DataDefinition.ParameterFields[0];
-            }
-        }
-        
-        [Browsable(false)]
-        [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.Shared.IParameterField Parameter_ToDate {
-            get {
-                return this.DataDefinition.ParameterFields[1];
+                return this.ReportDefinition.Sections[4];
             }
         }
     }
     
     [System.Drawing.ToolboxBitmapAttribute(typeof(CrystalDecisions.Shared.ExportOptions), "report.bmp")]
-    public class CachedPartsSalesSummary : Component, ICachedReport {
+    public class CachedCryFooterEn : Component, ICachedReport {
         
-        public CachedPartsSalesSummary() {
+        public CachedCryFooterEn() {
         }
         
         [Browsable(false)]
@@ -161,7 +129,7 @@ namespace ReportsService.Reports {
         }
         
         public virtual CrystalDecisions.CrystalReports.Engine.ReportDocument CreateReport() {
-            PartsSalesSummary rpt = new PartsSalesSummary();
+            CryFooterEn rpt = new CryFooterEn();
             rpt.Site = this.Site;
             return rpt;
         }

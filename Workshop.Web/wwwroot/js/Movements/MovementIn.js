@@ -908,11 +908,29 @@
 
             if (Data.VehicleStatusId == 2 && Etype == 1) {
                 getVehicleWorkOrders($("#VehicleID").val(), 1, Etype);
-                $.ajax({
-                    type: "GET",
-                    url: RazorVars.getLastOutMaintenanceUrl + '?vehicleId=' + $("#VehicleID").val(),
-                    dataType: "html"
-                }).done(function (html) { $('#tblData').html(html); });
+                $.get(RazorVars.getLastOutMaintenanceUrl, { vehicleId: vehicleId })
+                    .done(function (data) {
+
+                        const $ddl = $("#WorkOrderId");
+
+                        $ddl.empty();
+                        $ddl.append(`<option value="">${RazorVars.select}</option>`);
+
+                        if (data && data.length > 0) {
+                            data.forEach(item => {
+                                $ddl.append(`<option value="${item.value}">${item.text}</option>`);
+                            });
+                        }
+
+                        if ($.fn.select2) {
+                            $ddl.trigger('change.select2');
+                        }
+
+                    })
+                    .fail(function (err) {
+                        console.error(err);
+                    });
+
             } else {
                 $('[name=Type][value="option1"]').prop('checked', true).trigger('change');
                 $('.WorkOrderSelect, #WorkOrderId').prop('disabled', false);
