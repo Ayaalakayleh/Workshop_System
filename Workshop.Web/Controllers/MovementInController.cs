@@ -186,7 +186,19 @@ namespace Workshop.Web.Controllers
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);
             movement.Services = new List<Item>();
 
-            return PartialView("OutMaintenaceCard", movement);
+            //return PartialView("OutMaintenaceCard", movement);
+            //return Json(movement);
+
+            var workOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter)?? new List<MWorkOrderDTO>();
+
+            var result = workOrders.Select(x => new
+            {
+                value = x.Id,
+                text = x.WorkOrderTitle
+            });
+
+
+            return Json(result);
         }
 
         [HttpPost]
