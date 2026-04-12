@@ -326,9 +326,10 @@
             <div class="col-6">
                 <div class="form-group">
                     <label>@Common["Label_Currency"] <span class="text-danger">*</span></label>
-                    <select id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" class="form-control select2" required>
-                        <option value="@ViewBag.Currency">@Common["Select"]</option>
+                    <select id="PettyCash_CurrencyId_Display" class="form-control select2" disabled style="background-color: #e9ecef;">
+                        <option value="">@Common["Select"]</option>
                     </select>
+                    <input type="hidden" id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" value="" />
                 </div>
             </div>
 
@@ -683,23 +684,21 @@
                 url: '@Url.Action("GetCurrencies", "WIP")',
                 type: 'GET',
                 success: function (res) {
-
-                    var $dropdown = $('#PettyCash_CurrencyId');
-                    $dropdown.empty().append('<option value="">Select</option>');
+                    var $display = $('#PettyCash_CurrencyId_Display');
+                    var $hidden = $('#PettyCash_CurrencyId');
+                    $display.empty();
 
                     if (res.currencies && res.currencies.length > 0) {
-
                         $.each(res.currencies, function (i, item) {
-                            $dropdown.append($('<option>', {
+                            $display.append($('<option>', {
                                 value: item.currencyId,
-                                text: item.currencyCode + " - " + item.currencyName
+                                text: item.currencyCode + ' - ' + item.currencyName
                             }));
                         });
 
-                        // ✅ القيمة الجاية من السيرفر
                         if (res.selectedCurrency) {
-                            $dropdown.val(res.selectedCurrency);
-                            $dropdown.prop('disabled', true);
+                            $display.val(res.selectedCurrency);
+                            $hidden.val(res.selectedCurrency);
                         }
                     }
                 }
