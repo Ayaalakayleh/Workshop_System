@@ -1201,6 +1201,7 @@ namespace Workshop.Web.Controllers
         }
 
 
+ 
 
         [HttpPost]
         public async Task<IActionResult> PartsSalesSummary(PartsSummaryFilterDTO filter, string ReportType)
@@ -1213,10 +1214,10 @@ namespace Workshop.Web.Controllers
                 ? companyInfo.CompanyPrimaryName
                 : companyInfo.CompanySecondaryName;
 
+            byte[] logo = companyInfo.Img;
+
             DateTime? fromDate = filter.FromDate;
             DateTime? toDate = filter.ToDate;
-
-            byte[] logo = companyInfo.Img;
 
             var bytes = await _reportsServiceApiClient.PartsSalesSummaryReportReportAsync(
                 data,
@@ -1227,28 +1228,37 @@ namespace Workshop.Web.Controllers
                 ReportType
             );
 
+            var type = ReportType?.Trim().ToLower();
+
             string fileName;
             string contentType;
-
-            var type = ReportType?.Trim().ToLower();
+            string disposition;
 
             if (type == "excel")
             {
-                // IMPORTANT: Crystal Reports usually generates XLS, NOT XLSX
                 fileName = "PartsSalesSummary.xls";
-
                 contentType = "application/vnd.ms-excel";
+                disposition = "attachment"; // download excel
+            }
+            else if (type == "preview")
+            {
+                Response.Headers["Content-Disposition"] = "inline; filename=crReport.pdf";
+                return File(bytes, "application/pdf");
             }
             else
             {
                 fileName = "PartsSalesSummary.pdf";
                 contentType = "application/pdf";
+                disposition = "attachment"; // default download pdf
             }
 
-            Response.Headers["Content-Disposition"] = $"inline; filename={fileName}";
+            Response.Headers["Content-Disposition"] =
+                $"{disposition}; filename={fileName}";
 
             return File(bytes, contentType, fileName);
         }
+
+
 
 
     }
