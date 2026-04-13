@@ -204,7 +204,12 @@ $(function () {
             },
             { dataField: "Code", caption: window.RazorVars.DXCode, allowEditing: false, alignment: "left" },
             { dataField: "Name", caption: window.RazorVars.DXName, allowEditing: false, alignment: "left" },
-            { dataField: "FK_SubCategoryId", caption: "SubCategoryId", allowEditing: false, visible: false },
+            {
+                dataField: "FK_SubCategoryId", caption: "SubCategoryId", allowEditing: false, visible: false,
+                setCellValue: function (newData, value, currentRowData) {
+                    newData.FK_SubCategoryId = value ?? currentRowData.FK_SubCategoryId;
+                }
+            },
             {
                 dataField: "RequiresApproval",
                 caption: theMainLang == "en" ? "Price Approval" : "اعتماد السعر",
@@ -445,6 +450,10 @@ $(function () {
                                     row.BaseCostPrice = +((Number(row.CostPrice) || 0) * oldFactor).toFixed(2);
                                 }
 
+                                if (!row.BaseSalePrice || Number(row.BaseSalePrice) === 0) {
+                                    row.BaseSalePrice = +((Number(row.SalePrice) || 0) * oldFactor).toFixed(2);
+                                }
+
                                 recalcCostPriceForUnit(row);
 
                                 // reset locator
@@ -468,6 +477,7 @@ $(function () {
 
                                     grid.cellValue(rowIndex, "CostPrice", row.CostPrice);
                                     grid.cellValue(rowIndex, "Price", row.Price);
+                                    grid.cellValue(rowIndex, "SalePrice", row.SalePrice);
                                     grid.cellValue(rowIndex, "LocatorId", row.LocatorId);
                                 } finally {
                                     grid.endUpdate();
@@ -649,12 +659,10 @@ $(function () {
                         if (isNaN(basePrice)) basePrice = 0;
 
                     } else if (type === "2") {
-                        const baseSale = parseFloat(rowData.SalePrice) || 0;
-                        const factor = parseFloat(rowData.UnitFactor) || 1;
-
-                        basePrice = baseSale / factor;
-
+                        //const baseSale = parseFloat(rowData.SalePrice) || 0;
+                        basePrice = parseFloat(rowData.SalePrice);
                         basePrice = basePrice - (basePrice * (discount / 100));
+                        
                     }
 
                     rowData.Price = Number(basePrice) || 0;
@@ -1270,7 +1278,7 @@ $('#AccountType, #Vat, #PartialVat').on('change', safeRefreshMainItemsGrid);
 function updateFieldsFromGrid() {
     var grid = $("#mainItemsGrid").dxDataGrid("instance");
     if (!grid) return;
-
+    
     var rows = grid.getVisibleRows() || [];
     var totalSum = 0;
     var totalDiscountsPart = 0;

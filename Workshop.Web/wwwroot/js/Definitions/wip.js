@@ -281,6 +281,11 @@
                     var ServicesJson = JSON.stringify(Services_Items);
                     $("#Services").val(ServicesJson);
 
+                    gridItems = (gridItems || []).map(x => ({
+                        ...x,
+                        Price: Number(x.Price) || 0
+                    }));
+
                     var itemsJson = JSON.stringify(gridItems);
                     $("#Items").val(itemsJson);
 

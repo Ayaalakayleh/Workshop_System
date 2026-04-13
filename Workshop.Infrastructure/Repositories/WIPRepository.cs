@@ -193,6 +193,7 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("CostPrice", typeof(decimal));
             table.Columns.Add("SalePrice", typeof(decimal));
             table.Columns.Add("Discount", typeof(decimal));
+            table.Columns.Add("DiscountPct", typeof(decimal));
             table.Columns.Add("Total", typeof(decimal));
             table.Columns.Add("ModifyBy", typeof(int));
             table.Columns.Add("AccountType", typeof(int));
@@ -202,7 +203,7 @@ namespace Workshop.Infrastructure.Repositories
             foreach (var item in Items)
             {
                 table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.RequestId, item.ItemId, item.fk_UnitId, item.WarehouseId, item.LocatorId, item.FK_SubCategoryId, item.RequestQuantity, item.Quantity, item.UsedQuantity,
-                   item.Price, item.CostPrice, item.SalePrice, item.Discount, item.Total, item.ModifyBy, item.AccountType, item.RequiresPriceApproval, item.PriceWorkflowEnumId);
+                   item.Price, item.CostPrice, item.SalePrice, item.Discount, item.DiscountPct, item.Total, item.ModifyBy, item.AccountType, item.RequiresPriceApproval, item.PriceWorkflowEnumId);
             }
 
             return table;
@@ -260,6 +261,7 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("Rate", typeof(decimal));
             table.Columns.Add("TimeTaken", typeof(decimal));
             table.Columns.Add("Discount", typeof(decimal));
+            table.Columns.Add("DiscountPct", typeof(decimal));
             table.Columns.Add("Total", typeof(decimal));
             table.Columns.Add("Status", typeof(int));
             table.Columns.Add("AccountType", typeof(int));
@@ -269,7 +271,7 @@ namespace Workshop.Infrastructure.Repositories
             foreach (var item in Services)
             {
                 table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.Code, item.Description, item.LongDescription, item.StandardHours,
-                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.Total, item.Status, item.AccountType, item.IsExternal, item.ExternalWorkshopId);
+                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.DiscountPct, item.Total, item.Status, item.AccountType, item.IsExternal, item.ExternalWorkshopId);
             }
 
 

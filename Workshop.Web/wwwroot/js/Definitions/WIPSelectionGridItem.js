@@ -297,6 +297,7 @@ function updateSelectionCount(count) {
                     RequestQuantity: 1,
                     Price: item.price ?? 0,
                     BaseCostPrice: item.costPrice ?? 0,
+                    BaseSalePrice: item.salePrice ?? 0,
                     CostPrice: item.costPrice ?? 0,
                     SalePrice: item.salePrice ?? 0,
                     ItemUnits: [],
@@ -393,18 +394,38 @@ function getRowAccountType(row) {
     return type;
 }
 
+//function recalcCostPriceForUnit(row) {
+//    const type = getRowAccountType(row);
+
+//    if (type === "1") {
+//        const factor = Number(row.UnitFactor) || 1;
+
+//        const baseCost = Number(row.BaseCostPrice) || 0;
+
+//        row.CostPrice = +(baseCost / factor).toFixed(2);
+
+//        row.Price = row.CostPrice;
+//    }
+
+//    if (String(row.AccountType) === "2") {
+//        const factor = Number(row.UnitFactor) || 1;
+        
+//        const baseSale = Number(row.BaseSalePrice) || 0;
+
+//        row.SalePrice = +(baseSale / factor).toFixed(2);
+
+//        row.Price = row.SalePrice;
+//    }
+//}
+
 function recalcCostPriceForUnit(row) {
-    const type = getRowAccountType(row);
+    const factor = Number(row.UnitFactor) || 1;
 
-    if (type === "1") {
-        const factor = Number(row.UnitFactor) || 1;
+    const baseCost = Number(row.BaseCostPrice) || 0;
+    const baseSale = Number(row.BaseSalePrice) || 0;
 
-        const baseCost = Number(row.BaseCostPrice) || 0;
-
-        row.CostPrice = +(baseCost / factor).toFixed(2);
-
-        row.Price = row.CostPrice;
-    }
+    row.CostPrice = +(baseCost / factor).toFixed(2);
+    row.SalePrice = +(baseSale / factor).toFixed(2);
 }
 
 function loadUnitsForRows(rows) {
@@ -435,6 +456,11 @@ function loadUnitsForRows(rows) {
             if (!r.BaseCostPrice || Number(r.BaseCostPrice) === 0) {
                 const costNow = Number(r.CostPrice) || 0;
                 r.BaseCostPrice = +(costNow * r.UnitFactor).toFixed(2);
+            }
+
+            if (!r.BaseSalePrice || Number(r.BaseSalePrice) === 0) {
+                const saleNow = Number(r.SalePrice) || 0;
+                r.BaseSalePrice = +(saleNow * r.UnitFactor).toFixed(2);
             }
 
             recalcCostPriceForUnit(r);

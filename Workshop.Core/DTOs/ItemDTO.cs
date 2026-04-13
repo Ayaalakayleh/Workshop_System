@@ -160,6 +160,7 @@ namespace Workshop.Core.DTOs
         public decimal SalePrice { get; set; }
         public decimal Total { get; set; }
         public decimal Discount { get; set; }
+        public decimal DiscountPct { get; set; }
         public int? ModifyBy { get; set; }
         public int? AccountType { get; set; }
         public Guid? PriceWorkflowMasterId { get; set; }

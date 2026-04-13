@@ -134,6 +134,7 @@ namespace Workshop.Core.DTOs
         public decimal BaseRate { get; set; }
         public decimal Total { get; set; }
         public decimal? Discount { get; set; } = 0;
+        public decimal? DiscountPct { get; set; } = 0;
         public decimal TimeTaken { get; set; }
         public int Status { get; set; }
         public int? AccountType { get; set; }

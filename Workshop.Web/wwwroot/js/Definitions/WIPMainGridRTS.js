@@ -145,10 +145,45 @@ $(function () {
                 }
             },
             {
-                dataField: "Discount", caption: window.RazorVars.DXDiscount, dataType: "number", allowEditing: Permission_AddDiscount, alignment: "left",
+                dataField: "Discount",
+                caption: window.RazorVars.DXDiscount,
+                dataType: "number",
+                allowEditing: false,
+                visible: false,
+                defaultValue: 0
+            },
+            {
+                dataField: "DiscountPct",
+                caption: window.RazorVars.DXDiscount,
+                dataType: "number", allowEditing: Permission_AddDiscount,
+                alignment: "left",
                 editorOptions: {
                     min: 0,
                     max: 100
+                },
+                calculateCellValue: function (rowData) {
+                    const hours = parseFloat(rowData.StandardHours) || 0;
+                    const rate = parseFloat(rowData.Rate) || ensureDiscountedRate(rowData) || 0;
+                    const base = +(hours * rate).toFixed(4);
+
+                    const discAmt = +((Number(rowData.Discount) || 0).toFixed(5));
+                    if (base === 0) {
+                        rowData.DiscountPct = 0;
+                        return 0;
+                    }
+
+                    const pct = (discAmt / base) * 100;
+                    rowData.DiscountPct = pct;
+                    return pct;
+                },
+                setCellValue: function (newData, value, currentRowData) {
+                    const pct = +value || 0;
+                    const hours = parseFloat(currentRowData.StandardHours) || 0;
+                    const rate = parseFloat(currentRowData.Rate) || ensureDiscountedRate(currentRowData) || 0;
+                    const base = +(hours * rate).toFixed(4);
+
+                    newData.Discount = base * (pct / 100);
+                    newData.DiscountPct = pct;
                 },
                 customizeText: function (cellInfo) {
                     return (Number(cellInfo.value) || 0).toFixed(1) + " %";
@@ -162,14 +197,17 @@ $(function () {
                 alignment: "left",
                 calculateCellValue: function (rowData) {
                     var vatId = getEffectiveVatId(rowData);
-
                     var vatValue = parseFloat(GetVatValueById(vatId)) || 0;
                     var vatPercent = vatValue > 1 ? vatValue / 100 : vatValue;
 
                     var hours = parseFloat(rowData.StandardHours) || 0;
+                    var rate = parseFloat(rowData.Rate) || ensureDiscountedRate(rowData) || 0;
+                    var discAmt = parseFloat(rowData.Discount) || 0;
 
-                    var price = ensureDiscountedRate(rowData);
-                    var taxAmount = hours * price * vatPercent;
+                    var taxable = (hours * rate) - discAmt;
+                    if (taxable < 0) taxable = 0;
+
+                    var taxAmount = taxable * vatPercent;
 
                     rowData.Tax = +taxAmount.toFixed(2);
                     return rowData.Tax;
@@ -182,18 +220,17 @@ $(function () {
                 alignment: "left",
                 allowEditing: false,
                 calculateCellValue: function (rowData) {
-                    var rate = ensureDiscountedRate(rowData);
-                    var standardHours = parseFloat(rowData.StandardHours) || 1;
+                    var rate = parseFloat(rowData.Rate) || ensureDiscountedRate(rowData) || 0;
+                    var hours = parseFloat(rowData.StandardHours) || 0;
                     var tax = parseFloat(rowData.Tax) || 0;
-                    var rowDiscount = parseFloat(rowData.Discount) || 0;
+                    var discAmt = parseFloat(rowData.Discount) || 0;
 
-                    var totalValue = rate * standardHours;
+                    var totalValue = (hours * rate) + tax;
 
-                    if (rowDiscount > 0) {
-                        totalValue -= totalValue * (rowDiscount / 100);
+                    if (discAmt > 0) {
+                        totalValue -= discAmt;
+                        if (totalValue < 0) totalValue = 0;
                     }
-
-                    totalValue += tax;
 
                     rowData.Total = +totalValue.toFixed(2);
                     return rowData.Total;
@@ -400,11 +437,13 @@ async function updateTotalLabourFieldsFromGrid() {
 
         const rate = ensureDiscountedRate(d);
         const hours = parseFloat(d.StandardHours) || 0;
-        const pct = parseFloat(d.Discount) || 0;
+        //const pct = parseFloat(d.Discount) || 0;
         const tax = parseFloat(d.Tax) || 0;
 
         const lineBase = rate * hours;
-        const lineDisc = lineBase * (pct / 100);
+        //const lineDisc = lineBase * (pct / 100);
+
+        const lineDisc = parseFloat(d.Discount) || 0;
         const lineAfterDiscount = lineBase - lineDisc;
         const lineTotal = lineAfterDiscount + tax;
 
@@ -1006,27 +1045,38 @@ function GetVatValueById(vatId) {
     });
     return vatValue;
 }
+//function ensureDiscountedRate(rowData) {
+//    //const discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
+//    const discount = getEffectiveLabourDiscountPct(rowData);
+
+//    let rate = parseFloat(rowData.Rate) || 0;
+//    let base = parseFloat(rowData.BaseRate);
+
+//    if (!isFinite(base) || base <= 0) {
+//        rowData.BaseRate = rate;
+//        base = rowData.BaseRate;
+//    }
+
+//    const alreadyDiscounted = Math.abs((rate || 0) - (base || 0)) > 0.0001;
+//    if (alreadyDiscounted) {
+//        return +rate.toFixed(2);
+//    }
+
+//    const discounted = base - (base * (discount / 100));
+//    //rowData.Rate = discounted.toFixed(2);
+//    //return rowData.Rate;
+//    return discounted;
+//}
+
 function ensureDiscountedRate(rowData) {
-    //const discount = parseFloat($("#_DiscountPercentageLabor").val()) || 0;
+
     const discount = getEffectiveLabourDiscountPct(rowData);
 
-    let rate = parseFloat(rowData.Rate) || 0;
-    let base = parseFloat(rowData.BaseRate);
-
-    if (!isFinite(base) || base <= 0) {
-        rowData.BaseRate = rate;
-        base = rowData.BaseRate;
-    }
-
-    const alreadyDiscounted = Math.abs((rate || 0) - (base || 0)) > 0.0001;
-    if (alreadyDiscounted) {
-        return +rate.toFixed(2);
-    }
+    const base = parseFloat(rowData.BaseRate) || 0;
 
     const discounted = base - (base * (discount / 100));
-    //rowData.Rate = discounted.toFixed(2);
-    //return rowData.Rate;
-    return discounted;
+
+    return +discounted.toFixed(2);
 }
 
 $("#Vat, #PartialVat").on("change", function () {
