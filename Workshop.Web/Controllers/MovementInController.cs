@@ -182,7 +182,7 @@ namespace Workshop.Web.Controllers
             workOrderFilter.VehicleID = vehicleId;
             workOrderFilter.CompanyId = CompanyId;
             workOrderFilter.language = lang;
-            workOrderFilter.Id = movement.DamageId;
+            //workOrderFilter.Id = movement.DamageId;
             movement.WorkOrders = await _workshopapiClient.GetMWorkOrdersAsync(workOrderFilter);
             movement.Services = new List<Item>();
 
