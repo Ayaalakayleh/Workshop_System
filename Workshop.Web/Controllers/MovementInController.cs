@@ -193,8 +193,9 @@ namespace Workshop.Web.Controllers
 
             var result = workOrders.Select(x => new
             {
-                value = x.Id,
-                text = x.WorkOrderTitle
+                Id = x.Id,
+                text = x.WorkOrderTitle,
+                Description = x.Description
             });
 
 

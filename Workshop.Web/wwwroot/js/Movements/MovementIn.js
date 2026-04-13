@@ -488,8 +488,8 @@
                 .html(hasValue ? RazorVars.workOrderMaintenance : RazorVars.regularMaintenance);
 
             if (hasValue) {
-                var wo = WorkOrdersList.find(function (x) { return String(x.Id) === String(selectedId); });
-                if (wo) row.find('.MaintenanceDesc').val(wo.Description || "");
+                var wo = WorkOrdersList.find(function (x) { return String(x.Id || x.id) === String(selectedId); });
+                if (wo) row.find('.MaintenanceDesc').val(wo.Description || wo.description || "");
             }
         });
 
@@ -884,7 +884,12 @@
             $("#VehiclePlateNo").html(Data.PlateNumber);
             $("#VehicleModel").html(Data.RefVehicleModels.VehicleModelPrimaryName);
             $("#LastVehicleStatus").val(Data.VehicleStatusId);
-            $("#VehicleSubStatusId").val(String(Data.VehicleSubStatusId)).trigger("change");
+            //$("#VehicleSubStatusId").val(String(Data.VehicleSubStatusId)).trigger("change");
+            if (!Data.VehicleSubStatusId || Data.VehicleSubStatusId == 0) {
+                $("#VehicleSubStatusId").prop("selectedIndex", 0).trigger("change");
+            } else {
+                $("#VehicleSubStatusId").val(String(Data.VehicleSubStatusId)).trigger("change");
+            }
             $("#VehicleSubStatusId").trigger("change.select2");
             $("#MakeID").val(Data.RefManufacturers.Id);
             $("#ModelID").val(Data.RefVehicleModels.Id);
@@ -910,15 +915,17 @@
                 getVehicleWorkOrders($("#VehicleID").val(), 1, Etype);
                 $.get(RazorVars.getLastOutMaintenanceUrl, { vehicleId: vehicleId })
                     .done(function (data) {
-
+                        debugger;
                         const $ddl = $("#WorkOrderId");
 
                         $ddl.empty();
                         $ddl.append(`<option value="">${RazorVars.select}</option>`);
 
+                        WorkOrdersList = data;
+
                         if (data && data.length > 0) {
                             data.forEach(item => {
-                                $ddl.append(`<option value="${item.value}">${item.text}</option>`);
+                                $ddl.append(`<option value="${item.id}">${item.text}</option>`);
                             });
                         }
 
