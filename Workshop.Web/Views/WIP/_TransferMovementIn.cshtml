@@ -326,9 +326,10 @@
             <div class="col-6">
                 <div class="form-group">
                     <label>@Common["Label_Currency"] <span class="text-danger">*</span></label>
-                    <select id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" class="form-control select2" required>
-                        <option value="@ViewBag.Currency">@Common["Select"]</option>
+                    <select id="PettyCash_CurrencyId_Display" class="form-control select2" disabled style="background-color: #e9ecef;">
+                        <option value="">@Common["Select"]</option>
                     </select>
+                    <input type="hidden" id="PettyCash_CurrencyId" name="PettyCash_CurrencyId" value="" />
                 </div>
             </div>
 
@@ -385,8 +386,9 @@
 
             <div class="col-12">
                 <div class="form-group">
-                    <label>@Common["Label_UploadInvoice"] <span class="text-warning">@Common["Hint_FileTypesAllowed"]</span></label>
-                    <input type="file" id="PettyCash_Files" name="PettyCash_Files" class="form-control" accept=".pdf,.png,.jpg,.jpeg" />
+                    <label>@Common["Label_UploadInvoice"] <span class="text-danger">*</span> <span class="text-warning">@Common["Hint_FileTypesAllowed"]</span></label>
+                    <input type="file" id="PettyCash_Files" name="PettyCash_Files" class="form-control" accept=".pdf,.png,.jpg,.jpeg" required />
+                    <span id="PettyCash_Files_Error" class="text-danger" style="display:none;">@Common["Label_FillRequired"]</span>
                 </div>
             </div>
 
@@ -683,23 +685,21 @@
                 url: '@Url.Action("GetCurrencies", "WIP")',
                 type: 'GET',
                 success: function (res) {
-
-                    var $dropdown = $('#PettyCash_CurrencyId');
-                    $dropdown.empty().append('<option value="">Select</option>');
+                    var $display = $('#PettyCash_CurrencyId_Display');
+                    var $hidden = $('#PettyCash_CurrencyId');
+                    $display.empty();
 
                     if (res.currencies && res.currencies.length > 0) {
-
                         $.each(res.currencies, function (i, item) {
-                            $dropdown.append($('<option>', {
+                            $display.append($('<option>', {
                                 value: item.currencyId,
-                                text: item.currencyCode + " - " + item.currencyName
+                                text: item.currencyCode + ' - ' + item.currencyName
                             }));
                         });
 
-                        // ✅ القيمة الجاية من السيرفر
                         if (res.selectedCurrency) {
-                            $dropdown.val(res.selectedCurrency);
-                            $dropdown.prop('disabled', true);
+                            $display.val(res.selectedCurrency);
+                            $hidden.val(res.selectedCurrency);
                         }
                     }
                 }
@@ -1093,6 +1093,16 @@
             isValid = false;
         }
 
+        // Validate PettyCash file upload
+        if (!$('#PettyCash_Files').val()) {
+            $('#PettyCash_Files').addClass('is-invalid');
+            $('#PettyCash_Files_Error').show();
+            isValid = false;
+        } else {
+            $('#PettyCash_Files').removeClass('is-invalid');
+            $('#PettyCash_Files_Error').hide();
+        }
+
         if (isValid) {
             var services = [];
             $('.pettycash-service-checkbox').each(function () {
@@ -1104,6 +1114,9 @@
 
             // Submit petty cash form
             var formData = new FormData($('#PettyCashInvoiceForm').get(0));
+
+            // Explicitly append checkbox value since unchecked checkboxes are not included in FormData
+            formData.set('PettyCash_NotTaxable', $('#PettyCash_NotTaxable').is(':checked') ? 'true' : 'false');
 
             for (var i = 0; i < services.length; i++) {
                 formData.append(`Services[${i}].ServiceId`, services[i].ServiceId);

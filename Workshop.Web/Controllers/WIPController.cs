@@ -3684,7 +3684,20 @@ namespace Workshop.Web.Controllers
 
                 // Find the matching TaxClassificationId based on VatRate
                 int? taxClassificationId = null;
-                if (!isNotTaxable && vatRate > 0)
+                if (isNotTaxable)
+                {
+                    try
+                    {
+                        var taxClassifications = await _accountingApiClient.GetTaxClassificationListByCompanyIdAndBranchId(CompanyId, BranchId, lang);
+                        var zeroTaxClassification = taxClassifications.FirstOrDefault(tc => tc.TaxRate == 0);
+                        taxClassificationId = zeroTaxClassification?.TaxClassificationNo;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error finding zero-rate tax classification");
+                    }
+                }
+                else if (vatRate > 0)
                 {
                     try
                     {
