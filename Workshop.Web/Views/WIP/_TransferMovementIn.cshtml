@@ -1034,7 +1034,7 @@
             }
         }
 
-        function ValidPettyCashOut() {
+    function ValidPettyCashOut() {
         var isValid = true;
         var isPart = $("#PettyCash_IsPart").is(":checked");
 
@@ -1074,26 +1074,18 @@
             $('#PettyCash_Description').removeClass('is-invalid');
         }
 
-        // Updated validation for Parts Cost and Labor Cost
-        if (!$('#PettyCash_PartsCost').val() && !$('#PettyCash_LaborCost').val()) {
+        // Validate Parts Cost and Labor Cost — highlight only, no Swal here
+        var hasCost = parseFloat($('#PettyCash_PartsCost').val()) > 0 || parseFloat($('#PettyCash_LaborCost').val()) > 0;
+        if (!hasCost) {
             $('#PettyCash_PartsCost').addClass('is-invalid');
             $('#PettyCash_LaborCost').addClass('is-invalid');
-                Swal.fire('@Html.Raw(Common["ErrorHappend"])', "", "error");
             isValid = false;
         } else {
             $('#PettyCash_PartsCost').removeClass('is-invalid');
             $('#PettyCash_LaborCost').removeClass('is-invalid');
         }
 
-        // Check balance
-        var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
-        var balance = parseFloat($('#PettyCash_UserBalance').text()) || 0;
-        if (netAmount > balance) {
-                Swal.fire('@Html.Raw(Common["ErrorHappend"])', "", "error");
-            isValid = false;
-        }
-
-        // Validate PettyCash file upload
+        // Validate file upload — highlight only, no Swal here
         if (!$('#PettyCash_Files').val()) {
             $('#PettyCash_Files').addClass('is-invalid');
             $('#PettyCash_Files_Error').show();
@@ -1101,6 +1093,35 @@
         } else {
             $('#PettyCash_Files').removeClass('is-invalid');
             $('#PettyCash_Files_Error').hide();
+        }
+
+        // Check balance — only when a request is selected AND all other fields are valid
+        var requestSelected = !!$('#PettyCash_RequestNo').val();
+        if (requestSelected && isValid) {
+            var netAmount = parseFloat($('#PettyCash_NetAmount').val()) || 0;
+            var balance = parseFloat($('#PettyCash_UserBalance').text()) || 0;
+
+            if (balance === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: theMainLang == "en" ? 'Insufficient Balance' : 'الرصيد غير كافٍ',
+                    text: theMainLang == "en"
+                        ? 'The balance for this request is 0. There are no available funds.'
+                        : 'رصيد هذا الطلب يساوي صفر، لا توجد أموال متاحة.',
+                    confirmButtonColor: 'var(--primary-600)'
+                });
+                isValid = false;
+            } else if (netAmount > balance) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: theMainLang == "en" ? 'Insufficient Balance' : 'الرصيد غير كافٍ',
+                    text: theMainLang == "en"
+                        ? 'The net amount (' + netAmount.toFixed(2) + ') exceeds the available balance (' + balance.toFixed(2) + ').'
+                        : 'المبلغ الصافي (' + netAmount.toFixed(2) + ') يتجاوز الرصيد المتاح (' + balance.toFixed(2) + ').',
+                    confirmButtonColor: 'var(--primary-600)'
+                });
+                isValid = false;
+            }
         }
 
         if (isValid) {
@@ -1112,10 +1133,7 @@
                 });
             });
 
-            // Submit petty cash form
             var formData = new FormData($('#PettyCashInvoiceForm').get(0));
-
-            // Explicitly append checkbox value since unchecked checkboxes are not included in FormData
             formData.set('PettyCash_NotTaxable', $('#PettyCash_NotTaxable').is(':checked') ? 'true' : 'false');
 
             for (var i = 0; i < services.length; i++) {
@@ -1133,15 +1151,15 @@
                     if (data.isSuccess) {
                         Swal.fire({
                             icon: 'success',
-                                title: "@Html.Raw(Common["DoneSuccessfully"])",
-                                confirmButtonText: '@Html.Raw(Common["Ok"])',
+                            title: "@Html.Raw(Common["DoneSuccessfully"])",
+                            confirmButtonText: '@Html.Raw(Common["Ok"])',
                             timer: 3000,
                             timerProgressBar: true
                         }).then(() => {
                             window.location.href = "@Url.Action("TransferMovements", "WIP")";
                         });
                     } else {
-                            Swal.fire('@Html.Raw(Common["ErrorHappend"])', data.message, "error");
+                        Swal.fire('@Html.Raw(Common["ErrorHappend"])', data.message, "error");
                     }
                 }
             });
