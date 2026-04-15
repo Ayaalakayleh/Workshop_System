@@ -106,9 +106,15 @@
             data: { Id: Id }
         }).done(function (result) {
             if (result) {
+                debugger
                 $("#CurrencyId").val(result.currencyId).trigger("change.select2");
                 $("#Vat").val(result.salesTaxGroupId).trigger("change.select2");
                 $("#TermsId").val(result.oLDBPaymentType).trigger("change.select2");
+                $("#_DiscountPercentageLabor").val(result.discountPercentageLabor || 0);
+                $("#_DiscountPercentagePart").val(result.discountPercentagePart || 0);
+                $("#_DiscountPercentageLaborText").text("%" + (result.discountPercentageLabor || 0));
+                $("#_DiscountPercentagePartText").text("%" + (result.discountPercentagePart || 0));
+                debugger
             }
         }).fail(function (xhr, status, error) {
             console.error("Error:", error);
@@ -133,6 +139,10 @@
             $("#PartialCurrencyId").val(result.currencyId).trigger("change.select2");
             $("#PartialVat").val(result.salesTaxGroupId).trigger("change.select2");
             $("#PartialTermsId").val(result.oLDBPaymentType).trigger("change.select2");
+            $("#_DiscountPercentageLabor").val(result.discountPercentageLabor || 0);
+            $("#_DiscountPercentagePart").val(result.discountPercentagePart || 0);
+            $("#_DiscountPercentageLaborText").text("%" + (result.discountPercentageLabor || 0));
+            $("#_DiscountPercentagePartText").text("%" + (result.discountPercentagePart || 0));
         }).fail(function (xhr, status, error) {
             console.error("Error:", error);
         });

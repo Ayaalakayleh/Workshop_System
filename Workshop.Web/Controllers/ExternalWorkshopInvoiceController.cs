@@ -92,7 +92,6 @@ namespace Workshop.Controllers
         public async Task<IActionResult> Save(ExternalWorkshopInvoiceDTO externalWorkshopInvoice, List<IFormFile> files)
         {
             var result = new TempData();
-            int BranchId = externalWorkshopInvoice.BranchId;// int.Parse(Session["branch"].ToString());
             try
             {
                 MovementInvoice invoice = new MovementInvoice();

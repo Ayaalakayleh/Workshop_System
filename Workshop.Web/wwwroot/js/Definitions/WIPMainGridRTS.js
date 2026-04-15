@@ -363,9 +363,6 @@ $(function () {
             }
 
         },
-        onRowInserted: function () {
-            updateTotalLabourFieldsFromGrid();
-        },
         onRowRemoved: function () {
             updateTotalLabourFieldsFromGrid();
         },
@@ -386,11 +383,18 @@ $(function () {
             const accountTypeVal = parseInt($("#AccountType").val());
             const partialInvoicing = $("#optPartialInv").is(":checked");
 
+            const rowIndex = e.component.getRowIndexByKey(e.key);
+
+            if (rowIndex >= 0) {
+                e.component.cellValue(rowIndex, "Rate", ensureDiscountedRate(e.data));
+            }
+
             if (!partialInvoicing) {
                 e.data.AccountType = accountTypeVal;
                 store.update(e.key, e.data).then(() => grid.refresh());
             }
 
+            e.component.refresh();
             updateTotalLabourFieldsFromGrid();
         },
         onEditorPrepared: function (e) {
@@ -1145,13 +1149,13 @@ function getRateAmount(keyId, RTSId, rowAccountType) {
         const data = grid.option("dataSource") || [];
         const target = data.find(r => r.KeyId === keyId);
         if (!target) return;
-
+        debugger
         const hours = parseFloat(target.StandardHours) || 0;
-        const total = +(result * hours).toFixed(2);
+        //const total = +(result * hours).toFixed(2);
 
         target.BaseRate = result;
-        target.Rate = result;
-        target.Total = total;
+        target.Rate = ensureDiscountedRate(target);
+        target.Total = +(target.Rate * hours).toFixed(2);
 
         const rowIndex = grid.getRowIndexByKey(keyId);
 

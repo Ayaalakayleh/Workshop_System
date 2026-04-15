@@ -304,6 +304,19 @@ namespace Workshop.Web.Controllers
             }
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> GetMovementHeroImage(int movementId)
+        {
+            var movement = await _workshopapiClient.GetVehicleMovementByIdAsync(movementId);
+            var docs = await _workshopapiClient.GetMovementDocumentsAsync(movementId);
+
+            var firstDoc = docs?.FirstOrDefault();
+
+            var imageUrl = firstDoc != null
+                ? _fileService.GetFileFullPath(firstDoc.FilePath, firstDoc.FileName)
+                : Url.Content("~/images/vehicle-placeholder.png");
+
+            return Json(new { success = true, imageUrl });
+        }
     }
 }

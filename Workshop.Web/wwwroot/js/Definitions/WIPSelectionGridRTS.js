@@ -179,11 +179,11 @@ function getRateAmount(keyId, RTSId) {
         if (!target) return;
 
         const hours = parseFloat(target.StandardHours) || 0;
-        const total = +(result * hours).toFixed(2);
+        //const total = +(result * hours).toFixed(2);
 
         target.BaseRate = result;
-        target.Rate = result;
-        target.Total = total;
+        target.Rate = ensureDiscountedRate(target);
+        target.Total = +(target.Rate * hours).toFixed(2);
 
         const rowIndex = grid.getRowIndexByKey(keyId);
         grid.beginUpdate();

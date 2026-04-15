@@ -10,8 +10,10 @@
     ViewBag.Title = Common["Button_Details"];
 
     // Hero image (first uploaded document; fallback to placeholder)
-    var heroImgSrc = (Model?.VehicleMovementDocuments != null && Model.VehicleMovementDocuments.Any())
-        ? Url.Action("GetImage", "Base", new { Name = Model.VehicleMovementDocuments.First().FileName, D = 3, BasePath = Model.VehicleMovementDocuments.First().FilePath })
+    var firstDoc = Model?.VehicleMovementDocuments?.FirstOrDefault();
+
+    var heroImgSrc = firstDoc != null
+        ? FileService.GetFileFullPath(firstDoc.FilePath, firstDoc.FileName)
         : Url.Content("~/images/vehicle-placeholder.png");
     var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
@@ -485,7 +487,11 @@
                                 <div class="vehicle-hero__grid">
                                     <!-- Big vehicle image -->
                                     <div class="vehicle-hero__icon">
-                                        <img class="vehicle-hero__photo" src="@heroImgSrc" alt="vehicle" />
+                                        @* <img class="vehicle-hero__photo" src="@heroImgSrc" alt="vehicle" /> *@
+                                        <img id="vehicleHeroImage"
+                                             class="vehicle-hero__photo"
+                                             src="@Url.Content("~/images/vehicle-placeholder.png")"
+                                             alt="vehicle" />
                                     </div>
 
                                     <!-- Facts -->
@@ -969,6 +975,8 @@
             initializeDetailsPage();
         }
 
+        loadHeroImage();
+
         $(".lc-picker-contents div:nth-child(8)").trigger("click");
 
         $('.select2').select2({
@@ -979,6 +987,22 @@
             }
         });
     });
+
+    function loadHeroImage() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetMovementHeroImage", "Movements")',
+            data: { movementId: @Model.MovementId },
+            success: function (res) {
+                if (res && res.success && res.imageUrl) {
+                    $("#vehicleHeroImage").attr("src", res.imageUrl);
+                }
+            },
+            error: function () {
+                $("#vehicleHeroImage").attr("src", '@Url.Content("~/images/vehicle-placeholder.png")');
+            }
+        });
+    }
 
     function initializeDetailsPage() {
         loadVehicleDetails();
