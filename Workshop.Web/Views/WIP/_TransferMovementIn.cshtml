@@ -523,6 +523,16 @@
                 }
             }
         $(document).ready(function () {
+            var today = new Date().toISOString().split('T')[0];
+            
+            $('.flat-picker, #GregorianMovementDate, #PettyCash_MovementDate').flatpickr({
+                dateFormat: "Y-m-d",
+                defaultDate: today,
+                minDate: today,  
+                maxDate: today,  
+                allowInput: false
+            });
+
             // Initialize FilePond for original form
             var inputElement = document.querySelector('#Invoicefile');
             if (inputElement) {
