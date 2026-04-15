@@ -113,9 +113,16 @@ namespace Workshop.Web.Controllers
                     if (movement == null)
                         continue;
 
-                    VehicleNams? vehicle = movement.IsExternal == true
-                        ? externalVehicles.Find(p => p.id == movement.VehicleID)
-                        : ovehicleMovement.vehicleNams.Find(p => p.id == movement.VehicleID);
+                    bool isExternal = false;
+                    var workOrder = await _apiClient.GetMWorkOrderByID((int)movement.WorkOrderId);
+                    if (movement.WorkOrderId.HasValue)
+                    {
+                        isExternal = workOrder.IsExternal == true;
+                    }
+
+                    VehicleNams? vehicle = isExternal == true
+                            ? externalVehicles.Find(p => p.id == movement.VehicleID)
+                            : ovehicleMovement.vehicleNams.Find(p => p.id == movement.VehicleID);
 
                     movement.VehicleName = vehicle?.VehicleName ?? string.Empty;
                 }
