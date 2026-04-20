@@ -121,13 +121,13 @@ namespace Workshop.Web.Controllers
 
             VehicleTypeId vehicleTypeId;
             ViewBag.VehicleType = Enum.GetValues(typeof(VehicleTypeId))
-     .Cast<VehicleTypeId>()
-     .Select(v => new SelectListItem
-     {
-         Text = v.ToString(),        // "Internal", "External", etc.
-         Value = ((int)v).ToString() // "1", "2", "3"
-     })
-     .ToList();
+             .Cast<VehicleTypeId>()
+             .Select(v => new SelectListItem
+             {
+                 Text = v.ToString(),        // "Internal", "External", etc.
+                 Value = ((int)v).ToString() // "1", "2", "3"
+             })
+             .ToList();
 
             ViewBag.FK_AgreementId = new List<SelectListItem>();
             ViewBag.FkVehicleMovementId = new List<SelectListItem>();
@@ -175,6 +175,7 @@ namespace Workshop.Web.Controllers
 
                 var workOrder = await _apiClient.GetMWorkOrderByID(id ?? 0);
                 workOrderModel.WorkOrderForm = workOrder ?? new MWorkOrderDTO();
+                if(workOrderModel.WorkOrderForm.VehicleType == 0) workOrderModel.WorkOrderForm.VehicleType = 1;
                 return View(workOrderModel);
             }
             else
@@ -223,7 +224,7 @@ namespace Workshop.Web.Controllers
             filter.CompanyId = CompanyId;
 
 
-            if (filter.VehicleTypeId == 1) // internal
+            if (filter.VehicleTypeId == 1 || filter.VehicleTypeId == 0) // internal
             {
                 colVehicleDefinitions = (await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId))
                     .Select(item => new SelectListItem
@@ -272,19 +273,20 @@ namespace Workshop.Web.Controllers
 
             foreach (var item in workOrders)
             {
-                if (item.VehicleType == 1)
-                {
-                    item.VehicleName = vehicles
-                        .FirstOrDefault(v => v.id == item.VehicleId) is var v && v != null
-                            ? (lang == "en" ? v.VehicleName : v.VehicleName)
-                            : string.Empty;
-                }
-                else if (item.VehicleType == 2)
+                if (item.VehicleType == 2)
                 {
                     item.VehicleName = vehiclesExternal
                         .FirstOrDefault(v => v.id == item.VehicleId) is var v && v != null
                             ? (lang == "en" ? v.VehicleName : v.VehicleName)
                             : string.Empty;
+                }
+                else if (item.VehicleType == 1 || item.VehicleType == 0)
+                {
+                    item.VehicleName = vehicles
+                        .FirstOrDefault(v => v.id == item.VehicleId) is var v && v != null
+                            ? (lang == "en" ? v.VehicleName : v.VehicleName)
+                            : string.Empty;
+                    item.VehicleType = 1;
                 }
 
                 item.WorkOrderStatusName = statusLookup

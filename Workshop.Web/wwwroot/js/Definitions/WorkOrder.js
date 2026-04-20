@@ -19,7 +19,7 @@ function loadEditModal(id) {
                 console.warn("No data returned from server.");
                 return;
             }
-
+            if (data.vehicleType == 0) data.vehicleType = 1;
             // Fill form fields
             $('#WorkOrderForm_Id').val(id).trigger('change');
             $('#WorkOrderForm_WorkOrderType').val(data.workOrderType).trigger('change');
@@ -31,7 +31,8 @@ function loadEditModal(id) {
                     $('#VehicleId').val(String(data.vehicleId)).trigger('change');
                 });
 
-            $('#SubStatus').val(data.wfstatus).trigger('change');
+            debugger
+            $('#SubStatus').val(data.workOrderStatus).trigger('change');
 
             // ✅ Date only (trim time)
             $('#WorkOrderForm_AccidentDate').val(dateOnly(data.gregorianDamageDate)).trigger('change');
@@ -262,6 +263,7 @@ function getManufacturerList(VehicleType) {
     const $vehicleSelect = $('#VehicleId');
     $vehicleSelect.empty().append('<option value="">Select</option>');
     $vehicleSelect.trigger('change');
+    if (VehicleType == 0) { VehicleType = 1; } 
 
     return new Promise((resolve, reject) => {
         $.ajax({
