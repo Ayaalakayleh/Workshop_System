@@ -1959,7 +1959,7 @@ namespace Workshop.Web.Controllers
                         ItemNumber = items.Where(a => a.ItemNumber == -5).FirstOrDefault().ItemId,
                         UnitId = items.Where(a => a.ItemNumber == -5).FirstOrDefault().UnitId,
                         Discount = (decimal)item.Discount,
-                        Description = mapping.Name,
+                        Description = lang=="en"?mapping.PrimaryName:mapping.SecondaryName,
                         Quantity = (decimal)item.Quantity,
                         UnitQuantity = (decimal)item.Quantity,
                         Price = item.Price,

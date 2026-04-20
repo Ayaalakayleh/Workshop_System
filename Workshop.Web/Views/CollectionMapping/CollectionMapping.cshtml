@@ -358,7 +358,15 @@
                     e.stopPropagation();
 
                     var fd = new FormData(this);
-                    var file = $('#fileInput')[0].files[0];
+
+                    var files = pond.getFiles();
+
+                    if (!files || files.length === 0) {
+                        Swal.fire('Upload File Please', '', 'error');
+                        return false;
+                    }
+
+                    var file = files[0].file;
                     fd.append('File', file);
 
                     $.ajax({
@@ -533,9 +541,9 @@
 
             });
 
-            if ($.fn.select2 && $ddl.data('select2')) {
-                $ddl.trigger('change.select2');
-            }
+            // if ($.fn.select2 && $ddl.data('select2')) {
+            //     $ddl.trigger('change.select2');
+            // }
         });
     }
 

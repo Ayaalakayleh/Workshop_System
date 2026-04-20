@@ -2512,6 +2512,10 @@ document.getElementById("invFrameHost")?.addEventListener("click", (e) => {
     if (e.target.id === "invFrameHost") closeInvFrameHost();
 });
 
+$("#CustomerId").on("change", function () {
+    safeRefreshMainItemsGrid();
+});
+
 function UndoReservation(row) {
     const grid = $("#mainItemsGrid").dxDataGrid("instance");
     const wipId = Number($("#Id").val() || 0);
