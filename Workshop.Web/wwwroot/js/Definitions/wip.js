@@ -773,6 +773,7 @@
                                 cancelButtonText: resources.no
                             }).then((result) => {
                                 if (result.isConfirmed) {
+                                    $("#closeBTN").prop("disabled", true);
                                     //================================
                                     $.ajax({
                                         type: 'POST',
@@ -802,6 +803,7 @@
                     });
                 });
             });
+
         });// End Close WIP 
 
 

@@ -2927,4 +2927,7 @@
     <value>اغلاق كرت الصيانة</value>
     <comment>WIP Close</comment>
   </data>
+  <data name="Button_ClearFilter" xml:space="preserve">
+    <value>ازالة الفلتر</value>
+  </data>
 </root>

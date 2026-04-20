@@ -374,8 +374,9 @@ $(function () {
 
                     let code = rowData.LocatorCode || "";
                     let qty = rowData.AvailableQty || rowData.onHandQtyInUnit || 0;
+                    let Available = theMainLang === 'en' ? "Available:" : "المتاح:";
 
-                    return `${code} (Available: ${qty})`;
+                    return `${code} (${Available} ${qty})`;
                 }
             },
             {

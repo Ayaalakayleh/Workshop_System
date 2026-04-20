@@ -3,7 +3,11 @@
 @using Microsoft.Extensions.Localization
 @inject IStringLocalizer<Common> Common
 @inject IStringLocalizer<Messages> Message
-
+@using DocumentFormat.OpenXml.Drawing.Diagrams;
+@using Newtonsoft.Json;
+@using System.Globalization;
+@using System.Text;
+@using System.Text.Json;
 
 <div class="card">
     <div class="card-body">
@@ -56,29 +60,29 @@
                                 </td>
                                 <td>@item.ReferanceNo</td>
                                 <td>@item.InvoiceDate.Value.ToString("dd-MM-yyyy")</td>
-                                <td>@item.Total</td>
-                                <td>@item.Discount</td>
-                                <td>@item.Tax</td>
-                                <td>@item.Net</td>
+                                <td>@item.Total.Value.ToString(CultureInfo.InvariantCulture)</td>
+                                <td>@item.Discount.Value.ToString(CultureInfo.InvariantCulture)</td>
+                                <td>@item.Tax.Value.ToString(CultureInfo.InvariantCulture)</td>
+                                <td>@item.Net.Value.ToString(CultureInfo.InvariantCulture)</td>
                                 <td>
                                     @if (@item.AccountType==1)
                                     {
                                         <a href="@Url.Action("PrintInternal", "WIP")?WIPId=@item.WIPId&TransactionMasterId=@item.TransactionMasterId&InvoiceNo=@item.InvoiceNo&InvoiceType=@item.InvoiceType" class="btn btn-outline-primary btn-sm collapsed" target="_blank">
-                                            <i class="fas fa-print"></i> Print
+                                            <i class="fas fa-print"></i> @Common["Button_Print"]
 
                                         </a>
                                     }
                                     else
                                     {
                                         <a href="@Url.Action("PrintExternal", "WIP")?InvoiceType=@item.InvoiceType&InvoiceNo=@item.InvoiceNo" class="btn btn-outline-primary btn-sm collapsed" target="_blank">
-                                            <i class="fas fa-print"></i> Print
+                                            <i class="fas fa-print"></i>  @Common["Button_Print"]
                                         </a>
                                     }
 
                                     @if (item.IsReturn ==false && item.InvoiceType==1)
                                     {
                                         <button class="btn btn-outline-primary btn-sm " onclick=CreditNote("@item.WIPId")>
-                                            <i class="fas fa-print"></i> Cridt Note
+                                            <i class="fas fa-print"></i> @Common["Label_CreditNote"]
                                         </button>
                                     }
 

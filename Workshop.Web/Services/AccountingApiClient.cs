@@ -1,12 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Newtonsoft.Json;
+using System.Globalization;
+using System.Text;
+using System.Text.Json;
 using Workshop.Core.DTOs;
 using Workshop.Core.DTOs.AccountingDTOs;
 using Workshop.Core.DTOs.Vehicle;
 using Workshop.Web.Models;
-using System.Text;
-using System.Text.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
 
 namespace Workshop.Web.Services
 {
@@ -92,8 +93,8 @@ namespace Workshop.Web.Services
         }
         public async Task<List<Item>> GetItemsByCategoryNo(int categoryno, string lang = "en")
         {
-
-            string url = $"/Items/Get_Items_ByCategoryNumber?categoryno={categoryno}&Language={lang}";
+            var x = categoryno.ToString(CultureInfo.InvariantCulture);
+            string url = $"/Items/Get_Items_ByCategoryNumber?categoryno={x}&Language={lang}";
             return await SendRequest<List<Item>>(url, HttpMethod.Get);
         }
 
