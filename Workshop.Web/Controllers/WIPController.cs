@@ -1912,11 +1912,11 @@ namespace Workshop.Web.Controllers
                             Description = item.LongDescription,
                             Quantity = item.StandardHours,
                             UnitQuantity = item.StandardHours,
-                            Price = item.Rate,
-                            Total = item.Rate * item.StandardHours,
+                            Price = item.Rate - (decimal)item.Discount,
+                            Total = item.Rate * item.StandardHours - (decimal)item.Discount,
                             TaxValue = (item.Rate * item.StandardHours) * (taxClass.TaxRate / 100),
                             TaxClassificationId = taxClass.TaxClassificationNo,
-                            Final = (item.Rate * item.StandardHours) + ((item.Rate * item.StandardHours) * taxClass.TaxRate / 100),
+                            Final = ((item.Rate * item.StandardHours) - (decimal)item.Discount) + (((item.Rate * item.StandardHours) - (decimal)item.Discount) * taxClass.TaxRate / 100),
                             CostsCentersNo = 0,
                             Reference = VehicleDetails.PlateNumber,
                             Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
@@ -2018,7 +2018,7 @@ namespace Workshop.Web.Controllers
                     D3_DimensionsId = Customer.D3_DimensionsId,
                     D4_DimensionsId = Customer.D4_DimensionsId,
                     CustomerAccountNo = AccountList.Where(x => x.ID == Customer.AccountNoReceivableId).FirstOrDefault().AccountNo,
-                    IsDiscountByInvoice=false
+                    IsDiscountByInvoice=true
                 };
 
                 //-------------------------------------
