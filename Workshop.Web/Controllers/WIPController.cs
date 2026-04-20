@@ -1908,7 +1908,7 @@ namespace Workshop.Web.Controllers
                         {
                             ItemNumber = items.Where(a => a.ItemNumber == -6).FirstOrDefault().ItemId,
                             UnitId = items.Where(a => a.ItemNumber == -6).FirstOrDefault().UnitId,
-                            Discount = (decimal)item.Discount,
+                            Discount = 0,
                             Description = item.LongDescription,
                             Quantity = item.StandardHours,
                             UnitQuantity = item.StandardHours,
@@ -1958,15 +1958,15 @@ namespace Workshop.Web.Controllers
                     {
                         ItemNumber = items.Where(a => a.ItemNumber == -5).FirstOrDefault().ItemId,
                         UnitId = items.Where(a => a.ItemNumber == -5).FirstOrDefault().UnitId,
-                        Discount = (decimal)item.Discount,
+                        Discount = 0,
                         Description = lang=="en"?mapping.PrimaryName:mapping.SecondaryName,
                         Quantity = (decimal)item.Quantity,
                         UnitQuantity = (decimal)item.Quantity,
                         Price = item.Price,
-                        Total = (item.Price - (decimal)item.Discount) * (decimal)item.Quantity,
-                        TaxValue = (item.Price * (decimal)item.Quantity - (decimal)item.Discount) * (taxClass.TaxRate / 100),
+                        Total = (item.Price*(decimal)item.Quantity)   - (decimal)item.Discount,
+                        TaxValue = ((item.Price * (decimal)item.Quantity) - (decimal)item.Discount) * (taxClass.TaxRate / 100),
                         TaxClassificationId = taxClass.TaxClassificationNo,
-                        Final = (item.Price * (decimal)item.Quantity - (decimal)item.Discount) + ((item.Price * (decimal)item.Quantity - (decimal)item.Discount) * taxClass.TaxRate / 100),
+                        Final = ((item.Price * (decimal)item.Quantity) - (decimal)item.Discount) + (((item.Price * (decimal)item.Quantity) - (decimal)item.Discount) * taxClass.TaxRate / 100),
                         CostsCentersNo = VehicleDetails.CostCenter,
                         Reference = VehicleDetails.PlateNumber,
                         Customer_DimensionsId = accountTable.IsCustomer_Dimensions ? VehicleDetails.Customer_DimensionsId : null,
@@ -1993,7 +1993,7 @@ namespace Workshop.Web.Controllers
 
                     Total = oAccountSales.AccountSalesDetails.Sum(a => a.Total),
                     Net = oAccountSales.AccountSalesDetails.Sum(a => a.Total),
-                    Discount = oAccountSales.AccountSalesDetails.Sum(a => a.Discount),
+                    Discount = (decimal)oWIPDTO.ServicesList.Sum(x=>x.Discount)+(decimal)oWIPDTO.ItemsList.Sum(x=>x.Discount),
                     Final = oAccountSales.AccountSalesDetails.Sum(a => a.Total),
                     Tax = oAccountSales.AccountSalesDetails.Sum(a => a.TaxValue),
                     AccSalesTypeNo = 6,
@@ -2018,6 +2018,7 @@ namespace Workshop.Web.Controllers
                     D3_DimensionsId = Customer.D3_DimensionsId,
                     D4_DimensionsId = Customer.D4_DimensionsId,
                     CustomerAccountNo = AccountList.Where(x => x.ID == Customer.AccountNoReceivableId).FirstOrDefault().AccountNo,
+                    IsDiscountByInvoice=false
                 };
 
                 //-------------------------------------

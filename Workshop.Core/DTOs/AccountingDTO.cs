@@ -313,6 +313,8 @@
         public string CustomerAccountNo { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
+        public bool IsDiscountByInvoice { get; set; }
+
     }
 
     public class AccountSalesDetails
