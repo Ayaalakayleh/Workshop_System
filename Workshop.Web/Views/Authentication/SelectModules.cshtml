@@ -1,8 +1,11 @@
 ﻿@model IEnumerable<Workshop.Core.DTOs.General.Modules>
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
 @{
-    ViewBag.Title = "SelectModule";
+    ViewBag.Title = Common["SelectModule"];
     Layout = null;
-    string Lang = "en";
+    string Lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 <!DOCTYPE html>
 <html dir="ltr">
@@ -382,7 +385,7 @@
         var resetSettings = function () { localStorage.setItem("themeSettings", ""); }
     </script>
 
-    <a href="@Url.Action("SelectBranch")" class="btn btn-glass text-dark font-weight-bold" style="margin-bottom:24rem">Back To Branches</a>
+    <a href="@Url.Action("SelectBranch")" class="btn btn-glass text-dark font-weight-bold" style="margin-bottom:24rem">@Common["BackToBranches"]</a>
 
     <div class="row w-100 justify-content-center">
         <main>
@@ -399,7 +402,7 @@
                         <!-- Header -->
                         <div class="header">
                             <img class="change-width-on-mobile w-75" src="~/smartadmin-5-styles/img/fleetexpresslogo.png" />
-                            <h3 class="subtitle text-dark">Select Module</h3>
+                            <h3 class="subtitle text-dark">@Common["SelectModule"]</h3>
                         </div>
 
                         <!-- Module List (dynamic) -->

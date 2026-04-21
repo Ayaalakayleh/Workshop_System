@@ -2930,4 +2930,34 @@
   <data name="Button_ClearFilter" xml:space="preserve">
     <value>Clear filter</value>
   </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ChangeCompany" xml:space="preserve">
+    <value>Change Company</value>
+  </data>
+  <data name="ChangeBranch" xml:space="preserve">
+    <value>Change Branch</value>
+  </data>
+  <data name="ChangeModule" xml:space="preserve">
+    <value>Change Module</value>
+  </data>
+  <data name="BackToCompanies" xml:space="preserve">
+    <value>Back To Companies</value>
+  </data>
+  <data name="SelectBranch" xml:space="preserve">
+    <value>Select Branch</value>
+  </data>
+  <data name="SelectCompany" xml:space="preserve">
+    <value>Select Company</value>
+  </data>
+  <data name="BackToBranches" xml:space="preserve">
+    <value>Back To Branches</value>
+  </data>
+  <data name="SelectModule" xml:space="preserve">
+    <value>Select Module</value>
+  </data>
 </root>

@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<Workshop.Core.DTOs.General.CompanyInfo>
-
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
 @{
-    ViewBag.Title = "SelectCompany";
+    ViewBag.Title = Common["SelectCompany"];
     Layout = null;
 }
 <!DOCTYPE html>
@@ -198,7 +200,7 @@
 
     </div>
 
-    <h1 class="text-black my-5">Select Company</h1>
+    <h1 class="text-black my-5">@Common["SelectCompany"]</h1>
     <span class="mb-3">
         @*<img src="~/Content/img/logo-small.png" width="150" />*@
         <img src="~/smartadmin-5-styles/img/fleetexpresslogo.png" width="400" />

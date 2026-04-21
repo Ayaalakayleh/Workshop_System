@@ -281,15 +281,15 @@ class="set-nav-dark"
                     <div class="dropdown-menu">
                         <a href="@Url.Action("SelectCompany", "Authentication")"
                            class="dropdown-item d-flex align-items-center">
-                            <span class="flex-grow-1 ms-2">@CommonLocalizer["Change Company"]</span>
+                            <span class="flex-grow-1 ms-2">@CommonLocalizer["ChangeCompany"]</span>
                         </a>
                         <a href="@Url.Action("SelectBranch", "Authentication")"
                            class="dropdown-item d-flex align-items-center">
-                            <span class="flex-grow-1 ms-2">@CommonLocalizer["Change Branch"]</span>
+                            <span class="flex-grow-1 ms-2">@CommonLocalizer["ChangeBranch"]</span>
                         </a>
                         <a href="@Url.Action("SelectModules", "Authentication")"
                            class="dropdown-item d-flex align-items-center">
-                            <span class="flex-grow-1 ms-2">@CommonLocalizer["Change Module"]</span>
+                            <span class="flex-grow-1 ms-2">@CommonLocalizer["ChangeModule"]</span>
                         </a>
                     </div>
                 </div>
@@ -337,7 +337,7 @@ class="set-nav-dark"
                 <div class="dropdown-divider m-0"></div>
 
                 <a class="dropdown-item py-3 fw-500 d-flex justify-content-between" href="@Url.Action("Logout", "Authentication")">
-                    <span class="text-danger" data-i18n="drpdwn.page-logout">Logout</span>
+                    <span class="text-danger" data-i18n="drpdwn.page-logout">@CommonLocalizer["Logout"]</span>
                     @* <span class="d-block text-truncate text-truncate-sm">@userInfo?.FirstName</span> *@
                 </a>
             </div>

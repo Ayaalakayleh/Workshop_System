@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<Workshop.Core.DTOs.General.CompanyBranch>
-
+@using Workshop.Resources
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Common> Common
 @{
-    ViewBag.Title = "SelectBranch";
+    ViewBag.Title = Common["SelectBranch"];
     Layout = null;
 }
 <!DOCTYPE html>
@@ -118,7 +120,7 @@
         <span class="mb-3">
             <img src="~/smartadmin-5-styles/img/fleetexpresslogo.png" class="auth-logo" />
         </span>
-        <h1 class="text-black my-5">SelectBranch</h1>
+        <h1 class="text-black my-5">@Common["SelectBranch"]</h1>
         <div class="row justify-content-center my-5">
             @if (Model != null && Model.ToList().Count > 0)
             {
@@ -168,14 +170,14 @@
                         <a href="@Url.Action("SelectCompany", "Authentication")">lblAnotherCompany</a>
 
                         <br />
-                        <a href="@Url.Action("index", "Dashboard")">Logout</a>
+                        <a href="@Url.Action("index", "Dashboard")">@Common["Logout"]</a>
 
                     </div>
 
                 </div>
             }
         </div>
-        <a href="@Url.Action("SelectCompany")" class="btn btn-glass text-dark font-weight-bold">BackToCompanies</a>
+        <a href="@Url.Action("SelectCompany")" class="btn btn-glass text-dark font-weight-bold">@Common["BackToCompanies"]</a>
     </center>
     <video poster="~/smartadmin-5-styles/img/clouds.png" id="bgvid" playsinline autoplay muted loop>
         <source src="~/auth-assets/media/video/cc.webm" type="video/mp4">
