@@ -318,5 +318,18 @@ namespace Workshop.Web.Controllers
 
             return Json(new { success = true, imageUrl });
         }
+
+        public async Task<IActionResult> GetMovementDocumentImage(int movementId, int documentId)
+        {
+            var docs = await _workshopapiClient.GetMovementDocumentsAsync(movementId);
+
+            var doc = docs?.FirstOrDefault(x => x.Id == documentId);
+
+            var imageUrl = doc != null
+                ? _fileService.GetFileFullPath(doc.FilePath, doc.FileName)
+                : Url.Content("~/images/vehicle-placeholder.png");
+
+            return Redirect(imageUrl);
+        }
     }
 }

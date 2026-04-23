@@ -487,11 +487,14 @@
                                 <div class="vehicle-hero__grid">
                                     <!-- Big vehicle image -->
                                     <div class="vehicle-hero__icon">
-                                        @* <img class="vehicle-hero__photo" src="@heroImgSrc" alt="vehicle" /> *@
-                                        <img id="vehicleHeroImage"
-                                             class="vehicle-hero__photo"
-                                             src="@Url.Content("~/images/vehicle-placeholder.png")"
-                                             alt="vehicle" />
+                                      
+                                        @foreach (var item in Model.VehicleMovementDocuments)
+                                        {
+                                            <div>
+                                                <img src="@Url.Action("GetMovementDocumentImage", "Movements", new { movementId = item.MovementId, documentId = item.Id })"
+                                                     class="w-100 rounded" />
+                                            </div>
+                                        }
                                     </div>
 
                                     <!-- Facts -->
