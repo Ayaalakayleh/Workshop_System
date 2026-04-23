@@ -2144,6 +2144,12 @@ namespace Workshop.Web.Controllers
 
             model.FK_TransactionStatusId = 2; //Posted;
 
+            if (model.FK_TransactionTypeId == 1 || model.FK_TransactionTypeId == 4) // 1 -> ISSUE , 4 -> Transfer Out
+                model.StockType = -1;
+
+            if (model.FK_TransactionTypeId == 11) // 11 -> Reservation
+                model.StockType = 0;
+
             if (!string.IsNullOrEmpty(rawDetails))
             {
                 model.Details = JsonConvert.DeserializeObject<List<InventoryTransactionDetailsDTO>>(rawDetails);
