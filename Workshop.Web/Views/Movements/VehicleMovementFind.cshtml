@@ -451,8 +451,62 @@
         .the-movements .tire-thumb i {
             font-size: 2rem;
         }
-</style>
 
+
+    .the-movements .vehicle-hero__icon {
+        display: flex;
+        overflow: hidden;
+        padding: 14px;
+    }
+
+    .the-movements .vehicle-hero__slide {
+        padding: 0 4px;
+    }
+
+    .the-movements .vehicle-hero__photo {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 14px;
+        display: block;
+    }
+
+    .the-movements .vehicle-hero__icon .slick-track {
+        display: flex !important;
+        align-items: center;
+    }
+
+    .the-movements .vehicle-hero__icon .slick-slide {
+        height: auto;
+    }
+
+        .the-movements .vehicle-hero__icon .slick-slide > div {
+            height: 100%;
+        }
+
+    .the-movements .vehicle-hero__icon .slick-prev,
+    .the-movements .vehicle-hero__icon .slick-next {
+        z-index: 2;
+        width: 32px;
+        height: 32px;
+    }
+
+    .the-movements .vehicle-hero__icon .slick-prev {
+        left: 8px;
+    }
+
+    .the-movements .vehicle-hero__icon .slick-next {
+        right: 8px;
+    }
+
+    .the-movements .vehicle-hero__icon .slick-dots {
+        bottom: 6px;
+    }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <input type="hidden" id="GettingVehicleId" value="@Model.VehicleID" />
 <input type="hidden" id="strikes" value="" />
 
@@ -486,13 +540,24 @@
                             <div class="vehicle-hero__card">
                                 <div class="vehicle-hero__grid">
                                     <!-- Big vehicle image -->
-                                    <div class="vehicle-hero__icon">
-                                      
-                                        @foreach (var item in Model.VehicleMovementDocuments)
+                                    <div class="vehicle-hero__icon @(Model.VehicleMovementDocuments?.Count > 1 ? "vehicle-hero__icon--slider" : "")">
+                                        @if (Model.VehicleMovementDocuments != null && Model.VehicleMovementDocuments.Any())
                                         {
-                                            <div>
-                                                <img src="@Url.Action("GetMovementDocumentImage", "Movements", new { movementId = item.MovementId, documentId = item.Id })"
-                                                     class="w-100 rounded" />
+                                            foreach (var item in Model.VehicleMovementDocuments)
+                                            {
+                                                <div class="vehicle-hero__slide">
+                                                    <img src="@Url.Action("GetMovementDocumentImage", "Movements", new { movementId = item.MovementId, documentId = item.Id })"
+                                                         class="vehicle-hero__photo"
+                                                         alt="Vehicle Image" />
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="vehicle-hero__slide">
+                                                <img src="~/images/vehicle-placeholder.png"
+                                                     class="vehicle-hero__photo"
+                                                     alt="Vehicle Image" />
                                             </div>
                                         }
                                     </div>
@@ -973,12 +1038,12 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+      $(document).ready(function () {
         if ($("#GettingVehicleId").val() > 0) {
             initializeDetailsPage();
         }
 
-        loadHeroImage();
+        //loadHeroImage();
 
         $(".lc-picker-contents div:nth-child(8)").trigger("click");
 
@@ -989,23 +1054,44 @@
                 return $(this).data('placeholder') || 'Select an option';
             }
         });
+
+        initVehicleHeroSlider();
     });
 
-    function loadHeroImage() {
-        $.ajax({
-            type: "GET",
-            url: '@Url.Action("GetMovementHeroImage", "Movements")',
-            data: { movementId: @Model.MovementId },
-            success: function (res) {
-                if (res && res.success && res.imageUrl) {
-                    $("#vehicleHeroImage").attr("src", res.imageUrl);
-                }
-            },
-            error: function () {
-                $("#vehicleHeroImage").attr("src", '@Url.Content("~/images/vehicle-placeholder.png")');
-            }
+    function initVehicleHeroSlider() {
+        var $slider = $('.vehicle-hero__icon--slider');
+
+        if (!$slider.length) return;
+        if ($slider.hasClass('slick-initialized')) return;
+
+        $slider.slick({
+            rtl: $('html').attr('dir') === 'rtl',
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: true,
+            dots: true,
+            infinite: true,
+            autoplay: true,
+            autoplaySpeed: 3000,
+            adaptiveHeight: false
         });
     }
+    // Commented by me ( Frontend developer )
+    // function loadHeroImage() {
+    //     $.ajax({
+    //         type: "GET",
+    //         url: '@Url.Action("GetMovementHeroImage", "Movements")',
+    //         data: { movementId: @Model.MovementId },
+    //         success: function (res) {
+    //             if (res && res.success && res.imageUrl) {
+    //                 $("#vehicleHeroImage").attr("src", res.imageUrl);
+    //             }
+    //         },
+    //         error: function () {
+    //             $("#vehicleHeroImage").attr("src", '@Url.Content("~/images/vehicle-placeholder.png")');
+    //         }
+    //     });
+    // }
 
     function initializeDetailsPage() {
         loadVehicleDetails();
