@@ -155,37 +155,33 @@ namespace Workshop.Web.Services
 
                 if (grnObj.Details != null && grnObj.Details.Any())
                 {
-                    grnObj.Details = grnObj.Details
-                    .GroupBy(d => new { d.FK_ItemId, d.FK_UnitId, d.KeyId })
-                    .Select(g => g.First())
-                    .ToList();
                     for (int i = 0; i < grnObj.Details.Count; i++)
                     {
                         var detail = grnObj.Details[i];
 
                         if (detail.FK_ItemId.HasValue)
-                            form.Add(new StringContent(detail.FK_ItemId.Value.ToString()), $"Details[{i}].FK_ItemId");
+                            form.Add(new StringContent(detail.FK_ItemId.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].FK_ItemId");
 
                         if (detail.FK_UnitId.HasValue)
-                            form.Add(new StringContent(detail.FK_UnitId.Value.ToString()), $"Details[{i}].FK_UnitId");
+                            form.Add(new StringContent(detail.FK_UnitId.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].FK_UnitId");
 
                         if (!string.IsNullOrEmpty(detail.KeyId))
                             form.Add(new StringContent(detail.KeyId), $"Details[{i}].KeyId");
 
                         if (detail.Quantity.HasValue)
-                            form.Add(new StringContent(detail.Quantity.Value.ToString()), $"Details[{i}].Quantity");
+                            form.Add(new StringContent(detail.Quantity.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].Quantity");
 
                         if (detail.UnitQuantity.HasValue)
-                            form.Add(new StringContent(detail.UnitQuantity.Value.ToString()), $"Details[{i}].UnitQuantity");
+                            form.Add(new StringContent(detail.UnitQuantity.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].UnitQuantity");
 
                         if (detail.Price.HasValue)
-                            form.Add(new StringContent(detail.Price.Value.ToString()), $"Details[{i}].Price");
+                            form.Add(new StringContent(detail.Price.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].Price");
 
                         if (detail.Total.HasValue)
-                            form.Add(new StringContent(detail.Total.Value.ToString()), $"Details[{i}].Total");
+                            form.Add(new StringContent(detail.Total.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].Total");
 
                         if (detail.FK_LocatorId.HasValue)
-                            form.Add(new StringContent(detail.FK_LocatorId.Value.ToString()), $"Details[{i}].FK_LocatorId");
+                            form.Add(new StringContent(detail.FK_LocatorId.Value.ToString(CultureInfo.InvariantCulture)), $"Details[{i}].FK_LocatorId");
 
                         if (!string.IsNullOrEmpty(detail.Description))
                             form.Add(new StringContent(detail.Description), $"Details[{i}].Description");
@@ -201,54 +197,51 @@ namespace Workshop.Web.Services
                     }
                 }
 
-                //3-9
-                // Add other simple properties
                 form.Add(new StringContent(grnObj.TransactionDate.ToString("o")), "TransactionDate"); // ISO 8601
 
                 if (grnObj.TransactionReferenceNo.HasValue)
-                    form.Add(new StringContent(grnObj.TransactionReferenceNo.Value.ToString()), "TransactionReferenceNo");
+                    form.Add(new StringContent(grnObj.TransactionReferenceNo.Value.ToString(CultureInfo.InvariantCulture)), "TransactionReferenceNo");
 
                 if (grnObj.FK_TransactionReferenceTypeId.HasValue)
-                    form.Add(new StringContent(grnObj.FK_TransactionReferenceTypeId.Value.ToString()), "FK_TransactionReferenceTypeId");
+                    form.Add(new StringContent(grnObj.FK_TransactionReferenceTypeId.Value.ToString(CultureInfo.InvariantCulture)), "FK_TransactionReferenceTypeId");
 
                 if (grnObj.FK_WarehouseId.HasValue)
-                    form.Add(new StringContent(grnObj.FK_WarehouseId.Value.ToString()), "FK_WarehouseId");
+                    form.Add(new StringContent(grnObj.FK_WarehouseId.Value.ToString(CultureInfo.InvariantCulture)), "FK_WarehouseId");
 
-                form.Add(new StringContent(grnObj.FK_TransactionTypeId.ToString()), "FK_TransactionTypeId");
+                form.Add(new StringContent(grnObj.FK_TransactionTypeId.ToString(CultureInfo.InvariantCulture)), "FK_TransactionTypeId");
 
-                form.Add(new StringContent(grnObj.FK_TransactionStatusId.ToString()), "FK_TransactionStatusId");
+                form.Add(new StringContent(grnObj.FK_TransactionStatusId.ToString(CultureInfo.InvariantCulture)), "FK_TransactionStatusId");
 
                 form.Add(new StringContent(grnObj.Description ?? ""), "Description");
 
-                if (grnObj.CreatedBy.HasValue)
-                    form.Add(new StringContent(grnObj.CreatedBy.Value.ToString()), "CreatedBy");
+                form.Add(new StringContent(grnObj.CreatedBy.ToString() ?? ""), "CreatedBy");
 
                 if (grnObj.CompanyId.HasValue)
-                    form.Add(new StringContent(grnObj.CompanyId.Value.ToString()), "CompanyId");
+                    form.Add(new StringContent(grnObj.CompanyId.Value.ToString(CultureInfo.InvariantCulture)), "CompanyId");
 
                 if (grnObj.BranchId.HasValue)
-                    form.Add(new StringContent(grnObj.BranchId.Value.ToString()), "BranchId");
+                    form.Add(new StringContent(grnObj.BranchId.Value.ToString(CultureInfo.InvariantCulture)), "BranchId");
 
                 if (grnObj.FK_FromWarehouseId.HasValue)
-                    form.Add(new StringContent(grnObj.FK_FromWarehouseId.Value.ToString()), "FK_FromWarehouseId");
+                    form.Add(new StringContent(grnObj.FK_FromWarehouseId.Value.ToString(CultureInfo.InvariantCulture)), "FK_FromWarehouseId");
 
                 if (grnObj.FK_ToWarehouseId.HasValue)
-                    form.Add(new StringContent(grnObj.FK_ToWarehouseId.Value.ToString()), "FK_ToWarehouseId");
+                    form.Add(new StringContent(grnObj.FK_ToWarehouseId.Value.ToString(CultureInfo.InvariantCulture)), "FK_ToWarehouseId");
 
                 if (grnObj.Fk_FinancialTransactionMasterId.HasValue)
-                    form.Add(new StringContent(grnObj.Fk_FinancialTransactionMasterId.Value.ToString()), "Fk_FinancialTransactionMasterId");
+                    form.Add(new StringContent(grnObj.Fk_FinancialTransactionMasterId.Value.ToString(CultureInfo.InvariantCulture)), "Fk_FinancialTransactionMasterId");
 
                 if (grnObj.FinancialTransactionNo.HasValue)
-                    form.Add(new StringContent(grnObj.FinancialTransactionNo.Value.ToString()), "FinancialTransactionNo");
+                    form.Add(new StringContent(grnObj.FinancialTransactionNo.Value.ToString(CultureInfo.InvariantCulture)), "FinancialTransactionNo");
 
                 if (grnObj.FinancialTransactionTypeNo.HasValue)
-                    form.Add(new StringContent(grnObj.FinancialTransactionTypeNo.Value.ToString()), "FinancialTransactionTypeNo");
+                    form.Add(new StringContent(grnObj.FinancialTransactionTypeNo.Value.ToString(CultureInfo.InvariantCulture)), "FinancialTransactionTypeNo");
 
                 if (grnObj.Fk_InvoiceType.HasValue)
-                    form.Add(new StringContent(grnObj.Fk_InvoiceType.Value.ToString()), "Fk_InvoiceType");
+                    form.Add(new StringContent(grnObj.Fk_InvoiceType.Value.ToString(CultureInfo.InvariantCulture)), "Fk_InvoiceType");
 
                 if (grnObj.StockType.HasValue)
-                    form.Add(new StringContent(grnObj.StockType.Value.ToString()), "StockType");
+                    form.Add(new StringContent(grnObj.StockType.Value.ToString(CultureInfo.InvariantCulture)), "StockType");
 
                 form.Add(new StringContent(grnObj.AttachmentPath ?? ""), "AttachmentPath");
 
