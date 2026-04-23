@@ -6,7 +6,6 @@
         $c.prop('disabled', true);
 
         if ($c.hasClass('select2-hidden-accessible')) {
-            // force Select2 UI to refresh
             $c.trigger('change.select2');
         }
     }
@@ -14,8 +13,7 @@
     function unlockCustomerDropdown() {
         const $c = $('#CustomerId');
 
-        $c.prop('disabled', false)
-            .removeAttr('disabled');
+        $c.prop('disabled', false).removeAttr('disabled');
 
         if ($c.hasClass('select2-hidden-accessible')) {
             $c.select2('close');
@@ -62,7 +60,6 @@
         document.head.appendChild(style);
     }
 
-    // ==================== jQuery DateTimePicker (xdsoft) for schStart ====================
     function ensureJQDateTimePicker() {
         return new Promise((resolve, reject) => {
             if ($.fn && typeof $.fn.datetimepicker === "function") return resolve();
@@ -104,15 +101,21 @@
 
     function callApi({ url, type = 'GET', data = null, isFormData = false, onSuccess = null, onError = null }) {
         const ajaxOptions = {
-            url, type, dataType: 'json',
+            url,
+            type,
+            dataType: 'json',
             contentType: isFormData ? false : 'application/json; charset=utf-8',
-            processData: !isFormData, cache: false,
-            success: (response) => { if (onSuccess) onSuccess(response); },
+            processData: !isFormData,
+            cache: false,
+            success: (response) => {
+                if (onSuccess) onSuccess(response);
+            },
             error: (xhr, _status, error) => {
                 console.error("API Error:", xhr?.responseText || error);
                 if (onError) onError(xhr);
             }
         };
+
         if (data) ajaxOptions.data = isFormData ? data : JSON.stringify(data);
         $.ajax(ajaxOptions);
     }
@@ -121,11 +124,13 @@
         date: null,
         dateTo: null,
         plate: null,
+        vehicleType: null,
         vehicleId: null,
+        chassisId: null,
         customerId: null,
-        duration: 0,      // minutes (computed)
-        startTime: null,  // 24h HH:MM (stored)
-        endTime: null,    // 24h HH:MM (stored)
+        duration: 0,
+        startTime: null,
+        endTime: null,
         isSaving: false
     };
 
@@ -133,19 +138,22 @@
     let isVehicleChassisSyncing = false;
     let isCustomerSource = false;
 
-    // =====================================================================================
-    // ✅ TIME MODE: show 12h in UI, keep 24h internally (stable with xdsoft)
-    // =====================================================================================
     const UI_USE_12H = true;
     const pad2 = (n) => n.toString().padStart(2, '0');
 
     function normalizeHHMM24(v) {
         if (!v) return '';
-        const s = String(v).trim();
-        const m = /^(\d{1,2}):(\d{2})/.exec(s); // HH:MM or HH:MM:SS
+
+        const s = String(v).trim().toUpperCase();
+
+        if (/[AP]M\b/.test(s)) return '';
+
+        const m = /^([01]?\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/.exec(s);
         if (!m) return '';
-        const h = Number(m[1]), min = Number(m[2]);
-        if (!Number.isFinite(h) || !Number.isFinite(min)) return '';
+
+        const h = Number(m[1]);
+        const min = Number(m[2]);
+
         return `${pad2(h)}:${pad2(min)}`;
     }
 
@@ -168,8 +176,7 @@
         const s0 = String(v).trim();
         if (!s0) return '';
 
-        // already 24h
-        if (/^\d{1,2}:\d{2}/.test(s0) && !/[AaPp][Mm]/.test(s0)) {
+        if (/^\d{1,2}:\d{2}(?::\d{2})?$/.test(s0) && !/[AaPp][Mm]/.test(s0)) {
             return normalizeHHMM24(s0);
         }
 
@@ -181,7 +188,9 @@
         const min = Number(m[2]);
         const ampm = m[3];
 
-        if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) return '';
+        if (!Number.isFinite(h) || !Number.isFinite(min) || h < 1 || h > 12 || min < 0 || min > 59) {
+            return '';
+        }
 
         if (ampm === 'AM') {
             if (h === 12) h = 0;
@@ -192,17 +201,19 @@
         return `${pad2(h)}:${pad2(min)}`;
     }
 
-    function toUITime(hhmm24) {
-        const t24 = normalizeHHMM24(hhmm24);
-        if (!t24) return hhmm24 ? String(hhmm24) : '';
+    function toUITime(value) {
+        const t24 = time12To24(value) || normalizeHHMM24(value);
+        if (!t24) return value ? String(value) : '';
         return UI_USE_12H ? time24To12(t24) : t24;
     }
 
-    function toMinutes24(hhmm24) {
-        const t = normalizeHHMM24(hhmm24);
+    function toMinutes24(value) {
+        const t = time12To24(value) || normalizeHHMM24(value);
         if (!t) return NaN;
+
         const [h, m] = t.split(':').map(n => parseInt(n, 10));
         if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
+
         return h * 60 + m;
     }
 
@@ -213,7 +224,6 @@
         return `${pad2(h)}:${pad2(m)}`;
     }
 
-    // robust duration: accepts "1.5", "1,5", "HH:MM"
     function normalizeDurationToMinutes(rawDuration) {
         if (rawDuration == null) return 0;
         const s = String(rawDuration).trim();
@@ -229,22 +239,20 @@
         const n = parseFloat(s.replace(',', '.'));
         if (!isFinite(n) || n <= 0) return 0;
 
-        return Math.round(n * 60); // hours -> minutes
+        return Math.round(n * 60);
     }
 
-    function ensureTimeWithSecondsFrom24(hhmm24) {
-        const t = normalizeHHMM24(hhmm24);
+    function ensureTimeWithSecondsFrom24(value) {
+        const t = time12To24(value) || normalizeHHMM24(value);
         if (!t) return '';
         return `${t}:00`;
     }
 
-    // === schStart: store true 24h value here (NEVER trust display string for math)
     function getSchStart24() {
         const $s = $('#schStart');
         const stored = $s.data('t24');
         if (stored) return normalizeHHMM24(stored);
 
-        // fallback: try parse current value (may be 12h)
         const raw = ($s.val() || '').toString().trim();
         const t24 = time12To24(raw) || normalizeHHMM24(raw);
         if (t24) $s.data('t24', t24);
@@ -257,35 +265,28 @@
         if (!norm) return;
 
         $s.data('t24', norm);
-
-        // show user 12h
         $s.val(toUITime(norm));
     }
 
-    // =====================================================================================
-    // Base allowed times (store 24h HH:MM)
     let schStartBaseAllowedTimes = [];
 
-    // ✅ stable implementation:
-    // - picker runs in 24h (format H:i)
-    // - input displays 12h after close (no parser bugs, no -1 hour)
     function initSchStartTimepicker(allowedTimes = [], defaultTime24 = null) {
         const $schStart = $('#schStart');
         if (!$schStart.length) return;
         if (!($.fn && typeof $.fn.datetimepicker === 'function')) return;
 
-        // normalize base allowed times to 24h
         schStartBaseAllowedTimes = Array.isArray(allowedTimes)
             ? allowedTimes.map(t => normalizeHHMM24(t) || time12To24(t)).filter(Boolean)
             : [];
 
-        try { $schStart.datetimepicker('destroy'); } catch (e) { }
+        try {
+            $schStart.datetimepicker('destroy');
+        } catch (e) { }
 
         $schStart.prop('disabled', false);
 
         const step = 5;
 
-        // helpers
         function localISODate(d = new Date()) {
             return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
         }
@@ -313,7 +314,9 @@
         function buildTimesFromMinutes24(startMinutes, stepMinutes) {
             const out = [];
             const last = 24 * 60 - stepMinutes;
-            for (let m = startMinutes; m <= last; m += stepMinutes) out.push(minutesToHHMM(m));
+            for (let m = startMinutes; m <= last; m += stepMinutes) {
+                out.push(minutesToHHMM(m));
+            }
             return out;
         }
 
@@ -329,7 +332,6 @@
 
         const isToday = isSelectedDateToday();
 
-        // ✅ Picker must always be 24h for stability
         const opts = {
             datepicker: false,
             format: 'H:i',
@@ -337,22 +339,24 @@
             step: step,
             scrollInput: false,
             closeOnTimeSelect: true,
+            validateOnBlur: false,
 
-            // Before showing picker, switch input temporarily to stored 24h
             onShow: function () {
                 const t24 = getSchStart24();
                 if (t24) $schStart.val(t24);
 
-                // keep "today" filtering fresh
                 if (isSelectedDateToday()) {
                     const times24 = computeAllowedTimesForToday24();
-                    try { this.setOptions({ allowTimes: times24 }); } catch { }
+                    try {
+                        this.setOptions({ allowTimes: times24 });
+                    } catch (e) { }
                 }
             },
 
-            // After close, restore 12h display
             onClose: function () {
-                const val24 = normalizeHHMM24($schStart.val()) || getSchStart24();
+                const raw = ($schStart.val() || '').toString().trim();
+                const val24 = time12To24(raw) || normalizeHHMM24(raw) || getSchStart24();
+
                 if (val24) {
                     $schStart.data('t24', val24);
                     $schStart.val(toUITime(val24));
@@ -360,42 +364,48 @@
             },
 
             onSelectTime: function (_ct, $input) {
-                const picked24 = normalizeHHMM24(($input && $input.val) ? $input.val() : $schStart.val());
-                if (picked24) $schStart.data('t24', picked24);
+                const raw = (($input && $input.val) ? $input.val() : $schStart.val()) || '';
+                const picked24 = time12To24(raw) || normalizeHHMM24(raw);
+
+                if (picked24) {
+                    $schStart.data('t24', picked24);
+                }
 
                 recomputeEndTime();
                 $schStart.trigger('change');
             },
 
             onChangeDateTime: function (_ct, $input) {
-                const picked24 = normalizeHHMM24(($input && $input.val) ? $input.val() : $schStart.val());
-                if (picked24) $schStart.data('t24', picked24);
+                const raw = (($input && $input.val) ? $input.val() : $schStart.val()) || '';
+                const picked24 = time12To24(raw) || normalizeHHMM24(raw);
+
+                if (picked24) {
+                    $schStart.data('t24', picked24);
+                }
 
                 recomputeEndTime();
             }
         };
 
-        // apply allowTimes in 24h only (stable)
         if (isToday) {
             const times24 = computeAllowedTimesForToday24();
+
             if (!times24.length) {
                 $schStart.val('').prop('disabled', true).data('t24', '');
                 recomputeEndTime();
                 return;
             }
+
             opts.allowTimes = times24;
         } else if (schStartBaseAllowedTimes.length) {
             opts.allowTimes = schStartBaseAllowedTimes.slice();
         }
 
-        // init picker
         $schStart.datetimepicker(opts);
 
-        // pick initial time (24h)
         const currentStored = getSchStart24();
         let chosen24 = normalizeHHMM24(defaultTime24) || currentStored || schStartBaseAllowedTimes[0] || '08:00';
 
-        // if today with allowTimes, ensure chosen exists
         if (isToday && Array.isArray(opts.allowTimes) && opts.allowTimes.length) {
             if (!opts.allowTimes.includes(chosen24)) chosen24 = opts.allowTimes[0];
         }
@@ -403,7 +413,6 @@
         setSchStart24(chosen24);
         recomputeEndTime();
     }
-    // ================================================================================
 
     function formatDateISO(d) {
         if (!d) return '';
@@ -433,25 +442,31 @@
         };
     }
 
-    function isSelect2($el) { return $el.hasClass('select2-hidden-accessible'); }
+    function isSelect2($el) {
+        return $el.hasClass('select2-hidden-accessible');
+    }
 
     function initSelect2($el) {
         if (!$el.length) return;
         if (isSelect2($el)) $el.select2('destroy');
+
         if ($el.find('option[value=""]').length === 0) {
             $el.prepend(new Option('', ''));
         }
+
         $el.select2(select2Options($el));
     }
 
-    // flatpickr instance
     let datePickrInstance = null;
 
     function initDatePicker() {
         ensureFlatpickrZIndexPatch();
 
         const modal = document.getElementById('scheduleModal');
-        const input = modal ? modal.querySelector('#schDate.flat-picker-future') : document.querySelector('#schDate.flat-picker-future');
+        const input = modal
+            ? modal.querySelector('#schDate.flat-picker-future')
+            : document.querySelector('#schDate.flat-picker-future');
+
         if (!input) return;
 
         if (datePickrInstance && datePickrInstance.destroy) {
@@ -490,8 +505,6 @@
         $('#schDate').off('change').on('change', handleDateChange);
 
         $('#schStart').off('change').on('change', recomputeEndTime);
-
-        // ✅ duration must ALWAYS recompute
         $('#schDuration').off('input change keyup').on('input change keyup', recomputeEndTime);
 
         $('#CustomerId').off('change').on('change', handleCustomerChange);
@@ -549,6 +562,7 @@
                     $('#chassisDropdown')
                         .val(String(chassisId))
                         .trigger('change.select2');
+
                     updateRecallChip($('#chassisDropdown').find('option:selected').text());
                     state.chassisId = Number(chassisId);
                     $('#CompanyId').val(res.data.vehicle.companyId).trigger('change');
@@ -633,7 +647,6 @@
             url: `${window.API_BASE.getVehicleDefentionById}?id=${chassisId}&vehicleType=${vehicleType}&lang=en`,
             onSuccess: (res) => {
                 if (res?.success && res.data) {
-
                     const vehicleCustomerId = res.data.customerId;
 
                     callApi({
@@ -661,7 +674,6 @@
                                 $('#CustomerId').val(null).trigger('change.select2');
                                 unlockCustomerDropdown();
                             }
-
                         },
                         onError: () => {
                             if (!isCustomerSource && vehicleCustomerId) {
@@ -718,6 +730,7 @@
                     $chassis.trigger('change.select2');
                 }
             });
+
             unlockCustomerDropdown();
             return;
         }
@@ -776,7 +789,6 @@
         state.date = $(this).val() || null;
         if (!state.dateTo) state.dateTo = state.date;
 
-        // re-init timepicker so past times are hidden only for "today"
         initSchStartTimepicker(schStartBaseAllowedTimes, getSchStart24() || null);
     }
 
@@ -805,6 +817,7 @@
         if (!vehicleTypeId) return;
 
         const existingCustomer = ($('#CustomerName').val() || '').toString().trim();
+
         allVehicleOptionsCache = [];
         $vehicle.empty().append('<option value="">Select</option>').trigger('change');
         $chassis.empty().append('<option value="">Select</option>').trigger('change');
@@ -849,7 +862,6 @@
         });
     }
 
-    // ✅ End time: keep 24h HH:MM (prevents "damaged" issues on type="time")
     function recomputeEndTime() {
         const start24 = getSchStart24();
         const rawDuration = $('#schDuration').val();
@@ -868,8 +880,6 @@
         const end24 = minutesToHHMM(endMin);
 
         state.endTime = end24;
-
-        // keep it 24h in field
         $('#schEnd').val(end24).trigger('change');
     }
 
@@ -881,7 +891,6 @@
 
         $form.validate({
             ignore: ":hidden:not(.select2-hidden-accessible)",
-
             rules: {
                 Date: { required: true },
                 VehicleTypeId: { required: true },
@@ -892,7 +901,6 @@
                 Duration: { required: true, min: 0 },
                 End_Time: { required: true }
             },
-
             errorClass: 'is-invalid',
             errorPlacement: function (error, element) {
                 error.addClass('invalid-feedback');
@@ -908,7 +916,6 @@
                     error.insertAfter(element);
                 }
             },
-
             highlight: function (element) {
                 const $el = $(element);
                 $el.addClass('is-invalid');
@@ -917,7 +924,6 @@
                     $el.next('.select2').find('.select2-selection').addClass('is-invalid');
                 }
             },
-
             unhighlight: function (element) {
                 const $el = $(element);
                 $el.removeClass('is-invalid');
@@ -930,105 +936,100 @@
     }
 
     function bindSaveHandlerOnce() {
-        $(document).off('click.save', '#btnSaveSchedule').on('click.save', '#btnSaveSchedule', function () {
-            const $form = $('#scheduleForm');
+        $(document)
+            .off('click.save', '#btnSaveSchedule')
+            .on('click.save', '#btnSaveSchedule', function () {
+                const $form = $('#scheduleForm');
 
-            // recompute end before validation
-            recomputeEndTime();
+                recomputeEndTime();
 
-            if ($form.length && !$form.valid()) return;
+                if ($form.length && !$form.valid()) return;
+                if (state.isSaving) return;
 
-            if (state.isSaving) return;
-            state.isSaving = true;
+                state.isSaving = true;
 
-            const $btn = $('#btnSaveSchedule');
-            const originalText = $btn.text();
-            $btn.prop('disabled', true).text(originalText || 'Saving...');
+                const $btn = $('#btnSaveSchedule');
+                const originalText = $btn.text();
+                $btn.prop('disabled', true).text(originalText || 'Saving...');
 
-            if (!state.date) state.date = $('#schDate').val() || null;
-            if (!state.dateTo) state.dateTo = state.date;
+                if (!state.date) state.date = $('#schDate').val() || null;
+                if (!state.dateTo) state.dateTo = state.date;
 
-            // always use stored 24h
-            state.startTime = getSchStart24() || state.startTime;
-            state.duration = normalizeDurationToMinutes($('#schDuration').val());
-            recomputeEndTime();
+                state.startTime = getSchStart24() || state.startTime;
+                state.duration = normalizeDurationToMinutes($('#schDuration').val());
+                recomputeEndTime();
 
-            if (!state.vehicleId) {
-                const v = $('#vehicleDropdown').val();
-                if (v) state.vehicleId = v;
-            }
-            if (!state.chassisId) {
-                const c = $('#chassisDropdown').val();
-                if (c) state.chassisId = Number(c);
-            }
-
-            const scheduleData = {
-                Date: formatDateISO($('#schDate').val()),
-                DateTo: formatDateISO($('#schDate').val()),
-
-                VehicleTypeId: toNumber($('#vehicleTypeDropdown').val()),
-                VehicleId: toNumber($('#vehicleDropdown').val()),
-                ChassisId: toNumber($('#chassisDropdown').val()),
-                CustomerId: toNumber($('#CustomerId').val()),
-
-                PlateNumber: $('#vehicleDropdown').find(':selected').text()?.trim() || '',
-
-                // ✅ send 24h + seconds
-                Start_Time: ensureTimeWithSecondsFrom24(getSchStart24()),
-                End_Time: ensureTimeWithSecondsFrom24($('#schEnd').val()),
-                Duration: toNumber($('#schDuration').val()),
-
-                Description: $('#descriptionInput').val() ?? '',
-                Status: 44
-            };
-
-            const isEdit = $('#scheduleModal').data('mode') === 'edit';
-            const reservationId = $('#scheduleModal').data('reservationId');
-
-            const url = isEdit ? window.API_BASE.updateReservation : window.RazorVars.insertReservationUrl;
-            if (isEdit) scheduleData.Id = reservationId;
-
-            $.ajax({
-                type: 'POST',
-                url: url,
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                data: JSON.stringify(scheduleData),
-                success: function (res) {
-                    if (res?.isActive) {
-                        Swal.fire({
-                            title: window.RazorVars.warning,
-                            text: window.RazorVars.reservationAlreadyExist,
-                            icon: 'warning'
-                        });
-                        return;
-                    }
-
-                    if (res?.isSuccess) {
-                        Swal.fire({
-                            title: window.RazorVars.doneSuccessfully,
-                            text: window.RazorVars.reservationInserted,
-                            icon: 'success'
-                        }).then(() => location.reload());
-                        return;
-                    }
-                },
-                complete: function () {
-                    state.isSaving = false;
-                    $btn.prop('disabled', false).text(originalText);
+                if (!state.vehicleId) {
+                    const v = $('#vehicleDropdown').val();
+                    if (v) state.vehicleId = v;
                 }
+
+                if (!state.chassisId) {
+                    const c = $('#chassisDropdown').val();
+                    if (c) state.chassisId = Number(c);
+                }
+
+                const scheduleData = {
+                    Date: formatDateISO($('#schDate').val()),
+                    DateTo: formatDateISO($('#schDate').val()),
+                    VehicleTypeId: toNumber($('#vehicleTypeDropdown').val()),
+                    VehicleId: toNumber($('#vehicleDropdown').val()),
+                    ChassisId: toNumber($('#chassisDropdown').val()),
+                    CustomerId: toNumber($('#CustomerId').val()),
+                    PlateNumber: $('#vehicleDropdown').find(':selected').text()?.trim() || '',
+                    Start_Time: ensureTimeWithSecondsFrom24(getSchStart24()),
+                    End_Time: ensureTimeWithSecondsFrom24($('#schEnd').val()),
+                    Duration: toNumber($('#schDuration').val()),
+                    Description: $('#descriptionInput').val() ?? '',
+                    Status: 44
+                };
+
+                const isEdit = $('#scheduleModal').data('mode') === 'edit';
+                const reservationId = $('#scheduleModal').data('reservationId');
+
+                const url = isEdit
+                    ? window.API_BASE.updateReservation
+                    : window.RazorVars.insertReservationUrl;
+
+                if (isEdit) scheduleData.Id = reservationId;
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    data: JSON.stringify(scheduleData),
+                    success: function (res) {
+                        if (res?.isActive) {
+                            Swal.fire({
+                                title: window.RazorVars.warning,
+                                text: window.RazorVars.reservationAlreadyExist,
+                                icon: 'warning'
+                            });
+                            return;
+                        }
+
+                        if (res?.isSuccess) {
+                            Swal.fire({
+                                title: window.RazorVars.doneSuccessfully,
+                                text: window.RazorVars.reservationInserted,
+                                icon: 'success'
+                            }).then(() => location.reload());
+                        }
+                    },
+                    complete: function () {
+                        state.isSaving = false;
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                });
             });
-        });
     }
 
     $(document).on('shown.bs.modal', '#scheduleModal', async function () {
         bindEvents();
 
-        // ✅ MUST be text because we display "hh:mm AM/PM"
         $('#schStart').attr('type', 'text');
-        // schEnd can stay as-is; we write 24h so it won't break even if type="time"
 
-        // schStart: readonly (no manual typing)
         $('#schStart')
             .prop('disabled', false)
             .prop('readonly', true)
@@ -1039,7 +1040,10 @@
             .prop('disabled', false)
             .prop('readonly', false);
 
-        $('#schEnd').prop('readonly', true).on('keydown paste', (e) => e.preventDefault());
+        $('#schEnd')
+            .prop('readonly', true)
+            .off('keydown.readonly paste.readonly')
+            .on('keydown.readonly paste.readonly', (e) => e.preventDefault());
 
         initSelect2($('#vehicleDropdown'));
         initSelect2($('#chassisDropdown'));
@@ -1059,13 +1063,11 @@
             await ensureJQDateTimePicker();
             ensureJQDateTimePickerZIndexPatch();
 
-            // current time rounded up to next 5 minutes (24h)
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
             const roundedMinutes = Math.ceil(currentMinutes / 5) * 5;
             const currentTimeDefault24 = minutesToHHMM(roundedMinutes);
 
-            // init timepicker (internal 24h + UI display 12h)
             initSchStartTimepicker([], currentTimeDefault24);
         } catch (e) {
             console.warn("jQuery DateTimePicker failed to load", e);
@@ -1075,12 +1077,20 @@
         recomputeEndTime();
 
         bindSaveHandlerOnce();
+
+        $('#schStart')
+            .off('blur.fix12h')
+            .on('blur.fix12h', function () {
+                const t24 = getSchStart24();
+                if (t24) $(this).val(toUITime(t24));
+            });
     });
 
-    // optional cleanup when modal closes
     $(document).on('hidden.bs.modal', '#scheduleModal', function () {
         const $schStart = $("#schStart");
-        try { $schStart.datetimepicker("destroy"); } catch (e) { }
+        try {
+            $schStart.datetimepicker("destroy");
+        } catch (e) { }
     });
 
     $(document).ready(async function () {
