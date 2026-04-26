@@ -765,6 +765,7 @@
     }
 
     function CreateMovementSuccess(data) {
+        debugger;
         if (data && data.isSuccess) {
             Swal.fire({
                 icon: 'success',
@@ -775,7 +776,7 @@
                 timer: 3000,
                 timerProgressBar: true
             }).then(function () {
-                window.location.href = window.RazorVars.indexMovementsUrl;
+                window.location.href = window.RazorVars.detailsMovementsUrl + '?movementId=' + encodeURIComponent(data.id);
             });
         } else {
             Swal.fire(RazorVars.swalErrorHappened, (data && data.message) || RazorVars.error, 'error');
