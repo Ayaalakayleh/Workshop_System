@@ -1747,7 +1747,18 @@ namespace Workshop.Web.Controllers
                     }
                     if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
                     {
-                        ExternalInvoice = await SaveInvoice(dto);
+                        try
+                        {
+                            ExternalInvoice = await SaveInvoice(dto);
+                        }
+                        catch (Exception ex)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                message = ex.InnerException?.Message ?? ex.Message
+                            });
+                        }
                         if (ExternalInvoice.ID > 0 )
                         {// Insert External Invoice
                             if (dto.AccountDetails.AccountType == AccountTypeEnum.External || dto.AccountDetails.PartialAccountType == AccountTypeEnum.External)
