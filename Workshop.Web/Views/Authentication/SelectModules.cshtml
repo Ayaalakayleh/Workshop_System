@@ -5,24 +5,21 @@
 @{
     ViewBag.Title = Common["SelectModule"];
     Layout = null;
+
     string Lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+    bool IsArabic = Lang.StartsWith("ar");
 }
 <!DOCTYPE html>
-<html dir="ltr">
+<html lang="@Lang" dir="@(IsArabic ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8">
-    <title>Inventory System</title>
+    <title>Workshop System</title>
     <meta name="description" content="Login">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="msapplication-tap-highlight" content="no">
 
-    @*   @if (Vehicle.Controllers.LanguageController.IsRighToLeft())
-    {
-        <link href="~/Content/css/plugins/bootstrap-rtl/bootstrap-rtl.css" rel="stylesheet" />
-    }
-    *@
     <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/vendors.bundle.css">
     <link id="appbundle" rel="stylesheet" media="screen, print" href="~/auth-assets/css/app.bundle.css">
     <link id="mytheme" rel="stylesheet" media="screen, print">
@@ -36,6 +33,18 @@
             src: url('../../smartadmin-5-styles/tajwal-arabic-font/Tajawal-Bold.ttf') format('truetype');
         }
 
+        html[dir="rtl"],
+        html[dir="rtl"] body {
+            direction: rtl !important;
+            text-align: right;
+        }
+
+        html[dir="ltr"],
+        html[dir="ltr"] body {
+            direction: ltr !important;
+            text-align: left;
+        }
+
         body {
             overflow-y: scroll;
         }
@@ -45,22 +54,23 @@
         }
 
         .select2-container {
-            z-index: 9999999 !important
+            z-index: 9999999 !important;
         }
 
         #hidden-word {
             width: 200px;
             height: 50px;
             white-space: nowrap;
-            padding-right: 40px
+            padding-inline-end: 40px;
         }
 
         .page-logo-text {
             text-align: start;
-            color: var(--theme-dark) !important
+            color: var(--theme-dark) !important;
         }
 
-        .blankpage-form-field .page-logo, .blankpage-form-field .card {
+        .blankpage-form-field .page-logo,
+        .blankpage-form-field .card {
             background-image: unset !important;
             background-color: unset !important;
             background: rgba(255,255,255,.25) !important;
@@ -72,13 +82,13 @@
 
         .btn.btn-outline-danger {
             color: #dc3545 !important;
-            border: 1px solid #dc3545 !important
+            border: 1px solid #dc3545 !important;
         }
 
             .btn.btn-outline-danger:hover {
                 background-color: #dc3545 !important;
                 border: 1px solid #dc3545 !important;
-                color: #fff !important
+                color: #fff !important;
             }
 
         address {
@@ -87,7 +97,6 @@
             font-family: 'Tajawal-Bold';
         }
 
-        /* ===== design variables & styles ===== */
         :root {
             --button-active: -1;
             --debug: 0;
@@ -123,7 +132,6 @@
             border: 1px solid rgba(255,255,255,.18);
         }
 
-        /* Background Elements for Glassmorphism */
         .background-elements {
             position: absolute;
             inset: 0;
@@ -234,7 +242,7 @@
         .icon-container {
             padding: 12px;
             border-radius: 12px;
-            margin-right: 24px;
+            margin-inline-end: 24px;
             transition: transform .3s ease;
             box-shadow: 0 10px 25px rgba(0,0,0,.2);
         }
@@ -283,6 +291,7 @@
             color: #444;
             margin-bottom: 0;
             transition: color .3s ease;
+            text-align: start;
         }
 
         .arrow-container {
@@ -306,7 +315,14 @@
             width: 20px;
             height: 20px;
             color: white;
+        }
+
+        html[dir="ltr"] .arrow-icon {
             transform: rotate(180deg);
+        }
+
+        html[dir="rtl"] .arrow-icon {
+            transform: rotate(0deg);
         }
 
         @@media (max-width:768px) {
@@ -323,7 +339,7 @@
             }
 
             .icon-container {
-                margin-right: 16px;
+                margin-inline-end: 16px;
                 padding: 10px;
             }
 
@@ -351,7 +367,7 @@
             }
 
             .icon-container {
-                margin-right: 12px;
+                margin-inline-end: 12px;
             }
 
             .module-title {
@@ -368,29 +384,45 @@
             themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) : {},
             themeURL = themeSettings.themeURL || '',
             themeOptions = themeSettings.themeOptions || '';
-        if (themeSettings.themeOptions) { classHolder.className = themeSettings.themeOptions; }
+
+        if (themeSettings.themeOptions) {
+            classHolder.className = themeSettings.themeOptions;
+        }
+
         if (themeSettings.themeURL && !document.getElementById('mytheme')) {
-            var cssfile = document.createElement('link'); cssfile.id = 'mytheme'; cssfile.rel = 'stylesheet'; cssfile.href = themeURL;
+            var cssfile = document.createElement('link');
+            cssfile.id = 'mytheme';
+            cssfile.rel = 'stylesheet';
+            cssfile.href = themeURL;
             document.getElementsByTagName('head')[0].appendChild(cssfile);
         } else if (themeSettings.themeURL && document.getElementById('mytheme')) {
             document.getElementById('mytheme').href = themeSettings.themeURL;
         }
+
         var saveSettings = function () {
             themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
                 return /^(nav|header|footer|mod|display)-/i.test(item);
             }).join(' ');
-            if (document.getElementById('mytheme')) { themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href"); }
+
+            if (document.getElementById('mytheme')) {
+                themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
+            }
+
             localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
         }
-        var resetSettings = function () { localStorage.setItem("themeSettings", ""); }
+
+        var resetSettings = function () {
+            localStorage.setItem("themeSettings", "");
+        }
     </script>
 
-    <a href="@Url.Action("SelectBranch")" class="btn btn-glass text-dark font-weight-bold" style="margin-bottom:24rem">@Common["BackToBranches"]</a>
+    <a href="@Url.Action("SelectBranch")" class="btn btn-glass text-dark font-weight-bold" style="margin-bottom:24rem">
+        @Common["BackToBranches"]
+    </a>
 
     <div class="row w-100 justify-content-center">
         <main>
             <div class="main-container">
-                <!-- Background Elements for Glassmorphism -->
                 <div class="background-elements">
                     <div class="blur-element blur-1"></div>
                     <div class="blur-element blur-2"></div>
@@ -399,39 +431,38 @@
 
                 <div class="container">
                     <div class="content-wrapper">
-                        <!-- Header -->
                         <div class="header">
                             <img class="change-width-on-mobile w-75" src="~/smartadmin-5-styles/img/fleetexpresslogo.png" />
                             <h3 class="subtitle text-dark">@Common["SelectModule"]</h3>
                         </div>
 
-                        <!-- Module List (dynamic) -->
                         <div class="module-list">
                             @foreach (var item in Model)
                             {
-                                // choose a gradient/icon per known module id
                                 var gradientClass = "gradient-gray";
                                 var iconName = "grid";
+
                                 switch (item.Id)
                                 {
-                                    case 1: gradientClass = "gradient-blue-cyan"; iconName = "calendar"; break;          // Accounting
-                                    case 2: gradientClass = "gradient-green-emerald"; iconName = "truck"; break;         // Vehicle Fleet
-                                    case 3: gradientClass = "gradient-indigo-purple"; iconName = "wrench"; break;        // Workshop
-                                    case 4: gradientClass = "gradient-purple-pink"; iconName = "grid"; break;           // ERP Main
-                                    case 5: gradientClass = "gradient-orange-red"; iconName = "cart"; break;            // Sales/Procurement
-                                    case 9: gradientClass = "gradient-teal-blue"; iconName = "buildings"; break;        // Procurement/Other
-                                    case 10: gradientClass = "gradient-purple-pink"; iconName = "box"; break;           // Inventory
+                                    case 1: gradientClass = "gradient-blue-cyan"; iconName = "calendar"; break;
+                                    case 2: gradientClass = "gradient-green-emerald"; iconName = "truck"; break;
+                                    case 3: gradientClass = "gradient-indigo-purple"; iconName = "wrench"; break;
+                                    case 4: gradientClass = "gradient-purple-pink"; iconName = "grid"; break;
+                                    case 5: gradientClass = "gradient-orange-red"; iconName = "cart"; break;
+                                    case 9: gradientClass = "gradient-teal-blue"; iconName = "buildings"; break;
+                                    case 10: gradientClass = "gradient-purple-pink"; iconName = "box"; break;
                                 }
+
                                 var moduleTitle = (Lang == "en" ? item.ModulePrimaryName : item.ModuleSecondaryName);
+
                                 <div class="module-item"
                                      role="button"
                                      tabindex="0"
                                      data-link="@item.Url"
                                      data-toggle="tooltip"
-                                     data-placement="left"
+                                     data-placement="@(IsArabic ? "right" : "left")"
                                      data-original-title="@moduleTitle">
                                     <div class="icon-container @gradientClass">
-                                        @* inline SVG icons *@
                                         @if (iconName == "calendar")
                                         {
                                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -495,9 +526,7 @@
                                     </div>
 
                                     <div class="module-content">
-                                        <h3 class="module-title">
-                                            @moduleTitle
-                                        </h3>
+                                        <h3 class="module-title">@moduleTitle</h3>
                                     </div>
 
                                     <div class="arrow-container">
@@ -511,7 +540,6 @@
                                 </div>
                             }
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -524,16 +552,16 @@
 
     <script src="~/auth-assets/js/vendors.bundle.js"></script>
     <script src="~/auth-assets/js/app.bundle.js"></script>
+
     <script>
-        // Navigate on click
         $(document).on('click', '.module-item', function () {
             var link = $(this).data('link');
+
             if (link) {
                 window.location.href = link;
             }
         });
 
-        // Keyboard accessibility
         $(document).on('keydown', '.module-item', function (e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -541,7 +569,6 @@
             }
         });
 
-        // Enable bootstrap tooltip titles
         if ($.fn.tooltip) {
             $('[data-toggle="tooltip"]').tooltip();
         }

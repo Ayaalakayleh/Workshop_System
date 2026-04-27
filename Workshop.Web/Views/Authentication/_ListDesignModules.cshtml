@@ -5,7 +5,7 @@
     string Lang = "en";
 }
 <!DOCTYPE html>
-<html dir="ltr">
+<html>
 <head>
     <meta charset="utf-8">
     <title>VehiclesSystem</title>
@@ -15,11 +15,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="msapplication-tap-highlight" content="no">
 
-    @*   @if (Vehicle.Controllers.LanguageController.IsRighToLeft())
+    @if (System.Globalization.CultureInfo.CurrentUICulture.Name == "ar")
     {
     <link href="~/Content/css/plugins/bootstrap-rtl/bootstrap-rtl.css" rel="stylesheet" />
     }
-    *@
+   
     <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="~/Content/smart_theme/dist/css/vendors.bundle.css">
     <link id="appbundle" rel="stylesheet" media="screen, print" href="~/Content/smart_theme/dist/css/app.bundle.css">
     <link id="mytheme" rel="stylesheet" media="screen, print">
