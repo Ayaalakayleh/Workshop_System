@@ -562,20 +562,18 @@ namespace Workshop.Web.Services
             return await SendRequest<List<PettyCashSeller>>(url, HttpMethod.Get);
         }
 
-        public async Task<Int64> PettyCashRequest_GetApproved(int userId)
+        public async Task<List<long>> PettyCashRequest_GetApproved(int userId)
         {
             try
             {
                 string url = $"/PettyCashRequest/PettyCashRequest_GetApproved?UserId={userId}";
                 var response = await SendRequest<List<PettyCashRequest>>(url, HttpMethod.Get);
 
-                // Return the RequestNo of the first approved request, or 0 if none found
-                return response?.FirstOrDefault()?.RequestNo ?? 0;
+                return response?.Select(r => r.RequestNo).ToList() ?? new List<long>();
             }
             catch (Exception ex)
             {
-                // Log the error and return 0 as fallback
-                return 0;
+                return new List<long>();
             }
         }
 
