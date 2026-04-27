@@ -1,4 +1,6 @@
 ﻿// Grid ======================================================
+
+let scheduleIsMenu = false;
 $(function () {
     const LabourLineEnum = {
         1: { value: 1, text: "M-Draft" },
@@ -78,6 +80,7 @@ $(function () {
         columns: [
             { dataField: "KeyId", caption: "#", visible: true, allowEditing: false, width: 50, },
             { dataField: "Id", caption: "ID", visible: false },
+            { dataField: "ISMenu", caption: "ISMenu", visible: false, dataType: "boolean", },
             {
                 dataField: "WIPId", caption: "WIPId", dataType: "number", visible: false,
                 calculateCellValue: function (rowData) {
@@ -306,8 +309,11 @@ $(function () {
                         },
                         onClick: function (e) {
                             console.log(e.row.data.Id);
-                            $("#RTSId").val(e.row.data.Id);
-                            openScheduleModal(e.row.data);
+                            const row = e.row.data;
+
+                            $("#RTSId").val(row.Id);
+                            scheduleIsMenu = row.ISMenu === true || row.ISMenu === 1;
+                            openScheduleModal(row);
                         }
                     },
                     {
@@ -752,7 +758,8 @@ $("#btnSaveSchedule").on("click", function (e) {
         StartTime: getSchStart24() + ":00",         // ✅ حفظ 24h للسيرفر
         //Duration: parseFloat($('#schDuration').val()),//For Hours
         Duration: Math.round(parseFloat($('#schDuration').val()) * 60), //For Minutes
-        EndTime: $('#schEnd').val() + ":00"
+        EndTime: $('#schEnd').val() + ":00",
+        ISMenu: scheduleIsMenu
     };
 
     // ✅ startMin صار يفهم 12h مباشرة
