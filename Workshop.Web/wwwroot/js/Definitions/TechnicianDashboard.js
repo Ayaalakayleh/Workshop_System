@@ -212,7 +212,7 @@ function openNumericModal() {
     if (!modal) return;
 
     const nameEl = document.getElementById('numericName');
-    if (nameEl) nameEl.textContent = `${selectedTechnician.id} - ${selectedTechnician.primaryName}`;
+    if (nameEl) nameEl.textContent = `${selectedTechnician.code} - ${selectedTechnician.primaryName}`;
 
     // FIXED: use same image url as card
     const photo = document.getElementById('numericPhoto');

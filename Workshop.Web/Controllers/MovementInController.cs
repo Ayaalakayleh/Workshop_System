@@ -475,36 +475,38 @@ namespace Workshop.Web.Controllers
                         }
                         if (movement.HasRecall)
                         {
-                            RecallDTO recall = new RecallDTO();
-                            foreach (var item in movement?.Recalls)
-                            {
-                                var currectRecall = await _apiClient.GetRecallByIdAsync(item);
-                                if (!movement?.IsExternal ?? true)
+                            if (movement.Recalls != null) { 
+                                RecallDTO recall = new RecallDTO();
+                                foreach (var item in movement?.Recalls)
                                 {
-                                    var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement?.VehicleID ?? 0);
-                                    if (vehicle != null && vehicle.ChassisNo != null)
-                                        currectRecall.Vehicles.Add(new VehicleRecallDTO {MakeID = vehicle.ManufacturerId,
-                                            ModelID = vehicle.VehicleModelId,
-                                            Chassis = vehicle.ChassisNo });
-                                }
-                                else
-                                {
-                                    var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement?.VehicleID ?? 0);
-                                    if (vehicle != null && vehicle.ChassisNo != null)
-                                        currectRecall.Vehicles.Add(new VehicleRecallDTO
-                                        {
-                                            MakeID = vehicle.ManufacturerId,
-                                            ModelID = vehicle.VehicleModelId,
-                                            Chassis = vehicle.ChassisNo
-                                        });
-                                }
-                                UpdateRecallDTO updateRecall = new UpdateRecallDTO()
-                                {
-                                    Id = currectRecall.Id,
-                                    Vehicles = currectRecall.Vehicles
+                                    var currectRecall = await _apiClient.GetRecallByIdAsync(item);
+                                    if (!movement?.IsExternal ?? true)
+                                    {
+                                        var vehicle = await _vehicleApiClient.VehicleDefinitions_Find(movement?.VehicleID ?? 0);
+                                        if (vehicle != null && vehicle.ChassisNo != null)
+                                            currectRecall.Vehicles.Add(new VehicleRecallDTO {MakeID = vehicle.ManufacturerId,
+                                                ModelID = vehicle.VehicleModelId,
+                                                Chassis = vehicle.ChassisNo });
+                                    }
+                                    else
+                                    {
+                                        var vehicle = await _vehicleApiClient.VehicleDefinitions_GetExternalWSVehicleById(movement?.VehicleID ?? 0);
+                                        if (vehicle != null && vehicle.ChassisNo != null)
+                                            currectRecall.Vehicles.Add(new VehicleRecallDTO
+                                            {
+                                                MakeID = vehicle.ManufacturerId,
+                                                ModelID = vehicle.VehicleModelId,
+                                                Chassis = vehicle.ChassisNo
+                                            });
+                                    }
+                                    UpdateRecallDTO updateRecall = new UpdateRecallDTO()
+                                    {
+                                        Id = currectRecall.Id,
+                                        Vehicles = currectRecall.Vehicles
 
-                                };
-                                await _apiClient.UpdateRecallAsync(updateRecall);
+                                    };
+                                    await _apiClient.UpdateRecallAsync(updateRecall);
+                                }
                             }
                         }
                         return Json(resultJson);
