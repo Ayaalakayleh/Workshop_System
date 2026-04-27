@@ -3434,19 +3434,18 @@ namespace Workshop.Web.Controllers
         {
             try
             {
-                // Add null check for UserId
                 if (UserId <= 0)
                 {
                     _logger.LogWarning("GetPettyCashRequests called with invalid UserId: {UserId}", UserId);
                     return Json(new List<object>());
                 }
 
-                var approvedRequestNo = await _accountingApiClient.PettyCashRequest_GetApproved(UserId);
+                var approvedRequestNos = await _accountingApiClient.PettyCashRequest_GetApproved(UserId);
                 var result = new List<object>();
 
-                if (approvedRequestNo > 0)
+                foreach (var requestNo in approvedRequestNos)
                 {
-                    var request = await _accountingApiClient.PettyCashRequest_GetById((int)approvedRequestNo);
+                    var request = await _accountingApiClient.PettyCashRequest_GetById((int)requestNo);
                     if (request != null)
                     {
                         result.Add(new
@@ -3457,6 +3456,7 @@ namespace Workshop.Web.Controllers
                         });
                     }
                 }
+
                 ViewBag.Currency = CurrencyId;
                 return Json(result);
             }
