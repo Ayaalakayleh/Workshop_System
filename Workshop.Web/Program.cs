@@ -25,8 +25,8 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // ------------------- Serilog → Workshop.API HTTP sink -------------------
-    var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]
-                     ?? throw new InvalidOperationException("ApiSettings:BaseUrl is not configured.");
+    var apiBaseUrl = builder.Configuration["ApiSettings:BaseApiUrl"]
+                     ?? throw new InvalidOperationException("ApiSettings:BaseApiUrl is not configured.");
 
     builder.Host.UseSerilog((ctx, services, config) => config
         .ReadFrom.Configuration(ctx.Configuration)
