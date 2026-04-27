@@ -147,6 +147,7 @@ namespace Workshop.Core.DTOs
         public bool IsExternal { get; set; }
         public int? ExternalWorkshopId { get; set; }
         public bool IsFixed { get; set; } = false;
+        public bool ISMenu { get; set; } = false;
 
 
     }
@@ -227,6 +228,7 @@ namespace Workshop.Core.DTOs
         public decimal Duration { get; set; }
         public TimeSpan EndTime { get; set; }
         public int CompanyId { get; set; }
+        public bool ISMenu { get; set; } = false;
     }
 
     public class UpdateService

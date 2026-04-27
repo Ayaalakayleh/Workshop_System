@@ -17,6 +17,7 @@ function initialize_RTSGrid() {
         columns: [
             { dataField: "id", caption: theMainLang == "en" ? "ID" : "الرقم", visible: false },
             { dataField: "code", caption: theMainLang == "en" ? "Code" : "الرمز", allowEditing: false },
+            { dataField: "ISMenu", caption: "ISMenu", visible: false, dataType: "boolean", },
             { dataField: "primaryName", caption: theMainLang == "en" ? "Name (EN)" : "الاسم باللغة الإنجليزية", allowEditing: false },
             { dataField: "secondaryName", caption: theMainLang == "en" ? "Name (AR)" : "الاسم باللغة العربية", allowEditing: false },
             { dataField: "hours", caption: theMainLang == "en" ? "Hours" : "الساعات", allowEditing: false },
@@ -95,7 +96,8 @@ function injectMainGrid(count) {
                         IsExternal: 0,
                         Total: 0,
                         Status: LabourLineEnum[1].value,
-                        StatusText: LabourLineEnum[1].text
+                        StatusText: LabourLineEnum[1].text,
+                        ISMenu: item.ISMenu === true
                     });
                 });
 
@@ -252,8 +254,19 @@ function loadData() {
             grid.option("loadPanel.enabled", true);
         },
         success: function (result) {
+            //if (result) {
+            //    grid.option("dataSource", result);
+            //}
+
             if (result) {
-                grid.option("dataSource", result);
+                var mappedData = result.map(function (x) {
+                    return {
+                        ...x,
+                        ISMenu: false
+                    };
+                });
+
+                grid.option("dataSource", mappedData);
             }
         },
         error: function (xhr, status, error) {
@@ -288,10 +301,11 @@ function loadMenuData() {
                         code: x.groupCode,
                         hours: x.totalTime,
                         primaryName: x.groupName,
-                        secondaryName: x.groupName
+                        secondaryName: x.groupName,
+                        ISMenu: true
                     };
                 });
-
+                debugger
                 grid.option("dataSource", mappedData);
             }
         },

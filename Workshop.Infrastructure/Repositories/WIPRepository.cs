@@ -267,11 +267,12 @@ namespace Workshop.Infrastructure.Repositories
             table.Columns.Add("AccountType", typeof(int));
             table.Columns.Add("IsExternal", typeof(bool));
             table.Columns.Add("ExternalWorkshopId", typeof(int));
+            table.Columns.Add("ISMenu", typeof(bool));
 
             foreach (var item in Services)
             {
                 table.Rows.Add(item.Id, item.KeyId, item.WIPId, item.Code, item.Description, item.LongDescription, item.StandardHours,
-                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.DiscountPct, item.Total, item.Status, item.AccountType, item.IsExternal, item.ExternalWorkshopId);
+                               item.BaseRate, item.Rate, item.TimeTaken, item.Discount, item.DiscountPct, item.Total, item.Status, item.AccountType, item.IsExternal, item.ExternalWorkshopId, item.ISMenu);
             }
 
 
@@ -469,7 +470,8 @@ namespace Workshop.Infrastructure.Repositories
                 Date = dto.Date,
                 StartTime = dto.StartTime,
                 Duration = dto.Duration,
-                EndTime = dto.EndTime
+                EndTime = dto.EndTime,
+                ISMenu = dto.ISMenu
             };
             return await _database.ExecuteAddStoredProcedure<int>("WIP_SChedule_Insert", parameters);
         }

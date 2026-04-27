@@ -629,8 +629,8 @@ $(function () {
                     }).appendTo(cellElement);
                 }
             },
-            { dataField: "CostPrice", caption: "Cost Price", dataType: "number", visible: true, alignment: "left" },
-            { dataField: "SalePrice", caption: "SalePrice", dataType: "number", visible: true, alignment: "left" },
+            { dataField: "CostPrice", caption: "Cost Price", dataType: "number", visible: false, alignment: "left" },
+            { dataField: "SalePrice", caption: "SalePrice", dataType: "number", visible: false, alignment: "left" },
             {
                 dataField: "Price",
                 caption: window.RazorVars.DXPrice,
