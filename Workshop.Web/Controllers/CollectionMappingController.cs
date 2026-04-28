@@ -49,7 +49,7 @@ namespace Workshop.Web.Controllers
                 MExcelMappingDTO filter = new MExcelMappingDTO();
 
                 var externalWorkshops = await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId);
-                ViewBag.WorkshopList = externalWorkshops?.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.SecondaryName, r.PrimaryName)*/ lang == "en" ? r.SecondaryName : r.PrimaryName, Value = r.Id.ToString() }).ToList();
+                ViewBag.WorkshopList = externalWorkshops?.Select(r => new SelectListItem { Text =  lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
                 return View(filter);
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ namespace Workshop.Web.Controllers
         }
 
         [CustomAuthorize(Permissions.CollectionMapping.Create)]
-        public async Task<IActionResult> CollectionMapping(int? Id)
+        public async Task<IActionResult> CollectionMapping(int? Id)ollect
         {
             MExcelMappingDTO mExcelMapping = new MExcelMappingDTO();
 
@@ -95,13 +95,13 @@ namespace Workshop.Web.Controllers
                 mExcelMapping.ExcelMappingColumnsList = (await _workshopApiClient.GetExcelMappingColumnsAsync())?.ToList();
                 mExcelMapping.DExcelMappingList = (await _workshopApiClient.GetExcelMappingDetailsByIdAsync(Id, null))?.ToList();
                 var _External_Workshop = (await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId))?.Where(a => a.Id == mExcelMapping.WorkshopId).ToList();
-                ViewBag.WorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.SecondaryName, r.PrimaryName)*/ lang == "en" ? r.SecondaryName : r.PrimaryName, Value = r.Id.ToString() }).ToList();
+                ViewBag.WorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
             }
             else
             {
                 var WorkshopIds = (await _workshopApiClient.GetExcelMappingAsync(filter))?.Select(a => a.WorkshopId).ToList();
                 var _External_Workshop = (await _workshopApiClient.WorkshopGetAllAsync(CompanyId, BranchId))?.Where(a => a.Id > 0 && !WorkshopIds.Contains(a.Id)).ToList();
-                ViewBag.WorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = /*GetCurrentBilanguage(r.SecondaryName, r.PrimaryName)*/ lang == "en" ? r.SecondaryName : r.PrimaryName, Value = r.Id.ToString() }).ToList();
+                ViewBag.WorkshopList = _External_Workshop.Select(r => new SelectListItem { Text = lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
             }
 
             mExcelMapping.ExcelMappingColumnsList = (await _workshopApiClient.GetExcelMappingColumnsAsync())?.ToList();
