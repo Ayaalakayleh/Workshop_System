@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
@@ -28,7 +29,8 @@ namespace Workshop.Web.Controllers
         private readonly WorkshopApiClient _workshopApiClient;
         private readonly AccountingApiClient _accountingApiClient;
         private readonly IFileService _fileService;
-        private readonly IFileValidationService _fileValidationService;
+        private readonly IFileValidationService _fileValidationService; 
+        private readonly ILogger<CollectionController> _logger;
         private readonly string lang;
 
         public CollectionController(
@@ -37,6 +39,7 @@ namespace Workshop.Web.Controllers
             AccountingApiClient accountingApiClient,
             IFileService fileService,
             IFileValidationService fileValidationService,
+            ILogger<CollectionController> logger,
             IConfiguration configuration, IWebHostEnvironment env, IMemoryCache cache) : base(cache, configuration, env)
         {
             _vehicleApiClient = vehicleApiClient;
@@ -44,6 +47,7 @@ namespace Workshop.Web.Controllers
             _accountingApiClient = accountingApiClient;
             _fileService = fileService;
             _fileValidationService = fileValidationService;
+            _logger = logger;
             this.lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
         }
 
@@ -972,6 +976,8 @@ namespace Workshop.Web.Controllers
                 var cleanFilePath = workShop.FilePath.Replace("/", Path.DirectorySeparatorChar.ToString()).Trim();
                 var insidePath = _configuration["FileUpload:DirectoryInsidePath"] ?? "Uploads";
                 var fullPath = Path.Combine(_env.WebRootPath, insidePath, cleanFilePath, workShop.FileName);
+                
+                _logger.LogWarning($"fullPath {fullPath}");
 
                 if (!System.IO.File.Exists(fullPath))
                 {
