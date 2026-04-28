@@ -241,7 +241,8 @@ $(function () {
             },
             { dataField: "IsExternal", caption: "IsExternal", dataType: "boolean", allowEditing: false, visible: false },
             { dataField: "ExternalWorkshopId", caption: "ExternalWorkshopId", dataType: "number", allowEditing: false, visible: false },
-            { dataField: "TimeTaken", caption: window.RazorVars.DXTimeTaken, dataType: "number", allowEditing: false, alignment: "left" },
+            { dataField: "TimeTaken", caption: window.RazorVars.DXTimeTaken, dataType: "number", allowEditing: false, visible: false, alignment: "left" },
+            { dataField: "TimeTakenAsTime", caption: window.RazorVars.DXTimeTaken, allowEditing: false, alignment: "left" },
             { dataField: "Status", caption: "Status", dataType: "number", visible: false, alignment: "left" },
             {
                 dataField: "StatusText", caption: window.RazorVars.DXStatus, allowEditing: false, alignment: "left",
