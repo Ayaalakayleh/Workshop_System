@@ -803,10 +803,17 @@ namespace Workshop.Web.Controllers
                                 // Date ========================
                                 if (Col_Invoice_Date_Index == 0)
                                 {
-                                    throw new Exception("Invoice Date mapping is missing.");
+                                    throw new Exception("DATE_ERROR");
                                 }
 
-                                dataRow.Invoice_Date = ParseExcelDate(row.Cell(Col_Invoice_Date_Index));
+                                try
+                                {
+                                    dataRow.Invoice_Date = ParseExcelDate(row.Cell(Col_Invoice_Date_Index));
+                                }
+                                catch
+                                {
+                                    throw new Exception("DATE_ERROR");
+                                }
 
                                 jsonData.Add(dataRow);
                             }
@@ -876,8 +883,13 @@ namespace Workshop.Web.Controllers
 
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    if (ex.Message.Contains("DATE_ERROR"))
+                    {
+                        return Json(new { success = false, Message = "There is an issue with Invoice Date." });
+                    }
+
                     return Json(new { success = false, Message = "There Is An Issue With Uploaded File." });
                 }
             }
