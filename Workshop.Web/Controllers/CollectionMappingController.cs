@@ -80,7 +80,7 @@ namespace Workshop.Web.Controllers
         }
 
         [CustomAuthorize(Permissions.CollectionMapping.Create)]
-        public async Task<IActionResult> CollectionMapping(int? Id)ollect
+        public async Task<IActionResult> CollectionMapping(int? Id)
         {
             MExcelMappingDTO mExcelMapping = new MExcelMappingDTO();
 
