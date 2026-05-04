@@ -29,7 +29,7 @@ namespace Workshop.Web.Models
 
             if (string.IsNullOrEmpty(token) || !VeirifyJWTToken(token, config, logger))
             {
-                RedirectToLogout(context, config);
+                RedirectToLogout(context, config, IsEmbedRequest(httpContext));
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace Workshop.Web.Models
             bool authorized = _allowedRoles.Any(role => listPermissions.Contains(role));
 
             if (!authorized)
-                RedirectToLogout(context, config);
+                RedirectToLogout(context, config, IsEmbedRequest(httpContext));
         }
 
         public bool VeirifyJWTToken(string token, IConfiguration config, ILogger logger)
@@ -73,10 +73,32 @@ namespace Workshop.Web.Models
             }
         }
 
-        private void RedirectToLogout(AuthorizationFilterContext context, IConfiguration config)
+        private void RedirectToLogout(AuthorizationFilterContext context, IConfiguration config, bool isEmbed = false)
         {
+            if (isEmbed)
+            {
+                context.Result = new ContentResult
+                {
+                    ContentType = "text/html",
+                    Content = @"
+                    <script>
+                        window.parent.postMessage({
+                            type: 'WORKSHOP_PERMISSION_DENIED'
+                        }, '*');
+                    </script>"
+                    };
+
+                return;
+            }
+
             var logoutUrl = config["ApiSettings:SystemLogOut"] ?? "/Authentication/Logout";
             context.Result = new RedirectResult(logoutUrl);
+        }
+
+        private bool IsEmbedRequest(HttpContext httpContext)
+        {
+            return httpContext.Request.Query["isEmbed"].ToString()
+                .Equals("true", StringComparison.OrdinalIgnoreCase);
         }
     }
 
