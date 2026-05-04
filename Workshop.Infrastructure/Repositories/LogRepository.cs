@@ -32,14 +32,29 @@ namespace Workshop.Infrastructure.Repositories
         public async Task InsertBatchAsync(IEnumerable<LogEntryDto> entries, CancellationToken ct = default)
         {
             using var connection = _db.CreateConnection();
+            connection.Open();
 
-            var tasks = entries.Select(entry => connection.ExecuteAsync(
-                "dbo.InsertLog",
-                MapToParameters(entry),
-                commandType: CommandType.StoredProcedure,
-                commandTimeout: CommandTimeoutSeconds));
+            using var transaction = connection.BeginTransaction();
 
-            await Task.WhenAll(tasks);
+            try
+            {
+                foreach (var entry in entries)
+                {
+                    await connection.ExecuteAsync(
+                        "dbo.InsertLog",
+                        MapToParameters(entry),
+                        transaction: transaction,
+                        commandType: CommandType.StoredProcedure,
+                        commandTimeout: CommandTimeoutSeconds);
+                }
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         private static object MapToParameters(LogEntryDto e) => new
