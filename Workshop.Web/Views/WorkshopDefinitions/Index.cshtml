@@ -9,6 +9,7 @@
 @{
 	ViewBag.Title = Common["WorkshopList"];
 	Layout = "~/Views/Shared/_Layout.cshtml";
+	var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 
 }
 
@@ -61,7 +62,7 @@
 							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
 								<div class="form-group">
 									<label>@Common["Label_City"]</label>
-									@Html.DropDownList("CityId", new SelectList(ViewBag.ColCity, "Id", "Name"), Common["Select"], htmlAttributes: new { @class = "form-control select2", id = "CityId" })
+									@Html.DropDownList("CityId", (IEnumerable<SelectListItem>)ViewBag.ColCity, Common["Select"], htmlAttributes: new { @class = "form-control select2", id = "CityId" })
 								</div>
 							</div>
 							<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">

@@ -6,7 +6,7 @@
 @inject IStringLocalizer<Messages> Message
 
 @{
-    var lang = "en";
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 <style>
     .vehicle-card {

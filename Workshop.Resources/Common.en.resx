@@ -2960,4 +2960,16 @@
   <data name="SelectModule" xml:space="preserve">
     <value>Select Module</value>
   </data>
+  <data name="Accident" xml:space="preserve">
+    <value>حوادث</value>
+  </data>
+  <data name="Maintenance" xml:space="preserve">
+    <value>صيانة</value>
+  </data>
+  <data name="HasNoInvoice" xml:space="preserve">
+    <value>غير مفوتر</value>
+  </data>
+  <data name="HasInvoice" xml:space="preserve">
+    <value>مفوتر</value>
+  </data>
 </root>

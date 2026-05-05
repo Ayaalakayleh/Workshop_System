@@ -40,8 +40,8 @@
 							<div class="col-md-3 col-sm-12">
 								<div class="form-group">
 									<label>@Common["WorkOrderType"]</label>
-									@Html.DropDownListFor(model => model.WorkOrderFilter.WorkOrderTypeId, new List<SelectListItem>(){ new SelectListItem( @Common["Accident"] , "1"),
-									new SelectListItem(@Common["Maintenance"], "2")}
+									@Html.DropDownListFor(model => model.WorkOrderFilter.WorkOrderTypeId, new List<SelectListItem>(){ new SelectListItem( Common["Accident"] , "1"),
+									new SelectListItem(Common["Maintenance"], "2")}
 																, Common["Select"].Value, new { @class = "form-control" })
 
 							</div>
@@ -84,8 +84,8 @@
 							<div class="form-group">
 								<label>@Common["Label_InvoiceType"]</label>
 
-								@Html.DropDownListFor(model => model.WorkOrderFilter.InvoicingStatus, new List<SelectListItem>(){ new SelectListItem( @Common["HasNoInvoice"] , "0"),
-																new SelectListItem(@Common["HasInvoice"], "2"),
+								@Html.DropDownListFor(model => model.WorkOrderFilter.InvoicingStatus, new List<SelectListItem>(){ new SelectListItem( Common["HasNoInvoice"] , "0"),
+																new SelectListItem(Common["HasInvoice"], "2"),
 																}
 																, Common["Select"].Value, new { @class = "form-control" })
 

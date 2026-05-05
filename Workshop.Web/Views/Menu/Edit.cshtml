@@ -10,7 +10,7 @@
 @{
     ViewBag.Title = "Menu";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var Lang = "en";
+    var Lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 
 <div class="row">
@@ -72,7 +72,7 @@
                             <div class="col-lg-3 col-md-6 col-sm-12 my-1">
                                 <div class="form-group">
                                     <label>@Common["Label_PricingMethod"]</label>
-                                    @Html.DropDownListFor(m => m.PricingMethod, new SelectList(new[] { "Sum", "Fixed" }), Common["Select"], new { @class = "form-control", id = "PricingMethod" })
+                                    @Html.DropDownListFor(m => m.PricingMethod, new SelectList(new[] { Lang=="en"?"Sum":"مجموع", Lang=="en"?"Fixed":"ثابت" }), Common["Select"], new { @class = "form-control", id = "PricingMethod" })
                                     @Html.ValidationMessageFor(m => m.PricingMethod, "", new { @class = "text-danger" })
 
                                 </div>

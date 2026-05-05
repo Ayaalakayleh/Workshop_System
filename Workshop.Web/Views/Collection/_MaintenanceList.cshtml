@@ -36,7 +36,7 @@
                                         @* @if (BaseHttpContext.UserHasPermission(Permissions.CollectionEdit)) *@
                                         @if(true)
                                         {
-                                            <button class="btn btn-info btn-w-m my-1" onclick="location.href = '@Url.Action("Edit","Collection")/@item.ID'"><i class="fa fa-pencil"></i>&nbsp;@Common["View"]</button>
+                                            <button class="btn btn-info btn-w-m my-1" onclick="location.href = '@Url.Action("Edit", "Collection")/@item.ID'"><i class="fa fa-pencil"></i>&nbsp;@Common["Button_View"]</button>
                                         }
 
                                     </td>

@@ -39,7 +39,8 @@ namespace Workshop.Controllers
             //Fill dropdowns
             var Parents = await _workshopApiClient.GetAllSimpleParentsWorkshop(CompanyId);
             //Parents.Insert(0, new ParentWorkshopSimpleDTO() { ParentId = 0, PrimaryName = "Main Workshops", SecondaryName = "الورشات الرئيسية" });
-            ViewBag.ColCity = await _erpApiClient.GetCities(null, lang); // cities
+            var ColCity = await _erpApiClient.GetCities(null, lang); // cities
+            ViewBag.ColCity = ColCity?.Select(r => new SelectListItem { Text = lang == "en" ? r.PrimaryName : r.SeconderyName, Value = r.Id.ToString() }).ToList();
             ViewBag.ParentWorkshops = Parents?.Select(r => new SelectListItem { Text = lang == "en" ? r.PrimaryName : r.SecondaryName, Value = r.Id.ToString() }).ToList();
 
 

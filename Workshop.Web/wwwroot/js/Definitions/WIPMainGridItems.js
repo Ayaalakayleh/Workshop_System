@@ -855,7 +855,7 @@ $(function () {
                 alignment: "left",
                 buttons: [
                     {
-                        hint: "Approve",
+                        hint: theMainLang == "en" ? "Approve" : "الموافقة",
                         icon: "check",
                         type: "success",
                         stylingMode: "contained",
@@ -872,7 +872,7 @@ $(function () {
                         }
                     },
                     {
-                        hint: "Reject",
+                        hint: theMainLang == "en" ? "Reject" : "الرفض",
                         icon: "close",
                         type: "danger",
                         stylingMode: "contained",
@@ -888,7 +888,7 @@ $(function () {
                         }
                     },
                     {
-                        hint: "issue",
+                        hint: theMainLang == "en" ? "issue": "صرف",
                         icon: "box",
                         type: "success",
                         stylingMode: "contained",
@@ -920,7 +920,7 @@ $(function () {
                         }
                     },
                     {
-                        hint: "Undo",
+                        hint: theMainLang == "en" ? "Undo" : "تراجع عن الصرف",
                         icon: "undo",
                         type: "success",
                         stylingMode: "contained",
@@ -941,7 +941,7 @@ $(function () {
                         }
                     },
                     {
-                        hint: "Transfer",
+                        hint: theMainLang == "en" ? "Transfer": "طلب نقل",
                         icon: "repeat",
                         type: "default",
                         visible: function (e) {
@@ -1058,7 +1058,7 @@ $(function () {
                         }
                     },
                     {
-                        hint: "Delete",
+                        hint: theMainLang == "en" ? "Delete" : "حذف",
                         icon: "fad fa-trash",
                         visible: function (e) {
                             return Permission_AddParts && (

@@ -68,13 +68,19 @@ namespace Workshop.Web.Controllers
             ViewBag.Vehicles = vehicleList;
             VehicleTypeId vehicleTypeId;
             ViewBag.VehicleType = Enum.GetValues(typeof(VehicleTypeId))
-             .Cast<VehicleTypeId>()
-             .Select(v => new SelectListItem
-             {
-                 Text = v.ToString(),        // "Internal", "External", etc.
-                 Value = ((int)v).ToString() // "1", "2", "3"
-             })
-             .ToList();
+                 .Cast<VehicleTypeId>()
+                 .Select(v => new SelectListItem
+                 {
+                     Text = lang=="en"? v.ToString() : v switch
+                     {
+                         VehicleTypeId.Internal => "داخلي",
+                         VehicleTypeId.External => "خارجي",
+                         _ => v.ToString()
+                     },
+
+                     Value = ((int)v).ToString()
+                 })
+                 .ToList();
 
             ViewBag.FK_AgreementId = new List<SelectListItem>();
             ViewBag.FkVehicleMovementId = new List<SelectListItem>();
@@ -93,7 +99,7 @@ namespace Workshop.Web.Controllers
             workOrderModel.WorkOrderForm = new MWorkOrderDTO();
 
             List<SelectListItem> WorkOrderTypes = new List<SelectListItem>();
-            WorkOrderTypes.Add(new SelectListItem { Text = lang == "en" ? "Maintenance" : "Maintenance", Value = 2.ToString() });
+            WorkOrderTypes.Add(new SelectListItem { Text = lang == "en" ? "Maintenance" : "صيانة", Value = 2.ToString() });
             ViewBag.WorkOrderType = WorkOrderTypes;
 
             var vehicles =  (await _vehicleApiClient.GetVehiclesDDL(lang, CompanyId));

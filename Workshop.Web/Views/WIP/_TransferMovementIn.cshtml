@@ -7,7 +7,7 @@
 
 @model Workshop.Core.DTOs.Vehicle.VehicleMovement;
 @{
-    var lang = "en";
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 <div class="row mb-3">
     <div class="col-12">

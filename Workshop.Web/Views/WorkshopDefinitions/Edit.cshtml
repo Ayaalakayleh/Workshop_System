@@ -10,8 +10,7 @@
 @{
 	ViewBag.Title = Common["EditWorkshop"];
 	Layout = "~/Views/Shared/_Layout.cshtml";
-	var lang = "en";
-
+	var lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
 }
 
 <ol class="breadcrumb bg-transparent mb-3">
