@@ -42,7 +42,7 @@ namespace Workshop.Web.Controllers
             HttpContext.Session.SetInt32("CompanyId", company.Id);
             HttpContext.Session.SetString("CompanyInfo", System.Text.Json.JsonSerializer.Serialize(company));
             HttpContext.Session.SetString("Role", _oUser.Role_Id.ToString());
-            HttpContext.Session.SetString("UserGroupId", _oUser.UserGroupId.ToString());
+            //HttpContext.Session.SetString("UserGroupId", _oUser.UserGroupId.ToString());
             HttpContext.Session.SetInt32("UserId", _oUser.UserID);
 
             HttpContext.Session.SetString("UserInfo", System.Text.Json.JsonSerializer.Serialize(_oUser));
@@ -282,7 +282,7 @@ namespace Workshop.Web.Controllers
             HttpContext.Session.SetInt32("UserId", user.UserID);
             HttpContext.Session.SetString("UserInfo", JsonSerializer.Serialize(user));
             HttpContext.Session.SetString("Role", user.Role_Id.ToString());
-            HttpContext.Session.SetInt32("UserGroupId", user.UserGroupId);
+            HttpContext.Session.SetString("UserGroupId", user.UserGroupId.ToString());
 
             // 1. Get a company for this user (choose default/first)
             var companies = await _erpapicient.GetUserCompanies(user.UserID);
