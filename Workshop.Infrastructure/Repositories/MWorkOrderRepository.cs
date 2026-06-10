@@ -329,6 +329,7 @@ namespace Workshop.Infrastructure.Repositories
 				EstimationFees = insuranceClaimHistory.EstimationFees,
 				EstimateAmount = insuranceClaimHistory.EstimateAmount,
 				TowingFees = insuranceClaimHistory.TowingFees,
+				AdditionalFees = insuranceClaimHistory.AdditionalFees,
 				IsClientResponsible = insuranceClaimHistory.IsClientReponsible,
 				SecondPartyFaultFilePath = insuranceClaimHistory.SecondPartyFaultFilePath,
 				CollectionProofFilePath = insuranceClaimHistory.CollectionProofFilePath,

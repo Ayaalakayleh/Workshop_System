@@ -59,7 +59,7 @@ namespace Workshop.Core.DTOs.Insurance
 		public decimal EstimationFees { get; set; }  // رسوم التقدير
 		public decimal EstimateAmount { get; set; }  // قيمة التقدير
 		public decimal TowingFees { get; set; }      // رسوم السطحة
-
+		public decimal AdditionalFees { get; set; }     
 		public bool IsClientReponsible { get; set; }
 		public bool IfCancelled { get; set; }
 
